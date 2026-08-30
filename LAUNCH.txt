@@ -1,0 +1,15 @@
+ROZBAZAAR ADMIN — FINAL (v3, adds Messages)
+================================================
+Delete everything in your GitHub repo and upload this fresh.
+
+NEW: a Messages tab. Anything a customer submits from the
+Contact screen (index.html) shows up here, with an unread-count
+badge on login, mark read/unread, and a tap-to-call link when a
+phone number was given.
+
+Backend: three new database functions, already applied to your
+live Supabase project — nothing to migrate on your end.
+
+Tested end-to-end: real message submitted as a customer, appeared
+correctly in admin, marked read, badge updated — all confirmed
+in an actual browser before packaging.

@@ -1,0 +1,25 @@
+{
+  "name": "rozbazaar-admin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RozBazaar admin console — Node/Express. Runs on mock data until USE_SUPABASE=true.",
+  "type": "commonjs",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "deploy:netlify": "npx netlify-cli deploy --prod",
+    "make-password": "node scripts/hash-password.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "express": "^4.19.2",
+    "serverless-http": "^4.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
