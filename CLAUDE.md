@@ -136,8 +136,13 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   `customer_notifications()` (bilingual rows), `customer_mark_read()`; polled every 60 s while logged
   in. A bar above the bottom nav keeps asking (9 s after open, then 2 min after each close) until
   notifications AND location are allowed; if the browser blocked one it explains how to unblock.
-  `syncPush()` saves the push subscription after login. Address: GPS keeps sharpening up to 15 s
-  (stops at ±25 m); house no. / street / landmark are optional — village + (GPS pin or any text).
+  `syncPush()` saves the push subscription after login. Address: `getPreciseLocation()` (one shared
+  GPS session; keeps the most accurate fix for up to 20 s, stops at ±20 m) then a Leaflet map
+  (satellite = Esri World Imagery, map = OSM, loaded lazily from jsdelivr) with a draggable 📍 pin —
+  tap/drag sets `addrCoords.pinned`; fixes worse than ±60 m show a red "location is rough" hint. Home
+  "use my location" uses the same helper and never switches village on a fix worse than ±3 km.
+  (A real address was once saved 57 km away from a coarse first fix.) House no. / street / landmark
+  are optional — village + (GPS pin or any text).
 - Home ends with small social chips + a navy mini-footer ("Become a vendor" → `VENDOR_SITE`
   = https://vendor.rozbazaar.shop/). `#s-home` has bottom padding so nothing hides under the
   bottom nav / cart bar.

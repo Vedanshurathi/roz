@@ -254,6 +254,16 @@ a{color:inherit;text-decoration:none}
 .locate .lc-top span{font-size:13px;font-weight:600;color:var(--tx2);line-height:1.5}
 .linkbtn{width:100%;padding:12px;font-size:13.5px;font-weight:800;color:var(--tx2);margin-top:4px}
 .linkbtn:active{opacity:.6}
+.pinmap{position:relative;margin-top:12px;border-radius:18px;overflow:hidden;border:1.7px solid var(--line);background:#e8efe6}
+#pinMap{height:300px;width:100%}
+.pinmap .leaflet-top.leaflet-right{top:52px}
+.rbpin{font-size:38px;line-height:1;filter:drop-shadow(0 3px 4px rgba(0,0,0,.45));transform:translate(-4px,-6px)}
+.pm-seg{position:absolute;top:10px;left:10px;z-index:500;display:flex;background:#fff;border-radius:22px;box-shadow:0 4px 14px rgba(0,0,0,.18);overflow:hidden}
+.pm-seg button{padding:8px 13px;font-size:12.5px;font-weight:800;color:var(--tx2)}
+.pm-seg button.on{background:var(--g);color:#fff}
+.pm-me{position:absolute;top:10px;right:10px;z-index:500;width:40px;height:40px;border-radius:50%;background:#fff;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.pm-hint{position:absolute;left:10px;right:10px;bottom:10px;z-index:500;background:rgba(16,27,48,.88);color:#fff;border-radius:12px;padding:9px 12px;font-size:12.5px;font-weight:700;line-height:1.4}
+.pm-hint.warn{background:#B3261E}
 .located{display:flex;align-items:center;gap:12px;background:var(--lime-s);border-radius:15px;padding:15px}
 .located[hidden]{display:none}
 .lc-tick{width:30px;height:30px;border-radius:50%;background:var(--g);color:#fff;flex-shrink:0;
@@ -1225,10 +1235,16 @@ details summary::-webkit-details-marker{display:none}
     <div class="located" id="locatedCard" hidden>
       <span class="lc-tick">✓</span>
       <div style="min-width:0">
-        <b data-en="Exact location captured" data-hi="सही लोकेशन मिल गई">Exact location captured</b>
+        <b id="locTitle">Exact location captured</b>
         <span id="coordLine"></span>
       </div>
       <button class="mini" onclick="useGps()" data-en="↻ Redo" data-hi="↻ फिर से">↻ Redo</button>
+    </div>
+    <div class="pinmap" id="pinWrap" hidden>
+      <div id="pinMap"></div>
+      <div class="pm-seg"><button id="pmSat" class="on" onclick="setMapLayer('sat')" data-en="Satellite" data-hi="सैटेलाइट">Satellite</button><button id="pmStreet" onclick="setMapLayer('street')" data-en="Map" data-hi="नक्शा">Map</button></div>
+      <button class="pm-me" onclick="useGps()" aria-label="My location">◎</button>
+      <div class="pm-hint" id="pmHint"></div>
     </div>
 
     <div class="lbl-row" style="margin-top:22px">
@@ -3049,7 +3065,9 @@ async function detectArea(){
     }catch(e){}
   }
   toast(T('Finding your area…','आपका इलाका ढूँढ रहे हैं…'));
-  navigator.geolocation.getCurrentPosition(async pos=>{
+  getPreciseLocation(null, 12000, 50).then(async pos=>{
+    if(pos.coords.accuracy>3000){ openAreaPicker();
+      return toast(T('Your location is too rough to tell the village — please pick it','लोकेशन से गाँव पक्का नहीं हुआ — कृपया चुनें')); }
     const areaCoords={lat:pos.coords.latitude, lng:pos.coords.longitude, acc:pos.coords.accuracy};
     if(DEMO){ closeAreaPicker(); return toast(T('Demo mode — pick an area','डेमो मोड — इलाका चुनें')); }
     const r=await rpc('area_from_point',{p_lat:areaCoords.lat, p_lng:areaCoords.lng});
@@ -3075,11 +3093,11 @@ async function detectArea(){
     openAreaPicker();
     toast(T('Looks like '+d.area+' — please confirm',
             'शायद '+d.area+' है — पक्का कर दें'));
-  }, err=>{
-    toast(err.code===1
+  }).catch(err=>{
+    toast(err && err.code===1
       ? T('Permission denied — pick your area from the list','अनुमति नहीं मिली — सूची में से इलाका चुनें')
       : T('Could not find you — pick your area from the list','लोकेशन नहीं मिली — सूची में से इलाका चुनें'));
-  }, {enableHighAccuracy:true, timeout:10000, maximumAge:0});
+  });
 }
 
 function openAreaPicker(){
@@ -3877,8 +3895,97 @@ function skipGps(){
   document.getElementById('aFull').focus();
   toast(T('No problem — just fill the address below','कोई बात नहीं — नीचे पता भर दें'));
 }
+/* Precise location. A phone's first answer is often a rough cell-tower / Wi-Fi guess
+   (hundreds of metres, sometimes tens of km — one real address was saved 57 km away).
+   So: keep listening, keep the most accurate fix, stop at ±20 m or after maxMs. */
+let GEO_RUN=null;   /* one GPS session at a time — a second caller joins the running one */
+function getPreciseLocation(onUpdate, maxMs, goodAcc){
+  if(GEO_RUN){ if(onUpdate) GEO_RUN.subs.push(onUpdate); return GEO_RUN.p; }
+  maxMs=maxMs||20000; goodAcc=goodAcc||20;
+  const run={subs: onUpdate?[onUpdate]:[]};
+  run.p=new Promise((resolve,reject)=>{
+    if(!navigator.geolocation) return reject({code:0});
+    let best=null, done=false, wid=null;
+    const stop=()=>{ done=true; GEO_RUN=null; if(wid!==null) navigator.geolocation.clearWatch(wid); };
+    const end=()=>{ if(done) return; stop(); best ? resolve(best) : reject({code:3}); };
+    wid=navigator.geolocation.watchPosition(p=>{
+      if(!best || p.coords.accuracy < best.coords.accuracy){ best=p; run.subs.forEach(f=>{ try{ f(p); }catch(e){} }); }
+      if(best.coords.accuracy<=goodAcc) end();
+    }, err=>{ if(best) return end(); if(done) return; stop(); reject(err); },
+    {enableHighAccuracy:true, timeout:maxMs, maximumAge:0});
+    setTimeout(end, maxMs);
+  });
+  GEO_RUN=run;
+  return run.p;
+}
+/* ---------- map with a draggable pin (Leaflet + OpenStreetMap / Esri satellite) ---------- */
+let LMAP=null, LPIN=null, LCIRC=null, LLAYERS=null, leafletP=null;
+function loadLeaflet(){
+  if(window.L) return Promise.resolve();
+  if(leafletP) return leafletP;
+  leafletP=new Promise((res,rej)=>{
+    const c=document.createElement('link'); c.rel='stylesheet'; c.href='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(c);
+    const j=document.createElement('script'); j.src='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';
+    j.onload=()=>res(); j.onerror=()=>{ leafletP=null; rej(); }; document.head.appendChild(j);
+  });
+  return leafletP;
+}
+function setMapLayer(k){
+  if(!LMAP||!LLAYERS) return;
+  Object.values(LLAYERS).forEach(l=>LMAP.removeLayer(l)); LLAYERS[k].addTo(LMAP);
+  document.getElementById('pmSat').classList.toggle('on',k==='sat');
+  document.getElementById('pmStreet').classList.toggle('on',k==='street');
+}
+function pinHint(acc, moved){
+  const h=document.getElementById('pmHint'); if(!h) return;
+  const rough = !moved && acc>60;
+  h.classList.toggle('warn', rough);
+  h.textContent = moved
+    ? T('📌 Pin set by you — the vendor will come exactly here','📌 पिन आपने लगाया — वेंडर ठीक यहीं आएगा')
+    : rough
+      ? T('⚠️ Location is rough (±'+Math.round(acc)+' m). Drag the pin onto your house, or go outside and tap ◎',
+          '⚠️ लोकेशन सही नहीं है (±'+Math.round(acc)+' मी)। पिन को खींचकर अपने घर पर रखें, या बाहर जाकर ◎ दबाएँ')
+      : T('✓ Is the pin on your house? If not, drag it to your door','✓ क्या पिन आपके घर पर है? नहीं तो खींचकर अपने दरवाज़े पर रखें');
+}
+function setPin(lat,lng,byUser){
+  addrCoords={lat,lng,acc:byUser?5:(addrCoords&&addrCoords.acc)||null, pinned:!!byUser};
+  document.getElementById('coordLine').textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}` +
+    (byUser ? ' · '+T('pin set by you','पिन आपने लगाया') : (addrCoords.acc?` · ±${Math.round(addrCoords.acc)}m`:''));
+  if(byUser){ pinHint(0,true); if(LCIRC){ LMAP.removeLayer(LCIRC); LCIRC=null; }
+    const t=document.getElementById('locTitle'); if(t) t.textContent=T('Exact location set by you','सही लोकेशन आपने लगाई');
+    const box=document.getElementById('aFull'); if(box) box.dataset.touched='';
+    fillFromCoords(lat,lng); matchAreaFromCoords(lat,lng); }
+}
+async function openPinMap(lat,lng,acc){
+  const wrap=document.getElementById('pinWrap'); wrap.hidden=false;
+  try{ await loadLeaflet(); }catch(e){ wrap.hidden=true; return; }
+  const z = acc>2000 ? 14 : acc>300 ? 16 : 18;
+  if(!LMAP){
+    LMAP=L.map('pinMap',{zoomControl:false, attributionControl:true}).setView([lat,lng], z);
+    L.control.zoom({position:'topright'}).addTo(LMAP);
+    LLAYERS={
+      sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        {maxZoom:19, attribution:'Imagery © Esri'}),
+      street: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'© OpenStreetMap'})
+    };
+    LLAYERS.sat.addTo(LMAP);
+    const icon=L.divIcon({className:'', html:'<div class="rbpin">📍</div>', iconSize:[38,38], iconAnchor:[19,36]});
+    LPIN=L.marker([lat,lng],{draggable:true, autoPan:true, icon}).addTo(LMAP);
+    LPIN.on('dragend',()=>{ const p=LPIN.getLatLng(); setPin(p.lat,p.lng,true); });
+    LMAP.on('click',e=>{ LPIN.setLatLng(e.latlng); setPin(e.latlng.lat,e.latlng.lng,true); });
+  }else{
+    LMAP.setView([lat,lng], z); LPIN.setLatLng([lat,lng]);
+  }
+  if(LCIRC){ LMAP.removeLayer(LCIRC); LCIRC=null; }
+  if(acc && acc>15) LCIRC=L.circle([lat,lng],{radius:acc, color:'#1E8E3E', weight:1, fillOpacity:.08}).addTo(LMAP);
+  setTimeout(()=>LMAP.invalidateSize(), 200);
+  pinHint(acc||0,false);
+}
 function showLocated(lat,lng,acc){
   addrCoords={lat,lng,acc}; try{ localStorage.setItem('rb_geo_ok','1'); }catch(e){}
+  const t=document.getElementById('locTitle');
+  if(t) t.textContent = acc>60 ? T('Approximate location — set the pin below','लगभग लोकेशन — नीचे पिन सही करें')
+                               : T('Exact location captured','सही लोकेशन मिल गई');
   document.getElementById('locateCard').hidden=true;
   const c=document.getElementById('locatedCard');
   c.hidden=false;
@@ -3898,43 +4005,29 @@ async function useGps(){
     }catch(e){}
   }
   gpsBusy=true;
+  const reset=()=>{ gpsBusy=false; if(btn){btn.disabled=false; lbl.textContent=T('Allow location access','लोकेशन की अनुमति दें');} };
   if(btn){btn.disabled=true; lbl.textContent=T('Finding you…','आपको ढूँढ रहे हैं…');}
-  /* Exact location: keep listening for up to 15 s and keep the most accurate fix
-     (phones start with a rough network fix and sharpen to GPS within seconds).
-     Stops early once we are within 25 m. */
-  let best=null, done=false, wid=null;
-  const finish=()=>{
-    if(done) return; done=true; gpsBusy=false;
-    if(wid!==null) navigator.geolocation.clearWatch(wid);
-    if(btn){btn.disabled=false; lbl.textContent=T('Allow location access','लोकेशन की अनुमति दें');}
-    if(!best) return;
+  toast(T('Getting your exact location — keep the phone still for a few seconds','आपकी सही लोकेशन ले रहे हैं — कुछ सेकंड फ़ोन स्थिर रखें'));
+  try{
+    const best=await getPreciseLocation(p=>{
+      if(btn) lbl.textContent=T('Sharpening… ±','और सही कर रहे हैं… ±')+Math.round(p.coords.accuracy)+T(' m',' मी');
+      showLocated(p.coords.latitude, p.coords.longitude, p.coords.accuracy);
+    }, 20000, 20);
+    reset();
     const c=best.coords;
     showLocated(c.latitude, c.longitude, c.accuracy);
-    toast(c.accuracy<=50 ? T('Exact location captured','सही लोकेशन मिल गई')
-                         : T('Location captured (±'+Math.round(c.accuracy)+' m) — you can tap ↻ again outside for a sharper fix',
-                             'लोकेशन मिल गई (±'+Math.round(c.accuracy)+' मी) — ज़्यादा सही के लिए बाहर जाकर ↻ दबाएँ'));
+    openPinMap(c.latitude, c.longitude, c.accuracy);
+    toast(c.accuracy<=60 ? T('Location found — check the pin is on your house','लोकेशन मिल गई — देख लें पिन आपके घर पर है')
+                         : T('Location is rough — drag the pin onto your house','लोकेशन सही नहीं है — पिन को अपने घर पर रखें'));
     fillFromCoords(c.latitude, c.longitude);
     matchAreaFromCoords(c.latitude, c.longitude);
-  };
-  wid=navigator.geolocation.watchPosition(pos=>{
-      if(!best || pos.coords.accuracy < best.coords.accuracy) best=pos;
-      if(btn) lbl.textContent=T('Sharpening… ±','और सही कर रहे हैं… ±')+Math.round(best.coords.accuracy)+T(' m',' मी');
-      showLocated(best.coords.latitude, best.coords.longitude, best.coords.accuracy);
-      if(best.coords.accuracy<=25) finish();
-    },
-    err=>{
-      if(best) return finish();
-      done=true; gpsBusy=false;
-      if(wid!==null) navigator.geolocation.clearWatch(wid);
-      if(btn){btn.disabled=false; lbl.textContent=T('Allow location access','लोकेशन की अनुमति दें');}
-      toast(err.code===1
-        ? T('Permission denied — please type the address below','अनुमति नहीं मिली — नीचे पता लिख दें')
-        : T('Could not find you — please type the address below','लोकेशन नहीं मिली — नीचे पता लिख दें'));
-      if(err.code===1) setTimeout(nag, 1500);
-    },
-    {enableHighAccuracy:true, timeout:20000, maximumAge:0}
-  );
-  setTimeout(finish, 15000);
+  }catch(err){
+    reset();
+    toast(err && err.code===1
+      ? T('Permission denied — please type the address below','अनुमति नहीं मिली — नीचे पता लिख दें')
+      : T('Could not find you — please type the address below','लोकेशन नहीं मिली — नीचे पता लिख दें'));
+    if(err && err.code===1) setTimeout(nag, 1500);
+  }
 }
 /* Optional nicety: turn coordinates into a written line. If it fails,
    the exact coordinates are still saved and the person just types. */
