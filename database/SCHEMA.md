@@ -332,6 +332,20 @@ staff_update_my_name(p_name) · staff_request_password(p_password) · staff_pass
 (staff_id, new_hash, status pending/approved/rejected/replaced) — RLS on, no client access;
 `staff_me()` returns `role`; `staff_snapshot()` bookings include `customer_id`.)
 
+### Commission, team tasks, targets, notifications (added 26 Sep 2026 — `20260926d_*.sql`)
+```
+tables: app_settings(key, value jsonb) · staff.kind ('sales'|'intern') · staff_tasks · sales_targets
+commission_rate() · admin_settings() · admin_set_commission(p_rate)            ← default 10 (%)
+is_sales() · my_staff_id() · team_notify(user, role, type, title, msg) · notify_ops(type, title, msg)
+admin_add_staff(p_name, p_phone, p_password, p_role=null, p_kind='sales') · admin_update_staff(p_staff, p_name, p_role, p_kind=null)
+admin_tasks() · admin_add_task(p_staff uuid[], p_title, p_details, p_priority, p_due) · admin_update_task · admin_reopen_task · admin_delete_task
+staff_my_tasks() · staff_set_task_status(p_task, p_status todo|done|not_done, p_note)
+target_achieved(p_type, p_from, p_to) · admin_targets() · staff_my_targets() · admin_add_target(p_staff|null, p_type|null, p_amount, p_start, p_end, p_title) · admin_delete_target
+team_notifications(p_limit) · team_mark_read(p_id|null) · team_save_push(p_app admin|staff, endpoint, p256dh, auth, agent)
+triggers: trg_ops_new_booking (bookings), trg_ops_new_customer (customers), trg_ops_new_vendor (vendors) — AFTER INSERT
+```
+`staff_snapshot()` now requires `is_sales()`; `admin_finance_dashboard()` returns platform_revenue(_all) + commission_rate.
+
 ### Triggers & jobs
 ```
 tg_booking_defaults() · tg_guard_delivered() · tg_slot_count() · tg_status_notify()

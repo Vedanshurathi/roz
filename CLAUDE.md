@@ -22,9 +22,11 @@ villages of the Pataudi / Haileymandi belt, Haryana, India.
   items, books. A real local vendor (thela-wala) comes in that window.
 - Vendor **weighs at the door**, finalises the bill in the vendor app, customer
   pays **directly** (cash or UPI). A 4-digit **delivery OTP** confirms handover.
-- **Zero commission.** There is no fee column anywhere in the schema — platform
-  revenue is genuinely ₹0 today. The admin dashboard reports **GMV**, not revenue.
-  Don't invent a revenue number.
+- **Commission: 10% (admin-editable).** Customers still pay vendors directly, so the app
+  never collects money; "commission" = GMV × `commission_rate()` (setting in
+  `app_settings`, changed from admin → Settings via `admin_set_commission`) — i.e. what
+  vendors owe RozBazaar. `admin_finance_dashboard` returns `platform_revenue` (30 days),
+  `platform_revenue_all` and `commission_rate`. Don't invent any other revenue number.
 - Three-sided: customer app, vendor app, admin console.
 
 **Founder / sole owner:** Vedanshu Rathi (vedanshurathi@gmail.com).
@@ -44,12 +46,14 @@ customer/          → deployed to Hostinger public_html (rozbazaar.shop)
 vendor/            → also deployed to the same public_html (rozbazaar.shop/vendor.html)
   vendor.html        single-file vendor app (~400 KB)
   og-vendor.jpg
-staff-site/        → its OWN Hostinger website for employees (same 3-file layout as admin-site)
-  index.html         single-file read-only staff app — login with phone + password
+staff-site/        → its OWN Hostinger website for employees (same layout as admin-site)
+  index.html         single-file staff app (sales + intern views) — login with phone + password
+  sw.js, manifest.webmanifest, icon-*.png, badge-96.png   web push + installable PWA
 admin-site/        → its OWN Hostinger website (separate from rozbazaar.shop)
   index.html         single-file admin console (Supabase login, admin_* RPCs directly)
   .htaccess          HTTPS redirect, noindex, CSP + security headers (Apache/LiteSpeed)
   robots.txt         Disallow all
+  sw.js, manifest.webmanifest, icon-*.png, badge-96.png   web push + installable PWA
 admin/             → Node/Express app on Render
   server.js          Express, CSP headers, session cookie, serves public/
   src/router.js      /api/* routes (all behind requireAuth)
@@ -137,6 +141,27 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
 - Slots screen: per-slot capacity + per-slot village restriction
   (`vendor_slot_areas`). Loads real saved values via `vendor_my_slots` /
   `vendor_get_slot_areas` on open.
+
+### Team: sales, interns, tasks, targets, notifications (both sites)
+- `staff.kind` = `sales` | `intern` (admin sets it; Team tab). **Sales** see orders, vendors,
+  sale, customers, targets and tasks. **Interns** see only Welcome, Mere kaam, Account —
+  `staff_snapshot()` and `staff_my_targets()` refuse them (`is_sales()`), not just the UI.
+- **Tasks** (`staff_tasks`): admin → Kaam tab / "Kaam do" on a Team row (`admin_add_task` takes
+  an array of staff ids, priority, due date). Staff mark ✓ Complete / ✕ Nahi ho paya (reason
+  required) / back to todo (`staff_set_task_status`); admins get notified on done/not done.
+- **Sales targets** (`sales_targets`): amount + type (or all) + period, for one sales person
+  or the whole team (`staff_id` null). Progress = `target_achieved()` = same "sale" rule as
+  dashboards. Shown on staff Today + Sale tabs and admin Targets tab (pace marker, days
+  left, needed per day, on-track/behind/done/missed).
+- **Notifications**: `team_notify()` → `notify_bi()` (in-app row + `send-push` edge function).
+  Push subscriptions from these sites are saved with role `staff` / `admin`
+  (`team_save_push`); `send-push` filters by role. Who gets what: new order / customer /
+  vendor (triggers `trg_ops_new_*`, recurring spawns skipped) → admins + active sales; new
+  task → assignee; new target → sales; task done/not done → admins. Interns never get ops
+  alerts. Bell = `team_notifications()` / `team_mark_read()`. Each site has its own `sw.js`
+  (CSP `worker-src 'self'`). iPhone push works only after "Add to Home Screen" (iOS 16.4+).
+- Migration `database/migrations/20260926d_commission_tasks_targets_notifications.sql`.
+- Known gap (pre-existing): `send-push` has `verify_jwt=false` and accepts any caller.
 
 ### Staff app (`staff-site/index.html`)
 - Its own Hostinger website (upload `index.html`, `.htaccess`, `robots.txt`). Read-only,
