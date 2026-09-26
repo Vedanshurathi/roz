@@ -44,6 +44,8 @@ customer/          → deployed to Hostinger public_html (rozbazaar.shop)
 vendor/            → also deployed to the same public_html (rozbazaar.shop/vendor.html)
   vendor.html        single-file vendor app (~400 KB)
   og-vendor.jpg
+staff/             → also deployed to the same public_html (rozbazaar.shop/staff.html)
+  staff.html         single-file read-only staff app for employees (logo inlined)
 admin/             → Node/Express app on Render
   server.js          Express, CSP headers, session cookie, serves public/
   src/router.js      /api/* routes (all behind requireAuth)
@@ -69,6 +71,7 @@ here only for clarity.
 | Domain | rozbazaar.shop (hosted on Hostinger) | |
 | Customer app | https://rozbazaar.shop → Hostinger `public_html/index.html` | static upload, no build step |
 | Vendor app | https://rozbazaar.shop/vendor.html → same `public_html` | static upload, no build step |
+| Staff app | https://rozbazaar.shop/staff.html → same `public_html` | static upload, no build step |
 | Admin | Render web service `srv-d9vkutn40ujc738b0dp0` → https://rozbazaar-admin.onrender.com | auto-deploys from GitHub |
 | Admin repo | https://github.com/Vedanshurathi/roz | contents of `admin/` at repo root |
 | Database | Supabase `srvpfyjmwaruebbkqkdj` (Mumbai, Postgres 17) | |
@@ -129,6 +132,25 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
 - Slots screen: per-slot capacity + per-slot village restriction
   (`vendor_slot_areas`). Loads real saved values via `vendor_my_slots` /
   `vendor_get_slot_areas` on open.
+
+### Staff app (`staff/staff.html`)
+- Read-only, phone-first page for employees. Same single-file pattern; talks to
+  Supabase directly with the public key.
+- Login: Supabase **email + password**. Access = active row in `public.staff`
+  (or `is_admin()`), checked by `is_staff()`. Session stored under its own
+  `storageKey: 'rb-staff-auth'` so it never mixes with a customer login.
+- Data: `staff_me()` and `staff_snapshot()` only (migration
+  `database/migrations/20260926_staff_app.sql`). Snapshot = bookings from the last
+  90 days + upcoming, and all vendors; no `delivery_otp`, no house/street, no GPS.
+- Add an employee: Supabase Dashboard → Authentication → Users → Add user
+  (email + password, auto-confirm), then
+  `insert into staff (auth_user_id, name) select id, '<Name>' from auth.users where email = '<email>';`
+  Remove: `update staff set is_active = false where ...`.
+- Tabs: Orders (today/tomorrow/upcoming/7 days, status filters, search, tap for items,
+  call buttons), Vendors (today's orders, today + 7-day sale), Sale (Sabzi / Pyaaz-Aloo /
+  Fruits totals, cash vs UPI, 7-day bars, item-wise "kya kitna bika").
+- "Sale" = booking with a payment row, or status paid/delivered/completed; amount =
+  `pay_amount ?? final_total`. Item-wise = final bill lines (qty × per-unit `final_price`).
 
 ### Admin (`admin/`)
 - Express serves `public/`; SPA calls `/api/*`; `/api/snapshot` returns

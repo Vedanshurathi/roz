@@ -135,6 +135,13 @@ coords_verified boolean · sort_order · created_at
 ```
 Villages: Khandewla, Haileymandi, Rampur, Tirpari, Basunda, Jatola, Jatauli, Todapur.
 
+### staff  — employees who can open the staff app (added 26 Sep 2026)
+```
+id · auth_user_id NOT NULL UNIQUE → auth.users · name NOT NULL · phone
+is_active boolean DEFAULT true · created_at
+```
+RLS on, no policies — read only through `is_staff()` / `staff_me()` / `staff_snapshot()`.
+
 ### Supporting tables
 - `admins` — id, auth_user_id, name. Admin = `e9370460-2105-4c1f-9b16-877d1fff1ed6`
 - `waitlist` — customer_id, area, v_type, phone, notified (demand where no vendor serves)
@@ -304,6 +311,13 @@ set_language(p_lang) [definer]
 slot_window(p_slot)
 spawn_schedule_bookings(p_schedule, p_days=21) [definer]
 tr(p_hi, p_en)
+```
+
+### Staff (added 26 Sep 2026 — `database/migrations/20260926_staff_app.sql`)
+```
+is_staff() [definer]          ← active staff row or is_admin(); not callable by clients
+staff_me() [definer]          ← {name, is_admin} or ok:false
+staff_snapshot() [definer]    ← {today, bookings (90 days + upcoming, trimmed), vendors}
 ```
 
 ### Triggers & jobs
