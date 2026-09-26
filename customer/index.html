@@ -1084,7 +1084,7 @@ details summary::-webkit-details-marker{display:none}
         <div class="ft ft-2"><div class="em" data-art="p6"></div><div class="nm">Tamatar</div><div class="pr">₹36/kg</div><div class="cap" data-en="was ₹42 yesterday" data-hi="कल ₹42 था">kal ₹42 tha</div></div>
         <div class="ft ft-3"><div class="em" data-art="p2"></div><div class="nm">Pyaaz</div><div class="pr">₹31/kg</div><div class="cap" data-en="today's mandi rate" data-hi="आज का मंडी रेट">today's mandi rate</div></div>
         <div class="ft ft-4"><div class="em" data-art="p20"></div><div class="nm">Kela</div><div class="pr">₹44<span style="font-size:11px">/dozen</span></div><div class="cap" data-en="fresh this morning" data-hi="आज सुबह ताज़ा">fresh aaj subah</div></div>
-        <div class="ft-slot"><span data-en="ROZBAZAAR COMES" data-hi="RozBazaar आएगा">ROZBAZAAR AAYEGA</span><b>Aaj, Subah 7–11</b></div>
+        <div class="ft-slot"><span data-en="ROZBAZAAR COMES" data-hi="RozBazaar आएगा">ROZBAZAAR COMES</span><b data-en="Today, Morning 7–11" data-hi="आज, सुबह 7–11">Today, Morning 7–11</b></div>
       </div>
     </div>
   </section>
@@ -1224,7 +1224,7 @@ details summary::-webkit-details-marker{display:none}
       </div>
       <div class="catban">
         <span style="font-size:26px">🕖</span>
-        <div><b id="catBanSlot">Aaj, Subah 7–11</b><span data-en="vendor weighs at your door, you pay then" data-hi="वेंडर घर पर तौलकर बिल बनाएगा">vendor weighs at your door, you pay then</span></div>
+        <div><b id="catBanSlot" data-en="Today, Morning 7–11" data-hi="आज, सुबह 7–11">Today, Morning 7–11</b><span data-en="vendor weighs at your door, you pay then" data-hi="वेंडर घर पर तौलकर बिल बनाएगा">vendor weighs at your door, you pay then</span></div>
       </div>
       <div class="grid" id="catGrid"></div>
     </div>
@@ -1348,7 +1348,7 @@ details summary::-webkit-details-marker{display:none}
   <div class="pg">
     <div class="step">
       <div class="sn"><div class="sd on">1</div><div class="sl on"></div><div class="st" data-en="Slot" data-hi="स्लॉट">Slot</div></div>
-      <div class="sn"><div class="sd" id="sd2">2</div><div class="sl" id="sl2"></div><div class="st" data-en="Saman" data-hi="सामान">Saman</div></div>
+      <div class="sn"><div class="sd" id="sd2">2</div><div class="sl" id="sl2"></div><div class="st" data-en="Items" data-hi="सामान">Items</div></div>
       <div class="sn"><div class="sd" id="sd3">3</div><div class="sl"></div><div class="st" data-en="Confirm" data-hi="पक्का करें">Confirm</div></div>
     </div>
 
@@ -3755,7 +3755,8 @@ function dayLabels(){
   return Array.from({length:5},(_,i)=>{
     const d=new Date(); d.setDate(d.getDate()+i);
     const lbl = i===0 ? T('Today','आज') : i===1 ? T('Tomorrow','कल') : (LANG==='en'?wdEn[d.getDay()]:wd[d.getDay()]);
-    return {i, lbl, num:d.getDate(), mon:d.toLocaleString('en',{month:'short'})};
+    const en = i===0 ? 'Today' : i===1 ? 'Tomorrow' : wdEn[d.getDay()], hi = i===0 ? 'आज' : i===1 ? 'कल' : wd[d.getDay()];
+    return {i, lbl, en, hi, num:d.getDate(), mon:d.toLocaleString('en',{month:'short'})};
   });
 }
 async function renderSlotScreen(){
@@ -3935,7 +3936,8 @@ function checkSlot(){
     const d=dayLabels()[sel.day], s=SLOTS.find(x=>x.id===sel.slot);
     const line=`${d.lbl}, ${LANG==='en'?s.en:s.hi}`;
     document.getElementById('hSlot').textContent=line;
-    document.getElementById('catBanSlot').textContent=line;
+    const cb=document.getElementById('catBanSlot'); cb.textContent=line;
+    const dl=dayLabels()[sel.day]; cb.setAttribute('data-en', `${dl.en||dl.lbl}, ${s.en}`); cb.setAttribute('data-hi', `${dl.hi||dl.lbl}, ${s.hi}`);
     document.querySelectorAll('.pslot').forEach(el=>el.textContent='🕖 '+slotBadge());
     /* This used to always send to category browsing, even when the
        cart already had items — meaning "add to cart, then pick a
@@ -3953,7 +3955,7 @@ function slotBadge(){
   return d.lbl+' '+(LANG==='en'?s.en:s.hi).replace(/ \d.*/,'').toLowerCase();
 }
 function slotLine(){
-  if(!sel.slot) return 'Aaj, Subah 7–11';
+  if(!sel.slot) return T('Today, Morning 7–11','आज, सुबह 7–11');
   const d=dayLabels()[sel.day], s=SLOTS.find(x=>x.id===sel.slot);
   return `${d.lbl}, ${LANG==='en'?s.en:s.hi}`;
 }
