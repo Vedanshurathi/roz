@@ -44,8 +44,8 @@ customer/          → deployed to Hostinger public_html (rozbazaar.shop)
 vendor/            → also deployed to the same public_html (rozbazaar.shop/vendor.html)
   vendor.html        single-file vendor app (~400 KB)
   og-vendor.jpg
-staff/             → also deployed to the same public_html (rozbazaar.shop/staff.html)
-  staff.html         single-file read-only staff app for employees (logo inlined)
+staff-site/        → its OWN Hostinger website for employees (same 3-file layout as admin-site)
+  index.html         single-file read-only staff app — login with phone + password
 admin-site/        → its OWN Hostinger website (separate from rozbazaar.shop)
   index.html         single-file admin console (Supabase login, admin_* RPCs directly)
   .htaccess          HTTPS redirect, noindex, CSP + security headers (Apache/LiteSpeed)
@@ -75,7 +75,7 @@ here only for clarity.
 | Domain | rozbazaar.shop (hosted on Hostinger) | |
 | Customer app | https://rozbazaar.shop → Hostinger `public_html/index.html` | static upload, no build step |
 | Vendor app | https://rozbazaar.shop/vendor.html → same `public_html` | static upload, no build step |
-| Staff app | https://rozbazaar.shop/staff.html → same `public_html` | static upload, no build step |
+| Staff app | separate Hostinger website, `public_html` = contents of `staff-site/` | static upload; login = phone + password of a `staff` row |
 | Admin (new) | separate Hostinger website, `public_html` = contents of `admin-site/` | static upload; login = Supabase email/password of an `admins` row |
 | Admin | Render web service `srv-d9vkutn40ujc738b0dp0` → https://rozbazaar-admin.onrender.com | auto-deploys from GitHub |
 | Admin repo | https://github.com/Vedanshurathi/roz | contents of `admin/` at repo root |
@@ -138,30 +138,36 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   (`vendor_slot_areas`). Loads real saved values via `vendor_my_slots` /
   `vendor_get_slot_areas` on open.
 
-### Staff app (`staff/staff.html`)
-- Read-only, phone-first page for employees. Same single-file pattern; talks to
-  Supabase directly with the public key.
-- Login: Supabase **email + password**. Access = active row in `public.staff`
-  (or `is_admin()`), checked by `is_staff()`. Session stored under its own
-  `storageKey: 'rb-staff-auth'` so it never mixes with a customer login.
-- Data: `staff_me()` and `staff_snapshot()` only (migration
-  `database/migrations/20260926_staff_app.sql`). Snapshot = bookings from the last
-  90 days + upcoming, and all vendors; no `delivery_otp`, no house/street, no GPS.
-- Add an employee: Supabase Dashboard → Authentication → Users → Add user
-  (email + password, auto-confirm), then
-  `insert into staff (auth_user_id, name) select id, '<Name>' from auth.users where email = '<email>';`
-  Remove: `update staff set is_active = false where ...`.
-- Tabs: Orders (today/tomorrow/upcoming/7 days, status filters, search, tap for items,
-  call buttons), Vendors (today's orders, today + 7-day sale), Sale (Sabzi / Pyaaz-Aloo /
-  Fruits totals, cash vs UPI, 7-day bars, item-wise "kya kitna bika").
+### Staff app (`staff-site/index.html`)
+- Its own Hostinger website (upload `index.html`, `.htaccess`, `robots.txt`). Read-only,
+  responsive (laptop sidebar → phone drawer, down to 320 px). Same CSS base as the admin.
+- **Login = 10-digit phone + password.** Supabase has no SMS provider, so each employee is
+  an email/password auth user `<phone>@staff.rozbazaar.shop` (`staff_login_email()`); the
+  page turns the typed phone into that address. Access = active row in `public.staff`
+  (or `is_admin()`), checked by `is_staff()`. Session key `rb-staff-auth`.
+- **Add / reset / disable employees from the admin console → Staff tab**
+  (`admin_add_staff`, `admin_reset_staff_password`, `admin_set_staff_active`,
+  `admin_staff_list` — migration `database/migrations/20260926b_staff_phone_login.sql`).
+  `admin_add_staff` inserts straight into `auth.users` + `auth.identities`.
+- Data: `staff_me()` (name, phone, is_admin) and `staff_snapshot()` only (migration
+  `20260926_staff_app.sql`): bookings from the last 90 days + upcoming, and all vendors;
+  no `delivery_otp`, no house/street, no GPS. Customers tab is derived from those bookings.
+- Tabs: Aaj ka plan (KPIs, slot board Subah/Dopahar/Shaam, village + vendor load),
+  Orders (day/status/type/village filters, search, detail drawer, CSV), Vendors (cards,
+  7-day chart drawer), Sale (today/yesterday/7/30/custom range, Sabzi/Pyaaz-Aloo/Fruits,
+  cash vs UPI, daily bars, item/vendor/village breakdown, CSV), Customers (repeat,
+  lapsed 30+ days, call/WhatsApp), Mera account (change own password via `auth.updateUser`).
+- Auto-refresh every 45 s; a booking id not seen before → 🔔 toast + beep + Orders badge.
 - "Sale" = booking with a payment row, or status paid/delivered/completed; amount =
   `pay_amount ?? final_total`. Item-wise = final bill lines (qty × per-unit `final_price`).
+- Same CSP/SRI rules as the admin site: after editing the inline script run
+  `python3 scripts/site-csp.py staff-site`.
 
 ### Admin console (`admin-site/index.html`) — the one to use
 - Deployed as its own Hostinger website: upload `index.html`, `.htaccess`, `robots.txt`
   into that site's `public_html`. No Supabase redirect-URL setup needed (password login).
 - **CSP pins the inline script by sha256** (in both the `<meta>` tag and `.htaccess`).
-  After ANY edit to the inline `<script>`, run `python3 scripts/admin-site-csp.py`,
+  After ANY edit to the inline `<script>`, run `python3 scripts/site-csp.py admin-site`,
   or the page loads blank. supabase-js is pinned to `@2.117.2` with an SRI hash —
   bumping the version needs a new `integrity=` (`npm pack` it and `openssl dgst -sha384`).
 - Single file, light RozBazaar theme, works on desktop and phone (sidebar becomes a
@@ -178,7 +184,7 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   with sale, rating, upcoming orders, items), Products (approval queue, all products
   with inline price + stock + edit, master catalog add/remove), Customers (search,
   block, same-number flag), Villages (add, active toggle, set GPS point), Messages,
-  Traffic, Launch check.
+  Staff (add employee, reset password, turn off), Traffic, Launch check.
 - Modals replace `prompt()`/`confirm()`; one delegated click listener on `data-act`.
 
 ### Admin (`admin/`) — older Render version

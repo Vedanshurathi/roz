@@ -318,7 +318,11 @@ tr(p_hi, p_en)
 is_staff() [definer]          ← active staff row or is_admin(); not callable by clients
 staff_me() [definer]          ← {name, is_admin} or ok:false
 staff_snapshot() [definer]    ← {today, bookings (90 days + upcoming, trimmed), vendors}
+staff_login_email(p_phone)    ← '<10 digits>@staff.rozbazaar.shop' (staff log in with phone + password)
+admin_staff_list() · admin_add_staff(p_name, p_phone, p_password) [definer]
+admin_set_staff_active(p_staff, p_active) · admin_reset_staff_password(p_staff, p_password) [definer]
 ```
+(`20260926b_staff_phone_login.sql`; `staff_me()` now also returns `phone`.)
 
 ### Triggers & jobs
 ```
