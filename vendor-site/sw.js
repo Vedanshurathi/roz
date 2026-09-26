@@ -25,7 +25,7 @@ self.addEventListener('push', event => {
   event.waitUntil(Promise.all([rbTrack(d.nid, 'delivered'), self.registration.showNotification(d.title, {
     body: d.body,
     icon: './icon-192.png',
-    badge: './badge-96.png',
+    badge: './badge-96.png?v=2',
     tag: 'rbv-' + Date.now(),
     renotify: true,
     requireInteraction: loud,
