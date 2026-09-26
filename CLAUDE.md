@@ -80,6 +80,7 @@ USE_SUPABASE=true
 SUPABASE_URL=https://srvpfyjmwaruebbkqkdj.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=<from Supabase dashboard → API>
 ADMIN_PASSWORD_HASH=<bcrypt hash — generate with: npm run make-password>
+STAFF_PASSWORD_HASH=<bcrypt hash — generate with: npm run make-staff-password>
 SESSION_SECRET=<random 64-hex>
 PORT=<Render sets this>
 ```
@@ -129,6 +130,19 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
 - Slots screen: per-slot capacity + per-slot village restriction
   (`vendor_slot_areas`). Loads real saved values via `vendor_my_slots` /
   `vendor_get_slot_areas` on open.
+
+### Staff app (`/staff` on the admin server)
+- Read-only, phone-first page for employees: https://rozbazaar-admin.onrender.com/staff/
+- Files: `public/staff/` (index.html, staff.js, staff.css, logo.png), `src/staff.js` (auth + route).
+- Own password (`STAFF_PASSWORD_HASH`) and cookie (`rb_staff`); fails closed if unset.
+  Admin and staff cookies can't be swapped (different HMAC prefix).
+- One data route: `GET /api/staff/snapshot` → `store.staffSnapshot()` = `admin_bookings`
+  + `admin_vendors`, trimmed (no `delivery_otp`, no house/street, no GPS).
+- Tabs: Orders (today/tomorrow/upcoming/7 days, status filters, search, tap to see items,
+  call buttons), Vendors (today's orders, today + 7-day sale), Sale (Sabzi / Pyaaz-Aloo /
+  Fruits totals, cash vs UPI, 7-day bars, item-wise "kya kitna bika").
+- "Sale" = booking with a payment row, or status paid/delivered/completed; amount =
+  `pay_amount ?? final_total`. Item-wise sale = final bill lines (qty × per-unit `final_price`).
 
 ### Admin (`admin/`)
 - Express serves `public/`; SPA calls `/api/*`; `/api/snapshot` returns

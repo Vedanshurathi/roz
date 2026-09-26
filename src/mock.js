@@ -52,9 +52,17 @@ const bookings = Array.from({ length: 38 }, (_, i) => {
   const dayOffset = i - 9;                       /* i=0..8 -> future, i=9 -> today, i>9 -> past */
   const isFuture = dayOffset < 0;
   const st = isFuture ? (i % 2 ? 'placed' : 'on_the_way') : STATES[i % STATES.length];
-  const est = 90 + ((i * 37) % 220);
   const done = ['completed','paid'].includes(st);
   const cust = customers[i % customers.length];
+  /* booking_items rows, as booking_full.items returns them; final_price is per unit */
+  const items = [0, 1, 2].map(k => {
+    const p = products[(i * 3 + k * 5) % products.length];
+    const qty = 1 + ((i + k) % 3);
+    return { id: `bi${i}-${k}`, product_id: p.id, product_name: p.name, unit: p.unit,
+             qty, price_at_booking: p.price,
+             final_qty: done ? qty : null, final_price: done ? p.price : null, removed: false };
+  });
+  const est = items.reduce((s, it) => s + it.qty * it.price_at_booking, 0);
   return {
     id:'b'+(i+1), code:'RB-'+(104200 + i),
     customer_name:cust.name, customer_phone:cust.phone,
@@ -62,8 +70,11 @@ const bookings = Array.from({ length: 38 }, (_, i) => {
     area: i % 3 === 0 ? 'Haileymandi' : 'Khandewla',
     booking_date: iso(daysAgo(dayOffset)), slot: SLOTS[i % 3],
     status: st, est_total: est,
-    final_total: done ? est + ((i % 5) - 2) * 6 : null,
-    created_at: daysAgo(Math.max(0, dayOffset)).toISOString()
+    final_total: done ? est : null,
+    created_at: daysAgo(Math.max(0, dayOffset)).toISOString(),
+    v_type: 'vegetable', item_count: items.length, items,
+    pay_method: done ? (i % 2 ? 'cash' : 'upi_direct') : null,
+    pay_amount: done ? est : null
   };
 });
 

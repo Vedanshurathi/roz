@@ -12,7 +12,8 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "deploy:netlify": "npx netlify-cli deploy --prod",
-    "make-password": "node scripts/hash-password.js"
+    "make-password": "node scripts/hash-password.js",
+    "make-staff-password": "node scripts/hash-password.js --staff"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

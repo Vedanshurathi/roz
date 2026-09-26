@@ -332,7 +332,47 @@ async function addArea(name, active) {
   return { added:true };
 }
 
-module.exports = { USE_SUPABASE, snapshot, addVendor, reviewVendor,
+/* ---------- staff app (read-only) ----------
+   Everything the /staff page shows, trimmed to what an employee
+   needs: no delivery OTP, no house number/street, no GPS. */
+const istDate = (d = new Date()) =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(d);
+
+function staffBooking(b) {
+  return {
+    id: b.id, code: b.code, booking_date: b.booking_date, slot: b.slot, status: b.status,
+    v_type: b.v_type, area: b.area, landmark: b.landmark || null,
+    customer_name: b.customer_name, customer_phone: b.customer_phone,
+    vendor_id: b.vendor_id, vendor_name: b.vendor_name,
+    est_total: b.est_total, final_total: b.final_total,
+    pay_method: b.pay_method || null, pay_amount: b.pay_amount ?? null,
+    created_at: b.created_at,
+    items: (b.items || []).map(it => ({
+      name: it.product_name, unit: it.unit, qty: it.qty, price_at_booking: it.price_at_booking,
+      final_qty: it.final_qty, final_price: it.final_price, removed: !!it.removed
+    }))
+  };
+}
+function staffVendor(v) {
+  return {
+    id: v.id, name: v.name, shop_name: v.shop_name, phone: v.phone, v_type: v.v_type,
+    areas_served: v.areas_served || [], status: v.status, is_active: v.is_active,
+    avg_rating: v.avg_rating, total_ratings: v.total_ratings
+  };
+}
+async function staffSnapshot() {
+  const [bookings, vendors] = USE_SUPABASE
+    ? await Promise.all([rpc('admin_bookings', { p_limit: 5000 }), rpc('admin_vendors', {})])
+    : [M.bookings, M.vendors];
+  return {
+    source: USE_SUPABASE ? 'supabase' : 'mock',
+    today: istDate(),
+    bookings: (bookings || []).map(staffBooking),
+    vendors: (vendors || []).map(staffVendor)
+  };
+}
+
+module.exports = { USE_SUPABASE, snapshot, staffSnapshot, addVendor, reviewVendor,
                    blockCustomer, resolveBooking, cancelBooking, setAreaPoint,
                    reviewProduct, allProducts, updateProduct, addArea,
                    allMessages, markMessageRead,

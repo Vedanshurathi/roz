@@ -22,6 +22,7 @@ const express = require('express');
 })();
 
 const { buildRouter, store, CONFIGURED } = require('./src/router');
+const { buildStaffRouter } = require('./src/staff');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -34,12 +35,15 @@ app.use((req, res, next) => {                 /* CSP needs 'self' to resolve aga
   next();
 });
 
+app.use('/api/staff', buildStaffRouter());   /* before /api so the admin router never sees staff calls */
 app.use('/api', buildRouter());
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1h' }));
+app.get('/staff/*', (req, res) => res.redirect('/staff/'));   /* staff app is one page; its asset paths are relative to /staff/ */
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 app.listen(PORT, () => {
   console.log(`\n  RozBazaar Admin  →  http://localhost:${PORT}`);
   console.log(`  data source      →  ${store.USE_SUPABASE ? 'SUPABASE (live)' : 'MOCK (no real data — set USE_SUPABASE=true to launch)'}`);
-  console.log(`  admin login      →  ${CONFIGURED ? 'configured' : 'NOT CONFIGURED — see warning above, run: npm run make-password'}\n`);
+  console.log(`  admin login      →  ${CONFIGURED ? 'configured' : 'NOT CONFIGURED — see warning above, run: npm run make-password'}`);
+  console.log(`  staff app        →  http://localhost:${PORT}/staff/\n`);
 });
