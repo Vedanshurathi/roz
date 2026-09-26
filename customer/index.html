@@ -984,6 +984,25 @@ details summary::-webkit-details-marker{display:none}
     transition-duration:.01ms!important;scroll-behavior:auto!important}
   .rv{opacity:1;transform:none}
 }
+
+/* saved addresses: account list + checkout picker */
+.addr-row{display:flex;align-items:center;gap:12px;padding:14px 2px;border-bottom:1px solid var(--line)}
+.addr-row:last-child{border-bottom:none}
+.addr-row .ai{width:40px;height:40px;border-radius:12px;background:var(--grey);display:grid;place-items:center;font-size:19px;flex-shrink:0}
+.addr-row .at{flex:1;min-width:0;text-align:left}
+.addr-row .at b{display:flex;align-items:center;gap:6px;font-size:14.5px;font-weight:800}
+.addr-row .at span{display:block;font-size:12.5px;font-weight:600;color:var(--mut);line-height:1.4;margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.addr-row .def{font-size:10.5px;font-weight:800;color:var(--g-dk);background:var(--lime-s);border-radius:20px;padding:2px 8px}
+.addr-row .pin{font-size:10.5px;font-weight:800;color:#1f4a9c;background:var(--blue-s,#EAF1FF);border-radius:20px;padding:2px 8px}
+.addr-row .ab{width:36px;height:36px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-size:15px;flex-shrink:0}
+.addr-pick{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1.8px solid var(--line);border-radius:16px;padding:13px;margin-bottom:10px;background:#fff}
+.addr-pick.on{border-color:var(--g);background:var(--lime-s)}
+.addr-pick .rd{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;display:grid;place-items:center}
+.addr-pick.on .rd{border-color:var(--g)}
+.addr-pick.on .rd::after{content:'';width:11px;height:11px;border-radius:50%;background:var(--g)}
+.addr-pick .at{flex:1;min-width:0}
+.addr-pick .at b{display:block;font-size:14.5px;font-weight:800}
+.addr-pick .at span{display:block;font-size:12.5px;font-weight:600;color:var(--mut);line-height:1.4;margin-top:2px}
 </style>
 </head>
 <body>
@@ -1210,8 +1229,8 @@ details summary::-webkit-details-marker{display:none}
 <!-- ========================= ADDRESS (no map — GPS + written) ========================= -->
 <div class="scr" id="s-loc">
   <div class="topbar">
-    <button class="bk" onclick="go('basket')" aria-label="Back">←</button>
-    <div><h1 data-en="Your address" data-hi="आपका पता">Your address</h1>
+    <button class="bk" onclick="leaveAddrEditor()" aria-label="Back">←</button>
+    <div><h1 id="locH1" data-en="Your address" data-hi="आपका पता">Your address</h1>
     <div class="sub" data-en="so the vendor reaches the right gate" data-hi="ताकि वेंडर सही दरवाज़े पर पहुँचे">so the vendor reaches the right gate</div></div>
   </div>
 
@@ -1283,6 +1302,11 @@ details summary::-webkit-details-marker{display:none}
       <button data-tag="Mummy ka ghar" onclick="pickTag(this,'Mummy ka ghar')" data-en="👵 Parents' home" data-hi="👵 मम्मी का घर">👵 Parents' home</button>
       <button data-tag="Aur" onclick="pickTag(this,'Aur')" data-en="📍 Other" data-hi="📍 अन्य">📍 Other</button>
     </div>
+    <div id="aLabelWrap" hidden style="margin-top:12px">
+      <label class="lbl" data-en="Name this address *" data-hi="इस पते का नाम *">Name this address *</label>
+      <input class="field" id="aLabel" maxlength="30" data-en-ph="e.g. Office, Bua's house, Farm" data-hi-ph="जैसे: ऑफ़िस, बुआ का घर, खेत" placeholder="e.g. Office, Bua's house, Farm">
+    </div>
+    <button class="linkbtn" id="aDelete" hidden style="margin-top:18px;color:#D93025" onclick="deleteAddr(EDIT_ID)" data-en="🗑 Delete this address" data-hi="🗑 यह पता हटाएँ">🗑 Delete this address</button>
   </div>
 
   <div class="stick"><div class="stick-in">
@@ -1486,7 +1510,7 @@ details summary::-webkit-details-marker{display:none}
     <div class="card" style="padding:6px 17px">
       <div id="addrList"></div>
     </div>
-    <button class="ghostbtn" onclick="paintCheckoutBanner();go('loc')" data-en="+ Add a new address" data-hi="+ नया पता जोड़ें">+ Add a new address</button>
+    <button class="ghostbtn" onclick="LOC_FROM_CHECKOUT=false;openAddrEditor(null)" data-en="+ Add a new address" data-hi="+ नया पता जोड़ें">+ Add a new address</button>
 
     <div class="h2" data-en="Settings" data-hi="सेटिंग्स">Settings</div>
     <div class="card" style="padding:6px 17px">
@@ -1722,6 +1746,22 @@ details summary::-webkit-details-marker{display:none}
       <button class="bk" onclick="closeNotifs()" aria-label="Close">✕</button>
     </div>
     <div id="notifList" style="padding:0 16px 26px;max-height:62vh;overflow-y:auto"></div>
+  </div>
+</div>
+<div class="sheet-wrap" id="addrSheet" style="z-index:160">
+  <div class="sheet-bg" onclick="closeAddrPicker()"></div>
+  <div class="sheet">
+    <div class="sheet-grab"></div>
+    <div class="sheet-hd">
+      <div><b data-en="Deliver to which address?" data-hi="किस पते पर मँगाना है?">Deliver to which address?</b>
+      <span data-en="the vendor comes to the address you pick" data-hi="वेंडर आपके चुने पते पर आएगा">the vendor comes to the address you pick</span></div>
+      <button class="bk" onclick="closeAddrPicker()" aria-label="Close">✕</button>
+    </div>
+    <div id="addrPickList" style="padding:0 16px;max-height:52vh;overflow-y:auto"></div>
+    <div style="padding:12px 16px calc(18px + env(safe-area-inset-bottom));display:grid;gap:10px">
+      <button class="ghostbtn" style="margin:0" onclick="closeAddrPicker();LOC_FROM_CHECKOUT=true;openAddrEditor(null)" data-en="+ Add a new address" data-hi="+ नया पता जोड़ें">+ Add a new address</button>
+      <button class="bigbtn" id="addrPickGo" onclick="confirmAddrPick()" data-en="Deliver here" data-hi="यहीं मँगाएँ">Deliver here</button>
+    </div>
   </div>
 </div>
 <div class="permbar" id="permBar" role="status"></div>
@@ -2838,6 +2878,9 @@ async function ensureAddress(){
 let LANG='en';
 let cart={};                 /* id -> qty */
 let user=null;
+let ADDRS=[];            /* every saved address (logged in) */
+let EDIT_ID=null;         /* address open in the editor, null = new */
+let LOC_FROM_CHECKOUT=false, ADDR_PICKED=false, PICK_THEN_BOOK=false, PICK_SEL=null;
 let addr=(()=>{ /* an address typed before logging in survives a reload / the Google redirect */
   try{ const d=JSON.parse(localStorage.getItem('rb_addr_draft')||'null'); return d&&d.area?d:null; }catch(e){ return null; } })();
 /* Lightweight "is my vendor on the way" watcher — there's no real push
@@ -3893,22 +3936,32 @@ async function initAddr(){
   const el=document.getElementById('aArea');
   await loadAreas();
   const names=AREAS.map(a=>typeof a==='string'?a:a.name);
-  const cur = (addr && addr.area) || AREA;
+  const ed = EDIT_ID ? ADDRS.find(a=>a.id===EDIT_ID) : (!SESSION && addr && !ADDRS.length ? addr : null);
+  const cur = (ed && ed.area) || AREA;
   el.innerHTML = `<option value="" disabled ${cur?'':'selected'}>${T('Choose your village','अपना गाँव चुनें')}</option>`
     + names.map(a=>`<option ${a===cur?'selected':''}>${a}</option>`).join('');
-  /* editing the saved address: show what is saved (and its pin) instead of an empty form */
-  if(addr){
-    const set=(id,v)=>{ const f=document.getElementById(id); if(f) f.value=v||''; };
-    set('aHouse',addr.house); set('aStreet',addr.street); set('aLand',addr.land); set('aNote',addr.note); set('aFull',addr.full);
-    addrTag=addr.tag||'Ghar';
-    document.querySelectorAll('#saveAs button').forEach(b=>b.classList.toggle('on', b.dataset.tag===addrTag));
-    if(addr.lat!=null && addr.lng!=null){
-      showLocated(Number(addr.lat), Number(addr.lng), 0);
-      addrCoords.pinned=true;
-      openPinMap(Number(addr.lat), Number(addr.lng), 0);
-    }
+  /* editing: show what is saved (and its pin). New address: an empty form — never another address's details */
+  const set=(id,v)=>{ const f=document.getElementById(id); if(f) f.value=v||''; };
+  set('aHouse',ed&&ed.house); set('aStreet',ed&&ed.street); set('aLand',ed&&ed.land); set('aNote',ed&&ed.note); set('aFull',ed&&ed.full);
+  const box=document.getElementById('aFull'); if(box) box.dataset.touched = ed ? '1' : '';
+  const known=['Ghar','Dukaan','Mummy ka ghar'];
+  const tag = ed ? (ed.tag||'Ghar') : (ADDRS.some(a=>a.tag==='Ghar') ? 'Aur' : 'Ghar');
+  addrTag = known.includes(tag) ? tag : 'Aur';
+  document.querySelectorAll('#saveAs button').forEach(b=>b.classList.toggle('on', b.dataset.tag===addrTag));
+  set('aLabel', ed && !known.includes(ed.tag) && ed.tag!=='Aur' ? ed.tag : '');
+  document.getElementById('aLabelWrap').hidden = addrTag!=='Aur';
+  document.getElementById('aDelete').hidden = !(ed && ed.id);
+  const h1=document.getElementById('locH1');
+  if(h1) h1.textContent = ed&&ed.id ? T('Edit address','पता बदलें') : T('New address','नया पता');
+  const pw=document.getElementById('pinWrap'); if(pw) pw.hidden=true;
+  if(ed && ed.lat!=null && ed.lng!=null){
+    showLocated(Number(ed.lat), Number(ed.lng), 0);
+    addrCoords.pinned=true;
+    openPinMap(Number(ed.lat), Number(ed.lng), 0);
   }
 }
+function openAddrEditor(id){ EDIT_ID=id||null; paintCheckoutBanner(); go('loc'); }
+function leaveAddrEditor(){ const back=LOC_FROM_CHECKOUT?'basket':(SESSION?'acct':'home'); EDIT_ID=null; LOC_FROM_CHECKOUT=false; go(back); }
 function skipGps(){
   document.getElementById('locateCard').hidden=true;
   document.getElementById('aFull').focus();
@@ -3972,8 +4025,7 @@ function setPin(lat,lng,byUser){
     (byUser ? ' · '+T('pin set by you','पिन आपने लगाया') : (addrCoords.acc?` · ±${Math.round(addrCoords.acc)}m`:''));
   if(byUser){ pinHint(0,true); if(LCIRC){ LMAP.removeLayer(LCIRC); LCIRC=null; }
     const t=document.getElementById('locTitle'); if(t) t.textContent=T('Exact location set by you','सही लोकेशन आपने लगाई');
-    const box=document.getElementById('aFull'); if(box) box.dataset.touched='';
-    fillFromCoords(lat,lng); matchAreaFromCoords(lat,lng); }
+    matchAreaFromCoords(lat,lng); clearTimeout(window.__fillT); window.__fillT=setTimeout(()=>fillFromCoords(lat,lng), 700); }
 }
 async function openPinMap(lat,lng,acc){
   const wrap=document.getElementById('pinWrap'); wrap.hidden=false;
@@ -4103,7 +4155,17 @@ async function fillFromCoords(lat,lng){
   try{
     const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
     const j=await r.json(); const a=j.address||{};
-    if(box.dataset.touched!=='1' && j.display_name) box.value=j.display_name;
+    /* Build the text from the small parts only — house no., road, mohalla/hamlet — plus OUR village
+       (from the village list / GPS match). OpenStreetMap's own display_name for a village here is
+       usually the tehsil and district ("Farrukhnagar, Gurgaon, Haryana, India"), which is not an
+       address a vendor can use; that is what was being saved before. */
+    const known=(AREAS||[]).map(x=>typeof x==='string'?x:x.name);
+    const village=document.getElementById('aArea').value
+      || [a.village,a.hamlet,a.suburb,a.town].find(v=>v && known.some(k=>k.toLowerCase()===String(v).toLowerCase())) || '';
+    const parts=[a.house_number, a.road||a.pedestrian||a.footway||a.residential,
+                 a.neighbourhood||a.hamlet||a.quarter||a.suburb, village]
+      .filter(Boolean).filter((v,i,arr)=>arr.findIndex(x=>String(x).toLowerCase()===String(v).toLowerCase())===i);
+    if(box.dataset.touched!=='1') box.value = parts.join(', ');
 
     /* Village/area selection is handled entirely by matchAreaFromCoords()
        below, which checks your real, live, admin-configured village
@@ -4137,6 +4199,7 @@ function dismissPerm(id){ const e=document.getElementById(id); if(e) e.style.dis
 function pickTag(el,t){
   document.querySelectorAll('#saveAs button').forEach(b=>b.classList.remove('on'));
   el.classList.add('on'); addrTag=t;
+  const w=document.getElementById('aLabelWrap'); if(w){ w.hidden = t!=='Aur'; if(t==='Aur') setTimeout(()=>document.getElementById('aLabel').focus(),50); }
 }
 async function saveAddress(){
   const h=document.getElementById('aHouse').value.trim();
@@ -4151,11 +4214,16 @@ async function saveAddress(){
     toast(T('Tap "Allow location access" for your exact location — or write a landmark','अपनी सही लोकेशन के लिए "लोकेशन की अनुमति दें" दबाएँ — या कोई लैंडमार्क लिखें'));
     return useGps();
   }
-  const prevId = addr && addr.id;
-  addr={id:prevId||null, house:h, street:st, area:ar, land:ld,
+  let label=addrTag;
+  if(addrTag==='Aur'){
+    label=document.getElementById('aLabel').value.trim();
+    if(!label) return focusErr('aLabel', T('Give this address a name — e.g. Office','इस पते का नाम लिखें — जैसे: ऑफ़िस'));
+  }
+  const was=EDIT_ID?ADDRS.find(a=>a.id===EDIT_ID):null;
+  addr={id:EDIT_ID||null, is_default:!!(was&&was.is_default), house:h, street:st, area:ar, land:ld,
         note:document.getElementById('aNote').value.trim(),
         full:full,
-        tag:addrTag, lat:addrCoords?addrCoords.lat:null, lng:addrCoords?addrCoords.lng:null};
+        tag:label, lat:addrCoords?addrCoords.lat:null, lng:addrCoords?addrCoords.lng:null};
   if(!DEMO && SESSION){
     /* This used to only keep the address in memory until the next booking — so saving it
        from My account said "Address saved" but nothing reached the database, and it was
@@ -4170,15 +4238,21 @@ async function saveAddress(){
     try{ localStorage.setItem('rb_addr_draft', JSON.stringify(addr)); }catch(e){}
   }
   toast(T('Address saved','पता सेव हो गया'));
+  if(SESSION && !DEMO) await loadMyAddress(addr.id);
+  const fromCheckout=LOC_FROM_CHECKOUT;
+  EDIT_ID=null; LOC_FROM_CHECKOUT=false;
   renderAcct();
-  count()>0 ? createBooking() : go('home');
+  /* only book when this address was added while placing an order — editing an address from
+     My account with items in the basket used to place the order straight away */
+  if(fromCheckout && count()>0){ ADDR_PICKED=true; return createBooking(); }
+  go(SESSION?'acct':'home');
 }
 async function saveAddressToDb(){
   const r = await rpc('customer_save_address',{
     p_label:addr.tag||'Ghar', p_house:addr.house||null,
     p_street:addr.street || addr.full || null,          /* the "full address" text is kept too */
     p_landmark:[addr.land, addr.note].filter(Boolean).join(' · ') || null, p_area:addr.area,
-    p_lat:addr.lat, p_lng:addr.lng, p_make_default:true, p_address_id:addr.id||null
+    p_lat:addr.lat, p_lng:addr.lng, p_make_default: addr.id ? (!!addr.is_default || ADDRS.length<=1) : !ADDRS.length, p_address_id:addr.id||null
   });
   if(!r || !r.ok) return r||{ok:false};
   const d=r.data||{};
@@ -4186,16 +4260,60 @@ async function saveAddressToDb(){
   try{ localStorage.removeItem('rb_addr_draft'); }catch(e){}
   return {ok:true, id:addr.id};
 }
-/* after login: use the saved address; if the person filled one before logging in, save that */
-async function loadMyAddress(){
+/* after login: load every saved address; if the person filled one before logging in, save that first.
+   `keep` = id to select (the one just saved), else the current selection, else the default. */
+async function loadMyAddress(keep){
   let draft=null; try{ draft=JSON.parse(localStorage.getItem('rb_addr_draft')||'null'); }catch(e){}
-  if(draft && draft.area){ addr=Object.assign(draft,{id:null}); const r=await saveAddressToDb(); if(r.ok) return; }
+  if(draft && draft.area){ addr=Object.assign(draft,{id:null}); const r=await saveAddressToDb(); if(r.ok) keep=r.id; }
   const ad=await rpc('customer_my_addresses');
-  if(ad.ok && Array.isArray(ad.data) && ad.data.length){
-    const a=ad.data.find(x=>x.is_default)||ad.data[0];
-    addr={id:a.id, house:a.house_no, street:a.street, area:a.area, land:a.landmark,
-          tag:a.label, lat:a.lat, lng:a.lng};
-  }
+  if(!ad.ok || !Array.isArray(ad.data)) return;
+  ADDRS=ad.data.map(a=>({id:a.id, house:a.house_no, street:a.street, area:a.area, land:a.landmark,
+          tag:a.label, lat:a.lat, lng:a.lng, is_default:!!a.is_default}));
+  const want = keep || (addr && addr.id);
+  addr = ADDRS.find(a=>a.id===want) || ADDRS.find(a=>a.is_default) || ADDRS[0] || null;
+}
+function addrName(a){
+  const M={Ghar:T('Home','घर'),Dukaan:T('Shop','दुकान'),'Mummy ka ghar':T("Parents' home",'मम्मी का घर'),Aur:T('Other','अन्य')};
+  return a ? (M[a.tag]||a.tag||M.Ghar) : '';
+}
+function addrIcon(a){ return !a?'📍':a.tag==='Dukaan'?'🏪':a.tag==='Mummy ka ghar'?'👵':(!a.tag||a.tag==='Ghar')?'🏠':'📍'; }
+function lineOf(a){ return a ? [a.house, a.street, a.area].filter(Boolean).join(', ') + (a.land?' · '+a.land:'') : ''; }
+async function deleteAddr(id){
+  const a=ADDRS.find(x=>x.id===id); if(!a) return;
+  if(!confirm(T(`Delete "${addrName(a)}"?`,`"${addrName(a)}" हटाएँ?`))) return;
+  const r=await rpc('customer_delete_address',{p_id:id});
+  if(!r.ok) return toast(r.msg||T('Could not delete','हटाया नहीं जा सका'));
+  if(addr && addr.id===id) addr=null;
+  await loadMyAddress(); toast(T('Address deleted','पता हटा दिया'));
+  EDIT_ID=null; renderAcct(); if(document.getElementById('s-loc').classList.contains('on')) go('acct');
+  if(document.getElementById('s-basket').classList.contains('on')) renderBasket();
+}
+async function makeDefaultAddr(id){
+  const r=await rpc('customer_set_default_address',{p_id:id});
+  if(!r.ok) return toast(r.msg||T('Could not change','बदला नहीं जा सका'));
+  ADDRS.forEach(a=>a.is_default=(a.id===id)); addr=ADDRS.find(a=>a.id===id)||addr; renderAcct();
+  toast(T('Default address changed','मुख्य पता बदल दिया'));
+}
+/* ---------- checkout: which address? ---------- */
+function openAddrPicker(thenBook){
+  PICK_THEN_BOOK=!!thenBook; PICK_SEL=(addr&&addr.id)||(ADDRS[0]&&ADDRS[0].id);
+  renderAddrPicker(); document.getElementById('addrSheet').classList.add('on');
+}
+function closeAddrPicker(){ document.getElementById('addrSheet').classList.remove('on'); PICK_THEN_BOOK=false; }
+function renderAddrPicker(){
+  document.getElementById('addrPickList').innerHTML = ADDRS.map(a=>`
+    <button class="addr-pick ${a.id===PICK_SEL?'on':''}" onclick="PICK_SEL='${a.id}';renderAddrPicker()">
+      <span class="rd"></span><span style="font-size:22px">${addrIcon(a)}</span>
+      <span class="at"><b>${esc(addrName(a))}${a.is_default?` <small style="font-size:10.5px;color:var(--g-dk)">· ${T('default','मुख्य')}</small>`:''}</b>
+      <span>${esc(lineOf(a))}${a.lat!=null?' · 📍 '+T('pin saved','पिन सेव'):''}</span></span></button>`).join('')
+    || `<p class="muted" style="padding:10px 0">${T('No saved address yet','अभी कोई पता सेव नहीं')}</p>`;
+  document.getElementById('addrPickGo').style.display = ADDRS.length ? '' : 'none';
+}
+function confirmAddrPick(){
+  const a=ADDRS.find(x=>x.id===PICK_SEL); if(!a) return;
+  addr=a; ADDR_PICKED=true; const book=PICK_THEN_BOOK;
+  closeAddrPicker(); renderBasket();
+  if(book) createBooking();
 }
 function focusErr(id,msg){
   const el=document.getElementById(id);
@@ -4239,7 +4357,8 @@ function renderBasket(){
         <button class="pill" style="margin-left:auto" onclick="go('slot')">${T('Change','बदलें')}</button>
       </div>
       <div style="font-size:12.5px;font-weight:700;color:var(--g-dk);margin-top:12px;border-top:1px dashed rgba(20,104,44,.25);padding-top:11px">
-        ${addr ? `📍 ${addr.tag||'Ghar'} · ${addrLine()}`
+        ${addr ? `<div style="display:flex;align-items:center;gap:10px"><span style="min-width:0;flex:1">${addrIcon(addr)} <b>${T('Deliver to','यहाँ मँगाएँ')}: ${esc(addrName(addr))}</b><br><span style="font-weight:600">${esc(addrLine())}</span></span>
+                   ${SESSION?`<button class="pill" onclick="${ADDRS.length?'openAddrPicker(false)':"LOC_FROM_CHECKOUT=true;openAddrEditor(null)"}">${T('Change','बदलें')}</button>`:''}</div>`
                : `📍 ${T('Address not added yet — you will be asked before confirming','पता अभी नहीं डाला — पक्का करने से पहले पूछेंगे')}`}</div>
     </div>
 
@@ -4417,7 +4536,10 @@ function placeBooking(){
   if(!sel.slot) {toast(T('Pick a slot first','पहले स्लॉट चुनें')); return go('slot');}
   paintCheckoutBanner();
   if(!user) { pendingCheckout=true; return go('login'); }   /* login only at booking, never to browse */
-  if(!addr) return go('loc');
+  if(!addr && !ADDRS.length){ LOC_FROM_CHECKOUT=true; return openAddrEditor(null); }
+  /* more than one saved address: ask which one this order goes to */
+  if(ADDRS.length>1 && !ADDR_PICKED) return openAddrPicker(true);
+  if(!addr) addr=ADDRS[0];
   createBooking();
 }
 async function createBooking(){
@@ -4431,7 +4553,7 @@ async function createBooking(){
     addr:addrLine()||'', tag:(addr&&addr.tag)||'Ghar', name:(user&&user.name)||''
   };
   BOOKINGS.unshift(b);            /* replaced by the server list on the bookings screen */
-  cart={}; syncCart();
+  cart={}; syncCart(); ADDR_PICKED=false;
   document.getElementById('sucId').textContent=b.code;
   document.getElementById('sucOtp').textContent=b.otp;
   document.getElementById('sucLine').textContent=T('The vendor has been told. See you '+b.slot.toLowerCase()+'.','वेंडर को बता दिया गया है — '+b.slot);
@@ -4479,7 +4601,7 @@ async function restoreSession(){
     const c=await getSb();
     c.auth.onAuthStateChange((evt, session)=>{
       if(session && !sessionReady){ sessionReady=true; adoptSession(session); }
-      if(evt==='SIGNED_OUT'){ user=null; addr=null; SESSION=null; sessionReady=false; renderAcct(); }
+      if(evt==='SIGNED_OUT'){ user=null; addr=null; ADDRS=[]; SESSION=null; sessionReady=false; renderAcct(); }
     });
     const {data:{session}}=await c.auth.getSession();
     if(session && !sessionReady){ sessionReady=true; await adoptSession(session); }
@@ -4583,7 +4705,7 @@ function paintHeaderIdentity(){
 }
 async function logout(){
   if(!DEMO){ try{ const c=await getSb(); await c.auth.signOut(); }catch(e){} }
-  user=null; addr=null; cart={}; BOOKINGS=[]; FAVS.clear();
+  user=null; addr=null; ADDRS=[]; ADDR_PICKED=false; cart={}; BOOKINGS=[]; FAVS.clear();
   try{ localStorage.removeItem('rb_addr_draft'); }catch(e){}
   syncCart(); renderAcct(); paintHeaderIdentity(); go('home');
   toast(T('Logged out','लॉगआउट हो गया'));
@@ -5026,10 +5148,14 @@ function renderAcct(){
     if(w) w.textContent = user ? (user.email || ('+91 '+user.phone)) : ''; }
   document.getElementById('acctBk').textContent = BOOKINGS.length+' '+T('bookings','बुकिंग');
   const al=document.getElementById('addrList');
-  const TAGL={Ghar:T('Home','घर'),Dukaan:T('Shop','दुकान'),'Mummy ka ghar':T("Parents' home",'मम्मी का घर'),Aur:T('Other','अन्य')};
-  if(al) al.innerHTML = addr && addr.area
-    ? `<button class="arow" onclick="paintCheckoutBanner();go('loc')"><div class="ai">${addr.tag==='Dukaan'?'🏪':addr.tag==='Mummy ka ghar'?'👵':addr.tag==='Aur'?'📍':'🏠'}</div>
-        <div style="min-width:0"><b>${esc(TAGL[addr.tag]||addr.tag||TAGL.Ghar)}</b><span>${esc(addrLine())}${addr.lat!=null?' · 📍':''}</span></div><span class="ch">›</span></button>`
+  const list = ADDRS.length ? ADDRS : (addr && addr.area ? [addr] : []);
+  if(al) al.innerHTML = list.length
+    ? list.map(a=>`<div class="addr-row"><div class="ai">${addrIcon(a)}</div>
+        <button class="at" onclick="LOC_FROM_CHECKOUT=false;openAddrEditor(${a.id?`'${a.id}'`:'null'})">
+          <b>${esc(addrName(a))}${a.is_default&&list.length>1?`<span class="def">${T('Default','मुख्य')}</span>`:''}${a.lat!=null?`<span class="pin">📍 ${T('pin','पिन')}</span>`:''}</b>
+          <span>${esc(lineOf(a))}</span></button>
+        ${a.id&&!a.is_default&&list.length>1?`<button class="ab" title="${T('Make default','मुख्य बनाएँ')}" onclick="makeDefaultAddr('${a.id}')">⭐</button>`:''}
+        ${a.id?`<button class="ab" title="${T('Delete','हटाएँ')}" onclick="deleteAddr('${a.id}')">🗑</button>`:''}</div>`).join('')
     : `<div style="padding:16px 2px"><span style="font-size:13px;font-weight:700;color:var(--mut)">${T('No address saved yet','अभी कोई पता सेव नहीं')}</span></div>`;
 }
 

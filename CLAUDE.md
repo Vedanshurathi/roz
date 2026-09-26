@@ -150,6 +150,14 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   account that is also an admin/vendor got role `admin` and never received customer pushes
   (migration `20260926i_push_role_address_fix.sql`). A product photo that fails to load falls back
   to the SVG drawing (`artFail`).
+  **Several addresses** (migration `20260926l_multi_address.sql`): `ADDRS` = all saved (`customer_my_addresses`,
+  hidden ones excluded), `addr` = the one this order goes to. My account lists them (tap = edit, ⭐ =
+  `customer_set_default_address`, 🗑 = `customer_delete_address` — hides instead of deleting when old
+  bookings use it). `openAddrEditor(id|null)` opens the form (new = empty form). "Other" asks for a
+  name (saved in `addresses.label`). At "Confirm booking" with 2+ addresses a "Deliver to which
+  address?" sheet opens; the basket card has Change. Saving an address only books when it was added
+  during checkout (`LOC_FROM_CHECKOUT`). Auto-filled text = house no., road, mohalla/hamlet + OUR
+  village — never OSM's display_name (it gave "Farrukhnagar, Gurgaon, Haryana, India").
 - Home ends with small social chips + a navy mini-footer ("Become a vendor" → `VENDOR_SITE`
   = https://vendor.rozbazaar.shop/). `#s-home` has bottom padding so nothing hides under the
   bottom nav / cart bar.
