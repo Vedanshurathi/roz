@@ -66,8 +66,9 @@ here only for clarity.
 
 | piece | where | notes |
 |---|---|---|
-| Domain | rozbazaar.shop | |
-| Customer + vendor | Hostinger, `public_html` | static upload, no build step |
+| Domain | rozbazaar.shop (hosted on Hostinger) | |
+| Customer app | https://rozbazaar.shop → Hostinger `public_html/index.html` | static upload, no build step |
+| Vendor app | https://rozbazaar.shop/vendor.html → same `public_html` | static upload, no build step |
 | Admin | Render web service `srv-d9vkutn40ujc738b0dp0` → https://rozbazaar-admin.onrender.com | auto-deploys from GitHub |
 | Admin repo | https://github.com/Vedanshurathi/roz | contents of `admin/` at repo root |
 | Database | Supabase `srvpfyjmwaruebbkqkdj` (Mumbai, Postgres 17) | |
