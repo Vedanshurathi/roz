@@ -150,6 +150,16 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   account that is also an admin/vendor got role `admin` and never received customer pushes
   (migration `20260926i_push_role_address_fix.sql`). A product photo that fails to load falls back
   to the SVG drawing (`artFail`).
+  **My account → "🩺 Check notifications & location"** (`openCheck`/`runCheck`): shows on the person's phone app vs
+  browser (`IN_APP` = `?source=pwa` start URL or `android-app://` referrer — the Play app), notification permission,
+  service worker, push subscription saved, location permission, a real GPS test (`ckGeo`) and a test push
+  (`customer_test_push` → poll `customer_test_push_status` for sent / delivered; one per 30 s; migration
+  `20260927a_customer_push_selftest.sql`). Blocked-permission hints (`unblockHow`) say "Phone Settings → Apps →
+  RozBazaar" inside the app and "tap 🔒" in the browser.
+  **Play Store app** = TWA `shop.rozbazaar.twa` (PWABuilder). Upload key = `signing.keystore` alias `rozbazaar`
+  (SHA-256 67:8E…07:E0; kept by Vedanshu, never commit it). `customer/.well-known/assetlinks.json` lists that key,
+  Google's app-signing keys and an older build key. In the app, notification + location permission belong to the
+  RozBazaar app in Android settings (notification delegation), not to Chrome.
   **Several addresses** (migration `20260926l_multi_address.sql`): `ADDRS` = all saved (`customer_my_addresses`,
   hidden ones excluded), `addr` = the one this order goes to. My account lists them (tap = edit, ⭐ =
   `customer_set_default_address`, 🗑 = `customer_delete_address` — hides instead of deleting when old
