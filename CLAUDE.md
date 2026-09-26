@@ -46,8 +46,10 @@ vendor/            → also deployed to the same public_html (rozbazaar.shop/ven
   og-vendor.jpg
 staff/             → also deployed to the same public_html (rozbazaar.shop/staff.html)
   staff.html         single-file read-only staff app for employees (logo inlined)
-admin-web/         → also deployed to the same public_html (rozbazaar.shop/admin.html)
-  admin.html         single-file admin console (Supabase login, admin_* RPCs directly)
+admin-site/        → its OWN Hostinger website (separate from rozbazaar.shop)
+  index.html         single-file admin console (Supabase login, admin_* RPCs directly)
+  .htaccess          HTTPS redirect, noindex, CSP + security headers (Apache/LiteSpeed)
+  robots.txt         Disallow all
 admin/             → Node/Express app on Render
   server.js          Express, CSP headers, session cookie, serves public/
   src/router.js      /api/* routes (all behind requireAuth)
@@ -74,7 +76,7 @@ here only for clarity.
 | Customer app | https://rozbazaar.shop → Hostinger `public_html/index.html` | static upload, no build step |
 | Vendor app | https://rozbazaar.shop/vendor.html → same `public_html` | static upload, no build step |
 | Staff app | https://rozbazaar.shop/staff.html → same `public_html` | static upload, no build step |
-| Admin (new) | https://rozbazaar.shop/admin.html → same `public_html` | static upload; login = Supabase email/password of an `admins` row |
+| Admin (new) | separate Hostinger website, `public_html` = contents of `admin-site/` | static upload; login = Supabase email/password of an `admins` row |
 | Admin | Render web service `srv-d9vkutn40ujc738b0dp0` → https://rozbazaar-admin.onrender.com | auto-deploys from GitHub |
 | Admin repo | https://github.com/Vedanshurathi/roz | contents of `admin/` at repo root |
 | Database | Supabase `srvpfyjmwaruebbkqkdj` (Mumbai, Postgres 17) | |
@@ -155,7 +157,13 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
 - "Sale" = booking with a payment row, or status paid/delivered/completed; amount =
   `pay_amount ?? final_total`. Item-wise = final bill lines (qty × per-unit `final_price`).
 
-### Admin console (`admin-web/admin.html`) — the one to use
+### Admin console (`admin-site/index.html`) — the one to use
+- Deployed as its own Hostinger website: upload `index.html`, `.htaccess`, `robots.txt`
+  into that site's `public_html`. No Supabase redirect-URL setup needed (password login).
+- **CSP pins the inline script by sha256** (in both the `<meta>` tag and `.htaccess`).
+  After ANY edit to the inline `<script>`, run `python3 scripts/admin-site-csp.py`,
+  or the page loads blank. supabase-js is pinned to `@2.117.2` with an SRI hash —
+  bumping the version needs a new `integrity=` (`npm pack` it and `openssl dgst -sha384`).
 - Single file, light RozBazaar theme, works on desktop and phone (sidebar becomes a
   drawer under 860 px; tables scroll sideways inside their card).
 - Login: Supabase email + password; allowed only if `staff_me().is_admin` is true
