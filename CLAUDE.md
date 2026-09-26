@@ -6,8 +6,10 @@ were each made at least once — don't repeat them.
 
 > **In this repo (`Vedanshurathi/roz`)** the contents of `admin/` sit at the
 > repo root (`server.js`, `src/`, `public/`) because Render deploys from here.
-> `database/` is here too. `customer/`, `vendor/` and `docs/` are not in this
-> repo — they're uploaded to Hostinger by hand.
+> `database/`, `customer/`, `vendor/` and `docs/` are here too (customer and
+> vendor are still deployed by uploading to Hostinger by hand).
+> `brand/rozbazaar-logo.png` is the official logo: orange-to-green "R" shopping
+> bag with speed lines, "Roz" in green, "Bazaar" in dark navy.
 
 ---
 
