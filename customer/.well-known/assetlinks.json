@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "shop.rozbazaar.twa",
+        "sha256_cert_fingerprints": ["67:8E:1B:01:BD:34:57:47:5D:B9:38:18:BD:BE:05:FF:79:22:49:B6:5D:A9:96:76:63:8C:68:8A:A5:B1:07:E0"]
+      }
+    }]
