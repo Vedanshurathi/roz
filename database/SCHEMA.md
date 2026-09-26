@@ -371,6 +371,24 @@ admin_set_vendor_login(p_vendor, p_password) now also sets the password of Googl
 internal: vendor_by_phone(phone) · vendor_has_password(auth uid)
 ```
 
+### Customer notifications + broadcast (added 26 Sep 2026 — `20260926g_customer_notifications_broadcast.sql`)
+```
+person_lang(user) · push_to(user, role, title, body) · notify_person(user, role, type, title_hi, title_en, msg_hi, msg_en, booking)
+slot_label(slot, lang) · tg_customer_booking_created (bookings AFTER INSERT) · tg_status_notify rewritten (bilingual + push)
+job_customer_slot_reminder(slot) · job_customer_tomorrow_reminder()
+table broadcasts(id, audience, title, message, title_en, message_en, sent_to, devices, sent_by, created_at)
+admin_broadcast(p_audience, p_title, p_message, p_title_en, p_message_en) · admin_broadcasts()
+customer_notifications(p_limit) · customer_mark_read(p_id|null)
+cron: rz-customer-slot-morning/afternoon/evening (0 1 / 0 6 / 0 11 UTC), rz-customer-tomorrow (0 15 UTC)
+```
+
+### Item names + photos (added 26 Sep 2026 — `20260926h_item_names_photos.sql`)
+```
+catalog_items.english_name, catalog_items.image_url · products.name_en, products.stock_image_url
+storage bucket item-photos (public) · catalog_match(name) · tg_product_fill (products BEFORE INSERT/UPDATE of name, name_hi, catalog_key)
+edge function item-photos (token = app_settings.item_photos_token)
+```
+
 ### Triggers & jobs
 ```
 tg_booking_defaults() · tg_guard_delivered() · tg_slot_count() · tg_status_notify()

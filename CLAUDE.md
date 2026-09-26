@@ -124,8 +124,23 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   action dispatcher that maps UI actions to real RPCs (or mock data in DEMO).
 - Key state: `cart` {productId: qty}, `sel` {type, day, slot, vendorId},
   `user`, `addr`, `PRODUCTS`, `AREA`, `LANG`.
-- **Bilingual:** `T(en, hi)` in JS; `data-en` / `data-hi` attributes in HTML.
-  Hindi is written in Roman script in most UI copy ("Slot chuno", "sabzi ghar pe").
+- **Bilingual:** `T(en, hi)` in JS; `data-en` / `data-hi` attributes in HTML. Since 26 Sep 2026
+  English mode = proper English ("Vegetables", "Today, Morning 7–11") and Hindi mode = Devanagari
+  ("सब्ज़ी", "आज, सुबह 7–11"). Keep it that way — no Roman Hindi in either. The choice is saved in
+  `localStorage.rb_lang`, applied on load (`setLang(l, true)`), and synced to `customers.lang`
+  (`set_language`) so push notifications arrive in the same language.
+- Item names: `en` = `products.name_en` (real English, "Tomato"), `hi` = `name_hi` (Devanagari),
+  `roman` = `name` (what the vendor typed, "Tamatar" — still searchable). Photo = vendor's
+  `image_url` → else `stock_image_url` (real photo, see "Item photos") → else the SVG art.
+- **Notifications (customer):** 🔔 in the header (mobile + desktop) opens a sheet from
+  `customer_notifications()` (bilingual rows), `customer_mark_read()`; polled every 60 s while logged
+  in. A bar above the bottom nav keeps asking (9 s after open, then 2 min after each close) until
+  notifications AND location are allowed; if the browser blocked one it explains how to unblock.
+  `syncPush()` saves the push subscription after login. Address: GPS keeps sharpening up to 15 s
+  (stops at ±25 m); house no. / street / landmark are optional — village + (GPS pin or any text).
+- Home ends with small social chips + a navy mini-footer ("Become a vendor" → `VENDOR_SITE`
+  = https://vendor.rozbazaar.shop/). `#s-home` has bottom padding so nothing hides under the
+  bottom nav / cart bar.
 - **Login:** Google OAuth OR phone-only (`signInAnonymously()` + `customer_phone_login`).
   Phone login has **no OTP by design** — face-to-face village delivery; whoever
   last typed a number owns that account. Don't "fix" this without asking.
@@ -166,6 +181,27 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   (CSP `worker-src 'self'`). iPhone push works only after "Add to Home Screen" (iOS 16.4+).
 - Migration `database/migrations/20260926d_commission_tasks_targets_notifications.sql`.
 - Known gap (pre-existing): `send-push` has `verify_jwt=false` and accepts any caller.
+
+### Notifications to customers + admin broadcast (migration `20260926g_customer_notifications_broadcast.sql`)
+- `notify_person(user, role, type, title_hi, title_en, msg_hi, msg_en, booking)` = in-app row + push in
+  the person's language (`person_lang`). Customer gets: order confirmed (trigger on booking insert),
+  vendor on the way / reached / paid / order complete / missed / under review (`tg_status_notify`),
+  bill ready + cancelled (sent by the existing RPCs), 30-min slot reminder (cron 06:30/11:30/16:30
+  IST) and night-before reminder (20:30 IST). `notify_user()` now pushes for customers too.
+- Admin console → "📣 Notification bhejo": `admin_broadcast(audience all|customers|vendors|staff,
+  title, message, title_en, message_en)`, templates, history + reach (`admin_broadcasts()`).
+
+### Item names + photos (migration `20260926h_item_names_photos.sql`, edge function `item-photos`)
+- `catalog_items.english_name` (real English) + `image_url`; `products.name_en` + `stock_image_url`.
+- 99/104 catalog items have a real photo: hand-picked Wikimedia Commons / Wikipedia images, 480 px
+  thumbnails, stored in the public Storage bucket `item-photos` (`catalog/<key>.jpg`). p13, p31, p54,
+  p64, p89, p90, p91, p92, p96, p97 keep the drawing (no good photo found).
+- Trigger `tg_product_fill` (products insert / rename): fills `name_en`, Devanagari `name_hi` and
+  `stock_image_url` from the matching catalog item (by key, English, Roman or Hindi name); for an
+  unknown item it calls the `item-photos` function (mode `product`), which searches Commons and
+  saves a photo. The function checks `app_settings.item_photos_token`; source in
+  `supabase/functions/item-photos/`. Modes: `catalog` (items [{key,title|file}]), `product`
+  ({id, query[, file]}), `candidates` (4–8 previews per query, for choosing by eye).
 
 ### Vendor app (`vendor-site/index.html`) — own Hostinger website
 - **Same UI as `vendor/vendor.html`** (Vedanshu found a Spotify-style redesign too complex and asked to go

@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eZny5mPsXwTb89LXHsOUpn8p/6AT67+EJdxtr2U34UM=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-OzrxawdckkphlBaJXZp9KRypXpi3FEVr1mjjMuA6S0c=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -344,6 +344,7 @@ td.acts .btn+.btn{margin-left:6px}
     <button class="nav" data-act="go" data-arg="staff"><span class="ic">🧑‍💼</span>Team<span class="badge o hide" id="bStaff"></span></button>
     <button class="nav" data-act="go" data-arg="tasks"><span class="ic">📝</span>Kaam (tasks)<span class="badge hide" id="bTasks"></span></button>
     <button class="nav" data-act="go" data-arg="targets"><span class="ic">🎯</span>Sales targets</button>
+    <button class="nav" data-act="go" data-arg="broadcast"><span class="ic">📣</span>Notification bhejo</button>
     <button class="nav" data-act="go" data-arg="settings"><span class="ic">⚙️</span>Settings</button>
     <button class="nav" data-act="go" data-arg="traffic"><span class="ic">📈</span>Traffic</button>
     <button class="nav" data-act="go" data-arg="launch"><span class="ic">🚀</span>Launch check<span class="badge hide" id="bLaunch"></span></button>
@@ -376,6 +377,7 @@ td.acts .btn+.btn{margin-left:6px}
       <section class="scr" id="v-staff"></section>
       <section class="scr" id="v-tasks"></section>
       <section class="scr" id="v-targets"></section>
+      <section class="scr" id="v-broadcast"></section>
       <section class="scr" id="v-settings"></section>
       <section class="scr" id="v-traffic"></section>
       <section class="scr" id="v-launch"></section>
@@ -525,7 +527,7 @@ async function refresh(silent) {
     customers: ['admin_customers', { p_limit: 1000 }], pending: ['admin_pending_products'],
     visits: ['admin_visit_stats', { p_days: 30 }], finance: ['admin_finance_dashboard', { p_days: 30 }],
     products: ['admin_products'], messages: ['admin_messages', { p_limit: 200 }], catalog: ['admin_catalog_list'], staff: ['admin_staff_list'], pwreq: ['admin_password_requests'], vpwreq: ['admin_vendor_password_requests'],
-    tasks: ['admin_tasks'], targets: ['admin_targets'], settings: ['admin_settings']
+    tasks: ['admin_tasks'], targets: ['admin_targets'], settings: ['admin_settings'], bcast: ['admin_broadcasts']
   };
   const keys = Object.keys(calls);
   const res = await Promise.all(keys.map(k => rpc(calls[k][0], calls[k][1])));
@@ -542,6 +544,7 @@ async function refresh(silent) {
   next.bookings = next.bookings || []; next.customers = next.customers || []; next.pending = next.pending || [];
   next.products = next.products || []; next.messages = next.messages || []; next.catalog = next.catalog || [];
   next.staff = next.staff || []; next.pwreq = next.pwreq || []; next.vpwreq = next.vpwreq || []; next.tasks = next.tasks || []; next.targets = next.targets || [];
+  next.bcast = next.bcast || { history: [], reach: {} };
   next.settings = next.settings || { commission_rate: (next.finance || {}).commission_rate || 0 };
   loadNotifs(true); next.gaps = next.gaps || []; next.perf = next.perf || []; next.areas = next.areas || []; next.daily = next.daily || [];
   next.today = istToday();
@@ -586,7 +589,7 @@ const TITLES = {
   vendors: ['Vendors', 'approve, block, performance'], products: ['Products', 'approval, price, stock, master catalog'],
   customers: ['Customers', 'naam pe click karo — saare orders'], areas: ['Villages', 'gaon, location, coverage'],
   messages: ['Messages', 'customers kya bol rahe hain'], staff: ['Team', 'sales + interns — role, type, password approval'], tasks: ['Kaam (tasks)', 'sales ya intern ko kaam do — status yahan dikhega'],
-  targets: ['Sales targets', 'sale ka target aur time — progress apne aap'], settings: ['Settings', 'commission aur notifications'], traffic: ['Traffic', 'kitne log aa rahe hain'],
+  targets: ['Sales targets', 'sale ka target aur time — progress apne aap'], broadcast: ['Notification bhejo', 'sab customers / vendors / staff ke phone pe ek saath'], settings: ['Settings', 'commission aur notifications'], traffic: ['Traffic', 'kitne log aa rahe hain'],
   launch: ['Launch check', 'real order ke liye kya baaki hai']
 };
 function go(v) {
@@ -601,7 +604,7 @@ function render(animate) {
   const el = $('v-' + VIEW);
   if (!D) { el.innerHTML = '<div class="sk"></div><div class="sk"></div><div class="sk"></div>'; return; }
   ({ home: vHome, orders: vOrders, vendors: vVendors, products: vProducts, customers: vCustomers,
-     areas: vAreas, messages: vMessages, staff: vStaff, tasks: vTasks, targets: vTargets, settings: vSettings, traffic: vTraffic, launch: vLaunch })[VIEW](el, animate ? 'rv' : '');
+     areas: vAreas, messages: vMessages, staff: vStaff, tasks: vTasks, targets: vTargets, broadcast: vBroadcast, settings: vSettings, traffic: vTraffic, launch: vLaunch })[VIEW](el, animate ? 'rv' : '');
 }
 /* re-render but keep focus + caret in a search box */
 function rerenderKeep(id) {
@@ -1231,6 +1234,50 @@ async function delTarget(id) {
 }
 
 /* ---------- Settings ---------- */
+/* ---------- broadcast: one notification to many phones ---------- */
+const BC_AUD = [['all', '🌍 Sab log'], ['customers', '🛒 Customers'], ['vendors', '🧑‍🌾 Vendors'], ['staff', '🧑‍💼 Staff']];
+const BC_TPL = [
+  ['🥬 Taaza sabzi', 'आज ताज़ा सब्ज़ी आई है 🥬', 'अभी RozBazaar खोलें और अपना स्लॉट बुक करें।', 'Fresh vegetables today 🥬', 'Open RozBazaar now and book your slot.'],
+  ['🎁 Offer', 'आज का ख़ास ऑफ़र 🎁', 'आज के ऑर्डर पर खास दाम — जल्दी बुक करें!', "Today's special offer 🎁", 'Special prices on orders today — book soon!'],
+  ['🌧️ Mausam', 'मौसम की सूचना 🌧️', 'बारिश की वजह से ऑर्डर थोड़ा देर से पहुँच सकता है। धन्यवाद।', 'Weather update 🌧️', 'Orders may arrive a little late because of rain. Thank you.'],
+  ['🙏 Chhutti', 'कल छुट्टी है 🙏', 'कल RozBazaar पर डिलीवरी बंद रहेगी। परसों से फिर शुरू।', 'Holiday tomorrow 🙏', 'No deliveries tomorrow. We are back the day after.']];
+function vBroadcast(el, rv) {
+  const R = (D.bcast && D.bcast.reach) || {}, H = (D.bcast && D.bcast.history) || [];
+  const aud = UI.bcAud || 'customers';
+  const people = { all: num(R.customers) + num(R.vendors) + num(R.staff), customers: num(R.customers), vendors: num(R.vendors), staff: num(R.staff) };
+  const phones = { all: num(R.customer_devices) + num(R.vendor_devices) + num(R.staff_devices), customers: num(R.customer_devices), vendors: num(R.vendor_devices), staff: num(R.staff_devices) };
+  el.innerHTML = `<div class="grid k2" style="align-items:start">
+    <div class="card ${rv} d1"><b style="font-size:16px">📣 Naya notification</b>
+      <p class="mu" style="margin:4px 0 12px;line-height:1.55">App ke 🔔 me sabko dikhega, aur jinhone notification allow kiya hai unke phone pe turant aayega (app band ho tab bhi).</p>
+      <label class="lb">Kisko bhejna hai?</label>
+      <div class="chips" style="margin-bottom:10px">${BC_AUD.map(([k, l]) => `<button class="chip ${aud === k ? 'on' : ''}" data-act="bcAud" data-arg="${k}">${l}<span class="c">${people[k]}</span></button>`).join('')}</div>
+      <label class="lb">Jaldi likhne ke liye</label>
+      <div class="chips" style="margin-bottom:6px">${BC_TPL.map((t, i) => `<button class="chip" data-act="bcTpl" data-arg="${i}">${t[0]}</button>`).join('')}</div>
+      <label class="lb" for="bcT">Title (Hindi) *</label><input class="fld" id="bcT" maxlength="80" placeholder="जैसे: आज ताज़ा सब्ज़ी आई है 🥬" value="${esc(UI.bcT || '')}">
+      <label class="lb" for="bcM">Message (Hindi) *</label><textarea class="fld" id="bcM" rows="3" maxlength="300" placeholder="जैसे: अभी RozBazaar खोलें और स्लॉट बुक करें।">${esc(UI.bcM || '')}</textarea>
+      <label class="lb" for="bcTe">Title (English) — English wale customers ko ye dikhega</label><input class="fld" id="bcTe" maxlength="80" placeholder="e.g. Fresh vegetables today 🥬" value="${esc(UI.bcTe || '')}">
+      <label class="lb" for="bcMe">Message (English)</label><textarea class="fld" id="bcMe" rows="2" maxlength="300" placeholder="e.g. Open RozBazaar now and book your slot.">${esc(UI.bcMe || '')}</textarea>
+      <div class="row" style="margin-top:14px"><button class="btn btn-g" data-act="bcSend">📣 ${people[aud]} logon ko bhejo</button>
+        <span class="mu">${phones[aud]} phone pe push chalu</span></div></div>
+    <div class="${rv} d2"><div class="grid k2 keep" style="gap:10px;margin-bottom:12px">
+        ${kpi('Customers', num(R.customers), num(R.customer_devices) + ' phone pe push', '', '🛒')}
+        ${kpi('Vendors', num(R.vendors), num(R.vendor_devices) + ' phone pe push', '', '🧑‍🌾')}</div>
+      <div class="card"><b>Pichhle notifications</b>
+      ${H.length ? H.map(b => `<div class="it" style="align-items:flex-start;padding:10px 0"><div style="flex:1;min-width:0"><b style="display:block">${esc(b.title)}</b>
+          <span class="mu" style="display:block">${esc(b.message)}</span><span class="mu" style="font-size:12px">${(BC_AUD.find(a => a[0] === b.audience) || ['', b.audience])[1]} · ${num(b.sent_to)} log · ${num(b.devices)} phone · ${when(b.created_at)}</span></div></div>`).join('')
+        : '<div class="mu" style="margin-top:8px">Abhi tak koi notification nahi bheja</div>'}</div></div></div>`;
+}
+function bcSave() { ['bcT', 'bcM', 'bcTe', 'bcMe'].forEach(k => { if ($(k)) UI[k] = $(k).value; }); }
+async function bcSend() {
+  bcSave();
+  const aud = UI.bcAud || 'customers';
+  if ((UI.bcT || '').trim().length < 2 || (UI.bcM || '').trim().length < 2) return toast('⚠️ Title aur message dono likho');
+  const lbl = (BC_AUD.find(a => a[0] === aud) || [])[1];
+  const v = await modal({ title: `${lbl} ko bhejein?`, sub: `"${UI.bcT}" — ye turant sabke phone pe jayega, wapas nahi le sakte.`, ok: '📣 Haan, bhejo' });
+  if (!v) return;
+  const ok = await act('admin_broadcast', { p_audience: aud, p_title: UI.bcT.trim(), p_message: UI.bcM.trim(), p_title_en: (UI.bcTe || '').trim() || null, p_message_en: (UI.bcMe || '').trim() || null });
+  if (ok) { UI.bcT = UI.bcM = UI.bcTe = UI.bcMe = ''; render(false); }
+}
 function vSettings(el, rv) {
   const f = D.finance || {}, r = rate();
   el.innerHTML = `<div style="max-width:640px">
@@ -1283,7 +1330,7 @@ async function loadNotifs(silent) {
   NOTIF_SEEN = ids;
   if ($('drawer').classList.contains('show') && $('drawer').dataset.kind === 'notifs') openNotifs();
 }
-const NICON = { ops_new_order: '🛒', ops_new_customer: '👤', ops_new_vendor: '🧑‍🌾', task_new: '📝', task_reopen: '↩️',
+const NICON = { broadcast: '📣', vendor_password: '🔑', ops_new_order: '🛒', ops_new_customer: '👤', ops_new_vendor: '🧑‍🌾', task_new: '📝', task_reopen: '↩️',
   task_done: '✅', task_not_done: '⚠️', target_new: '🎯' };
 function pushState() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return 'unsupported';
@@ -1635,6 +1682,9 @@ document.addEventListener('click', e => {
     case 'staffPw': staffPw(a, a2); break;
     case 'editStaff': editStaff(a); break;
     case 'pwDecide': pwDecide(a, a2 === 'true'); break;
+    case 'bcAud': bcSave(); UI.bcAud = a; render(false); break;
+    case 'bcTpl': { const t = BC_TPL[+a]; UI.bcT = t[1]; UI.bcM = t[2]; UI.bcTe = t[3]; UI.bcMe = t[4]; render(false); break; }
+    case 'bcSend': bcSend(); break;
     case 'vpwDecide': vpwDecide(a, a2 === 'true'); break;
     case 'notifs': openNotifs(); break;
     case 'readAll': readNotif(null); break;
