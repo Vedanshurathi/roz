@@ -6,6 +6,10 @@
 <title>RozBazaar — Slot book karo, sabzi ghar pe pao</title>
 <meta name="description" content="RozBazaar — book a local sabzi, fruit or pyaaz-aloo vendor for a time slot. Vendor comes to your door, weighs fresh, you pay cash or UPI. Pataudi, Haileymandi aur aas-paas.">
 <meta name="theme-color" content="#1E8E3E">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="RozBazaar">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="RozBazaar">
 <meta property="og:title" content="RozBazaar — Slot book karo, sabzi ghar pe pao">
@@ -4784,6 +4788,9 @@ function urlBase64ToUint8Array(base64String){
   const raw=atob(base64);
   return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
 }
+/* register on every load: installable as an app (Play Store / Add to Home Screen), and each visit
+   picks up the newest sw.js (delivery tracking) — it used to register only when alerts were turned on */
+if('serviceWorker' in navigator && !DEMO) window.addEventListener('load',()=>{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
 async function registerPushSW(){
   if(!('serviceWorker' in navigator)) return null;
   try{ return await navigator.serviceWorker.register('/sw.js'); }

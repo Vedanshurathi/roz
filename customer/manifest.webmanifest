@@ -1,0 +1,19 @@
+{
+  "id": "/",
+  "name": "RozBazaar — Fresh sabzi at your door",
+  "short_name": "RozBazaar",
+  "description": "Book a slot and your local sabzi-wala comes to your door — vegetables, fruits, onion-potato. Pataudi & Haileymandi villages.",
+  "lang": "en-IN",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#1E8E3E",
+  "categories": ["shopping", "food"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

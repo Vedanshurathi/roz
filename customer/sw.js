@@ -24,8 +24,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(Promise.all([rbTrack(data.nid, 'delivered'),
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: '/rozbazaar_logo_remove_backgrounds.png',
-      badge: '/rozbazaar_logo_remove_backgrounds.png',
+      icon: '/icon-192.png',
+      badge: '/badge-96.png',
       data: { url: data.url || '/', nid: data.nid || null },
       vibrate: [120, 60, 120]
     })]));
