@@ -210,6 +210,17 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   IST) and night-before reminder (20:30 IST). `notify_user()` now pushes for customers too.
 - Admin console → "📣 Notification bhejo": `admin_broadcast(audience all|customers|vendors|staff,
   title, message, title_en, message_en)`, templates, history + reach (`admin_broadcasts()`).
+- **Delivery tracking** (migration `20260926p_notification_tracking.sql`): every push goes through
+  `push_note(notification_id)` (called by `notify_person` / `notify_bi` / `notify_user`) → edge function
+  `send-push` (source in `supabase/functions/send-push/`; private VAPID key read from
+  `app_settings.vapid_private`, not in code) writes `push_devices/push_sent/push_failed/push_at` on the row
+  and sends `nid` in the payload. Each site's `sw.js` calls `notification_track(nid, 'delivered')` when the
+  push reaches the phone and `'opened'` when tapped (anon-callable; only sets those timestamps). The
+  `*_mark_read` functions set `read_at` (seen in the app's 🔔). Broadcast rows get `broadcast_id`.
+  Admin → "📬 Kisko mila / khola" (`admin_notification_report(p_broadcast, p_days, p_type)`) lists every
+  recipient with name, phone, delivered / opened, filters, search, CSV; broadcast history shows
+  sent / delivered / opened counts and a "Kisko mila" drawer. Notifications sent before 26 Sep 2026
+  22:00 IST have no tracking ("purana").
 
 ### Item names + photos (migration `20260926h_item_names_photos.sql`, edge function `item-photos`)
 - `catalog_items.english_name` (real English) + `image_url`; `products.name_en` + `stock_image_url`.
