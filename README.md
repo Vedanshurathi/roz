@@ -43,19 +43,6 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 Paste that as `SESSION_SECRET`. Both are required — the server won't
 start serving logins without them.
 
-## Staff app for employees (`/staff`)
-
-A read-only, phone-friendly page at `/staff/` (e.g.
-https://rozbazaar-admin.onrender.com/staff/) where employees can see incoming
-orders, vendors and sale (sabzi / pyaaz-aloo / fruits, item-wise). It has its
-own password, separate from the admin one, and cannot change anything.
-
-1. `npm run make-staff-password` → copy the `STAFF_PASSWORD_HASH=...` line
-2. Render → your service → Environment → add `STAFF_PASSWORD_HASH` → Save (it redeploys)
-3. Give employees the link and the staff password
-
-Until `STAFF_PASSWORD_HASH` is set, the staff login stays locked.
-
 ## Run it locally
 
 ```bash
