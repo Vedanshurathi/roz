@@ -4881,6 +4881,18 @@ async function geoState(){
   try{ if(navigator.permissions){ return (await navigator.permissions.query({name:'geolocation'})).state; } }catch(e){}
   return (addrCoords || localStorage.getItem('rb_geo_ok')) ? 'granted' : 'prompt';
 }
+/* opened as the Play Store app (TWA)? Its start URL is /?source=pwa and Android sends an
+   android-app:// referrer. There, permissions live in the phone's app settings, not behind 🔒. */
+const IN_APP=(()=>{ try{
+  if(document.referrer.startsWith('android-app://') || /[?&]source=pwa/.test(location.search)) sessionStorage.setItem('rb_app','1');
+  return !!sessionStorage.getItem('rb_app');
+}catch(e){ return document.referrer.startsWith('android-app://'); } })();
+function unblockHow(kind){
+  const en=kind==='notif'?'Notifications':'Location', hi=kind==='notif'?'सूचनाएँ':'लोकेशन';
+  return IN_APP
+    ? T('Phone Settings → Apps → RozBazaar → '+en+' → Allow','फ़ोन सेटिंग्स → ऐप्स → RozBazaar → '+hi+' → अनुमति दें')
+    : T('Tap 🔒 next to the website address → Permissions → '+en+' → Allow','वेबसाइट के पते के पास 🔒 दबाएँ → अनुमतियाँ → '+hi+' → अनुमति दें');
+}
 async function nag(){
   clearTimeout(nagT);
   const bar=document.getElementById('permBar'); if(!bar) return;
@@ -4899,10 +4911,10 @@ async function nag(){
       <button class="pok" onclick="hidePermBar();allowLoc()">${T('Allow','अनुमति दें')}</button>`;
   }else if(n==='denied' && !seen('notif-denied')){ nagShown='notif-denied';
     h=`<span class="pe">🔕</span><div style="flex:1;min-width:0"><b>${T('Notifications are blocked','सूचनाएँ बंद हैं')}</b>
-      <span>${T('Tap 🔒 next to the website address → Permissions → Notifications → Allow','वेबसाइट के पते के पास 🔒 दबाएँ → अनुमतियाँ → सूचनाएँ → अनुमति दें')}</span></div>`;
+      <span>${unblockHow('notif')}</span></div>`;
   }else if(g==='denied' && !seen('geo-denied')){ nagShown='geo-denied';
     h=`<span class="pe">📍</span><div style="flex:1;min-width:0"><b>${T('Location is blocked','लोकेशन बंद है')}</b>
-      <span>${T('Tap 🔒 next to the website address → Permissions → Location → Allow','वेबसाइट के पते के पास 🔒 दबाएँ → अनुमतियाँ → लोकेशन → अनुमति दें')}</span></div>`;
+      <span>${unblockHow('geo')}</span></div>`;
   }
   if(!h){ hidePermBar(); return; }
   bar.innerHTML=h+`<button class="px" onclick="closePermBar()" aria-label="${T('Close','बंद करें')}">✕</button>`;
