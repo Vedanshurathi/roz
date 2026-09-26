@@ -152,11 +152,22 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
 - Data: `staff_me()` (name, phone, is_admin) and `staff_snapshot()` only (migration
   `20260926_staff_app.sql`): bookings from the last 90 days + upcoming, and all vendors;
   no `delivery_otp`, no house/street, no GPS. Customers tab is derived from those bookings.
+- **Click-through details (both staff and admin):** order → full detail + items; from an
+  order, "Is customer ke sab orders" / "Vendor ke sab orders" open drawers with totals
+  (orders, sale, avg, cancel/miss), top items and every order (each clickable). Customers
+  rows open the same customer drawer. Staff group customers by `customer_id` (in snapshot).
+- **Roles + approvals:** `staff.role` is set by the admin only (`admin_update_staff`);
+  staff can rename themselves (`staff_update_my_name`). Staff password change is a request
+  (`staff_request_password` stores only a bcrypt hash in `staff_password_requests`); it
+  becomes the real password when an admin approves (`admin_decide_password_request`).
+  The staff site no longer calls `auth.updateUser`. Caveat: Supabase itself still lets any
+  logged-in user change their own password through the raw auth API, so the approval step
+  is enforced by the app, not by Supabase. Migration `20260926c_staff_roles_password_approval.sql`.
 - Tabs: Aaj ka plan (KPIs, slot board Subah/Dopahar/Shaam, village + vendor load),
   Orders (day/status/type/village filters, search, detail drawer, CSV), Vendors (cards,
   7-day chart drawer), Sale (today/yesterday/7/30/custom range, Sabzi/Pyaaz-Aloo/Fruits,
   cash vs UPI, daily bars, item/vendor/village breakdown, CSV), Customers (repeat,
-  lapsed 30+ days, call/WhatsApp), Mera account (change own password via `auth.updateUser`).
+  lapsed 30+ days, call/WhatsApp), Mera account (rename self, request password change + status).
 - Auto-refresh every 45 s; a booking id not seen before → 🔔 toast + beep + Orders badge.
 - "Sale" = booking with a payment row, or status paid/delivered/completed; amount =
   `pay_amount ?? final_total`. Item-wise = final bill lines (qty × per-unit `final_price`).
@@ -184,7 +195,8 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   with sale, rating, upcoming orders, items), Products (approval queue, all products
   with inline price + stock + edit, master catalog add/remove), Customers (search,
   block, same-number flag), Villages (add, active toggle, set GPS point), Messages,
-  Staff (add employee, reset password, turn off), Traffic, Launch check.
+  Staff (add employee with role, edit name/role, approve/reject password requests,
+  reset password, turn off), Traffic, Launch check. Customer + vendor drawers show full order history.
 - Modals replace `prompt()`/`confirm()`; one delegated click listener on `data-act`.
 
 ### Admin (`admin/`) — older Render version

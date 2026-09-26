@@ -323,6 +323,14 @@ admin_staff_list() · admin_add_staff(p_name, p_phone, p_password) [definer]
 admin_set_staff_active(p_staff, p_active) · admin_reset_staff_password(p_staff, p_password) [definer]
 ```
 (`20260926b_staff_phone_login.sql`; `staff_me()` now also returns `phone`.)
+```
+admin_add_staff(p_name, p_phone, p_password, p_role=null) · admin_update_staff(p_staff, p_name, p_role) [definer]
+admin_password_requests() · admin_decide_password_request(p_request, p_approve) [definer]
+staff_update_my_name(p_name) · staff_request_password(p_password) · staff_password_status() [definer]
+```
+(`20260926c_staff_roles_password_approval.sql`: `staff.role`, table `staff_password_requests`
+(staff_id, new_hash, status pending/approved/rejected/replaced) — RLS on, no client access;
+`staff_me()` returns `role`; `staff_snapshot()` bookings include `customer_id`.)
 
 ### Triggers & jobs
 ```
