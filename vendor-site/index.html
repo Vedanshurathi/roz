@@ -2873,15 +2873,15 @@ async function toggleCatalogStock(id){
   const newVal=!p.stock;
   p.stock=newVal; renderCatalogPicker();   /* optimistic */
   const r=await api('setStock',{id, stock:newVal});
-  if(!r.ok){ p.stock=!newVal; renderCatalogPicker(); toast(r.msg||T('Could not save — try again','Save nahi hua — dubara try karo')); }
+  if(!r.ok){ p.stock=!newVal; renderCatalogPicker(); toast(r.msg||T('Could not save — try again','सेव नहीं हुआ — दोबारा कोशिश करो')); }
 }
 async function updateCatalogPrice(id, val){
   const n=parseFloat(val); const p=prod(id);
   if(isNaN(n)||n<=0){ renderCatalogPicker(); return toast(T('Enter a valid rate','सही रेट डालो')); }
   const old=p.price; p.price=n;
   const r=await api('saveStock',{prices:[{id, price:n}]});
-  if(!r.ok){ p.price=old; renderCatalogPicker(); return toast(r.msg||T('Could not save — try again','Save nahi hua — dubara try karo')); }
-  toast(T('Rate updated','Rate update ho gaya'));
+  if(!r.ok){ p.price=old; renderCatalogPicker(); return toast(r.msg||T('Could not save — try again','सेव नहीं हुआ — दोबारा कोशिश करो')); }
+  toast(T('Rate updated','रेट अपडेट हो गया'));
   renderCatalogPicker();
 }
 async function removeCatalogItem(id, label){
@@ -3998,7 +3998,7 @@ async function renderStock(){
       <div style="display:flex;align-items:center;gap:11px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">
         <span style="font-size:13px;font-weight:800;color:var(--tx2)">${T("Today's rate",'आज का रेट')}</span>
         <div class="rupee" style="margin-left:auto">
-          <span>₹</span><input value="${p.price}" inputmode="numeric" onchange="setStockPrice('${p.id}',this.value)">
+          <span>₹</span><input value="${p.price}" inputmode="decimal" onchange="setStockPrice('${p.id}',this.value)">
         </div>
         <span style="font-size:13px;font-weight:800;color:var(--mut)">/${p.unit}</span>
       </div>
@@ -4011,12 +4011,19 @@ async function toggleStock(id){
   const p=prod(id); const newVal=!p.stock;
   p.stock=newVal; renderStock();   /* optimistic — feels instant */
   const r=await api('setStock',{id, stock:newVal});
-  if(!r.ok){ p.stock=!newVal; renderStock(); toast(r.msg||T('Could not save — try again','Save nahi hua — dubara try karo')); }
+  if(!r.ok){ p.stock=!newVal; renderStock(); toast(r.msg||T('Could not save — try again','सेव नहीं हुआ — दोबारा कोशिश करो')); }
 }
-function setStockPrice(id,v){
-  const n=parseInt(v,10); const p=prod(id);
-  if(isNaN(n)||n<=0) return toast(T('Enter a valid rate','सही रेट डालो'));
-  p.price=n; renderStock();
+/* A new rate is saved the moment it is typed. It used to wait for "Save changes" — leaving the
+   screen without tapping it silently lost the new rate — and parseInt turned ₹32.5 into ₹32. */
+async function setStockPrice(id,v){
+  const n=Math.round(parseFloat(v)*100)/100; const p=prod(id);
+  if(!p) return;
+  if(isNaN(n)||n<=0){ renderStock(); return toast(T('Enter a valid rate','सही रेट डालो')); }
+  if(n===Number(p.price)) return;
+  const old=p.price; p.price=n; renderStock();
+  const r=await api('saveStock',{prices:[{id, price:n}]});
+  if(!r.ok){ p.price=old; renderStock(); return toast(r.msg||T('Could not save the rate — try again','रेट सेव नहीं हुआ — दोबारा कोशिश करो')); }
+  toast(T(`${pname(p)}: ₹${n} saved — customers see it now`,`${pname(p)}: ₹${n} सेव — ग्राहक अब यही देखेंगे`));
 }
 async function saveStock(){
   const prices = PRODUCTS.filter(p=>!p.pending).map(p=>({id:p.id, price:p.price}));

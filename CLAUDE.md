@@ -341,6 +341,23 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   items add directly. The first item in the cart sets `sel.vendorId`; adding an
   item from a different vendor shows a warning toast (a booking goes to one vendor).
 - Times: always `ist_date()` / `ist_now()` for business logic. The DB clock is UTC.
+  No function uses `current_date` any more (migration `20260926n_ist_dates_row_checks.sql` rewrote all of
+  them, and every `if rec is [not] null` on a table-row variable → `rec.id`).
+- **Vendor picker:** `customer_vendors_for_product` matches the item by `name`, `name_en` or `catalog_key`
+  (the app sends `products.name`, e.g. "Tamatar"). It used to get the English name and match nothing, so
+  every item sold by 2+ vendors said "No one sells this here yet". Out-of-stock vendors are listed but
+  can't be picked. `customer_create_booking` refuses out-of-stock items (`code OUT_OF_STOCK`, names them)
+  and, when the customer's chosen vendor is full in that slot, returns `VENDOR_FULL` instead of silently
+  giving the order to another vendor (migration `20260926m_vendor_picker_stock.sql`).
+- **Stock/price freshness (customer):** `applyCatalogue()` updates items from the 25 s logged-in poll and
+  `refreshCatalogue()` (app back on screen + every 3 min); basket marks items that went out of stock and
+  blocks booking; the basket "note for the vendor" is now actually sent (`BASKET_NOTE` → `p_note`).
+- **Messages in the right language:** `tr(hi, en)` looks the Roman-Hindi text up in `msg_i18n` → proper
+  Devanagari / English; customer functions' plain messages are wrapped in `tr()`. The customer app always
+  syncs `set_language` on login (phone login too, which also now saves push + loads 🔔).
+- `vendor_finalize_bill` also works in status `disputed` (vendor re-weighs and re-sends the bill)
+  (migration `20260926o_messages_i18n_bill_redo.sql`). Vendor Stock screen saves a rate as soon as it's
+  typed (decimals allowed).
 
 ---
 

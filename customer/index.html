@@ -2777,7 +2777,7 @@ async function mockApi(fn, args={}){
       const r = await rpc('customer_create_booking',{
         p_type: sel.type||'vegetable', p_address_id: saved.id,
         p_date: istISO(sel.day), p_slot: sel.slot||'morning',
-        p_items: items, p_note: (addr&&addr.note)||null, p_vendor_id: sel.vendorId||null
+        p_items: items, p_note: [BASKET_NOTE.trim(), addr&&addr.note].filter(Boolean).join(' · ')||null, p_vendor_id: sel.vendorId||null
       });
       if(!r.ok) return r;
       return {ok:true, data:{code:r.data.code, otp:r.data.delivery_otp||r.data.otp, id:r.data.id}};
@@ -2958,6 +2958,7 @@ function startWayPolling(){
       const pr=await rpc('customer_home',{p_area:AREA});
       if(pr.ok && pr.data && Array.isArray(pr.data.products)){
         checkPriceChanges(pr.data.products.map(mapProduct));
+        if(PRODUCTS.length) applyCatalogue(pr.data);   /* stock / price changes show up without a reload */
       }
     }
   }, 25000);
@@ -3224,7 +3225,7 @@ function card(p){
             : `<button class="add" onclick="fly(event,'${p.id}')">ADD</button>`}</div>
     <span class="wt">${p.unit}</span>
     <div class="pn">${pname(p)}</div>
-    ${p.vendorName ? `<div class="pvendor" onclick="event.stopPropagation();openVendorPicker('${(p.en||'').replace(/'/g,"\\'")}')">
+    ${p.vendorName ? `<div class="pvendor" onclick="event.stopPropagation();openVendorPicker(pname(prod('${p.id}')),null,'${p.id}')">
       \u{1F9D1} ${p.vendorName}${p.vendorRating>0?` <span class="pv-star">\u2B50 ${p.vendorRating.toFixed(1)}</span>`:''}
     </div>` : ''}
     <div class="pslot">🕖 ${slotBadge()}</div>
@@ -3234,6 +3235,35 @@ function card(p){
 function skeletons(n){
   return Array.from({length:n}).map(()=>`<div class="pcard sk-card"><div class="sk sk1"></div><div class="sk sk2"></div><div class="sk sk3"></div></div>`).join('');
 }
+
+/* Keep stock and prices fresh. The list was loaded once per visit, so an item a vendor put back
+   in stock (or a new rate) only showed after a full reload. Re-checked when the app comes back
+   to the screen and every 3 minutes while it is open; the screen is redrawn only if something changed. */
+let CAT_T=Date.now(), CAT_BUSY=false;
+async function refreshCatalogue(force){
+  if(DEMO || CAT_BUSY || !AREA || !PRODUCTS.length) return;
+  if(!force && Date.now()-CAT_T < 60000) return;
+  CAT_BUSY=true;
+  try{
+    const r=await rpc('customer_home',{p_area:AREA});
+    if(r.ok) applyCatalogue(r.data);
+  }catch(e){} finally{ CAT_BUSY=false; }
+}
+function applyCatalogue(data){
+  CAT_T=Date.now();
+  const next=(data.products||[]).map(mapProduct);
+  const sig=l=>l.map(p=>[p.id,p.fresh,p.price,p.en,p.hi,p.photo].join('|')).join(';');
+  if(sig(next)===sig(PRODUCTS)) return;
+  PRODUCTS=next; SERVED=data.served; LIVE_TYPES=data.types||LIVE_TYPES;
+  const on=(document.querySelector('.scr.on')||{}).id;
+  if(on==='s-home') renderHome();
+  else if(on==='s-cat' && typeof renderCat==='function') renderCat();
+  else if(on==='s-search' && typeof renderSearch==='function') renderSearch();
+  else if(on==='s-basket') renderBasket();
+  syncCart();
+}
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') refreshCatalogue(); });
+setInterval(()=>{ if(document.visibilityState==='visible') refreshCatalogue(true); }, 180000);
 
 /* ---------------- HOME ---------------- */
 async function renderHome(){
@@ -3474,10 +3504,15 @@ function chip(el,f){document.querySelectorAll('.chip').forEach(c=>{ if(c.id!=='v
 /* ---------------- VENDOR PICKER — Zomato-style browse-by-vendor ---------------- */
 let VENDOR_LIST=[], catVendorFilter=null, vendSort='rating';
 let productVendorMode=null;   /* the exact product name being compared, or null for area-wide browsing */
-let pendingAddName=null;
-async function openVendorPicker(productName, addMode){
+let pendingAddName=null, PICK_PID=null;
+/* productName = what the title shows (in the current language); pid = the product tapped.
+   The vendor list is looked up by the vendor's own item name (products.name, "Tamatar") —
+   it used to send the English display name ("Tomato"), which matched nothing, so every item
+   sold by two vendors said "No one sells this here yet". */
+async function openVendorPicker(productName, addMode, pid){
   productVendorMode = productName || null;
   pendingAddName = addMode ? productName : null;
+  PICK_PID = (typeof addMode==='string' ? addMode : pid) || null;
   document.getElementById('vendBg').classList.add('on');
   document.getElementById('vendAsk').classList.add('on');
   document.getElementById('vendList').innerHTML = skeletons(3);
@@ -3492,7 +3527,7 @@ async function openVendorPicker(productName, addMode){
   subEl.textContent = LANG==='en' ? subEn : subHi;
   document.getElementById('vendShowAllBtn').style.display = productVendorMode ? 'none' : '';
   const r = productVendorMode
-    ? await mockApi('getVendorsForProduct',{name:productVendorMode})
+    ? await mockApi('getVendorsForProduct',{name:((PICK_PID&&prod(PICK_PID))||{}).roman || productVendorMode})
     : await mockApi('getVendors');
   VENDOR_LIST = (r.ok && r.data) ? r.data : [];
   renderVendorList();
@@ -3523,7 +3558,7 @@ function renderVendorList(){
     return p ? p.vendorId : null;
   })() : null;
   document.getElementById('vendList').innerHTML = list.length ? list.map(v=>`
-    <button class="vcard ${catVendorFilter===v.id?'sel':''}" onclick="pickVendor('${v.id}')">
+    <button class="vcard ${catVendorFilter===v.id?'sel':''}" onclick="pickVendor('${v.id}')" ${productVendorMode&&v.in_stock===false?'disabled style="opacity:.5"':''}>
       ${v.photo_url ? `<img class="vav" src="${v.photo_url}" alt="">` : `<div class="vav">${(v.name||'?')[0].toUpperCase()}</div>`}
       <div class="vt">
         <b>${v.name}${cartVendorId && v.id===cartVendorId ? ` · <span style="color:var(--g-dk);font-weight:800">${T('already in your cart','पहले से टोकरी में')}</span>` : ''}</b>
@@ -3531,7 +3566,7 @@ function renderVendorList(){
           ${v.avg_rating>0 ? `<span class="vstars">⭐ ${Number(v.avg_rating).toFixed(1)}</span><span class="vdot">·</span>` : ''}
           <span class="vch">${v.orders_completed||0} ${T('orders done','ऑर्डर पूरे')}</span>
           ${productVendorMode
-            ? `<span class="vdot">·</span><span class="vch" style="color:var(--g-dk);font-weight:800">₹${v.price}/${v.unit}</span>`
+            ? `<span class="vdot">·</span><span class="vch" style="color:var(--g-dk);font-weight:800">₹${v.price}/${v.unit}</span>${v.in_stock===false?`<span class="vdot">·</span><span class="vch" style="color:#D93025;font-weight:800">${T('Out of stock','स्टॉक ख़त्म')}</span>`:''}`
             : `<span class="vdot">·</span><span class="vch">${v.product_count||0} ${T('items','सामान')}</span>`}
         </div>
       </div>
@@ -3542,7 +3577,14 @@ function renderVendorList(){
 function pickVendor(id){
   if(pendingAddName){
     const v=VENDOR_LIST.find(x=>x.id===id);
+    if(v && v.in_stock===false){ return toast(T(v.name+' has this out of stock right now','अभी '+v.name+' के पास यह ख़त्म है')); }
     if(v && v.product_id){
+      /* the picked vendor's item may not be in the loaded list (e.g. loaded before the vendor added it) */
+      if(!prod(v.product_id)){
+        const base=prod(PICK_PID)||{};
+        PRODUCTS.push(Object.assign({}, base, {id:v.product_id, price:Number(v.price), unit:v.unit||base.unit,
+          vendorId:v.id, vendorName:v.name, vendorRating:Number(v.avg_rating)||0, fresh:true}));
+      }
       cart[v.product_id]=(cart[v.product_id]||0)+1;
       syncCart();
       /* This is a real, explicit choice, not a guess — it should carry
@@ -3580,8 +3622,9 @@ function fly(e,id){
      happened to render first hides a choice the person would
      reasonably want to make. Only ask when it's a real choice —
      one vendor selling it still adds instantly, same as always. */
-  const siblings = PRODUCTS.filter(x=>x.en && p && x.en===p.en && x.fresh!==false);
-  if(siblings.length>1){ openVendorPicker(p.en, id); return; }
+  const same=(a,b)=>String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();
+  const siblings = p ? PRODUCTS.filter(x=>x.fresh!==false && ((x.en&&same(x.en,p.en)) || same(x.roman,p.roman))) : [];
+  if(siblings.length>1){ openVendorPicker(pname(p), id); return; }
   flyAnimate(e, id);
 }
 function flyAnimate(e,id){
@@ -4335,8 +4378,12 @@ function addrLine(){
 
 
 /* ---------------- BASKET ---------------- */
+let BASKET_NOTE='';   /* the basket's "note for the vendor" — it was never sent before */
 function renderBasket(){
   const body=document.getElementById('basketBody'), stick=document.getElementById('basketStick');
+  /* an item the vendor removed since the page loaded would crash this screen */
+  const gone=Object.keys(cart).filter(id=>!prod(id));
+  if(gone.length){ gone.forEach(id=>delete cart[id]); syncCart(); toast(T('An item is no longer sold and was removed from your basket','एक सामान अब नहीं बिकता — टोकरी से हटा दिया')); }
   const ids=Object.keys(cart);
   if(!ids.length){
     stick.style.display='none';
@@ -4364,16 +4411,17 @@ function renderBasket(){
 
     <div class="h2">${T('Your items','आपका सामान')}</div>
     <div class="card">${ids.map(id=>{const p=prod(id);return `
-      <div class="brow">
+      <div class="brow"${p.fresh===false?' style="opacity:.7"':''}>
         <div class="be">${art(p)}</div>
-        <div style="min-width:0"><b>${pname(p)}</b><span>${p.unit} · ₹${p.price}</span></div>
+        <div style="min-width:0"><b>${pname(p)}</b><span>${p.unit} · ₹${p.price}</span>
+          ${p.fresh===false?`<span style="display:block;color:#D93025;font-weight:800">${T('Out of stock now — please remove','अभी स्टॉक ख़त्म — कृपया हटाएँ')}</span>`:''}</div>
         <div class="qty">
           <button onclick="setQty('${id}',-1)">−</button><i>${cart[id]}</i><button onclick="setQty('${id}',1)">+</button>
         </div>
       </div>`}).join('')}</div>
 
     <div class="h2">${T('Note for the vendor','वेंडर के लिए नोट')}</div>
-    <textarea class="field" id="vnote" rows="2" placeholder="${T('e.g. more tomatoes, less coriander','जैसे: ज़्यादा टमाटर, कम धनिया')}"></textarea>
+    <textarea class="field" id="vnote" rows="2" maxlength="300" oninput="BASKET_NOTE=this.value" placeholder="${T('e.g. more tomatoes, less coriander','जैसे: ज़्यादा टमाटर, कम धनिया')}">${esc(BASKET_NOTE)}</textarea>
 
     <div class="card" style="margin-top:20px">
       <div class="trow"><span>${T('Items','सामान')} (${count()})</span><span>₹${total()}</span></div>
@@ -4508,6 +4556,10 @@ async function phoneLogin(){
     user={name:d.name||n, phone:d.phone||p, email:d.email||''};
     await loadMyAddress();
     renderAcct(); paintHeaderIdentity();
+    /* same as the Google path: language, push subscription and the 🔔 list — phone-login
+       customers used to get none of these until they reloaded the page */
+    rpc('set_language',{p_lang:LANG});
+    syncPush(); loadCustNotifs(true); clearInterval(window.__nPoll); window.__nPoll=setInterval(()=>loadCustNotifs(true), 60000);
     mockApi('getBookings').then(res=>{ if(res.ok){ if(!DEMO) BOOKINGS=res.data; checkForCompletedOrder(); } });
     startWayPolling();
     btn.style.pointerEvents='auto'; btn.style.opacity='1';
@@ -4532,6 +4584,8 @@ function paintCheckoutBanner(){
   if(loc){ loc.innerHTML=html; loc.style.display= n>0 ? 'flex' : 'none'; }
 }
 function placeBooking(){
+  const oos=Object.keys(cart).map(prod).filter(p=>p && p.fresh===false);
+  if(oos.length) return toast(T('Out of stock now: ','अभी स्टॉक ख़त्म: ')+oos.map(pname).join(', ')+T(' — please remove',' — कृपया हटाएँ'));
   if(total()<MIN_BASKET) return toast(T(`Minimum booking is ₹${MIN_BASKET}`,`कम से कम बुकिंग ₹${MIN_BASKET} है`));
   if(!sel.slot) {toast(T('Pick a slot first','पहले स्लॉट चुनें')); return go('slot');}
   paintCheckoutBanner();
@@ -4545,7 +4599,11 @@ function placeBooking(){
 async function createBooking(){
   toast(T('Booking the vendor…','वेंडर को बता रहे हैं…'));
   const res=await mockApi('createBooking',{items:cart, slot:sel});
-  if(!res.ok) return toast(res.msg||T('Could not book — try again','बुकिंग नहीं हुई — दोबारा कोशिश करें'));
+  if(!res.ok){
+    if(res.code==='OUT_OF_STOCK'){ await refreshCatalogue(true); if(!document.getElementById('s-basket').classList.contains('on')) go('basket'); }
+    if(res.code==='VENDOR_FULL' || res.code==='NO_VENDOR'){ sel.slot=null; go('slot'); }
+    return toast(res.msg||T('Could not book — try again','बुकिंग नहीं हुई — दोबारा कोशिश करें'));
+  }
   const b={
     id:res.data.id, code:res.data.code, otp:res.data.otp, status:'confirmed',
     type:sel.type||'vegetable', slot:slotLine(),
@@ -4553,7 +4611,7 @@ async function createBooking(){
     addr:addrLine()||'', tag:(addr&&addr.tag)||'Ghar', name:(user&&user.name)||''
   };
   BOOKINGS.unshift(b);            /* replaced by the server list on the bookings screen */
-  cart={}; syncCart(); ADDR_PICKED=false;
+  cart={}; syncCart(); ADDR_PICKED=false; BASKET_NOTE='';
   document.getElementById('sucId').textContent=b.code;
   document.getElementById('sucOtp').textContent=b.otp;
   document.getElementById('sucLine').textContent=T('The vendor has been told. See you '+b.slot.toLowerCase()+'.','वेंडर को बता दिया गया है — '+b.slot);
@@ -4647,7 +4705,7 @@ async function adoptSession(session){
     await loadMyAddress();
     renderAcct();
     paintHeaderIdentity();
-    try{ if(localStorage.getItem('rb_lang')) rpc('set_language',{p_lang:LANG}); }catch(e){}   /* pushes arrive in the language the person picked */
+    rpc('set_language',{p_lang:LANG});   /* messages + pushes come in the language this app is showing */
     syncPush(); loadCustNotifs(true); clearInterval(window.__nPoll); window.__nPoll=setInterval(()=>loadCustNotifs(true), 60000);
     /* silent background check — a customer whose order finished while
        the app was closed should see the celebration the moment they
