@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-PCvCA9/CJ08k/cH2t3Aiyl7LqmKztU8EM82+5jxEOSo=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eZny5mPsXwTb89LXHsOUpn8p/6AT67+EJdxtr2U34UM=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -524,7 +524,7 @@ async function refresh(silent) {
     bookings: ['admin_bookings', { p_date: null, p_status: null, p_area: null, p_limit: 1000 }],
     customers: ['admin_customers', { p_limit: 1000 }], pending: ['admin_pending_products'],
     visits: ['admin_visit_stats', { p_days: 30 }], finance: ['admin_finance_dashboard', { p_days: 30 }],
-    products: ['admin_products'], messages: ['admin_messages', { p_limit: 200 }], catalog: ['admin_catalog_list'], staff: ['admin_staff_list'], pwreq: ['admin_password_requests'],
+    products: ['admin_products'], messages: ['admin_messages', { p_limit: 200 }], catalog: ['admin_catalog_list'], staff: ['admin_staff_list'], pwreq: ['admin_password_requests'], vpwreq: ['admin_vendor_password_requests'],
     tasks: ['admin_tasks'], targets: ['admin_targets'], settings: ['admin_settings']
   };
   const keys = Object.keys(calls);
@@ -541,7 +541,7 @@ async function refresh(silent) {
   next.vendors = (next.vendors || []).map(v => ({ ...v, can_log_in: !!v.auth_user_id }));
   next.bookings = next.bookings || []; next.customers = next.customers || []; next.pending = next.pending || [];
   next.products = next.products || []; next.messages = next.messages || []; next.catalog = next.catalog || [];
-  next.staff = next.staff || []; next.pwreq = next.pwreq || []; next.tasks = next.tasks || []; next.targets = next.targets || [];
+  next.staff = next.staff || []; next.pwreq = next.pwreq || []; next.vpwreq = next.vpwreq || []; next.tasks = next.tasks || []; next.targets = next.targets || [];
   next.settings = next.settings || { commission_rate: (next.finance || {}).commission_rate || 0 };
   loadNotifs(true); next.gaps = next.gaps || []; next.perf = next.perf || []; next.areas = next.areas || []; next.daily = next.daily || [];
   next.today = istToday();
@@ -555,7 +555,7 @@ async function refresh(silent) {
 function badges() {
   const set = (id, n) => { const b = $(id); b.classList.toggle('hide', !n); b.textContent = n; };
   set('bOrders', D.bookings.filter(b => ATTN.includes(b.status)).length);
-  set('bVendors', D.vendors.filter(v => v.status === 'pending').length);
+  set('bVendors', D.vendors.filter(v => v.status === 'pending').length + D.vpwreq.filter(r => r.status === 'pending').length);
   set('bProducts', D.pending.length);
   set('bMessages', D.messages.filter(m => !m.is_read).length);
   set('bLaunch', D.readiness.filter(x => x.state === 'no').length);
@@ -879,7 +879,14 @@ function vVendors(el, rv) {
   const F = { all: () => true, live: v => v.status === 'approved' && v.is_active, pending: v => v.status === 'pending',
     blocked: v => v.status === 'suspended' || (v.status === 'approved' && !v.is_active), rejected: v => v.status === 'rejected' };
   const list = D.vendors.filter(F[UI.vfilter]);
+  const vpend = D.vpwreq.filter(r => r.status === 'pending');
   el.innerHTML = `
+    ${vpend.length ? `<div class="alert info ${rv} d1"><div class="e">🔑</div><div><b>${vpend.length} vendor password change request</b><span>Approve karte hi vendor ka naya password chalega. Tab tak purana hi chalega.</span></div></div>
+    <div class="tw ${rv} d1" style="margin-bottom:16px"><table><thead><tr><th>Vendor</th><th>Type</th><th>Kab maanga</th><th></th></tr></thead><tbody>
+      ${vpend.map(r => `<tr><td><b>${esc(r.name)}</b><span class="sub">${esc(r.phone || '')}</span></td><td>${typeLbl(r.v_type)}</td><td class="mu">${when(r.created_at)}</td>
+        <td class="acts"><button class="btn btn-g btn-sm" data-act="vpwDecide" data-arg="${esc(r.id)}" data-arg2="true">✓ Approve</button>
+          <button class="btn btn-r btn-sm" data-act="vpwDecide" data-arg="${esc(r.id)}" data-arg2="false">✕ Reject</button></td></tr>`).join('')}
+    </tbody></table></div>` : ''}
     <div class="grid k4 ${rv} d1">
       ${kpi('Live vendors', D.vendors.filter(F.live).length, 'customers ko dikh rahe', 'good', '🟢')}
       ${kpi('Approval baaki', D.vendors.filter(F.pending).length, 'naye applications', D.vendors.some(F.pending) ? 'warn' : '', '⏳')}
@@ -1120,6 +1127,13 @@ async function editStaff(id) {
 async function staffPw(id, name) {
   const v = await modal({ title: `${name} ka naya password`, sub: 'Aap khud set kar rahe ho, isliye turant chalega.', ok: 'Save', fields: [{ id: 'pw', label: 'Naya password (kam se kam 6)' }] });
   if (v) await act('admin_reset_staff_password', { p_staff: id, p_password: v.pw });
+}
+async function vpwDecide(id, approve) {
+  const r = D.vpwreq.find(x => x.id === id);
+  const v = await modal({ title: approve ? `${r ? r.name : ''} (vendor) ka naya password approve karein?` : 'Request reject karein?',
+    sub: approve ? 'Approve karte hi purana password band ho jaayega aur naya chalega.' : 'Vendor ka purana password hi chalta rahega.',
+    ok: approve ? '✓ Approve' : '✕ Reject', danger: !approve });
+  if (v) await act('admin_decide_vendor_password_request', { p_request: id, p_approve: approve });
 }
 async function pwDecide(id, approve) {
   const r = D.pwreq.find(x => x.id === id);
@@ -1509,7 +1523,7 @@ async function reviewVendor(id, decision) {
 }
 async function vendorLogin(id) {
   const v = D.vendors.find(x => x.id === id); if (!v) return;
-  const r = await modal({ title: `${v.name}: vendor app login`, sub: `Vendor app me phone ${v.phone || '—'} + ye password daal ke login karega. Pehle se Google se juda vendor Google se hi login kare.`,
+  const r = await modal({ title: `${v.name}: vendor app login`, sub: `Vendor app me phone ${v.phone || '—'} + ye password daal ke login karega (koi OTP nahi). Purana password turant band ho jaayega.`,
     ok: 'Password set karo', fields: [{ id: 'pw', label: 'Naya password (kam se kam 6)', type: 'text', ph: 'Jaise: ramesh123' }] });
   if (!r) return;
   if (String(r.pw || '').length < 6) return toast('⚠️ Password kam se kam 6 character');
@@ -1621,6 +1635,7 @@ document.addEventListener('click', e => {
     case 'staffPw': staffPw(a, a2); break;
     case 'editStaff': editStaff(a); break;
     case 'pwDecide': pwDecide(a, a2 === 'true'); break;
+    case 'vpwDecide': vpwDecide(a, a2 === 'true'); break;
     case 'notifs': openNotifs(); break;
     case 'readAll': readNotif(null); break;
     case 'readOne': readNotif(a); break;

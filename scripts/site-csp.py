@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """Re-pin the inline-script hash of a static site after editing its index.html.
 
-admin-site/, staff-site/ and vendor-site/ have a Content-Security-Policy that only lets the
+admin-site/ and staff-site/ have a Content-Security-Policy that only lets the
 inline <script> run if its sha256 matches. Any edit to that script changes the
-hash, so run this afterwards (no argument = all three sites):
-    python3 scripts/site-csp.py [admin-site|staff-site|vendor-site]
+hash, so run this afterwards (no argument = both sites):
+    python3 scripts/site-csp.py [admin-site|staff-site]
 It updates both the <meta> CSP in index.html and the header in .htaccess.
 """
 import base64, hashlib, pathlib, re, sys
 
 base = pathlib.Path(__file__).resolve().parent.parent
-for site in (sys.argv[1:] or ['admin-site', 'staff-site', 'vendor-site']):
+for site in (sys.argv[1:] or ['admin-site', 'staff-site']):
   root = base / site
   page, ht = root / 'index.html', root / '.htaccess'
   h = page.read_text()

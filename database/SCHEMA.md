@@ -361,6 +361,16 @@ triggers: trg_vendor_booking_notify (bookings → disputed / missed), trg_vendor
 jobs: job_vendor_slot_alert(slot, 'soon'|'start') · job_vendor_daily_summary()
 ```
 
+### Vendor phone + password login (added 26 Sep 2026 — `20260926f_vendor_phone_password.sql`)
+```
+table vendor_password_requests(id, vendor_id, new_hash, status pending|approved|rejected|replaced, created_at, decided_at, decided_by)
+vendor_login_lookup(p_phone) → {registered, has_password, email?}   ← anon allowed
+vendor_password_status() · vendor_set_first_password(p_password) · vendor_request_password(p_password)
+admin_vendor_password_requests() · admin_decide_vendor_password_request(p_request, p_approve)
+admin_set_vendor_login(p_vendor, p_password) now also sets the password of Google-linked vendors
+internal: vendor_by_phone(phone) · vendor_has_password(auth uid)
+```
+
 ### Triggers & jobs
 ```
 tg_booking_defaults() · tg_guard_delivered() · tg_slot_count() · tg_status_notify()
