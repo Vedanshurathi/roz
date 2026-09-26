@@ -82,9 +82,9 @@ here only for clarity.
 | Domain | rozbazaar.shop (hosted on Hostinger) | |
 | Customer app | https://rozbazaar.shop → Hostinger `public_html/index.html` | static upload, no build step |
 | Vendor app | https://rozbazaar.shop/vendor.html → same `public_html` | static upload, no build step |
-| Vendor app (new) | separate Hostinger website, `public_html` = contents of `vendor-site/` | static upload; its URL must be in Supabase Auth → URL Configuration → Redirect URLs for Google login |
-| Staff app | separate Hostinger website, `public_html` = contents of `staff-site/` | static upload; login = phone + password of a `staff` row |
-| Admin (new) | separate Hostinger website, `public_html` = contents of `admin-site/` | static upload; login = Supabase email/password of an `admins` row |
+| Vendor app (new) | https://vendor.rozbazaar.shop → separate Hostinger website, `public_html` = contents of `vendor-site/` (rozbazaar.shop/vendor.html now forwards here) | static upload; its URL must be in Supabase Auth → URL Configuration → Redirect URLs for Google login |
+| Staff app | https://employ.rozbazaar.shop → separate Hostinger website, `public_html` = contents of `staff-site/` | static upload; login = phone + password of a `staff` row |
+| Admin (new) | https://admin.rozbazaar.shop → separate Hostinger website, `public_html` = contents of `admin-site/` | static upload; login = Supabase email/password of an `admins` row |
 | Admin | Render web service `srv-d9vkutn40ujc738b0dp0` → https://rozbazaar-admin.onrender.com | auto-deploys from GitHub |
 | Admin repo | https://github.com/Vedanshurathi/roz | contents of `admin/` at repo root |
 | Database | Supabase `srvpfyjmwaruebbkqkdj` (Mumbai, Postgres 17) | |
@@ -234,6 +234,15 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   cancelled / reassigned / price reminder (`notify_user` pushes for vendors), bill disputed, order missed,
   new rating, item approved/rejected, 20:45 daily summary, password approved/rejected.
 - Migrations `20260926e_vendor_app_notifications.sql`, `20260926f_vendor_phone_password.sql`.
+- **Dashboard tab** (was "Earnings"): `vendor_dashboard(p_from, p_to)` (migration `20260926k_vendor_dashboard.sql`)
+  returns total sale, orders, avg, cash/UPI, commission (`commission_rate()` % of the sale — owed by the
+  vendor, customers pay nothing extra), what the vendor keeps, booked/cancelled/missed, daily (or monthly
+  > 62 days) chart, top items, every sale, and this month's commission. Sale rule = `vendor_sale_rows()`:
+  payment row or status paid/delivered/completed; amount = payment else final_total; date = paid day (IST)
+  else booking date. `vendor_stats` / `vendor_earnings_*` use the same rule now (they used UTC and only
+  delivered/completed with a final bill). Home header shows today's sale + "you keep ₹X".
+- Dates sent to the DB use `istISO(offset)` (customer + vendor apps) — `toISOString()` is UTC and gave
+  yesterday between midnight and 5:30 AM IST.
 - Privacy trade-off: `vendor_login_lookup` returns the login email of any vendor number that has a password.
 
 ### Staff app (`staff-site/index.html`)

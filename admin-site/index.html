@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-OzrxawdckkphlBaJXZp9KRypXpi3FEVr1mjjMuA6S0c=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-n6UXsiSKyRIIKRpIUWED8d7Rhi2E2EqLHf4N/U6OPBQ=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -646,7 +646,8 @@ function lineChart(points, series, opts) {
     s += `<path class="chart-line" d="${path(se.key)}" stroke="${se.color}" style="stroke-dasharray:${len};stroke-dashoffset:${len};animation:drawIn 1.1s var(--ez) forwards"/>`;
   });
   points.forEach((p, i) => {
-    if (i % Math.ceil(n / 8) === 0 || i === n - 1) s += `<text class="chart-axis" x="${x(i)}" y="${H - 6}" text-anchor="middle">${esc(p.label)}</text>`;
+    const st = Math.ceil(n / 8);
+    if ((i % st === 0 && (i === n - 1 || n - 1 - i >= st / 2)) || i === n - 1) s += `<text class="chart-axis" x="${x(i)}" y="${H - 6}" text-anchor="middle">${esc(p.label)}</text>`;
     const tip = series.map(se => `${se.name}: ${opts.fmt ? opts.fmt(p[se.key]) : num(p[se.key])}`).join('|');
     s += `<rect class="chart-hit" data-tip="${esc(p.label)}||${esc(tip)}" x="${x(i) - (W / n) / 2}" y="0" width="${W / n}" height="${H}"/>`;
   });
@@ -1489,7 +1490,7 @@ function vLaunch(el, rv) {
     <div class="sec"><h2>Supabase settings (sirf aap badal sakte ho)</h2></div>
     <div class="card ${rv} d3">
       <div class="chk wa"><span class="dot">!</span><div><b>Sign-in providers</b><span>Authentication → Sign In / Providers: Google, Anonymous aur Email (staff/admin login ke liye) on rakho.</span></div></div>
-      <div class="chk wa"><span class="dot">!</span><div><b>Redirect URLs</b><span>Authentication → URL Configuration: https://rozbazaar.shop aur /vendor.html</span></div></div>
+      <div class="chk wa"><span class="dot">!</span><div><b>Redirect URLs</b><span>Authentication → URL Configuration: https://rozbazaar.shop/** aur https://vendor.rozbazaar.shop/** (Google login ke baad sahi site pe wapas aane ke liye)</span></div></div>
       <div class="chk wa"><span class="dot">!</span><div><b>Leaked password protection</b><span>Authentication → Policies. Ek toggle.</span></div></div></div>`;
 }
 
