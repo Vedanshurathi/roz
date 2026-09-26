@@ -1,8 +1,11 @@
 [{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "shop.rozbazaar.twa",
-        "sha256_cert_fingerprints": ["67:8E:1B:01:BD:34:57:47:5D:B9:38:18:BD:BE:05:FF:79:22:49:B6:5D:A9:96:76:63:8C:68:8A:A5:B1:07:E0"]
-      }
-    }]
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "shop.rozbazaar.twa",
+    "sha256_cert_fingerprints": [
+      "9B:C3:66:5A:A4:ED:B1:46:0B:13:4A:DA:4A:3B:F6:43:D4:F7:85:21:7C:CB:9D:B6:44:95:E4:8A:18:C7:50:65",
+      "67:8E:1B:01:BD:34:57:47:5D:B9:38:18:BD:BE:05:FF:79:22:49:B6:5D:A9:96:76:63:8C:68:8A:A5:B1:07:E0"
+    ]
+  }
+}]
