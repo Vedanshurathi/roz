@@ -46,6 +46,8 @@ vendor/            → also deployed to the same public_html (rozbazaar.shop/ven
   og-vendor.jpg
 staff/             → also deployed to the same public_html (rozbazaar.shop/staff.html)
   staff.html         single-file read-only staff app for employees (logo inlined)
+admin-web/         → also deployed to the same public_html (rozbazaar.shop/admin.html)
+  admin.html         single-file admin console (Supabase login, admin_* RPCs directly)
 admin/             → Node/Express app on Render
   server.js          Express, CSP headers, session cookie, serves public/
   src/router.js      /api/* routes (all behind requireAuth)
@@ -72,6 +74,7 @@ here only for clarity.
 | Customer app | https://rozbazaar.shop → Hostinger `public_html/index.html` | static upload, no build step |
 | Vendor app | https://rozbazaar.shop/vendor.html → same `public_html` | static upload, no build step |
 | Staff app | https://rozbazaar.shop/staff.html → same `public_html` | static upload, no build step |
+| Admin (new) | https://rozbazaar.shop/admin.html → same `public_html` | static upload; login = Supabase email/password of an `admins` row |
 | Admin | Render web service `srv-d9vkutn40ujc738b0dp0` → https://rozbazaar-admin.onrender.com | auto-deploys from GitHub |
 | Admin repo | https://github.com/Vedanshurathi/roz | contents of `admin/` at repo root |
 | Database | Supabase `srvpfyjmwaruebbkqkdj` (Mumbai, Postgres 17) | |
@@ -152,7 +155,25 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
 - "Sale" = booking with a payment row, or status paid/delivered/completed; amount =
   `pay_amount ?? final_total`. Item-wise = final bill lines (qty × per-unit `final_price`).
 
-### Admin (`admin/`)
+### Admin console (`admin-web/admin.html`) — the one to use
+- Single file, light RozBazaar theme, works on desktop and phone (sidebar becomes a
+  drawer under 860 px; tables scroll sideways inside their card).
+- Login: Supabase email + password; allowed only if `staff_me().is_admin` is true
+  (i.e. the account is in `public.admins`). Session key `rb-admin-auth`.
+- Calls the same `admin_*` RPCs the Render admin's `store.js` uses, directly from the
+  browser — safe because every one of them runs `admin_guard()` in the DB.
+  `admin_pending_products` returns a bare array (no `{ok,data}` wrapper); `rpc()` handles both.
+- Tabs: Overview (GMV today/week/month, AOV, 30-day chart, cash vs UPI, top vendors,
+  14-day order bars, waitlist), Orders (filters + search; row → drawer with items,
+  customer/vendor contact, reassign to a same-type live vendor, complete, OTP-less
+  delivered, cancel with reason), Vendors (filters, add, approve/block/remove, drawer
+  with sale, rating, upcoming orders, items), Products (approval queue, all products
+  with inline price + stock + edit, master catalog add/remove), Customers (search,
+  block, same-number flag), Villages (add, active toggle, set GPS point), Messages,
+  Traffic, Launch check.
+- Modals replace `prompt()`/`confirm()`; one delegated click listener on `data-act`.
+
+### Admin (`admin/`) — older Render version
 - Express serves `public/`; SPA calls `/api/*`; `/api/snapshot` returns
   everything the dashboard needs in one call (`store.snapshot()` fans out to ~11 RPCs).
 - Tabs: Overview (finance: GMV, week-over-week trend, AOV, cash vs UPI, top
