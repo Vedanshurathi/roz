@@ -143,6 +143,13 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   "use my location" uses the same helper and never switches village on a fix worse than ±3 km.
   (A real address was once saved 57 km away from a coarse first fix.) House no. / street / landmark
   are optional — village + (GPS pin or any text).
+  **"Save address" writes to the DB right away** (`customer_save_address`; editing passes
+  `p_address_id` so it updates) — it used to only live in memory until the next booking. A guest's
+  address is kept in `localStorage.rb_addr_draft` and saved on login (`loadMyAddress()`).
+  Push: the customer app calls `save_push_subscription(..., p_role:'customer')` — without it an
+  account that is also an admin/vendor got role `admin` and never received customer pushes
+  (migration `20260926i_push_role_address_fix.sql`). A product photo that fails to load falls back
+  to the SVG drawing (`artFail`).
 - Home ends with small social chips + a navy mini-footer ("Become a vendor" → `VENDOR_SITE`
   = https://vendor.rozbazaar.shop/). `#s-home` has bottom padding so nothing hides under the
   bottom nav / cart bar.

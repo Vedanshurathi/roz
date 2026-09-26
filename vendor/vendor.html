@@ -1446,7 +1446,7 @@ async function askNotifVendor(){
         try{
           const sub=await subscribeToPush();
           const saved=await rpc('save_push_subscription',
-            {p_endpoint:sub.endpoint, p_p256dh:sub.p256dh, p_auth:sub.auth, p_agent:navigator.userAgent});
+            {p_endpoint:sub.endpoint, p_p256dh:sub.p256dh, p_auth:sub.auth, p_agent:navigator.userAgent, p_role:'vendor'});
           realSubOk = !!(saved && saved.ok);
         }catch(e){ realSubOk=false; }
       }
