@@ -43,9 +43,12 @@ customer/          → deployed to Hostinger public_html (rozbazaar.shop)
   sw.js              service worker for web push — MUST sit at public_html root
   og.jpg             link-preview image (1200×630)
   _headers _redirects  Netlify-style headers/redirects (kept for portability)
-vendor/            → also deployed to the same public_html (rozbazaar.shop/vendor.html)
+vendor/            → also deployed to the same public_html (rozbazaar.shop/vendor.html) — OLD vendor app
   vendor.html        single-file vendor app (~400 KB)
   og-vendor.jpg
+vendor-site/       → its OWN Hostinger website — the NEW vendor app (Spotify-style dark UI)
+  index.html         single-file vendor app — login = phone + password (admin sets it) or Google (new vendors apply)
+  sw.js, manifest.webmanifest, icon-*.png, badge-96.png, .htaccess, robots.txt
 staff-site/        → its OWN Hostinger website for employees (same layout as admin-site)
   index.html         single-file staff app (sales + intern views) — login with phone + password
   sw.js, manifest.webmanifest, icon-*.png, badge-96.png   web push + installable PWA
@@ -79,6 +82,7 @@ here only for clarity.
 | Domain | rozbazaar.shop (hosted on Hostinger) | |
 | Customer app | https://rozbazaar.shop → Hostinger `public_html/index.html` | static upload, no build step |
 | Vendor app | https://rozbazaar.shop/vendor.html → same `public_html` | static upload, no build step |
+| Vendor app (new) | separate Hostinger website, `public_html` = contents of `vendor-site/` | static upload; its URL must be in Supabase Auth → URL Configuration → Redirect URLs for Google login |
 | Staff app | separate Hostinger website, `public_html` = contents of `staff-site/` | static upload; login = phone + password of a `staff` row |
 | Admin (new) | separate Hostinger website, `public_html` = contents of `admin-site/` | static upload; login = Supabase email/password of an `admins` row |
 | Admin | Render web service `srv-d9vkutn40ujc738b0dp0` → https://rozbazaar-admin.onrender.com | auto-deploys from GitHub |
@@ -162,6 +166,34 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   (CSP `worker-src 'self'`). iPhone push works only after "Add to Home Screen" (iOS 16.4+).
 - Migration `database/migrations/20260926d_commission_tasks_targets_notifications.sql`.
 - Known gap (pre-existing): `send-push` has `verify_jwt=false` and accepts any caller.
+
+### Vendor app (`vendor-site/index.html`) — the new one, own Hostinger website
+- Spotify-inspired dark UI: home greeting + online switch + stat row + swipeable slot cards (LIVE / 30 min me /
+  KHATAM, route button) + "Agla kaam" tracklist + quick tiles + "Aage ke order" shelf; bottom nav (Home, Order,
+  Mera maal, Kamai, Profile); a **now-playing bar** above the nav shows the order in progress with a one-tap
+  next-step button; tapping an order opens a full-screen **order "player"** (cover, progress scrubber
+  Nikla→Pahuncha→Bill→Approve→Paisa→Code, big green action, Call/WhatsApp/Rasta, address, items).
+- Order flow: placed →「Nikal gaya」(`vendor_set_status on_the_way`) →「Pahunch gaya」(reached) → bill editor
+  (qty stepper, rate, remove, add item at door → `vendor_finalize_bill`) → payment (Cash / UPI →
+  `vendor_record_payment` cash|upi_direct; allowed from bill_final too) → OTP keypad (`vendor_verify_otp`) →
+  celebration → next order. Cancel with reason, "Code nahi mil raha?" → `vendor_report_otp_issue`.
+- Mera maal: inline rate edit + one "N rate save karo" bar (`vendor_bulk_prices`), stock switch, filters
+  (category / rate purana / khatam / review), catalog grid → `vendor_activate_catalog_item`, own item with photo
+  (resized to 640 px JPEG data URL) + auto category → `vendor_upsert_product`, delete.
+- Kamai: 7 din / 30 din / custom range bars, best day, reviews. Profile: photo, name/shop/vehicle/default
+  capacity, slots page (open, capacity, villages per slot, apply for 1/7/14 days), villages, help form
+  (`customer_send_message`), install, logout. `SUPPORT_PHONE` const (empty) shows WhatsApp/Call on Help if set.
+- **Login:** phone + password → auth user `<phone>@vendor.rozbazaar.shop`, created/reset by admin console →
+  vendor drawer → "📱 Vendor app password" (`admin_set_vendor_login`; refuses vendors already linked to a Google
+  account). Or Google → new vendor onboarding (name/phone → type → villages → `vendor_apply`) → pending screen.
+  Session key `rb-vendor-auth`.
+- **Notifications** (push via `vendor_save_push` + in-app 🔔 via `vendor_notifications`): new order (existing),
+  slot in 30 min + slot start (cron), bill approved / customer cancelled / reassigned / price reminder
+  (`notify_user` now pushes for vendors), bill disputed, order missed, new rating, item approved/rejected, 20:45
+  daily summary. While open, the app also polls every 20 s: new order → big banner + beep + vibrate; bill
+  approved; order removed; local slot-start banner.
+- Same CSP/SRI rules: after editing the inline script run `python3 scripts/site-csp.py vendor-site`.
+- Migration `database/migrations/20260926e_vendor_app_notifications.sql`.
 
 ### Staff app (`staff-site/index.html`)
 - Its own Hostinger website (upload `index.html`, `.htaccess`, `robots.txt`). Read-only,

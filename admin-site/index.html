@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NomXEKOZq4fjHO/ft4hGzhQ8RRDm1BCdrXMypaNc9tA=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-PCvCA9/CJ08k/cH2t3Aiyl7LqmKztU8EM82+5jxEOSo=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -948,7 +948,8 @@ function openVendor(id) {
     <div class="card"><div class="kv"><span>Login</span><span>${v.can_log_in ? 'Juda hai ✓' : 'Nahi juda'}</span></div>
       <div class="kv"><span>Apply kiya</span><span>${when(v.applied_at)}</span></div>
       ${v.review_note ? `<div class="kv"><span>Note</span><span>${esc(v.review_note)}</span></div>` : ''}
-      <div class="row" style="margin-top:10px">${vendorActions(v)}</div></div>
+      <div class="row" style="margin-top:10px">${vendorActions(v)}
+        <button class="btn btn-o btn-sm" data-act="vendorLogin" data-arg="${esc(v.id)}">📱 Vendor app password</button></div></div>
     ${topItems(orders)}${orderList('Aane wale orders', upcoming.slice().reverse(), 'customer')}${orderList('Sab orders', orders, 'customer')}
     <div class="card"><b>Items (${prods.length})</b>${prods.map(x => `<div class="it"><span>${esc(x.name)}</span><span class="q">${esc(x.unit)}</span>
       <span class="a">${money(x.price)} ${x.in_stock ? '' : '<span class="pill p-r">khatam</span>'}</span></div>`).join('') || '<div class="mu" style="margin-top:6px">Koi item nahi</div>'}</div>`;
@@ -1506,8 +1507,16 @@ async function reviewVendor(id, decision) {
   if (!r) return;
   if (await act('admin_review_vendor', { p_vendor: id, p_decision: decision, p_note: r.note || null }) && $('drawer').classList.contains('show')) openVendor(id);
 }
+async function vendorLogin(id) {
+  const v = D.vendors.find(x => x.id === id); if (!v) return;
+  const r = await modal({ title: `${v.name}: vendor app login`, sub: `Vendor app me phone ${v.phone || '—'} + ye password daal ke login karega. Pehle se Google se juda vendor Google se hi login kare.`,
+    ok: 'Password set karo', fields: [{ id: 'pw', label: 'Naya password (kam se kam 6)', type: 'text', ph: 'Jaise: ramesh123' }] });
+  if (!r) return;
+  if (String(r.pw || '').length < 6) return toast('⚠️ Password kam se kam 6 character');
+  if (await act('admin_set_vendor_login', { p_vendor: id, p_password: r.pw }) && $('drawer').classList.contains('show')) openVendor(id);
+}
 async function addVendor() {
-  const v = await modal({ title: 'Naya vendor jodo', sub: 'Seedha approve ho ke live ho jaayega. Vendor app login baad me link hota hai.', ok: '+ Jodo',
+  const v = await modal({ title: 'Naya vendor jodo', sub: 'Seedha approve ho ke live ho jaayega. Vendor app login: vendor ke drawer me "📱 Vendor app password" dabao.', ok: '+ Jodo',
     fields: [{ id: 'name', label: 'Naam', ph: 'Ramesh Kumar' }, { id: 'phone', label: 'Phone (10 digit)', ph: '9812345670' },
       { id: 'shop', label: 'Dukaan ka naam (optional)' }, { id: 'type', label: 'Kya bechta hai', type: 'select', options: TYPE_OPTS, value: 'vegetable' },
       { id: 'cap', label: 'Ek slot me kitne order', type: 'number', value: 15 },
@@ -1595,6 +1604,7 @@ document.addEventListener('click', e => {
     case 'vfilter': UI.vfilter = a; render(false); break;
     case 'vendor': openVendor(a); break;
     case 'reviewVendor': reviewVendor(a, a2); break;
+    case 'vendorLogin': vendorLogin(a); break;
     case 'addVendor': addVendor(); break;
     case 'ptab': UI.ptab = a; render(false); break;
     case 'reviewProduct': reviewProduct(a, a2); break;

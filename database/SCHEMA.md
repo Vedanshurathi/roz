@@ -172,6 +172,9 @@ RLS on, no policies — read only through `is_staff()` / `staff_me()` / `staff_s
 | rz-expire-missed | `0 * * * *` | hourly | `job_expire_missed()` — marks past, unfulfilled bookings missed |
 | rz-spawn-recurring | `0 20 * * *` | 01:30 | `job_spawn_recurring()` — creates bookings from schedules |
 | rz-price-reminder | `30 23 * * *` | 05:00 | `job_price_reminders()` — nudges vendors with stale prices |
+| rz-vendor-slot-soon-morning / -afternoon / -evening | `0 1` / `0 6` / `0 11` | 06:30 / 11:30 / 16:30 | `job_vendor_slot_alert(slot,'soon')` — "slot 30 min me, N order" push to each vendor with open orders |
+| rz-vendor-slot-start-morning / -afternoon / -evening | `30 1` / `30 6` / `30 11` | 07:00 / 12:00 / 17:00 | `job_vendor_slot_alert(slot,'start')` — "slot shuru" push |
+| rz-vendor-daily-summary | `15 15 * * *` | 20:45 | `job_vendor_daily_summary()` — today's orders + ₹ earned, tomorrow's bookings |
 
 ---
 
@@ -345,6 +348,18 @@ team_notifications(p_limit) · team_mark_read(p_id|null) · team_save_push(p_app
 triggers: trg_ops_new_booking (bookings), trg_ops_new_customer (customers), trg_ops_new_vendor (vendors) — AFTER INSERT
 ```
 `staff_snapshot()` now requires `is_sales()`; `admin_finance_dashboard()` returns platform_revenue(_all) + commission_rate.
+
+### Vendor app + vendor notifications (added 26 Sep 2026 — `20260926e_vendor_app_notifications.sql`)
+```
+notify_user() now ALSO sends a phone push when role = 'vendor' (bill approved, customer cancel, reassign, price reminder)
+vendor_notify(p_vendor, type, title, msg, booking)            ← internal helper (vendor id → auth user)
+vendor_notifications(p_limit) · vendor_mark_read(p_id|null) · vendor_save_push(endpoint, p256dh, auth, agent)
+vendor_login_email(phone) → '<10 digits>@vendor.rozbazaar.shop'
+admin_set_vendor_login(p_vendor, p_password)                  ← creates/links the auth user, or resets its password
+triggers: trg_vendor_booking_notify (bookings → disputed / missed), trg_vendor_rating_notify (ratings insert),
+          trg_vendor_product_review_notify (products.review_status → approved / rejected)
+jobs: job_vendor_slot_alert(slot, 'soon'|'start') · job_vendor_daily_summary()
+```
 
 ### Triggers & jobs
 ```
