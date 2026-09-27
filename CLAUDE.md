@@ -312,6 +312,11 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   The staff site no longer calls `auth.updateUser`. Caveat: Supabase itself still lets any
   logged-in user change their own password through the raw auth API, so the approval step
   is enforced by the app, not by Supabase. Migration `20260926c_staff_roles_password_approval.sql`.
+- **Interns see plain English** (27 Sep): `L(hinglish, english)` picks by `isIntern()`; covers menu, titles
+  (`TITLES_EN`), Welcome, My tasks, task modals/toasts, My account, notifications drawer, push card, `when()`.
+  Sales keep Hinglish. The login screen is still Hinglish (shown before we know who logs in). Server side,
+  `admin_add_task` / `admin_reopen_task` send interns English notifications (migration
+  `20260927d_intern_english_notifications.sql`).
 - Tabs: Aaj ka plan (KPIs, slot board Subah/Dopahar/Shaam, village + vendor load),
   Orders (day/status/type/village filters, search, detail drawer, CSV), Vendors (cards,
   7-day chart drawer), Sale (today/yesterday/7/30/custom range, Sabzi/Pyaaz-Aloo/Fruits,

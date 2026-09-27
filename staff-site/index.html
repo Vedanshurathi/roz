@@ -6,7 +6,7 @@
 <title>RozBazaar Staff</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-gaSkHZGjQH+A7QhjW51voER7NGjv5D0dg0CPW6h8Zwc=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QlblnaYkyIRsQX81GYPD09sE0vYjpexT+TW0jjyFqDw=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -384,8 +384,8 @@ td.acts .btn+.btn{margin-left:6px}
     <button class="nav" data-kind="sales" data-act="go" data-arg="vendors"><span class="ic">🧑‍🌾</span>Vendors</button>
     <button class="nav" data-kind="sales" data-act="go" data-arg="sale"><span class="ic">💰</span>Sale</button>
     <button class="nav" data-kind="sales" data-act="go" data-arg="customers"><span class="ic">👥</span>Customers</button>
-    <button class="nav" data-act="go" data-arg="tasks"><span class="ic">📝</span>Mere kaam<span class="badge hide" id="bTasks"></span></button>
-    <button class="nav" data-act="go" data-arg="account"><span class="ic">🔑</span>Mera account</button>
+    <button class="nav" data-act="go" data-arg="tasks"><span class="ic">📝</span><span data-h="Mere kaam" data-e="My tasks">Mere kaam</span><span class="badge hide" id="bTasks"></span></button>
+    <button class="nav" data-act="go" data-arg="account"><span class="ic">🔑</span><span data-h="Mera account" data-e="My account">Mera account</span></button>
     <div class="foot">
       <div class="me"><div class="av" id="meAv">S</div><div><b id="meName">Staff</b><span id="mePhone"></span></div></div>
       <button class="nav" data-act="logout"><span class="ic">⏻</span>Logout</button>
@@ -447,6 +447,8 @@ let D = null, VIEW = 'today', ME = null, busy = false, timer = null, SEEN = null
 let TASKS = [], TARGETS = [], LOADED = false;
 const TEAM_APP = 'staff';
 const isIntern = () => ME && ME.kind === 'intern';
+/* Interns see the site in plain English (Vedanshu, 27 Sep); sales staff keep the Hinglish. L(hinglish, english) */
+const L = (h, e) => isIntern() ? e : h;
 const UI = { oq: '', oday: 'today', ostatus: 'all', otype: 'all', oarea: 'all', vq: '', cq: '', csort: 'orders',
   period: 'today', from: '', to: '', cat: 'all' };
 
@@ -469,8 +471,9 @@ function dayLabel(iso) {
 const when = d => {
   if (!d) return '—';
   const m = Math.round((Date.now() - new Date(d)) / 60000);
-  if (m < 1) return 'abhi'; if (m < 60) return m + ' min pehle'; if (m < 1440) return Math.round(m / 60) + ' ghante pehle';
-  return Math.round(m / 1440) + ' din pehle';
+  if (m < 1) return L('abhi', 'just now'); if (m < 60) return m + L(' min pehle', ' min ago');
+  if (m < 1440) return Math.round(m / 60) + L(' ghante pehle', ' h ago');
+  return Math.round(m / 1440) + L(' din pehle', ' days ago');
 };
 const SLOT = { morning: ['🌅', 'Subah 7–11', 0], afternoon: ['☀️', 'Dopahar 12–4', 1], evening: ['🌇', 'Shaam 5–8', 2] };
 const TYPE = { vegetable: ['🥬', 'Sabzi', 'vc-veg'], onion_potato: ['🧅', 'Pyaaz–Aloo', 'vc-onion'], fruit: ['🍎', 'Fruits', 'vc-fruit'] };
@@ -508,8 +511,8 @@ async function rpc(fn, args) {
     const { data, error } = await sb.rpc(fn, args || {});
     if (error) return { ok: false, error: error.message, auth: /jwt|staff/i.test(error.message) };
     if (data && typeof data === 'object' && 'ok' in data) return { ok: !!data.ok, data: data.data, error: data.msg, auth: !data.ok && /staff ka nahi/i.test(data.msg || '') };
-    return { ok: false, error: 'Galat jawab' };
-  } catch (e) { return { ok: false, error: 'Internet check karo' }; }
+    return { ok: false, error: L('Galat jawab', 'Unexpected reply') };
+  } catch (e) { return { ok: false, error: L('Internet check karo', 'Check your internet') }; }
 }
 
 /* ---------- auth ---------- */
@@ -524,6 +527,7 @@ function showApp() {
   $('meAv').textContent = (ME.name || 'S').trim()[0].toUpperCase();
   document.querySelectorAll('.nav[data-kind]').forEach(b => b.classList.toggle('hide', b.dataset.kind !== (isIntern() ? 'intern' : 'sales')));
   $('app').classList.toggle('intern', isIntern());
+  document.querySelectorAll('[data-e]').forEach(x => { x.textContent = isIntern() ? x.dataset.e : x.dataset.h; });
   VIEW = isIntern() ? 'welcome' : 'today';
   go(VIEW); refresh(); refreshPushSub();
   clearInterval(timer);
@@ -541,7 +545,7 @@ async function login() {
   if (!me.ok) { await sb.auth.signOut(); $('loginMsg').textContent = me.error || 'Ye account staff ka nahi hai'; return; }
   $('pw').value = ''; ME = me.data; showApp();
 }
-async function logout() { await sb.auth.signOut(); D = null; ME = null; SEEN = null; NOTIF_SEEN = null; TASKS = []; TARGETS = []; LOADED = false; showLogin('Logout ho gaye'); }
+async function logout() { const bye = L('Logout ho gaye', 'Logged out'); await sb.auth.signOut(); D = null; ME = null; SEEN = null; NOTIF_SEEN = null; TASKS = []; TARGETS = []; LOADED = false; showLogin(bye); }
 
 /* ---------- data ---------- */
 async function refresh(silent) {
@@ -552,10 +556,10 @@ async function refresh(silent) {
   loadNotifs(true);
   busy = false; $('rfIc').classList.remove('spin');
   if (!r.ok) {
-    if (r.auth) { await sb.auth.signOut(); showLogin('Dubara login karo'); return; }
-    if (!silent) toast('⚠️ Data load nahi hua: ' + (r.error || ''));
-    if (!D) $('v-' + VIEW).innerHTML = `<div class="empty"><div class="e">⚠️</div><b>Data load nahi hua</b><p>${esc(r.error || '')}</p>
-      <button class="btn btn-g" style="margin-top:14px" data-act="refresh">Dubara try karo</button></div>`;
+    if (r.auth) { const m = L('Dubara login karo', 'Please log in again'); await sb.auth.signOut(); showLogin(m); return; }
+    if (!silent) toast('⚠️ ' + L('Data load nahi hua: ', 'Could not load data: ') + (r.error || ''));
+    if (!D) $('v-' + VIEW).innerHTML = `<div class="empty"><div class="e">⚠️</div><b>${L('Data load nahi hua', 'Could not load data')}</b><p>${esc(r.error || '')}</p>
+      <button class="btn btn-g" style="margin-top:14px" data-act="refresh">${L('Dubara try karo', 'Try again')}</button></div>`;
     return;
   }
   if (tk.ok) TASKS = tk.data || [];
@@ -580,9 +584,9 @@ async function refresh(silent) {
   } else {
     D = { today: new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date()), bookings: [], vendors: [] };
   }
-  $('stamp').textContent = 'Update ' + new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  $('stamp').textContent = L('Update ', 'Updated ') + new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
   render(false);
-  if (!silent && !first && !alerted) toast('Naya data aa gaya ✓');
+  if (!silent && !first && !alerted) toast(L('Naya data aa gaya ✓', 'Up to date ✓'));
 }
 /* a notification we haven't shown yet arrived while the page is open */
 function onFreshNotifs(fresh) {
@@ -599,11 +603,13 @@ const TITLES = {
   vendors: ['Vendors', 'kaun kya bech raha, kitna bika'], sale: ['Sale', 'kitna bika — din, type, item, vendor, gaon'],
   customers: ['Customers', 'naam pe click karo — saare orders'], account: ['Mera account', 'naam, password, notifications']
 };
+const TITLES_EN = { welcome: ['Welcome', 'Welcome to RozBazaar'], tasks: ['My tasks', 'tasks from the admin — mark each one done or not done'],
+  account: ['My account', 'name, password, notifications'] };
 function go(v) {
   VIEW = v;
   document.querySelectorAll('.scr').forEach(x => x.classList.toggle('on', x.id === 'v-' + v));
   document.querySelectorAll('.nav[data-arg]').forEach(b => b.classList.toggle('on', b.dataset.arg === v));
-  $('pgTitle').textContent = TITLES[v][0]; $('pgSub').textContent = TITLES[v][1];
+  const tt = (isIntern() && TITLES_EN[v]) || TITLES[v]; $('pgTitle').textContent = tt[0]; $('pgSub').textContent = tt[1];
   if (v === 'orders') { NEWCOUNT = 0; $('bOrders').classList.add('hide'); }
   document.body.classList.remove('nav-open');
   window.scrollTo(0, 0); render(true);
@@ -927,16 +933,16 @@ function vTasks(el, rv) {
   const list = TASKS.filter(TF[UI.tf]);
   el.innerHTML = `
     <div class="grid k4 ${rv} d1">
-      ${kpi('Baaki kaam', open.length, 'abhi karna hai', open.length ? 'warn' : 'good', '📝')}
-      ${kpi('Late', late, 'due date nikal gayi', late ? 'bad' : '', '⏰')}
-      ${kpi('Complete', doneN, `${rate}% kaam pura`, doneN ? 'good' : '', '✅')}
-      ${kpi('Nahi ho paya', TASKS.filter(TF.not_done).length, 'admin ko bataya', '', '❌')}
+      ${kpi(L('Baaki kaam', 'To do'), open.length, L('abhi karna hai', 'still to do'), open.length ? 'warn' : 'good', '📝')}
+      ${kpi('Late', late, L('due date nikal gayi', 'past the due date'), late ? 'bad' : '', '⏰')}
+      ${kpi(L('Complete', 'Done'), doneN, `${rate}% ${L('kaam pura', 'done')}`, doneN ? 'good' : '', '✅')}
+      ${kpi(L('Nahi ho paya', 'Not done'), TASKS.filter(TF.not_done).length, L('admin ko bataya', 'reported to admin'), '', '❌')}
     </div>
-    <div class="chips ${rv} d2" style="margin:16px 0 12px">${[['open', 'Baaki'], ['done', 'Complete'], ['not_done', 'Nahi hua'], ['all', 'Sab']].map(([k, l]) =>
+    <div class="chips ${rv} d2" style="margin:16px 0 12px">${[['open', L('Baaki', 'To do')], ['done', L('Complete', 'Done')], ['not_done', L('Nahi hua', 'Not done')], ['all', L('Sab', 'All')]].map(([k, l]) =>
       `<button class="chip ${UI.tf === k ? 'on' : ''}" data-act="tf" data-arg="${k}">${l}<span class="c">${TASKS.filter(TF[k]).length}</span></button>`).join('')}</div>
     <div class="${rv} d3">${list.length ? list.map(t => taskCard(t, false, today)).join('')
-      : `<div class="empty"><div class="e">${UI.tf === 'open' ? '🎉' : '📭'}</div><b>${UI.tf === 'open' ? 'Koi kaam baaki nahi!' : 'Yahan kuch nahi'}</b>
-        <p>Admin naya kaam dega to yahan dikhega aur phone pe notification aayega.</p></div>`}</div>`;
+      : `<div class="empty"><div class="e">${UI.tf === 'open' ? '🎉' : '📭'}</div><b>${UI.tf === 'open' ? L('Koi kaam baaki nahi!', 'Nothing left to do!') : L('Yahan kuch nahi', 'Nothing here')}</b>
+        <p>${L('Admin naya kaam dega to yahan dikhega aur phone pe notification aayega.', 'New tasks from the admin show up here, and you get a notification on your phone.')}</p></div>`}</div>`;
 }
 function vWelcome(el, rv) {
   const today = D.today, open = TASKS.filter(TF.open), doneN = TASKS.filter(TF.done).length;
@@ -944,66 +950,70 @@ function vWelcome(el, rv) {
   const joined = ME.joined ? daysBetween(String(ME.joined).slice(0, 10), today) : 0;
   el.innerHTML = `
     <div class="welcome ${rv} d1"><span class="chipw">🌱 INTERN · ${esc(ME.role || 'RozBazaar')}</span>
-      <h2>Namaste ${esc(ME.name)}! Aap RozBazaar ke naye intern ho 🎉</h2>
-      <p>Hum Pataudi aur Haileymandi ke gaon me taaza sabzi, fruit aur pyaaz-aloo ghar tak pahunchate hain — slot book karo, local vendor aata hai, tol ke deta hai.
-      Aapka kaam admin yahan dega. Har kaam pura karke ✓ Complete dabao, aur agar nahi ho paya to bata do kyun.</p>
-      <div class="row" style="margin-top:16px"><button class="btn" style="background:#fff;color:var(--g-dk)" data-act="go" data-arg="tasks">📝 Mere kaam dekho${open.length ? ` (${open.length})` : ''}</button>
+      <h2>Hello ${esc(ME.name)}, welcome to RozBazaar! 🎉</h2>
+      <p>We bring fresh vegetables, fruit and onion–potato to homes in the villages around Pataudi and Haileymandi: a customer books a time slot, a local vendor comes, weighs and sells at the door.
+      The admin gives you your tasks here. When you finish a task, tap ✓ Done. If you couldn't do it, tap ✕ Not done and tell us why.</p>
+      <div class="row" style="margin-top:16px"><button class="btn" style="background:#fff;color:var(--g-dk)" data-act="go" data-arg="tasks">📝 See my tasks${open.length ? ` (${open.length})` : ''}</button>
         <button class="btn" style="background:rgba(255,255,255,.18);color:#fff" data-act="notifs">🔔 Notifications</button></div></div>
     <div class="grid k4 ${rv} d2" style="margin-top:16px">
-      ${kpi('Baaki kaam', open.length, next ? 'agla: ' + esc(next.title).slice(0, 40) : 'sab ho gaya', open.length ? 'warn' : 'good', '📝')}
-      ${kpi('Complete kiye', doneN, TASKS.length ? Math.round(doneN / TASKS.length * 100) + '% kaam pura' : 'abhi koi kaam nahi', doneN ? 'good' : '', '✅')}
-      ${kpi('RozBazaar ke saath', joined + ' din', ME.joined ? 'joda ' + shortD(ME.joined) : '', '', '📅')}
-      ${kpi('Late kaam', open.filter(t => t.due_date && String(t.due_date).slice(0, 10) < today).length, 'due date ke baad', '', '⏰')}
+      ${kpi('To do', open.length, next ? 'next: ' + esc(next.title).slice(0, 40) : 'all done', open.length ? 'warn' : 'good', '📝')}
+      ${kpi('Done', doneN, TASKS.length ? Math.round(doneN / TASKS.length * 100) + '% of your tasks' : 'no tasks yet', doneN ? 'good' : '', '✅')}
+      ${kpi('With RozBazaar', joined + (joined === 1 ? ' day' : ' days'), ME.joined ? 'joined ' + shortD(ME.joined) : '', '', '📅')}
+      ${kpi('Late', open.filter(t => t.due_date && String(t.due_date).slice(0, 10) < today).length, 'past the due date', '', '⏰')}
     </div>
-    ${next ? `<div class="sec ${rv} d3"><h2>Agla kaam</h2></div><div class="${rv} d3">${taskCard(next, false, today)}</div>` : ''}
-    <div class="sec ${rv} d4"><h2>Shuru kaise karein</h2></div>
+    ${next ? `<div class="sec ${rv} d3"><h2>Next task</h2></div><div class="${rv} d3">${taskCard(next, false, today)}</div>` : ''}
+    <div class="sec ${rv} d4"><h2>How to get started</h2></div>
     <div class="steps3 ${rv} d4">
-      <div class="card"><span class="n">1</span><b>Notifications chalu karo</b><span>🔔 dabao → "Notifications chalu karo". Naya kaam aate hi phone pe pata chalega.</span></div>
-      <div class="card"><span class="n">2</span><b>Kaam pura karo</b><span>"Mere kaam" me har kaam ke niche ✓ Complete ya ✕ Nahi ho paya dabao.</span></div>
-      <div class="card"><span class="n">3</span><b>Apna profile theek karo</b><span>"Mera account" me apna naam sahi karo aur naya password maango.</span></div>
+      <div class="card"><span class="n">1</span><b>Turn on notifications</b><span>Tap 🔔 → "Turn on notifications". You'll know as soon as a new task arrives.</span></div>
+      <div class="card"><span class="n">2</span><b>Finish your tasks</b><span>In "My tasks", tap ✓ Done or ✕ Not done under each task.</span></div>
+      <div class="card"><span class="n">3</span><b>Check your profile</b><span>In "My account", correct your name and request a new password.</span></div>
     </div>
-    <div class="card ${rv} d5" style="margin-top:14px"><b>Kuch samajh na aaye?</b><p class="mu" style="margin-top:4px">Admin se seedha baat karo. Business ka data (orders, sale) intern ke liye band hai — sirf aapke kaam yahan dikhenge.</p></div>`;
+    <div class="card ${rv} d5" style="margin-top:14px"><b>Something not clear?</b><p class="mu" style="margin-top:4px">Talk to the admin directly. Business data (orders, sales) is not shown to interns — only your own tasks appear here.</p></div>`;
 }
 async function setTask(id, status) {
   let note = null;
   if (status === 'not_done') {
     for (;;) {   /* keep asking until there is a reason or they cancel */
-      const v = await modal({ title: 'Kaam kyun nahi ho paya?', sub: 'Admin ko ye reason dikhega.', ok: 'Admin ko bhejo', danger: true,
-        fields: [{ id: 'note', label: 'Reason (zaroori)', type: 'textarea', ph: 'Jaise: customer ne phone nahi uthaya' }] });
+      const v = await modal({ title: L('Kaam kyun nahi ho paya?', 'Why couldn\'t you do it?'), sub: L('Admin ko ye reason dikhega.', 'The admin will see this reason.'),
+        ok: L('Admin ko bhejo', 'Send to admin'), danger: true,
+        fields: [{ id: 'note', label: L('Reason (zaroori)', 'Reason (required)'), type: 'textarea', ph: L('Jaise: customer ne phone nahi uthaya', 'e.g. the customer did not pick up the phone') }] });
       if (!v) return;
       if (v.note) { note = v.note; break; }
-      toast('Reason likhna zaroori hai');
+      toast(L('Reason likhna zaroori hai', 'Please write a reason'));
     }
   } else if (status === 'done') {
-    const v = await modal({ title: 'Kaam complete? 🎉', sub: 'Admin ko notification jaayega.', ok: '✓ Complete',
-      fields: [{ id: 'note', label: 'Kuch batana hai? (optional)', type: 'textarea', ph: 'Jaise: 5 dukaan wale se baat ho gayi' }] });
+    const v = await modal({ title: L('Kaam complete? 🎉', 'Task done? 🎉'), sub: L('Admin ko notification jaayega.', 'The admin will be notified.'), ok: L('✓ Complete', '✓ Done'),
+      fields: [{ id: 'note', label: L('Kuch batana hai? (optional)', 'Anything to add? (optional)'), type: 'textarea', ph: L('Jaise: 5 dukaan wale se baat ho gayi', 'e.g. spoke to 5 shop owners') }] });
     if (!v) return; note = v.note || null;
   }
   const r = await rpc('staff_set_task_status', { p_task: id, p_status: status, p_note: note });
-  toast(r.ok ? (r.data && r.data.msg) || (status === 'done' ? 'Shabaash! Kaam complete ✓' : status === 'not_done' ? 'Admin ko bata diya' : 'Wapas baaki me') : '⚠️ ' + (r.error || 'Nahi hua'));
+  toast(r.ok ? (isIntern() ? (status === 'done' ? 'Well done! Task complete ✓' : status === 'not_done' ? 'The admin has been told' : 'Moved back to To do')
+               : (r.data && r.data.msg) || (status === 'done' ? 'Shabaash! Kaam complete ✓' : status === 'not_done' ? 'Admin ko bata diya' : 'Wapas baaki me'))
+             : '⚠️ ' + (r.error || L('Nahi hua', 'Something went wrong')));
   if (r.ok) { const t = TASKS.find(x => x.id === id); if (t) { t.status = status; if (note) t.staff_note = note; } render(false); refresh(true); }
 }
 
 /* ---------- Account ---------- */
 const PWS = { pending: ['⏳ Admin ke approval ka intezaar', 'p-o'], approved: ['✅ Approve ho gaya — naya password chal raha hai', 'p-g'], rejected: ['❌ Admin ne reject kiya', 'p-r'] };
+const PWS_EN = { pending: '⏳ Waiting for the admin to approve', approved: '✅ Approved — your new password works now', rejected: '❌ The admin rejected it' };
 function vAccount(el, rv) {
   el.innerHTML = `<div class="acct">
     <div class="card ${rv} d1"><div class="vcard"><div class="av-t" style="background:var(--lime-s)">🧑‍💼</div><div><b style="font-size:17px">${esc(ME.name)}</b>
-      <div class="mu">${ME.role ? esc(ME.role) + ' · ' : ''}${ME.phone ? '📞 ' + esc(ME.phone) : 'Admin account'}</div></div></div></div>
-    ${ME.phone ? `<div class="card ${rv} d2" style="margin-top:14px"><b style="font-size:15px">Apna naam</b>
-      <p class="mu" style="margin:4px 0 12px">Ye naam admin aur app me dikhta hai.${ME.role ? ' Role (' + esc(ME.role) + ') sirf admin badal sakta hai.' : ''}</p>
+      <div class="mu">${ME.role ? esc(ME.role) + ' · ' : ''}${ME.phone ? '📞 ' + esc(ME.phone) : L('Admin account', 'Admin account')}</div></div></div></div>
+    ${ME.phone ? `<div class="card ${rv} d2" style="margin-top:14px"><b style="font-size:15px">${L('Apna naam', 'Your name')}</b>
+      <p class="mu" style="margin:4px 0 12px">${L('Ye naam admin aur app me dikhta hai.', 'This name is shown to the admin and in the app.')}${ME.role ? L(' Role (' + esc(ME.role) + ') sirf admin badal sakta hai.', ' Only the admin can change your role (' + esc(ME.role) + ').') : ''}</p>
       <div class="row"><input class="fld" id="myName" value="${esc(ME.name)}" maxlength="60" style="flex:1;min-width:180px">
-      <button class="btn btn-g" data-act="saveName">Naam save karo</button></div></div>
-    <div class="card ${rv} d3" style="margin-top:14px"><b style="font-size:15px">Password badlo</b>
-      <p class="mu" style="margin:4px 0 12px">Naya password admin ke approve karne ke baad hi chalega. Tab tak purana password hi chalega.</p>
+      <button class="btn btn-g" data-act="saveName">${L('Naam save karo', 'Save name')}</button></div></div>
+    <div class="card ${rv} d3" style="margin-top:14px"><b style="font-size:15px">${L('Password badlo', 'Change password')}</b>
+      <p class="mu" style="margin:4px 0 12px">${L('Naya password admin ke approve karne ke baad hi chalega. Tab tak purana password hi chalega.', 'Your new password works only after the admin approves it. Until then, keep using the old one.')}</p>
       <div id="pwStatus" style="margin-bottom:12px"></div>
-      <label class="lbl" for="np1">Naya password (kam se kam 6)</label><input class="fld" id="np1" type="password" autocomplete="new-password">
-      <label class="lbl" for="np2" style="margin-top:10px">Dubara likho</label><input class="fld" id="np2" type="password" autocomplete="new-password">
-      <button class="btn btn-g" style="margin-top:14px" data-act="changePw">Admin se approval maango</button></div>` : ''}
+      <label class="lbl" for="np1">${L('Naya password (kam se kam 6)', 'New password (at least 6 characters)')}</label><input class="fld" id="np1" type="password" autocomplete="new-password">
+      <label class="lbl" for="np2" style="margin-top:10px">${L('Dubara likho', 'Type it again')}</label><input class="fld" id="np2" type="password" autocomplete="new-password">
+      <button class="btn btn-g" style="margin-top:14px" data-act="changePw">${L('Admin se approval maango', 'Ask the admin to approve')}</button></div>` : ''}
     <div class="${rv} d4" style="margin-top:14px">${pushCard()}</div>
-    <div class="card ${rv} d4" style="margin-top:14px"><b style="font-size:15px">Is app ke baare me</b>
+    <div class="card ${rv} d4" style="margin-top:14px"><b style="font-size:15px">${L('Is app ke baare me', 'About this app')}</b>
       <p class="mu" style="margin-top:6px;line-height:1.6">${isIntern()
-        ? 'Aap intern ho — yahan sirf aapke kaam dikhte hain. Naya kaam aate hi 🔔 notification aata hai.'
+        ? 'You are an intern — only your own tasks are shown here. You get a 🔔 notification as soon as a new task arrives.'
         : 'Ye app sirf dekhne ke liye hai — order badalna, cancel karna ya vendor badalna ho to admin ko bolo. Kisi bhi order, customer ya vendor pe click karke poori detail dekh sakte ho. Data har 45 second me update hota hai; naya order, customer, vendor, kaam ya target aane pe 🔔 notification aata hai.'}</p>
       <button class="btn btn-r" style="margin-top:12px" data-act="logout">⏻ Logout</button></div></div>`;
   if (ME.phone) loadPwStatus();
@@ -1011,22 +1021,22 @@ function vAccount(el, rv) {
 async function loadPwStatus() {
   const r = await rpc('staff_password_status'), el = $('pwStatus'); if (!el) return;
   if (!r.ok || !r.data) { el.innerHTML = ''; return; }
-  const [l, c] = PWS[r.data.status] || [r.data.status, 'p-m'];
+  let [l, c] = PWS[r.data.status] || [r.data.status, 'p-m']; if (isIntern() && PWS_EN[r.data.status]) l = PWS_EN[r.data.status];
   el.innerHTML = `<span class="pill ${c}" style="white-space:normal">${l}</span> <span class="mu">${when(r.data.decided_at || r.data.created_at)}</span>`;
 }
 async function saveName() {
-  const n = $('myName').value.trim(); if (!n) return toast('Naam daalo');
+  const n = $('myName').value.trim(); if (!n) return toast(L('Naam daalo', 'Enter your name'));
   const r = await rpc('staff_update_my_name', { p_name: n });
-  toast(r.ok ? 'Naam badal gaya ✓' : '⚠️ ' + (r.error || 'Nahi hua'));
+  toast(r.ok ? L('Naam badal gaya ✓', 'Name saved ✓') : '⚠️ ' + (r.error || L('Nahi hua', 'Something went wrong')));
   if (r.ok) { ME.name = n; $('meName').textContent = n; $('meAv').textContent = n[0].toUpperCase(); render(false); }
 }
 async function changePw() {
   const a = $('np1').value, b = $('np2').value;
-  if (a.length < 6) return toast('Kam se kam 6 character');
-  if (a !== b) return toast('Dono password same nahi hain');
+  if (a.length < 6) return toast(L('Kam se kam 6 character', 'At least 6 characters'));
+  if (a !== b) return toast(L('Dono password same nahi hain', 'The two passwords do not match'));
   const r = await rpc('staff_request_password', { p_password: a });
-  if (!r.ok) return toast('⚠️ ' + (r.error || 'Nahi hua'));
-  $('np1').value = $('np2').value = ''; toast('Request admin ko bhej di ✓'); loadPwStatus();
+  if (!r.ok) return toast('⚠️ ' + (r.error || L('Nahi hua', 'Something went wrong')));
+  $('np1').value = $('np2').value = ''; toast(L('Request admin ko bhej di ✓', 'Request sent to the admin ✓')); loadPwStatus();
 }
 
 /* ---------- CSV ---------- */
@@ -1069,7 +1079,7 @@ function modal({ title, sub, fields, ok, danger }) {
         : x.type === 'select' ? `<select class="fld" id="m_${x.id}">${x.options.map(([v, l]) => `<option value="${esc(v)}" ${v === x.value ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`
         : x.type === 'checks' ? `<div class="chips" id="m_${x.id}">${x.options.map(([v, l]) => `<label class="chip"><input type="checkbox" value="${esc(v)}" style="margin-right:6px">${esc(l)}</label>`).join('')}</div>`
         : `<input class="fld" id="m_${x.id}" type="${x.type === 'number' ? 'text' : 'text'}" ${x.type === 'number' ? 'inputmode="decimal"' : ''} value="${esc(x.value ?? '')}" placeholder="${esc(x.ph || '')}">`}</div>`).join('')}
-      </div><div class="foot"><button class="btn btn-o" data-act="modalCancel">Rehne do</button>
+      </div><div class="foot"><button class="btn btn-o" data-act="modalCancel">${L('Rehne do', 'Cancel')}</button>
       <button class="btn ${danger ? 'btn-r' : 'btn-g'}" data-act="modalOk">${esc(ok || 'Save')}</button></div>`;
     $('ov').classList.add('show'); $('modal').classList.add('show');
     modalDone = resolve;
@@ -1123,15 +1133,15 @@ function pushState() {
 }
 function pushCard() {
   const st = pushState();
-  if (st === 'granted' && localStorageSafe('rb-push-' + TEAM_APP) === 'on') return `<div class="card" style="padding:12px 14px;margin-bottom:12px"><span class="pill p-g">🔔 Phone notifications chalu hain</span>
-    <button class="btn btn-o btn-sm" style="margin-left:8px" data-act="pushOn">Dubara jodo</button></div>`;
-  if (st === 'unsupported') return `<div class="card" style="padding:12px 14px;margin-bottom:12px"><b>Is browser me phone notification nahi chalega</b>
-    <p class="mu" style="margin-top:4px">Android pe Chrome use karo. iPhone pe: Share → "Add to Home Screen" karke wahan se app kholo.</p></div>`;
-  if (st === 'denied') return `<div class="card" style="padding:12px 14px;margin-bottom:12px"><b>Notifications band hain</b>
-    <p class="mu" style="margin-top:4px">Browser settings → Site settings → Notifications me is site ko "Allow" karo, phir page reload karo.</p></div>`;
-  return `<div class="card" style="padding:14px;margin-bottom:12px;background:var(--lime-s)"><b>🔔 Phone pe notification paao</b>
-    <p class="mu" style="margin:4px 0 10px">App band ho tab bhi naya kaam / order / target turant phone pe aayega.</p>
-    <button class="btn btn-g" data-act="pushOn">Notifications chalu karo</button></div>`;
+  if (st === 'granted' && localStorageSafe('rb-push-' + TEAM_APP) === 'on') return `<div class="card" style="padding:12px 14px;margin-bottom:12px"><span class="pill p-g">🔔 ${L('Phone notifications chalu hain', 'Phone notifications are on')}</span>
+    <button class="btn btn-o btn-sm" style="margin-left:8px" data-act="pushOn">${L('Dubara jodo', 'Reconnect')}</button></div>`;
+  if (st === 'unsupported') return `<div class="card" style="padding:12px 14px;margin-bottom:12px"><b>${L('Is browser me phone notification nahi chalega', 'Phone notifications don\'t work in this browser')}</b>
+    <p class="mu" style="margin-top:4px">${L('Android pe Chrome use karo. iPhone pe: Share → "Add to Home Screen" karke wahan se app kholo.', 'On Android, use Chrome. On iPhone: Share → "Add to Home Screen", then open the app from there.')}</p></div>`;
+  if (st === 'denied') return `<div class="card" style="padding:12px 14px;margin-bottom:12px"><b>${L('Notifications band hain', 'Notifications are blocked')}</b>
+    <p class="mu" style="margin-top:4px">${L('Browser settings → Site settings → Notifications me is site ko "Allow" karo, phir page reload karo.', 'Browser settings → Site settings → Notifications → set this site to "Allow", then reload the page.')}</p></div>`;
+  return `<div class="card" style="padding:14px;margin-bottom:12px;background:var(--lime-s)"><b>🔔 ${L('Phone pe notification paao', 'Get notifications on your phone')}</b>
+    <p class="mu" style="margin:4px 0 10px">${L('App band ho tab bhi naya kaam / order / target turant phone pe aayega.', 'Even when the app is closed, new tasks reach your phone right away.')}</p>
+    <button class="btn btn-g" data-act="pushOn">${L('Notifications chalu karo', 'Turn on notifications')}</button></div>`;
 }
 function localStorageSafe(k, v) {
   try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; }
@@ -1140,12 +1150,12 @@ function openNotifs() {
   $('drawer').dataset.kind = 'notifs';
   $('drTitle').textContent = 'Notifications';
   $('drBody').innerHTML = pushCard() + (NOTIFS.length ? `<div class="row" style="justify-content:flex-end;margin-bottom:8px">
-      <button class="btn btn-o btn-sm" data-act="readAll">✓ Sab padh liya</button></div>` +
+      <button class="btn btn-o btn-sm" data-act="readAll">✓ ${L('Sab padh liya', 'Mark all read')}</button></div>` +
     NOTIFS.map(n => `<div class="card nrow ${n.is_read ? '' : 'unread'}" data-act="readOne" data-arg="${esc(n.id)}">
       <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><span style="font-size:20px">${NICON[n.type] || '🔔'}</span>
         <div style="flex:1;min-width:0"><b style="display:block">${esc(n.title)}</b><span class="mu" style="display:block;margin-top:2px">${esc(n.message)}</span></div>
         <span class="mu" style="white-space:nowrap">${when(n.created_at)}</span></div></div>`).join('')
-    : `<div class="empty"><div class="e">🔕</div><b>Abhi koi notification nahi</b></div>`);
+    : `<div class="empty"><div class="e">🔕</div><b>${L('Abhi koi notification nahi', 'No notifications yet')}</b></div>`);
   $('ov').classList.add('show'); $('drawer').classList.add('show'); $('drawer').setAttribute('aria-hidden', 'false');
 }
 async function readNotif(id) {
@@ -1160,21 +1170,21 @@ function b64ToU8(b64) {
   return Uint8Array.from([...s].map(c => c.charCodeAt(0)));
 }
 async function enablePush() {
-  if (pushState() === 'unsupported') return toast('Is browser me notification support nahi');
+  if (pushState() === 'unsupported') return toast(L('Is browser me notification support nahi', 'This browser does not support notifications'));
   try {
     const perm = await Notification.requestPermission();
-    if (perm !== 'granted') { toast('Permission nahi mili'); if ($('drawer').dataset.kind === 'notifs') openNotifs(); return; }
+    if (perm !== 'granted') { toast(L('Permission nahi mili', 'Permission not given')); if ($('drawer').dataset.kind === 'notifs') openNotifs(); return; }
     const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
     await navigator.serviceWorker.ready;
     let sub = await reg.pushManager.getSubscription();
     if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(VAPID_PUBLIC_KEY) });
     const j = sub.toJSON();
     const r = await rpc('team_save_push', { p_app: TEAM_APP, p_endpoint: j.endpoint, p_p256dh: j.keys.p256dh, p_auth: j.keys.auth, p_agent: navigator.userAgent });
-    if (!r.ok) return toast('⚠️ ' + (r.error || 'Save nahi hua'));
+    if (!r.ok) return toast('⚠️ ' + (r.error || L('Save nahi hua', 'Could not save')));
     localStorageSafe('rb-push-' + TEAM_APP, 'on');
-    toast('🔔 Notifications chalu ho gaye');
+    toast('🔔 ' + L('Notifications chalu ho gaye', 'Notifications are on'));
     if ($('drawer').dataset.kind === 'notifs') openNotifs();
-  } catch (e) { toast('⚠️ Notification chalu nahi hua: ' + (e && e.message ? e.message : e)); }
+  } catch (e) { toast('⚠️ ' + L('Notification chalu nahi hua: ', 'Could not turn on notifications: ') + (e && e.message ? e.message : e)); }
 }
 /* re-save an existing subscription on every login (endpoint can rotate; user may have changed) */
 async function refreshPushSub() {
@@ -1224,28 +1234,31 @@ function targetCard(t, admin) {
 /* ---------- task card (shared; admin gets edit/reopen/delete, staff gets complete/not-done) ---------- */
 const PRI = { high: ['🔴 Zaroori', 'p-r'], normal: ['🟠 Normal', 'p-o'], low: ['🟢 Aaram se', 'p-g'] };
 const TST = { todo: ['Baaki', 'p-b'], done: ['✅ Complete', 'p-g'], not_done: ['❌ Nahi hua', 'p-r'] };
+const PRI_EN = { high: '🔴 Urgent', normal: '🟠 Normal', low: '🟢 No rush' }, TST_EN = { todo: 'To do', done: '✅ Done', not_done: '❌ Not done' };
+const priL = p => isIntern() ? PRI_EN[p] : PRI[p][0], tstL = t => isIntern() ? TST_EN[t] : TST[t][0];
 function dueChip(due, status, today) {
   if (!due) return '';
   const d = String(due).slice(0, 10), diff = daysBetween(today, d);
-  const txt = diff === 0 ? 'Aaj tak' : diff === 1 ? 'Kal tak' : diff < 0 ? `${-diff} din late` : `${shortD(d)} tak`;
+  const txt = isIntern() ? (diff === 0 ? 'Due today' : diff === 1 ? 'Due tomorrow' : diff < 0 ? `${-diff} ${-diff === 1 ? 'day' : 'days'} late` : `Due ${shortD(d)}`)
+    : diff === 0 ? 'Aaj tak' : diff === 1 ? 'Kal tak' : diff < 0 ? `${-diff} din late` : `${shortD(d)} tak`;
   return `<span class="pill ${status === 'todo' && diff < 0 ? 'p-r' : status === 'todo' && diff <= 1 ? 'p-o' : 'p-m'}">⏰ ${txt}</span>`;
 }
 function taskCard(t, admin, today) {
   return `<div class="card task pr-${esc(t.priority)} st-${esc(t.status)}">
-    <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><div class="tt" style="flex:1">${esc(t.title)}</div>${`<span class="pill ${TST[t.status][1]}">${TST[t.status][0]}</span>`}</div>
+    <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><div class="tt" style="flex:1">${esc(t.title)}</div>${`<span class="pill ${TST[t.status][1]}">${tstL(t.status)}</span>`}</div>
     ${t.details ? `<div class="td">${esc(t.details)}</div>` : ''}
-    <div class="meta"><span class="pill ${PRI[t.priority][1]}">${PRI[t.priority][0]}</span>${dueChip(t.due_date, t.status, today)}
+    <div class="meta"><span class="pill ${PRI[t.priority][1]}">${priL(t.priority)}</span>${dueChip(t.due_date, t.status, today)}
       ${admin ? `<span class="pill ${t.staff_kind === 'intern' ? 'p-y' : 'p-b'}">👤 ${esc(t.staff_name)} · ${t.staff_kind === 'intern' ? 'Intern' : 'Sales'}</span>` : ''}
-      <span class="mu">diya ${when(t.created_at)}${t.completed_at ? ' · complete ' + when(t.completed_at) : ''}</span></div>
+      <span class="mu">${L('diya ', 'given ')}${when(t.created_at)}${t.completed_at ? L(' · complete ', ' · done ') + when(t.completed_at) : ''}</span></div>
     ${t.staff_note ? `<div class="note">💬 ${esc(t.staff_note)}</div>` : ''}
     <div class="acts2">${admin
       ? `<button class="btn btn-o btn-sm" data-act="editTask" data-arg="${esc(t.id)}">✏️ Edit</button>
          ${t.status !== 'todo' ? `<button class="btn btn-o btn-sm" data-act="reopenTask" data-arg="${esc(t.id)}">↩️ Dobara kholo</button>` : ''}
          <button class="btn btn-r btn-sm" data-act="delTask" data-arg="${esc(t.id)}">Hatao</button>`
       : t.status === 'todo'
-        ? `<button class="btn btn-g" data-act="taskDone" data-arg="${esc(t.id)}">✓ Complete</button>
-           <button class="btn btn-r" data-act="taskNotDone" data-arg="${esc(t.id)}">✕ Nahi ho paya</button>`
-        : `<button class="btn btn-o btn-sm" data-act="taskTodo" data-arg="${esc(t.id)}">↩️ Wapas baaki me daalo</button>`}</div>
+        ? `<button class="btn btn-g" data-act="taskDone" data-arg="${esc(t.id)}">✓ ${L('Complete', 'Done')}</button>
+           <button class="btn btn-r" data-act="taskNotDone" data-arg="${esc(t.id)}">✕ ${L('Nahi ho paya', 'Not done')}</button>`
+        : `<button class="btn btn-o btn-sm" data-act="taskTodo" data-arg="${esc(t.id)}">↩️ ${L('Wapas baaki me daalo', 'Move back to To do')}</button>`}</div>
   </div>`;
 }
 
