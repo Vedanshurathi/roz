@@ -247,6 +247,11 @@ img{display:block;max-width:100%}
 .run.is-next .na-nav{background:var(--blue);color:#fff}
 .run.is-next .na-call{background:var(--grey);color:var(--tx)}
 .st-done{background:var(--grey);color:var(--mut)}
+.st-disp{background:#fdecea;color:#c0392b}
+.run.acc-disp::before{background:#e5484d}
+.donebar{display:flex;align-items:center;gap:12px;width:100%;margin-top:14px;padding:13px 15px;border-radius:16px;
+  background:#fff;border:1px dashed #d9e2d9;text-align:left;font-weight:700;color:var(--tx2);font-size:13.5px}
+.donebar b{color:var(--navy,#16213e)}.donebar .go{margin-left:auto;color:var(--g);font-weight:800;white-space:nowrap}
 
 /* ============ ITEM ROWS + STEPPER ============ */
 .irow{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
@@ -890,8 +895,8 @@ body.has-nav .scr{padding-bottom:200px}
 <div class="scr" id="s-catalog">
   <div class="topbar">
     <button class="bk" onclick="go('stock')" aria-label="Back">←</button>
-    <div><h1 data-en="Add from catalog" data-hi="Catalog se jodo">Add from catalog</h1>
-    <div class="sub" data-en="just set your rate and you're live" data-hi="bas rate daalo, live ho jaoge">just set your rate and you're live</div></div>
+    <div><h1 data-en="Add from catalog" data-hi="कैटलॉग से जोड़ो">Add from catalog</h1>
+    <div class="sub" data-en="just set your rate and you're live" data-hi="बस रेट डालो, आपका सामान दिखने लगेगा">just set your rate and you're live</div></div>
   </div>
   <div class="wrap" style="padding-top:14px">
     <div class="csrch">
@@ -1086,13 +1091,13 @@ body.has-nav .scr{padding-bottom:200px}
         <div style="display:flex;gap:12px;align-items:flex-start">
           <span style="font-size:26px">🔔</span>
           <div style="min-width:0;flex:1">
-            <b style="display:block;font-size:14.5px" data-en="Get told the moment a new order comes in?" data-hi="Naya order aate hi bata dein?">Get told the moment a new order comes in?</b>
-            <span style="font-size:12.5px;color:var(--mut);font-weight:600" data-en="Works even if the app is closed." data-hi="App band ho tab bhi kaam karega.">Works even if the app is closed.</span>
+            <b style="display:block;font-size:14.5px" data-en="Get told the moment a new order comes in?" data-hi="नया ऑर्डर आते ही बताएँ?">Get told the moment a new order comes in?</b>
+            <span style="font-size:12.5px;color:var(--mut);font-weight:600" data-en="Works even if the app is closed." data-hi="ऐप बंद हो तब भी काम करेगा।">Works even if the app is closed.</span>
           </div>
         </div>
         <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btn btn-o btn-sm" onclick="document.getElementById('permNotifV').style.display='none'" data-en="Not now" data-hi="Abhi nahi">Not now</button>
-          <button class="btn btn-g btn-sm" onclick="askNotifVendor()" data-en="Yes, alert me" data-hi="Haan, batao">Yes, alert me</button>
+          <button class="btn btn-o btn-sm" onclick="document.getElementById('permNotifV').style.display='none'" data-en="Not now" data-hi="अभी नहीं">Not now</button>
+          <button class="btn btn-g btn-sm" onclick="askNotifVendor()" data-en="Yes, alert me" data-hi="हाँ, बताओ">Yes, alert me</button>
         </div>
       </div>
       <div id="nextWrap"></div>
@@ -1188,7 +1193,7 @@ body.has-nav .scr{padding-bottom:200px}
       <span class="r" id="stockCount"></span></div>
     <button class="addbtn" onclick="newItem()">＋ <span data-en="Add a new item" data-hi="नया सामान जोड़ो">Add a new item</span></button>
     <button class="addbtn" style="border-color:var(--g);color:var(--g-dk);background:var(--lime-s);margin-top:10px" onclick="openCatalogPicker()">
-      🗂️ <span data-en="Browse catalog — sabzi, fruit, sab kuch" data-hi="Catalog dekho — sabzi, fruit, sab kuch">Browse catalog — vegetables &amp; fruits, ready to go</span></button>
+      🗂️ <span data-en="Browse catalog — sabzi, fruit, sab kuch" data-hi="कैटलॉग देखो — सब्ज़ी, फल, सब कुछ">Browse catalog — vegetables &amp; fruits, ready to go</span></button>
     <div id="stockList"></div>
   </div>
   <div class="bar"><div class="bar-in">
@@ -1263,7 +1268,7 @@ body.has-nav .scr{padding-bottom:200px}
     <div style="font-size:52px">✅</div>
     <b class="disp" style="display:block;font-size:20px;margin-top:12px" data-en="Message sent" data-hi="भेज दिया">Message sent</b>
     <p style="color:var(--mut);margin-top:6px" data-en="Thank you — someone from RozBazaar will read this." data-hi="धन्यवाद — RozBazaar से कोई ज़रूर पढ़ेगा">Thank you — someone from RozBazaar will read this.</p>
-    <button class="btn btn-g" style="width:100%;margin-top:22px" onclick="go('home')" data-en="Back to home" data-hi="Home par jao">Back to home</button>
+    <button class="btn btn-g" style="width:100%;margin-top:22px" onclick="go('home')" data-en="Back to home" data-hi="होम पर जाओ">Back to home</button>
   </div>
 </div>
 
@@ -1293,10 +1298,15 @@ console.log('RozBazaar vendor build', RB_BUILD);
    is one line per case.
    ============================================================ */
 
-let LANG='en';
+/* Hindi by default (most vendors read Hindi); the choice is remembered on the phone and saved to the
+   vendor's account (set_language) so push notifications come in the same language. */
+let LANG=(()=>{ try{ return localStorage.getItem('rb_vlang')==='en'?'en':'hi'; }catch(e){ return 'hi'; } })();
 function T(en,hi){return LANG==='en'?en:hi}
-function setLang(l){
+function setLang(l, silent){
+  const changed = l!==LANG;
   LANG=l;
+  try{ localStorage.setItem('rb_vlang', l); }catch(e){}
+  if(!silent && changed && !DEMO && VENDOR) rpc('set_language',{p_lang:l}).catch(()=>{});
   document.querySelectorAll('[data-en]').forEach(el=>{
     const v=el.getAttribute('data-'+l); if(v!==null) el.innerHTML=v;
   });
@@ -1399,7 +1409,7 @@ const RUNS_DEMO = [
 let RUNS = [];
 let RUN_DAY = 0;   /* 0=today, 1=tomorrow, ... — which day's runs are being viewed */
 function runDayLabels(){
-  const wd=['Ravi','Som','Mangal','Budh','Guru','Shukra','Shani'];
+  const wd=['रवि','सोम','मंगल','बुध','गुरु','शुक्र','शनि'];
   const wdEn=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   return Array.from({length:6},(_,i)=>{
     const d=new Date(); d.setDate(d.getDate()+i);
@@ -1478,7 +1488,12 @@ async function rpc(fn,args={}){
    delivery is confirmed yet — the code step still has to happen. */
 const ST_IN  = {placed:'new',on_the_way:'way',reached:'way',bill_final:'bill',
                 bill_approved:'bill',paid:'paidwait',
-                delivered:'done',completed:'done'};
+                delivered:'done',completed:'done',
+                /* these used to fall back to 'new' — a missed / under-review order showed "I'm on the way"
+                   and a disputed one showed the wrong steps */
+                disputed:'disp',missed:'missed',pending_review:'review',cancelled:'cancelled'};
+/* orders the vendor still has to act on — only these are shown as cards on Home */
+const ACTIVE_ST = ['new','way','bill','paidwait','disp'];
 const ST_OUT = {way:'on_the_way', bill:'bill_final', paidwait:'paid', done:'delivered'};
 
 /* ---------------- NEW-ORDER NOTIFICATION ----------------
@@ -1505,7 +1520,7 @@ function checkForNewOrders(runs){
   markOrdersSeen(runs.map(r=>r.code));
   if(!seen.size){ return; }   /* first load this session — nothing to compare against yet, not "new" */
   fresh.forEach(r=>{
-    toast('\u{1F6CE}\uFE0F '+T('New order!','Naya order!')+' '+r.name+' \u2014 \u20B9'+runTotal(r));
+    toast('\u{1F6CE}\uFE0F '+T('New order!','नया ऑर्डर!')+' '+r.name+' \u2014 \u20B9'+runTotal(r));
     if(navigator.vibrate) navigator.vibrate([120,60,120]);
   });
 }
@@ -1563,12 +1578,12 @@ async function askNotifVendor(){
          attempt even ran, so a silent failure (sw.js missing, etc.)
          looked identical to genuinely working. */
       toast(realSubOk
-        ? T('Done — new orders will alert you','Ho gaya — naye order pe alert aayega')
-        : T('Alerts on for this tab — but the always-on version needs a browser restart, try again in a bit','Is tab ke liye alert chalu — hamesha wale ke liye browser dubara kholo, thodi der me try karo'));
+        ? T('Done — new orders will alert you','हो गया — नया ऑर्डर आते ही बताएँगे')
+        : T('Alerts on for this tab — but the always-on version needs a browser restart, try again in a bit','इस टैब के लिए अलर्ट चालू — हमेशा के लिए ब्राउज़र दोबारा खोलो, थोड़ी देर में कोशिश करो'));
     }else{
-      toast(T('No problem — check the app for new orders instead','Koi baat nahi — app me hi naye order dekh lena'));
+      toast(T('No problem — check the app for new orders instead','कोई बात नहीं — ऐप में ही नए ऑर्डर देख लेना'));
     }
-  }catch(e){ toast(T('Could not enable alerts','Alerts chalu nahi hue')); }
+  }catch(e){ toast(T('Could not enable alerts','अलर्ट चालू नहीं हुए')); }
 }
 function startOrderPolling(){
   clearInterval(orderPollTimer);
@@ -1604,6 +1619,8 @@ function mapBooking(b){
 }
 function mapProduct(p){
   return {id:p.id, em:'🥬', en:p.name, hi:p.name_hi||p.name, unit:p.unit, price:Number(p.price),
+          enName:p.name_en||null,             /* real English ("Tomato") — display only; en stays the typed name */
+          stockImg:p.stock_image_url||null,   /* real photo from the catalog, when the vendor has none */
           stock:p.in_stock!==false, img:p.image_url||null, stale:p.price_is_stale,
           category:p.category, catalogKey:p.catalog_key||null,
           reviewStatus: p.review_status || 'approved',   /* real vendors: always set */
@@ -1710,11 +1727,11 @@ function prod(id){return PRODUCTS.find(p=>p.id===id)}
    product away from throwing mid-render and blanking the whole page. */
 function itemView(i){
   const p=prod(i.id);
-  return p ? {en:p.en, hi:p.hi, unit:p.unit, price:p.price, img:p.img, em:p.em}
+  return p ? {en:p.en, hi:p.hi, enName:p.enName, unit:p.unit, price:p.price, img:p.img, stockImg:p.stockImg, catalogKey:p.catalogKey, em:p.em}
            : {en:i.name||'Item', hi:i.name||'Item', unit:i.unit||'', price:i.price||0, img:null, em:'🥬'};
 }
 function itemPrice(i){ return itemView(i).price; }
-function pname(p){return LANG==='en' ? p.en : p.hi}
+function pname(p){return LANG==='en' ? (p.enName||p.en) : p.hi}
 function slotOf(id){return SLOTS.find(s=>s.id===id)}
 function slotName(id){const s=slotOf(id); return s?(LANG==='en'?s.en:s.hi):id}
 function runTotal(r){
@@ -1723,10 +1740,13 @@ function runTotal(r){
 }
 function stName(st){
   return {new:T('New','नया'), way:T('On the way','रास्ते में'), bill:T('Bill sent','बिल भेजा'),
-          paidwait:T('Paid — confirm code','पेड — कोड कन्फ़र्म करो'), done:T('Delivered','डिलीवर')}[st];
+          paidwait:T('Paid — confirm code','पेड — कोड कन्फ़र्म करो'), done:T('Delivered','डिलीवर'),
+          disp:T('Bill disputed','बिल पर आपत्ति'), missed:T('Missed','छूट गया'), review:T('Under review','जाँच में'),
+          cancelled:T('Cancelled','रद्द')}[st] || st;
 }
 function stClass(st){
-  return {new:'st-new', way:'st-way', bill:'st-bill', paidwait:'st-paid', done:'st-done'}[st];
+  return {new:'st-new', way:'st-way', bill:'st-bill', paidwait:'st-paid', done:'st-done',
+          disp:'st-disp', missed:'st-done', review:'st-done', cancelled:'st-done'}[st] || 'st-done';
 }
 let tT;
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -1820,6 +1840,7 @@ async function adoptVendor(session){
       /* returning vendor: trust the server's own record over anything
          freshly typed — a returning vendor's number should already match */
       VENDOR=me.data;
+      if(VENDOR.lang!==LANG) rpc('set_language',{p_lang:LANG}).catch(()=>{});   /* notifications in the app's language */
       vendorUser.name=VENDOR.name||vendorUser.name;
       vendorUser.phone=VENDOR.phone||vendorUser.phone;
       VTYPE=VENDOR.v_type; PHOTO=VENDOR.photo_url||null;
@@ -2793,12 +2814,14 @@ function pImg(p, cls){
   if(p.img) return `<img src="${p.img}" alt="${p.en}">`;   /* the vendor's own real photo, always wins */
   const key = p.catalogKey || ART_ALIAS[(p.en||'').trim().toLowerCase()];
   const sv = key && ART[key];
-  if(!sv) return p.em||'🥬';
   /* same reason index.html does this: reused gradient ids collide if
      the same illustration appears more than once on a page at once */
   const u='_'+(_artN++);
-  return sv.replace(/id="([a-z]\d+[a-z]?)"/g, (m,g)=>`id="${g}${u}"`)
+  const art = !sv ? (p.em||'🥬') : sv.replace(/id="([a-z]\d+[a-z]?)"/g, (m,g)=>`id="${g}${u}"`)
            .replace(/url\(#([a-z]\d+[a-z]?)\)/g, (m,g)=>`url(#${g}${u})`);
+  /* then the real catalog photo (same one customers see); if it fails to load, the drawing */
+  if(p.stockImg) return `<img src="${esc(p.stockImg)}" alt="" loading="lazy" onerror="this.outerHTML=this.dataset.fb" data-fb="${esc(art)}">`;
+  return art;
 }
 
 /* ---------------- CATALOG PICKER ---------------- */
@@ -2845,7 +2868,7 @@ function renderCatalogPicker(){
       </div>` : `
       <div class="cctrl">
         <button class="tg ${mine.stock?'on':''}" onclick="toggleCatalogStock('${mine.id}')" aria-label="stock"><i></i></button>
-        <span class="cstocklbl">${mine.stock?T('In stock','Stock me'):T('Out of stock','Stock khatam')}</span>
+        <span class="cstocklbl">${mine.stock?T('In stock','स्टॉक में'):T('Out of stock','स्टॉक ख़त्म')}</span>
         <div class="rupee"><span>₹</span><input class="cpriceIn" style="width:56px" value="${mine.price}"
              inputmode="numeric" onchange="updateCatalogPrice('${mine.id}',this.value)"></div>
         <button class="cremove" onclick="removeCatalogItem('${mine.id}','${LANG==='en'?c.name_en:c.name_hi}')" aria-label="remove">🗑</button>
@@ -2857,9 +2880,9 @@ function renderCatalogPicker(){
 async function activateCatalogItem(key){
   const input=document.getElementById('cprice_'+key);
   const price=parseFloat(input.value);
-  if(isNaN(price)||price<=0) return toast(T('Enter a valid rate first','Pehle sahi rate daalo'));
+  if(isNaN(price)||price<=0) return toast(T('Enter a valid rate first','पहले सही रेट डालो'));
   const r=await api('activateCatalog',{key, price});
-  if(!r.ok) return toast(r.msg||T('Could not add — try again','Add nahi hua — dubara try karo'));
+  if(!r.ok) return toast(r.msg||T('Could not add — try again','जोड़ा नहीं गया — दोबारा कोशिश करो'));
   await ensureProducts(true);   /* force refresh so the main stock list picks it up too */
   toast(T('Added — live for customers now','जुड़ गया — अभी customers ko दिख रहा है'));
   renderCatalogPicker();
@@ -2888,9 +2911,9 @@ async function removeCatalogItem(id, label){
   if(!confirm(T(`Remove ${label} from your shop? Customers will no longer see it at all.`,
                 `${label} apni dukan se हटाओ? Customer ko ab ye bilkul nahi dikhega.`))) return;
   const r=await api('deleteProduct',{id});
-  if(!r.ok) return toast(r.msg||T('Could not remove — try again','Hataya nahi gaya — dubara try karo'));
+  if(!r.ok) return toast(r.msg||T('Could not remove — try again','हटाया नहीं गया — दोबारा कोशिश करो'));
   await ensureProducts(true);
-  toast(T('Removed','Hata diya'));
+  toast(T('Removed','हटा दिया'));
   renderCatalogPicker();
 }
 function newItem(){ editId=null; itPhoto=null; itUnit='kg'; itCat=VTYPE||'vegetable'; go('item'); }
@@ -3414,9 +3437,12 @@ async function renderHome(){
     document.getElementById('nextWrap').innerHTML='';
     return;
   }
-  const runs=res.data||[];
-  const done=runs.filter(r=>r.status==='done');
-  const left=runs.filter(r=>r.status!=='done');
+  const all=res.data||[];
+  const done=all.filter(r=>r.status==='done');
+  /* Home shows only orders that still need the vendor — delivered / missed / cancelled ones used to sit
+     in the same list and confused vendors. Delivered ones are summed up in one line (→ Dashboard). */
+  const runs=all.filter(r=>ACTIVE_ST.includes(r.status));
+  const left=runs;
   const isToday = RUN_DAY===0;
   const dayLbl = runDayLabels()[RUN_DAY];
 
@@ -3428,7 +3454,7 @@ async function renderHome(){
     refreshHeroSale();
     document.getElementById('stDone').textContent = done.length;
     document.getElementById('stLeft').textContent = left.length;
-    document.getElementById('stKg').textContent   = runs.length;
+    document.getElementById('stKg').textContent   = runs.length+done.length;
   }
   document.getElementById('dutyName').textContent =
     ((vendorUser&&vendorUser.name)||T('Vendor','वेंडर'))+' · '+typeName();
@@ -3445,7 +3471,8 @@ async function renderHome(){
      a soft animated glow and a NEXT badge, with Navigate/Call folded
      in underneath. One consistent shape for the whole list is easier
      to scan at a glance than a big block sitting apart from it. */
-  const nx = isToday ? left[0] : null;
+  /* NEXT = an order already in progress, else the first new one */
+  const nx = isToday ? (left.find(r=>r.status!=='new') || left[0]) : null;
   document.getElementById('nextWrap').innerHTML = dayPickerHtml + (!isToday && !runs.length ? `
     <div class="card" style="text-align:center;padding:24px 18px">
       <div style="font-size:36px">🌤️</div>
@@ -3459,12 +3486,12 @@ async function renderHome(){
         ${runs.length} ${T('order'+(runs.length>1?'s':'')+' scheduled','ऑर्डर तय')} — ${dayLbl.lbl}, ${dayLbl.num} ${dayLbl.mon}</b>
       <p style="font-size:13px;font-weight:600;color:var(--mut);margin-top:5px">
         ${T('This list becomes navigable that morning.','उस दिन सुबह ये list navigate करने लायक हो जाएगी।')}</p>
-    </div>` : isToday && !nx && runs.length ? `
+    </div>` : isToday && !runs.length && done.length ? `
     <div class="card" style="text-align:center;padding:30px 18px">
       <div style="font-size:44px">✅</div>
       <b class="disp" style="display:block;font-size:20px;margin-top:10px">${T('All done for today','आज का काम पूरा')}</b>
       <p style="font-size:13.5px;font-weight:600;color:var(--mut);margin-top:6px">${T('Nice work. Rest up.','बढ़िया काम। अब आराम करो।')}</p>
-    </div>` : isToday && !runs.length ? `
+    </div>` : isToday && !runs.length && !done.length ? `
     <div class="card" style="text-align:center;padding:30px 18px">
       <div style="font-size:44px">🌤️</div>
       <b class="disp" style="display:block;font-size:18px;margin-top:10px">${T('Nothing booked yet today','आज अभी कोई बुकिंग नहीं')}</b>
@@ -3502,11 +3529,15 @@ async function renderHome(){
       </button>`;
     }).join('');
   });
-  const heading = isToday ? T("Today's runs",'आज के ऑर्डर')
+  const doneSum = done.reduce((s,r)=>s+(r.final||runTotal(r)),0);
+  if(done.length) html += `<button class="donebar" onclick="go('earn')"><span style="font-size:20px">✅</span>
+      <span><b>${done.length} ${T(done.length>1?'orders delivered':'order delivered',done.length>1?'ऑर्डर डिलीवर हो गए':'ऑर्डर डिलीवर हो गया')}</b> · ₹${doneSum}</span>
+      <span class="go">${T('Dashboard','डैशबोर्ड')} ›</span></button>`;
+  const heading = isToday ? T("Orders to deliver",'डिलीवर करने वाले ऑर्डर')
     : T(dayLbl.lbl+"'s runs", dayLbl.lbl+' के ऑर्डर');
   document.getElementById('runList').innerHTML =
     `<div class="sec-hd"><h2>${heading}</h2>
-     <span class="r">${runs.length} ${T('total','कुल')}</span></div>` + html;
+     <span class="r">${runs.length} ${T('left','बाकी')}</span></div>` + html;
   stagger('#runList .run', 60);
 
   /* desktop side column: quick stock warnings */
@@ -3578,6 +3609,12 @@ function renderRun(){
   : r.status==='way'      ? B('btn-or',   '⚖️ '+T('Reached — make bill','पहुँच गया — बिल बनाओ'), "startBill()")
   : r.status==='bill'     ? B('btn-g',    '💵 '+T('Take payment','पेमेंट लो'), "go('pay')")
   : r.status==='paidwait' ? B('btn-navy', '🔢 '+T('Confirm delivery code','डिलीवरी कोड कन्फ़र्म करो'), "go('code')")
+  : r.status==='disp'     ? B('btn-or',   '⚖️ '+T('Customer disputed — weigh again & re-send bill','ग्राहक ने आपत्ति की — दोबारा तोलो और बिल भेजो'), "startBill()")
+  : ['missed','review','cancelled'].includes(r.status) ? `<div style="width:100%;text-align:center;padding:6px 0">
+       <b class="disp" style="font-size:16px;color:var(--mut)">${r.status==='missed'?'⏰ '+T('This order was missed','यह ऑर्डर छूट गया')
+         : r.status==='review'?'🔍 '+T('RozBazaar is checking this order','RozBazaar इस ऑर्डर की जाँच कर रहा है')
+         : '❌ '+T('This order was cancelled','यह ऑर्डर रद्द हो गया')}</b>
+       <div style="font-size:12.5px;font-weight:700;color:var(--mut)">${T('Nothing to do here','यहाँ कुछ नहीं करना')}</div></div>`
   : `<div style="width:100%;text-align:center;padding:6px 0">
        <b class="disp" style="font-size:17px;color:var(--g)">✅ ${T('Delivered & paid','डिलीवर और पेमेंट हो गया')}</b>
        <div style="font-size:12.5px;font-weight:700;color:var(--mut)">${
@@ -4053,7 +4090,7 @@ function renderPending(){
       <div class="pend-card">
         <span class="pend-tag">⏳ ${T('YOU ADDED THIS','आपने जोड़ा')}</span>
         <div style="display:flex;align-items:center;gap:13px;margin-top:12px">
-          <span class="p-thumb">${p.img?`<img src="${p.img}" alt="">`:(p.em||'🥬')}</span>
+          <span class="p-thumb">${pImg(p)}</span>
           <div style="min-width:0;flex:1">
             <b style="font-size:16px;display:block">${pname(p)}</b>
             <span style="font-size:13px;font-weight:700;color:var(--mut)">₹${p.price} / ${p.unit}</span>
@@ -4061,7 +4098,7 @@ function renderPending(){
         </div>
         <p style="font-size:13px;font-weight:600;color:var(--tx2);line-height:1.5;margin-top:10px">${
           T('RozBazaar checks new items before customers can book them. Usually done within a day.',
-            'RozBazaar naya saman check karta hai customer ko dikhne se pehle. Aksar ek din me ho jaata hai।')}</p>
+            'ग्राहक को दिखने से पहले RozBazaar नया सामान जाँचता है। अक्सर एक दिन में हो जाता है।')}</p>
       </div>`).join('') : '') +
     (rejected.length ? `
     <div class="sec-hd"><h2>${T('Not approved','मंज़ूर नहीं हुआ')}</h2>
@@ -4070,7 +4107,7 @@ function renderPending(){
       <div class="pend-card" style="border-color:var(--red)">
         <span class="pend-tag" style="background:var(--red-s);color:var(--red)">✕ ${T('REJECTED','रिजेक्ट')}</span>
         <div style="display:flex;align-items:center;gap:13px;margin-top:12px">
-          <span class="p-thumb">${p.img?`<img src="${p.img}" alt="">`:(p.em||'🥬')}</span>
+          <span class="p-thumb">${pImg(p)}</span>
           <div style="min-width:0;flex:1">
             <b style="font-size:16px;display:block">${pname(p)}</b>
             <span style="font-size:13px;font-weight:700;color:var(--mut)">₹${p.price} / ${p.unit}</span>
@@ -4415,7 +4452,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     sp.style.color = i<3 ? '#7ECB53' : '#fff';
     w.appendChild(sp);
   });
-  setLang('en');
+  setLang(LANG, true);
   restoreSession();
   setTimeout(()=>{
     const sp=document.getElementById('splash');

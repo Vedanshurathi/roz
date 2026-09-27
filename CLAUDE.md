@@ -273,6 +273,15 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
 - Dates sent to the DB use `istISO(offset)` (customer + vendor apps) — `toISOString()` is UTC and gave
   yesterday between midnight and 5:30 AM IST.
 - Privacy trade-off: `vendor_login_lookup` returns the login email of any vendor number that has a password.
+- **Home = only orders still to do** (`ACTIVE_ST` = new / way / bill / paidwait / disp). Delivered ones are one line
+  "✅ N delivered · ₹X → Dashboard"; missed / under review / cancelled are hidden. `ST_IN` now maps disputed →
+  `disp` (button "weigh again & re-send bill" → `startBill()`), missed → `missed`, pending_review → `review`
+  (no action button) — they used to fall back to `new` and showed "I'm on the way". NEXT = the order already in progress.
+- **Language: Hindi by default**, remembered in `localStorage.rb_vlang`, synced with `set_language` (after login and
+  on change) so pushes match. Hindi mode is Devanagari (day names, toasts, notification card fixed).
+- Item photos/names: `vendor_my_products` also returns `name_en` + `stock_image_url` (migration
+  `20260927b_vendor_products_photo_name.sql`); `pImg` = vendor photo → catalog photo → drawing (on load error);
+  `pname` shows `name_en` in English. `p.en` stays the vendor's typed name (editing must not rename items).
 
 ### Staff app (`staff-site/index.html`)
 - Its own Hostinger website (upload `index.html`, `.htaccess`, `robots.txt`). Read-only,
