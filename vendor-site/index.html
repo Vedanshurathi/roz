@@ -223,40 +223,21 @@ img{display:block;max-width:100%}
 .dpc{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;border-radius:10px;background:var(--or);color:#fff;
   font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;box-shadow:0 2px 6px rgba(0,0,0,.15)}
 .day-pill{position:relative}
-/* home footer */
-.hf-inc{background:linear-gradient(150deg,#15233F,#0E1A30);color:#fff;border-radius:22px;padding:18px 18px 14px;margin:18px 0 14px;
-  box-shadow:0 14px 34px rgba(16,27,48,.22)}
-.hf-top{display:flex;justify-content:space-between;font-size:11px;font-weight:800;letter-spacing:1.1px;color:rgba(255,255,255,.6)}
-.hf-amt{font-family:var(--disp);font-size:clamp(34px,11vw,44px);font-weight:800;line-height:1.1;margin-top:6px}
-.hf-sub{font-size:13px;font-weight:700;color:rgba(255,255,255,.65)}
-.hf-split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.hf-split>div{background:rgba(255,255,255,.08);border-radius:14px;padding:10px 12px;min-width:0}
-.hf-split small{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.6)}
-.hf-split b{display:block;font-family:var(--disp);font-size:20px;font-weight:800;margin-top:2px}
-.hf-split .neg{color:#FFB37A} .hf-split .pos{color:var(--lime)}
-.hf-bar{height:8px;border-radius:6px;background:#4f8df5;margin-top:14px;overflow:hidden}.hf-bar i{display:block;height:100%;background:var(--lime)}
-.hf-leg{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:rgba(255,255,255,.75);margin-top:6px}
-.hf-none{font-size:12.5px;font-weight:700;color:rgba(255,255,255,.6);margin-top:12px}
-.hf-go{display:block;width:100%;margin-top:14px;padding:12px;border-radius:14px;background:rgba(255,255,255,.12);color:#fff;font-weight:800;font-size:14px}
-.hf-card{padding:14px 14px 6px;margin-bottom:14px}
-.hf-h{margin-bottom:6px}.hf-h b{display:block;font-family:var(--disp);font-size:16.5px;font-weight:800}
-.hf-h span{font-size:12px;font-weight:700;color:var(--mut)}
-.hf-row{display:flex;align-items:center;gap:10px;width:100%;padding:11px 2px;border-top:1px solid var(--line);text-align:left;min-height:52px}
-.hf-row:active{background:var(--grey)}
-.hf-day{width:74px;flex-shrink:0}.hf-day b{display:block;font-size:14px;font-weight:800}.hf-day small{font-size:11.5px;font-weight:700;color:var(--mut)}
-.hf-slots{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:5px}
-.hf-slots i{font-style:normal;font-size:11.5px;font-weight:800;padding:3px 7px;border-radius:12px}
-.hf-slots i.z{opacity:.4}.hf-slots em{font-style:normal;font-size:12.5px;font-weight:700;color:var(--tx2)}
-.hf-n{min-width:30px;height:30px;border-radius:10px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;
-  font-family:var(--disp);font-weight:800;font-size:15px;flex-shrink:0}
-.hf-n.z{background:var(--grey);color:var(--mut)}
-.hf-amt2{font-family:var(--disp);font-weight:800;font-size:15px;flex-shrink:0}.hf-amt2.z{color:var(--mut)}
-.hf-ch{color:var(--mut);font-size:18px;font-weight:700;flex-shrink:0}
-.hf-quick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.hf-quick button{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:12px 6px;font-size:22px;
-  display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s var(--sp)}
-.hf-quick button:active{transform:scale(.95)}
-.hf-quick span{font-size:12px;font-weight:800;color:var(--tx2)}
+/* home quick list (footer) — big one-line buttons */
+.hq{padding:16px 14px 8px}
+.hq-row{display:flex;align-items:center;gap:12px;width:100%;min-height:62px;padding:10px 12px;margin-bottom:8px;
+  border:1.8px solid var(--line);border-radius:16px;background:#fff;text-align:left;transition:transform .15s var(--sp)}
+.hq-row:active{transform:scale(.97)}
+.hq-ic{width:40px;height:40px;border-radius:12px;background:var(--grey);display:flex;align-items:center;justify-content:center;
+  font-size:21px;flex-shrink:0}
+.hq-t{flex:1;min-width:0}.hq-t b{display:block;font-size:15.5px;font-weight:800;color:var(--tx)}
+.hq-t small{display:block;font-size:12.5px;font-weight:700;color:var(--mut);margin-top:1px}
+.hq-r{font-family:var(--disp);font-size:19px;font-weight:800;color:var(--tx);flex-shrink:0}
+.hq-ch{font-size:20px;font-weight:700;color:var(--mut);flex-shrink:0}
+.hq-money{background:var(--lime-s);border-color:#cfe8bf}.hq-money .hq-ic{background:#fff}.hq-money .hq-r{color:var(--g-dk)}
+.hq-n{min-width:32px;height:32px;border-radius:10px;background:var(--or);color:#fff;display:inline-flex;align-items:center;
+  justify-content:center;font-size:16px;padding:0 8px}
+.hq-n.z{background:var(--grey);color:var(--mut)}
 .slot-band{display:flex;align-items:center;gap:12px;margin:22px 0 10px;padding:12px 14px;border-radius:18px;
   animation:slideIn .4s var(--sp) both;scroll-margin-top:12px}
 .slot-band .ic{width:40px;height:40px;border-radius:12px;background:#fff;display:flex;align-items:center;
@@ -3650,9 +3631,8 @@ async function renderHome(){
   renderHomeFooter();
 }
 
-/* ---------- Home footer: today's income · coming days · past days ----------
-   (was a plain "Quick actions" box). Data: vendor_dashboard(today) + vendor_day_counts(today-7 … today+5),
-   refreshed at most every 20 s; tapping a coming day opens its orders, a past day opens the Dashboard for it. */
+/* ---------- Home footer: "Quick actions" list with today's income, tomorrow's orders, past sales ----------
+   Data: vendor_dashboard(today) + vendor_day_counts(today-7 … today+5), refreshed at most every 20 s. */
 let FOOT={t:0, dash:null, days:null};
 async function renderHomeFooter(){
   const el=document.getElementById('deskSide'); if(!el) return;
@@ -3675,64 +3655,36 @@ async function renderHomeFooter(){
     if(row && row.open>0) b.insertAdjacentHTML('beforeend',`<span class="dpc">${row.open}</span>`);
   });
 
-  /* 1 — today's income */
-  const sale=D?Number(D.sale)||0:0, cash=D?Number(D.cash)||0:0, upi=D?Number(D.upi)||0:0;
-  const cashPct = sale>0 ? Math.round(cash*100/sale) : 0;
-  const inc = !D ? '' : `
-    <div class="hf-inc">
-      <div class="hf-top"><span>💰 ${T("TODAY'S INCOME",'आज की कमाई')}</span><span>${fmt(t).dm}</span></div>
-      <div class="hf-amt">${rs(sale)}</div>
-      <div class="hf-sub">${D.orders} ${T(D.orders==1?'order delivered':'orders delivered','ऑर्डर डिलीवर')}</div>
-      <div class="hf-split">
-        <div><small>${T('RozBazaar commission','RozBazaar कमीशन')} (${D.rate}%)</small><b class="neg">− ${rs(D.commission)}</b></div>
-        <div><small>${T('You keep','आपकी कमाई')}</small><b class="pos">${rs(D.net)}</b></div>
-      </div>
-      ${sale>0?`<div class="hf-bar"><i style="width:${cashPct}%"></i></div>
-      <div class="hf-leg"><span>💵 ${T('Cash','नकद')} ${rs(cash)}</span><span>📱 UPI ${rs(upi)}</span></div>`
-      :`<div class="hf-none">${T('No payment taken yet today','आज अभी कोई पेमेंट नहीं आई')}</div>`}
-      <button class="hf-go" onclick="go('earn')">${T('See full account','पूरा हिसाब देखो')} ›</button>
-    </div>`;
-
-  /* 2 — coming days: tap = that day's orders */
-  const next=days.filter(x=>{const k=diff(x.d); return k>=1 && k<=5;});
-  const up = `<div class="card hf-card">
-      <div class="hf-h"><b>📅 ${T('Coming days','आने वाले दिन')}</b><span>${T('tap a day to see its orders','ऑर्डर देखने के लिए दिन दबाओ')}</span></div>
-      ${next.length?next.map(x=>{const k=diff(x.d), f=fmt(x.d);
-        return `<button class="hf-row" onclick="pickRunDay(${k});scrollTo({top:0,behavior:'smooth'})">
-          <span class="hf-day"><b>${dayName(x.d)}</b><small>${f.dm}</small></span>
-          <span class="hf-slots">${x.open?SLOTS.map(sl=>`<i class="s-${sl.id}${x[sl.id]?'':' z'}">${sl.em} ${x[sl.id]}</i>`).join(''):`<em>${T('No orders yet','अभी कोई ऑर्डर नहीं')}</em>`}</span>
-          <span class="hf-n${x.open?'':' z'}">${x.open}</span><span class="hf-ch">›</span></button>`;}).join('')
-      :`<div class="hf-none" style="color:var(--mut)">${T('Could not load','लोड नहीं हुआ')}</div>`}
-    </div>`;
-
-  /* 3 — past days: delivered + income, tap = Dashboard for that day */
-  const past=days.filter(x=>{const k=diff(x.d); return k<0 && k>=-7;}).reverse();
-  const pastHtml = `<div class="card hf-card">
-      <div class="hf-h"><b>🗓️ ${T('Past days','पिछले दिन')}</b><span>${T('delivered orders & income','डिलीवर ऑर्डर और कमाई')}</span></div>
-      ${past.map(x=>{const f=fmt(x.d);
-        return `<button class="hf-row" onclick="openDashDay('${x.d}')">
-          <span class="hf-day"><b>${dayName(x.d)}</b><small>${f.dm}</small></span>
-          <span class="hf-slots"><em>${x.delivered?`✅ ${x.delivered} ${T(x.delivered==1?'order':'orders','ऑर्डर')}`:T('No sale','कोई बिक्री नहीं')}</em></span>
-          <span class="hf-amt2${x.sale>0?'':' z'}">${rs(x.sale)}</span><span class="hf-ch">›</span></button>`;}).join('')}
-    </div>`;
-
+  /* Simple, like the old "Quick actions" box: one list of big buttons, one line each (Vedanshu found the
+     income card + day tables too much). Today's income, tomorrow's orders and past sales are rows in it. */
+  const sale=D?Number(D.sale)||0:0;
+  const tm=days.find(x=>diff(x.d)===1), tmN=tm?tm.open:0;
+  const later=days.filter(x=>{const k=diff(x.d); return k>=2 && k<=5 && x.open>0;});
+  const row=(ic,title,sub,right,fn,cls='')=>`<button class="hq-row ${cls}" onclick="${fn}">
+      <span class="hq-ic">${ic}</span>
+      <span class="hq-t"><b>${title}</b>${sub?`<small>${sub}</small>`:''}</span>
+      ${right?`<span class="hq-r">${right}</span>`:''}<span class="hq-ch">›</span></button>`;
   const out=PRODUCTS.filter(p=>!p.stock);
-  el.innerHTML = inc + up + pastHtml + `
-    <div class="hf-quick">
-      <button onclick="go('stock')">🥬<span>${T('Stock & rates','स्टॉक और रेट')}</span></button>
-      <button onclick="go('slots')">🕖<span>${T('My slots','मेरे स्लॉट')}</span></button>
-      <button onclick="go('earn')">📊<span>${T('Dashboard','डैशबोर्ड')}</span></button>
+  el.innerHTML = `<div class="card hq">
+      <div class="sec-hd" style="padding-top:0"><h2>${T('Quick actions','जल्दी वाले काम')}</h2></div>
+      ${row('💰', T("Today's income",'आज की कमाई'),
+            D ? (sale>0 ? T('you keep ','आपकी कमाई ')+rs(D.net) : T('no payment yet','अभी कोई पेमेंट नहीं')) : '',
+            D?rs(sale):'', "go('earn')", 'hq-money')}
+      ${row('📅', T("Tomorrow's orders",'कल के ऑर्डर'),
+            later.length ? T('also: ','आगे: ')+later.map(x=>dayName(x.d)+' '+x.open).join(', ') : '',
+            `<span class="hq-n${tmN?'':' z'}">${tmN}</span>`, "pickRunDay(1);scrollTo({top:0,behavior:'smooth'})")}
+      ${row('🗓️', T('Past days sale','पिछले दिनों की बिक्री'), T('last 7 days, day by day','पिछले 7 दिन, हर दिन का हिसाब'), '', "openDashPast()")}
+      ${row('🥬', T('Update stock & rates','स्टॉक और रेट बदलो'), '', '', "go('stock')")}
+      ${row('🕖', T('Change slots','स्लॉट बदलो'), '', '', "go('slots')")}
     </div>
     ${out.length?`<div class="note"><span>⚠️</span><span>${
       T(out.length+' item(s) marked out of stock: ','स्टॉक ख़त्म बताया है: ')
       + out.map(p=>pname(p)).join(', ')}</span></div>`:''}`;
 }
-/* past day → Dashboard showing just that day */
-function openDashDay(iso){
+function openDashPast(){
   go('earn');
-  document.getElementById('dashFrom').value=iso; document.getElementById('dashTo').value=iso;
-  const btn=[...document.querySelectorAll('#dashChips .eprd')].pop();
-  setDashPeriod('custom', btn);
+  const btn=[...document.querySelectorAll('#dashChips .eprd')].find(b=>(b.getAttribute('onclick')||'').includes("'7d'"));
+  setDashPeriod('7d', btn);
 }
 
 /* ---------------- BOOKING DETAIL ---------------- */
