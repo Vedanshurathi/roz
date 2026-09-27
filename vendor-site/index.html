@@ -3439,8 +3439,8 @@ async function renderHome(){
   }
   const all=res.data||[];
   const done=all.filter(r=>r.status==='done');
-  /* Home shows only orders that still need the vendor — delivered / missed / cancelled ones used to sit
-     in the same list and confused vendors. Delivered ones are summed up in one line (→ Dashboard). */
+  /* Home shows only orders that still need the vendor — delivered / under review / missed / cancelled ones
+     used to sit in the same list and confused vendors (Vedanshu: none of them on Home). Sales are on the Dashboard. */
   const runs=all.filter(r=>ACTIVE_ST.includes(r.status));
   const left=runs;
   const isToday = RUN_DAY===0;
@@ -3529,10 +3529,6 @@ async function renderHome(){
       </button>`;
     }).join('');
   });
-  const doneSum = done.reduce((s,r)=>s+(r.final||runTotal(r)),0);
-  if(done.length) html += `<button class="donebar" onclick="go('earn')"><span style="font-size:20px">✅</span>
-      <span><b>${done.length} ${T(done.length>1?'orders delivered':'order delivered',done.length>1?'ऑर्डर डिलीवर हो गए':'ऑर्डर डिलीवर हो गया')}</b> · ₹${doneSum}</span>
-      <span class="go">${T('Dashboard','डैशबोर्ड')} ›</span></button>`;
   const heading = isToday ? T("Orders to deliver",'डिलीवर करने वाले ऑर्डर')
     : T(dayLbl.lbl+"'s runs", dayLbl.lbl+' के ऑर्डर');
   document.getElementById('runList').innerHTML =

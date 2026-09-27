@@ -273,8 +273,8 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
 - Dates sent to the DB use `istISO(offset)` (customer + vendor apps) — `toISOString()` is UTC and gave
   yesterday between midnight and 5:30 AM IST.
 - Privacy trade-off: `vendor_login_lookup` returns the login email of any vendor number that has a password.
-- **Home = only orders still to do** (`ACTIVE_ST` = new / way / bill / paidwait / disp). Delivered ones are one line
-  "✅ N delivered · ₹X → Dashboard"; missed / under review / cancelled are hidden. `ST_IN` now maps disputed →
+- **Home = only orders still to do** (`ACTIVE_ST` = new / way / bill / paidwait / disp). Delivered ones are not shown
+  (none on Home — sales are on the Dashboard); missed / under review / cancelled are hidden too. `ST_IN` now maps disputed →
   `disp` (button "weigh again & re-send bill" → `startBill()`), missed → `missed`, pending_review → `review`
   (no action button) — they used to fall back to `new` and showed "I'm on the way". NEXT = the order already in progress.
 - **Language: Hindi by default**, remembered in `localStorage.rb_vlang`, synced with `set_language` (after login and
