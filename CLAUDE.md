@@ -277,6 +277,9 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   (none on Home — sales are on the Dashboard); missed / under review / cancelled are hidden too. `ST_IN` now maps disputed →
   `disp` (button "weigh again & re-send bill" → `startBill()`), missed → `missed`, pending_review → `review`
   (no action button) — they used to fall back to `new` and showed "I'm on the way". NEXT = the order already in progress.
+- **Slot view on Home:** a 3-tile slot board (count per slot + state: अभी चल रहा / starts in X / देर हो रही / ख़त्म,
+  tap = jump) and a coloured band per slot section (`slotState()` from IST now, `SLOTS[].from/to` hours 7–11, 12–16,
+  17–20). Order cards carry a coloured slot-time chip.
 - **Language: Hindi by default**, remembered in `localStorage.rb_vlang`, synced with `set_language` (after login and
   on change) so pushes match. Hindi mode is Devanagari (day names, toasts, notification card fixed).
 - Item photos/names: `vendor_my_products` also returns `name_en` + `stock_image_url` (migration
