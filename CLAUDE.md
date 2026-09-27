@@ -280,6 +280,10 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
 - **Slot view on Home:** a 3-tile slot board (count per slot + state: अभी चल रहा / starts in X / देर हो रही / ख़त्म,
   tap = jump) and a coloured band per slot section (`slotState()` from IST now, `SLOTS[].from/to` hours 7–11, 12–16,
   17–20). Order cards carry a coloured slot-time chip.
+- **Home footer** (`renderHomeFooter`, was "Quick actions"): 💰 today's income card (sale, orders, commission, you keep,
+  cash/UPI bar → Dashboard), 📅 coming 5 days (open orders per slot; tap = `pickRunDay`), 🗓️ past 7 days (delivered +
+  sale; tap = `openDashDay` → Dashboard for that date), 3 quick buttons. Day pills get an order-count dot. Data:
+  `vendor_day_counts(p_from,p_to)` (migration `20260927c_vendor_day_counts.sql`) + `vendor_dashboard(today)`.
 - **Language: Hindi by default**, remembered in `localStorage.rb_vlang`, synced with `set_language` (after login and
   on change) so pushes match. Hindi mode is Devanagari (day names, toasts, notification card fixed).
 - Item photos/names: `vendor_my_products` also returns `name_en` + `stock_image_url` (migration
