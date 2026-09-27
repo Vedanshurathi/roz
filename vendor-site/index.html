@@ -201,54 +201,6 @@ img{display:block;max-width:100%}
 .slot-hd b{font-family:var(--disp);font-size:17px;font-weight:800}
 .slot-hd span{font-size:12px;font-weight:700;color:var(--mut);margin-left:auto}
 @keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
-/* slot board: which slot is on now, how many orders in each — tap to jump */
-.sboard{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:2px 0 6px}
-.stile{border-radius:18px;padding:11px 8px 10px;text-align:center;border:2px solid transparent;
-  transition:transform .15s var(--sp);position:relative;min-width:0}
-.stile:active{transform:scale(.95)}
-.stile .se{font-size:22px;line-height:1}
-.stile .sn{display:block;font-size:13.5px;font-weight:800;margin-top:4px}
-.stile .stm{display:block;font-size:11.5px;font-weight:700;color:var(--tx2);white-space:nowrap}
-.stile .sc{display:block;font-family:var(--disp);font-size:24px;font-weight:800;line-height:1.1;margin-top:5px}
-.stile .scl{display:block;font-size:10.5px;font-weight:700;color:var(--tx2)}
-.stile .sst{display:inline-block;margin-top:6px;font-size:10px;font-weight:800;padding:3px 7px;border-radius:20px;
-  background:rgba(255,255,255,.75);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.s-morning{background:var(--or-s)} .s-afternoon{background:#FFF4C2} .s-evening{background:#E4E8F4}
-.stile.live{border-color:var(--g);box-shadow:0 6px 18px rgba(30,142,62,.18)}
-.stile.live .sst{background:var(--g);color:#fff}
-.stile.late .sst{background:#e5484d;color:#fff}
-.stile.past{opacity:.6}
-.stile.none .sc{color:var(--mut)}
-/* slot section header: a coloured band saying what time it is for these orders */
-.dpc{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;border-radius:10px;background:var(--or);color:#fff;
-  font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;box-shadow:0 2px 6px rgba(0,0,0,.15)}
-.day-pill{position:relative}
-/* home quick list (footer) — big one-line buttons */
-.hq{padding:16px 14px 8px}
-.hq-row{display:flex;align-items:center;gap:12px;width:100%;min-height:62px;padding:10px 12px;margin-bottom:8px;
-  border:1.8px solid var(--line);border-radius:16px;background:#fff;text-align:left;transition:transform .15s var(--sp)}
-.hq-row:active{transform:scale(.97)}
-.hq-ic{width:40px;height:40px;border-radius:12px;background:var(--grey);display:flex;align-items:center;justify-content:center;
-  font-size:21px;flex-shrink:0}
-.hq-t{flex:1;min-width:0}.hq-t b{display:block;font-size:15.5px;font-weight:800;color:var(--tx)}
-.hq-t small{display:block;font-size:12.5px;font-weight:700;color:var(--mut);margin-top:1px}
-.hq-r{font-family:var(--disp);font-size:19px;font-weight:800;color:var(--tx);flex-shrink:0}
-.hq-ch{font-size:20px;font-weight:700;color:var(--mut);flex-shrink:0}
-.hq-money{background:var(--lime-s);border-color:#cfe8bf}.hq-money .hq-ic{background:#fff}.hq-money .hq-r{color:var(--g-dk)}
-.hq-n{min-width:32px;height:32px;border-radius:10px;background:var(--or);color:#fff;display:inline-flex;align-items:center;
-  justify-content:center;font-size:16px;padding:0 8px}
-.hq-n.z{background:var(--grey);color:var(--mut)}
-.slot-band{display:flex;align-items:center;gap:12px;margin:22px 0 10px;padding:12px 14px;border-radius:18px;
-  animation:slideIn .4s var(--sp) both;scroll-margin-top:12px}
-.slot-band .ic{width:40px;height:40px;border-radius:12px;background:#fff;display:flex;align-items:center;
-  justify-content:center;font-size:21px;flex-shrink:0;box-shadow:0 2px 8px rgba(16,27,48,.08)}
-.slot-band .tx{min-width:0;flex:1}
-.slot-band b{display:block;font-family:var(--disp);font-size:17px;font-weight:800;line-height:1.2}
-.slot-band .when{display:block;font-size:12.5px;font-weight:700;color:var(--tx2);margin-top:2px}
-.slot-band .when.live{color:var(--g-dk)} .slot-band .when.late{color:#c0392b}
-.slot-band .cnt{flex-shrink:0;min-width:38px;height:38px;border-radius:12px;background:var(--navy);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:18px;font-weight:800;padding:0 8px}
-.dot-live{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--g);margin-right:5px;vertical-align:1px}
 .run{display:flex;align-items:center;gap:13px;background:#fff;border:1.5px solid var(--line);
   border-radius:22px;padding:15px 16px;margin-bottom:12px;width:100%;text-align:left;
   transition:transform .16s var(--sp),box-shadow .2s;box-shadow:0 2px 10px rgba(20,30,20,.05);
@@ -266,9 +218,8 @@ img{display:block;max-width:100%}
 .run .t{min-width:0;flex:1}
 .run .t .rtop{display:flex;align-items:center;gap:7px;margin-bottom:2px}
 .run .t .rcode{font-size:10.5px;font-weight:800;color:var(--mut);letter-spacing:.4px}
-.run .t .rslot{font-size:10.5px;font-weight:800;color:var(--tx);background:var(--lime-s);
+.run .t .rslot{font-size:10.5px;font-weight:800;color:var(--g-dk);background:var(--lime-s);
   padding:2px 8px;border-radius:20px;white-space:nowrap}
-.run .t .rslot.s-morning{background:var(--or-s)} .run .t .rslot.s-afternoon{background:#FFF4C2} .run .t .rslot.s-evening{background:#E4E8F4}
 .run .t b{display:block;font-size:15.5px;font-weight:800;margin-top:1px}
 .run .t span.addr{font-size:12.5px;font-weight:600;color:var(--mut);display:block;line-height:1.45;margin-top:1px}
 .run .amt{text-align:right;flex-shrink:0}
@@ -1431,30 +1382,10 @@ const REVIEWS = [
    cm_hi:'अब हमारी गली का सबसे बढ़िया सब्ज़ी वाला।'}
 ];
 const SLOTS = [
-  {id:'morning',   em:'🌅', en:'Morning 7–11',   hi:'सुबह 7–11',    cap:15, open:true,  areas:null, from:7,  to:11, nen:'Morning',   nhi:'सुबह'},
-  {id:'afternoon', em:'☀️', en:'Afternoon 12–4', hi:'दोपहर 12–4',   cap:10, open:true,  areas:null, from:12, to:16, nen:'Afternoon', nhi:'दोपहर'},
-  {id:'evening',   em:'🌇', en:'Evening 5–8',    hi:'शाम 5–8',      cap:12, open:false, areas:null, from:17, to:20, nen:'Evening',   nhi:'शाम'}
+  {id:'morning',   em:'🌅', en:'Morning 7–11',   hi:'सुबह 7–11',    cap:15, open:true,  areas:null},
+  {id:'afternoon', em:'☀️', en:'Afternoon 12–4', hi:'दोपहर 12–4',   cap:10, open:true,  areas:null},
+  {id:'evening',   em:'🌇', en:'Evening 5–8',    hi:'शाम 5–8',      cap:12, open:false, areas:null}
 ];
-/* ---- slot time helpers (India time) ---- */
-function istMinutes(){
-  const [h,m]=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false})
-    .format(new Date()).split(':').map(Number);
-  return (h%24)*60+m;
-}
-function hr12(h){ return h>12?h-12:h; }
-function slotRange(s){ return LANG==='en'
-  ? `${hr12(s.from)}–${hr12(s.to)} ${s.to<12?'am':'pm'}`
-  : `${hr12(s.from)} से ${hr12(s.to)} बजे`; }
-function inTime(min){ const h=Math.floor(min/60), m=min%60;
-  return LANG==='en' ? (h?h+' h ':'')+(m||!h?m+' min':'') : (h?h+' घं ':'')+(m||!h?m+' मि':''); }
-/* where is this slot, right now? only meaningful for today */
-function slotState(s, isToday){
-  if(!isToday) return {k:'day'};
-  const now=istMinutes(), a=s.from*60, b=s.to*60;
-  if(now<a) return {k:'soon', mins:a-now};
-  if(now<b) return {k:'live', mins:b-now};
-  return {k:'past'};
-}
 const RUNS_DEMO = [
   {code:'RB-104217', slot:'morning', name:'Sunita Devi', phone:'9812345670',
    house:'142-B', street:'Ward 4, Nai basti', area:'Khandewla', landmark:'Hanuman mandir ke paas',
@@ -1483,7 +1414,7 @@ function runDayLabels(){
   return Array.from({length:6},(_,i)=>{
     const d=new Date(); d.setDate(d.getDate()+i);
     const lbl = i===0 ? T('Today','आज') : i===1 ? T('Tomorrow','कल') : (LANG==='en'?wdEn[d.getDay()]:wd[d.getDay()]);
-    return {i, lbl, num:d.getDate(), mon:d.toLocaleString(LANG==='en'?'en':'hi-IN',{month:'short'})};
+    return {i, lbl, num:d.getDate(), mon:d.toLocaleString('en',{month:'short'})};
   });
 }
 function pickRunDay(d){ RUN_DAY=d; renderHome(); }
@@ -1775,8 +1706,6 @@ async function api(fn, args={}){
       return await rpc('vendor_earnings_range',{p_from:args.from, p_to:args.to});
     case 'dashboard':
       return await rpc('vendor_dashboard',{p_from:args.from, p_to:args.to});
-    case 'dayCounts':
-      return await rpc('vendor_day_counts',{p_from:args.from, p_to:args.to});
     case 'getReviews':
       return await rpc('vendor_my_reviews',{p_limit:30});
     case 'setActive':
@@ -3568,37 +3497,16 @@ async function renderHome(){
       <b class="disp" style="display:block;font-size:18px;margin-top:10px">${T('Nothing booked yet today','आज अभी कोई बुकिंग नहीं')}</b>
     </div>` : '');
 
-  /* slot board: the three slots side by side — which one is on now, how many orders each */
-  let html='';
-  if(runs.length){
-    html += `<div class="sboard">${SLOTS.map(s=>{
-      const n=runs.filter(r=>r.slot===s.id).length, st=slotState(s,isToday);
-      const late = st.k==='past' && n>0;
-      const cls = (n?'':' none')+(st.k==='live'?' live':'')+(late?' late':'')+(st.k==='past'&&!n?' past':'');
-      const tag = st.k==='live' ? T('ON NOW','अभी चल रहा')
-               : st.k==='soon' ? T('in ','')+inTime(st.mins)+T('',' बाद')
-               : late ? T('LATE','देर हो रही')
-               : st.k==='past' ? T('over','ख़त्म') : dayLbl.lbl;
-      return `<button class="stile s-${s.id}${cls}" onclick="${n?`document.getElementById('slot-${s.id}').scrollIntoView({behavior:'smooth',block:'start'})`:''}">
-        <span class="se">${s.em}</span><span class="sn">${LANG==='en'?s.nen:s.nhi}</span>
-        <span class="stm">${slotRange(s)}</span>
-        <span class="sc">${n}</span><span class="scl">${T(n===1?'order':'orders','ऑर्डर')}</span>
-        <span class="sst">${tag}</span></button>`;}).join('')}</div>`;
-  }
   /* runs grouped by slot */
+  let html='';
   let cardIx=0;
   SLOTS.forEach(s=>{
     const list=runs.filter(r=>r.slot===s.id);
     if(!list.length) return;
-    const st=slotState(s,isToday);
-    const when = st.k==='live' ? `<span class="when live"><span class="dot-live"></span>${T('On now — till '+hr12(s.to)+(s.to<12?' am':' pm'),'अभी चल रहा — '+hr12(s.to)+' बजे तक')} · ${inTime(st.mins)} ${T('left','बचे')}</span>`
-      : st.k==='soon' ? `<span class="when">⏳ ${T('Starts at '+hr12(s.from)+(s.from<12?' am':' pm'),hr12(s.from)+' बजे शुरू')} · ${inTime(st.mins)} ${T('from now','बाद')}</span>`
-      : st.k==='past' ? `<span class="when late">⚠️ ${T('Slot time is over — finish these quickly','समय निकल गया — जल्दी पूरा करो')}</span>`
-      : `<span class="when">📅 ${dayLbl.lbl}, ${dayLbl.num} ${dayLbl.mon}</span>`;
-    html += `<div class="slot-band s-${s.id}" id="slot-${s.id}" style="animation-delay:${cardIx*.04}s">
-      <span class="ic">${s.em}</span>
-      <span class="tx"><b>${LANG==='en'?s.nen:s.nhi} · ${slotRange(s)}</b>${when}</span>
-      <span class="cnt">${list.length}</span></div>`;
+    const pending=list.filter(r=>r.status!=='done').length;
+    html += `<div class="slot-hd" style="animation-delay:${cardIx*.04}s"><span class="ic">${s.em}</span>
+      <b>${LANG==='en'?s.en:s.hi}</b>
+      <span>${isToday ? (pending?pending+' '+T('left','बाकी'):T('all done','सब हो गया')) : list.length+' '+T('booked','बुक')}</span></div>`;
     html += list.map((r,i)=>{
       const isNext = nx && r.code===nx.code;
       cardIx++;   /* keeps subsequent slot headers staggered even though this card's own delay now comes from stagger() */
@@ -3608,7 +3516,7 @@ async function renderHome(){
         <span class="n">${i+1}</span>
         <span class="t">
           <span class="rtop"><span class="rcode">${r.code}</span>
-            <span class="rslot s-${s.id}">${s.em} ${slotRange(s)}</span></span>
+            <span class="rslot">${s.em} ${LANG==='en'?s.en:s.hi}</span></span>
           <b>${r.name}</b>
           <span class="addr">${r.house}, ${r.street} · 📍 ${r.landmark}</span>
         </span>
@@ -3628,63 +3536,18 @@ async function renderHome(){
      <span class="r">${runs.length} ${T('left','बाकी')}</span></div>` + html;
   stagger('#runList .run', 60);
 
-  renderHomeFooter();
-}
-
-/* ---------- Home footer: "Quick actions" list with today's income, tomorrow's orders, past sales ----------
-   Data: vendor_dashboard(today) + vendor_day_counts(today-7 … today+5), refreshed at most every 20 s. */
-let FOOT={t:0, dash:null, days:null};
-async function renderHomeFooter(){
-  const el=document.getElementById('deskSide'); if(!el) return;
-  if(Date.now()-FOOT.t>20000 || !FOOT.dash){
-    FOOT.t=Date.now();
-    const t=istToday();
-    const [d,c]=await Promise.all([api('dashboard',{from:t,to:t}), api('dayCounts',{from:addDays(t,-7),to:addDays(t,5)})]);
-    if(d&&d.ok) FOOT.dash=d.data; if(c&&c.ok) FOOT.days=c.data;
-  }
-  const t=istToday(), D=FOOT.dash, days=FOOT.days||[];
-  const fmt=iso=>{ const x=new Date(iso+'T00:00:00');
-    return {wd:x.toLocaleDateString(LANG==='en'?'en-IN':'hi-IN',{weekday:'short'}),
-            dm:x.toLocaleDateString(LANG==='en'?'en-IN':'hi-IN',{day:'numeric',month:'short'})}; };
-  const diff=iso=>Math.round((new Date(iso+'T00:00:00Z')-new Date(t+'T00:00:00Z'))/864e5);
-  const dayName=iso=>{ const k=diff(iso); return k===0?T('Today','आज'):k===1?T('Tomorrow','कल'):k===-1?T('Yesterday','बीता कल'):fmt(iso).wd; };
-
-  /* day pills at the top get a small order count */
-  document.querySelectorAll('#nextWrap .day-pill').forEach((b,i)=>{
-    const row=days.find(x=>diff(x.d)===i); b.querySelector('.dpc')?.remove();
-    if(row && row.open>0) b.insertAdjacentHTML('beforeend',`<span class="dpc">${row.open}</span>`);
-  });
-
-  /* Simple, like the old "Quick actions" box: one list of big buttons, one line each (Vedanshu found the
-     income card + day tables too much). Today's income, tomorrow's orders and past sales are rows in it. */
-  const sale=D?Number(D.sale)||0:0;
-  const tm=days.find(x=>diff(x.d)===1), tmN=tm?tm.open:0;
-  const later=days.filter(x=>{const k=diff(x.d); return k>=2 && k<=5 && x.open>0;});
-  const row=(ic,title,sub,right,fn,cls='')=>`<button class="hq-row ${cls}" onclick="${fn}">
-      <span class="hq-ic">${ic}</span>
-      <span class="hq-t"><b>${title}</b>${sub?`<small>${sub}</small>`:''}</span>
-      ${right?`<span class="hq-r">${right}</span>`:''}<span class="hq-ch">›</span></button>`;
+  /* desktop side column: quick stock warnings */
   const out=PRODUCTS.filter(p=>!p.stock);
-  el.innerHTML = `<div class="card hq">
+  document.getElementById('deskSide').innerHTML = `
+    <div class="card">
       <div class="sec-hd" style="padding-top:0"><h2>${T('Quick actions','जल्दी वाले काम')}</h2></div>
-      ${row('💰', T("Today's income",'आज की कमाई'),
-            D ? (sale>0 ? T('you keep ','आपकी कमाई ')+rs(D.net) : T('no payment yet','अभी कोई पेमेंट नहीं')) : '',
-            D?rs(sale):'', "go('earn')", 'hq-money')}
-      ${row('📅', T("Tomorrow's orders",'कल के ऑर्डर'),
-            later.length ? T('also: ','आगे: ')+later.map(x=>dayName(x.d)+' '+x.open).join(', ') : '',
-            `<span class="hq-n${tmN?'':' z'}">${tmN}</span>`, "pickRunDay(1);scrollTo({top:0,behavior:'smooth'})")}
-      ${row('🗓️', T('Past days sale','पिछले दिनों की बिक्री'), T('last 7 days, day by day','पिछले 7 दिन, हर दिन का हिसाब'), '', "openDashPast()")}
-      ${row('🥬', T('Update stock & rates','स्टॉक और रेट बदलो'), '', '', "go('stock')")}
-      ${row('🕖', T('Change slots','स्लॉट बदलो'), '', '', "go('slots')")}
+      <button class="btn btn-out" style="margin-bottom:10px" onclick="go('stock')">🥬 ${T('Update stock & rates','स्टॉक और रेट बदलो')}</button>
+      <button class="btn btn-out" style="margin-bottom:10px" onclick="go('slots')">🕖 ${T('Change slots','स्लॉट बदलो')}</button>
+      <button class="btn btn-out" onclick="go('earn')">📊 ${T('Open dashboard','डैशबोर्ड खोलो')}</button>
     </div>
     ${out.length?`<div class="note"><span>⚠️</span><span>${
       T(out.length+' item(s) marked out of stock: ','स्टॉक ख़त्म बताया है: ')
       + out.map(p=>pname(p)).join(', ')}</span></div>`:''}`;
-}
-function openDashPast(){
-  go('earn');
-  const btn=[...document.querySelectorAll('#dashChips .eprd')].find(b=>(b.getAttribute('onclick')||'').includes("'7d'"));
-  setDashPeriod('7d', btn);
 }
 
 /* ---------------- BOOKING DETAIL ---------------- */
