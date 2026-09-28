@@ -6,7 +6,7 @@
 <title>RozBazaar Staff</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QlblnaYkyIRsQX81GYPD09sE0vYjpexT+TW0jjyFqDw=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NLjyI3r1SwI7pRm76uu5CwwrOInnp9dN81qSnGf0XBQ=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -202,6 +202,40 @@ td.acts .btn+.btn{margin-left:6px}
 .msg{margin-bottom:12px}
 .msg.unread{border-left:4px solid var(--blue)}
 .empty{text-align:center;padding:44px 16px;color:var(--tx2)}
+/* intern workspace: sheet, board, files, meetings */
+.sheet-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sheet-t{width:100%;border-collapse:collapse;min-width:780px;font-size:13.5px}
+.sheet-t th{position:sticky;top:0;background:var(--grey);text-align:left;font-size:11.5px;font-weight:800;color:var(--tx2);padding:9px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.sheet-t td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.sheet-t tr:hover td{background:#FCFBF7}
+.sheet-t tr.is-done .c-title b,.sheet-t tr.is-done .cell-in.title{text-decoration:line-through;color:var(--mut)}
+.sheet-t .c-chk{width:34px;text-align:center}.sheet-t .c-chk input{width:18px;height:18px;accent-color:var(--g);cursor:pointer}
+.sheet-t .c-title{min-width:190px}.sheet-t .c-act{width:40px;padding-right:12px}
+.sheet-t input[type=date]{min-width:128px}
+.sheet-t .c-link a{color:var(--blue);font-weight:700;text-decoration:none;white-space:nowrap}
+.cell-in,.cell-sel{width:100%;border:1.4px solid transparent;border-radius:8px;padding:7px 8px;font:inherit;background:transparent;color:inherit}
+.cell-in:hover,.cell-sel:hover{border-color:var(--line);background:#fff}
+.cell-in:focus,.cell-sel:focus{outline:none;border-color:var(--g);background:#fff;box-shadow:0 0 0 3px rgba(30,142,62,.12)}
+.cell-in[disabled],.cell-sel[disabled]{opacity:1;color:var(--tx2);cursor:default}
+.cell-in.title{font-weight:700}.cell-in.late{color:var(--red);font-weight:800}
+.cell-note{padding:0 8px 4px;font-size:11.5px}
+.cell-sel{appearance:none;-webkit-appearance:none;font-weight:700;min-width:86px;cursor:pointer}
+.cell-sel.st-doing{background:#FFF6C7}.cell-sel.st-done{background:var(--lime-s)}.cell-sel.st-not_done{background:var(--red-s)}
+.add-row td{color:var(--mut);font-weight:800}.add-row .cell-in{border:1.4px dashed var(--line);background:#fff}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px}
+@media (max-width:760px){.board{grid-template-columns:1fr}}
+.bcol{background:var(--grey);border-radius:16px;padding:10px;min-height:120px}
+.bcol-h{font-weight:800;font-size:13.5px;padding:4px 4px 10px;display:flex;gap:6px}.bcol-h span{margin-left:auto;color:var(--mut)}
+.bcard{padding:12px;margin-bottom:10px;cursor:pointer;border-left:4px solid var(--line)}
+.bcard.pr-high{border-left-color:var(--red)}.bcard.pr-normal{border-left-color:var(--or)}.bcard.pr-low{border-left-color:var(--g)}
+.drop{text-align:center;border:2px dashed var(--line);box-shadow:none;background:#fff}.drop.over{border-color:var(--g);background:var(--lime-s)}
+.frow{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:8px}
+.fic{width:42px;height:42px;border-radius:12px;background:var(--grey);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+.fname{display:block;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fname:hover{color:var(--g-dk)}
+.mcard{display:flex;gap:14px;margin-bottom:10px}.mcard.live{border:2px solid var(--g)}.mcard.cx{opacity:.6}
+.mdate{width:52px;flex-shrink:0;text-align:center;background:var(--lime-s);border-radius:12px;padding:8px 0;height:max-content}
+.mdate b{display:block;font-size:20px;line-height:1.1;color:var(--g-dk)}.mdate span{font-size:11px;font-weight:800;color:var(--g-dk);text-transform:uppercase}
+.note{background:var(--grey);border-radius:10px;padding:8px 10px;font-size:12.5px;white-space:pre-wrap}
 .empty .e{font-size:40px;margin-bottom:8px}
 .empty b{display:block;color:var(--tx);font-size:16px;margin-bottom:4px}
 .sk{background:linear-gradient(90deg,var(--grey),#fff,var(--grey));background-size:200% 100%;animation:sk 1.2s linear infinite;border-radius:16px;height:90px;margin-bottom:12px}
@@ -385,6 +419,9 @@ td.acts .btn+.btn{margin-left:6px}
     <button class="nav" data-kind="sales" data-act="go" data-arg="sale"><span class="ic">💰</span>Sale</button>
     <button class="nav" data-kind="sales" data-act="go" data-arg="customers"><span class="ic">👥</span>Customers</button>
     <button class="nav" data-act="go" data-arg="tasks"><span class="ic">📝</span><span data-h="Mere kaam" data-e="My tasks">Mere kaam</span><span class="badge hide" id="bTasks"></span></button>
+    <button class="nav hide" data-kind="intern" data-act="go" data-arg="files"><span class="ic">📎</span>Files &amp; links</button>
+    <button class="nav" data-act="go" data-arg="meet"><span class="ic">📅</span><span data-h="Meetings" data-e="Meetings">Meetings</span><span class="badge hide" id="bMeet"></span></button>
+    <button class="nav hide" data-kind="intern" data-act="go" data-arg="report"><span class="ic">🗒️</span>Daily report<span class="badge hide" id="bReport"></span></button>
     <button class="nav" data-act="go" data-arg="account"><span class="ic">🔑</span><span data-h="Mera account" data-e="My account">Mera account</span></button>
     <div class="foot">
       <div class="me"><div class="av" id="meAv">S</div><div><b id="meName">Staff</b><span id="mePhone"></span></div></div>
@@ -413,6 +450,9 @@ td.acts .btn+.btn{margin-left:6px}
       <section class="scr" id="v-customers"></section>
       <section class="scr" id="v-tasks"></section>
       <section class="scr" id="v-account"></section>
+      <section class="scr" id="v-files"></section>
+      <section class="scr" id="v-meet"></section>
+      <section class="scr" id="v-report"></section>
     </div>
   </div>
 </div>
@@ -564,7 +604,7 @@ async function refresh(silent) {
   }
   if (tk.ok) TASKS = tk.data || [];
   if (tg.ok) TARGETS = tg.data || [];
-  const openTasks = TASKS.filter(t => t.status === 'todo').length, bt = $('bTasks');
+  const openTasks = TASKS.filter(t => t.status === 'todo' || t.status === 'doing').length, bt = $('bTasks');
   bt.classList.toggle('hide', !openTasks); bt.textContent = openTasks;
   const first = !LOADED; LOADED = true;
   let alerted = false;
@@ -601,9 +641,12 @@ const TITLES = {
   welcome: ['Welcome', 'RozBazaar me aapka swagat hai'], tasks: ['Mere kaam', 'admin ne jo kaam diya — complete ya nahi, yahan batao'],
   today: ['Aaj ka plan', 'aaj ke orders, slot ke hisaab se'], orders: ['Orders', 'har order — search, filter, detail'],
   vendors: ['Vendors', 'kaun kya bech raha, kitna bika'], sale: ['Sale', 'kitna bika — din, type, item, vendor, gaon'],
-  customers: ['Customers', 'naam pe click karo — saare orders'], account: ['Mera account', 'naam, password, notifications']
+  customers: ['Customers', 'naam pe click karo — saare orders'], account: ['Mera account', 'naam, password, notifications'],
+  meet: ['Meetings', 'team ke saath Google Meet'], files: ['Files & links', ''], report: ['Daily report', '']
 };
-const TITLES_EN = { welcome: ['Welcome', 'Welcome to RozBazaar'], tasks: ['My tasks', 'tasks from the admin — mark each one done or not done'],
+const TITLES_EN = { welcome: ['Welcome', 'Welcome to RozBazaar'], tasks: ['My tasks', 'your own to-do sheet + tasks from the admin'],
+  files: ['Files & links', 'share files and links with the admin'], meet: ['Meetings', 'schedule a Google Meet with the team'],
+  report: ['Daily report', 'what you did today, what\'s next, anything blocking you'],
   account: ['My account', 'name, password, notifications'] };
 function go(v) {
   VIEW = v;
@@ -611,6 +654,7 @@ function go(v) {
   document.querySelectorAll('.nav[data-arg]').forEach(b => b.classList.toggle('on', b.dataset.arg === v));
   const tt = (isIntern() && TITLES_EN[v]) || TITLES[v]; $('pgTitle').textContent = tt[0]; $('pgSub').textContent = tt[1];
   if (v === 'orders') { NEWCOUNT = 0; $('bOrders').classList.add('hide'); }
+  if (v === 'files' || v === 'meet' || v === 'report') wsLoad(v);
   document.body.classList.remove('nav-open');
   window.scrollTo(0, 0); render(true);
 }
@@ -618,7 +662,10 @@ function render(animate) {
   const el = $('v-' + VIEW), rv = animate ? 'rv' : '';
   if (VIEW === 'account') return vAccount(el, rv);
   if (!LOADED) { el.innerHTML = '<div class="sk"></div><div class="sk"></div><div class="sk"></div>'; return; }
-  if (VIEW === 'tasks') return vTasks(el, rv);
+  if (VIEW === 'tasks') return isIntern() ? vSheet(el, rv) : vTasks(el, rv);
+  if (VIEW === 'files') return vFiles(el, rv);
+  if (VIEW === 'meet') return vMeet(el, rv);
+  if (VIEW === 'report') return vReport(el, rv);
   if (VIEW === 'welcome') return vWelcome(el, rv);
   if (!D) { el.innerHTML = '<div class="sk"></div><div class="sk"></div><div class="sk"></div>'; return; }
   ({ today: vToday, orders: vOrders, vendors: vVendors, sale: vSale, customers: vCustomers })[VIEW](el, rv);
@@ -924,7 +971,7 @@ function vCustomers(el, rv) {
 
 /* ---------- targets / tasks / intern welcome ---------- */
 const activeTargets = () => TARGETS.filter(t => { const i = targetInfo(t); return i.state !== 'missed' && !(i.state === 'done' && i.today > i.e); });
-const TF = { open: t => t.status === 'todo', done: t => t.status === 'done', not_done: t => t.status === 'not_done', all: () => true };
+const TF = { open: t => t.status === 'todo' || t.status === 'doing', done: t => t.status === 'done', not_done: t => t.status === 'not_done', all: () => true };
 UI.tf = 'open';
 function vTasks(el, rv) {
   const today = D.today, open = TASKS.filter(TF.open);
@@ -965,8 +1012,14 @@ function vWelcome(el, rv) {
     <div class="sec ${rv} d4"><h2>How to get started</h2></div>
     <div class="steps3 ${rv} d4">
       <div class="card"><span class="n">1</span><b>Turn on notifications</b><span>Tap 🔔 → "Turn on notifications". You'll know as soon as a new task arrives.</span></div>
-      <div class="card"><span class="n">2</span><b>Finish your tasks</b><span>In "My tasks", tap ✓ Done or ✕ Not done under each task.</span></div>
-      <div class="card"><span class="n">3</span><b>Check your profile</b><span>In "My account", correct your name and request a new password.</span></div>
+      <div class="card"><span class="n">2</span><b>Plan your work</b><span>"My tasks" is your own to-do sheet — add rows, set type, priority and due date, move them To do → Doing → Done.</span></div>
+      <div class="card"><span class="n">3</span><b>Share &amp; report</b><span>Upload files or links in "Files &amp; links" and send a short "Daily report" every evening.</span></div>
+    </div>
+    <div class="row ${rv} d4" style="margin-top:12px">
+      <button class="btn btn-o" data-act="go" data-arg="files">📎 Files &amp; links</button>
+      <button class="btn btn-o" data-act="go" data-arg="meet">📅 Meetings</button>
+      <button class="btn btn-o" data-act="go" data-arg="report">🗒️ Daily report</button>
+      <button class="btn btn-o" data-act="go" data-arg="account">🔑 My account</button>
     </div>
     <div class="card ${rv} d5" style="margin-top:14px"><b>Something not clear?</b><p class="mu" style="margin-top:4px">Talk to the admin directly. Business data (orders, sales) is not shown to interns — only your own tasks appear here.</p></div>`;
 }
@@ -991,6 +1044,379 @@ async function setTask(id, status) {
                : (r.data && r.data.msg) || (status === 'done' ? 'Shabaash! Kaam complete ✓' : status === 'not_done' ? 'Admin ko bata diya' : 'Wapas baaki me'))
              : '⚠️ ' + (r.error || L('Nahi hua', 'Something went wrong')));
   if (r.ok) { const t = TASKS.find(x => x.id === id); if (t) { t.status = status; if (note) t.staff_note = note; } render(false); refresh(true); }
+}
+
+/* ============================================================
+   Intern workspace — own to-do sheet (+ board), files & links,
+   Google Meet meetings, daily report. Interns only (meetings: everyone).
+   Data: staff_task_save / staff_task_delete / staff_set_task_status,
+   team_file_add / team_files / team_file_delete (+ Storage bucket
+   staff-files, folder = own staff id), team_meeting_save / team_meetings /
+   team_meeting_cancel / team_meeting_notes / team_people,
+   staff_report_save / team_reports.
+   ============================================================ */
+const WS = { view: 'sheet', sf: 'open', scat: 'all', ff: 'all', files: null, meets: null, reports: null, people: null, rday: null };
+const CATS = [['Development', '💻'], ['Marketing', '📣'], ['Design', '🎨'], ['Content', '✍️'], ['Research', '🔎'], ['Other', '📌']];
+const catIc = c => (CATS.find(x => x[0] === c) || [0, '📌'])[1];
+const STCOL = [['todo', 'To do', '📝'], ['doing', 'Doing', '🔄'], ['done', 'Done', '✅']];
+const istDay = (off = 0) => { const t = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date()); return addDays(t, off); };
+const fmtSize = b => !b ? '' : b < 1024 ? b + ' B' : b < 1048576 ? (b / 1024).toFixed(0) + ' KB' : (b / 1048576).toFixed(1) + ' MB';
+const fmtWhen = iso => new Date(iso).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+const fileIc = f => f.kind === 'link' ? (/figma/.test(f.url) ? '🎨' : /github/.test(f.url) ? '🐙' : /docs\.google|drive\.google/.test(f.url) ? '📄' : /canva/.test(f.url) ? '🖌️' : '🔗')
+  : /^image\//.test(f.mime || '') ? '🖼️' : /pdf/.test(f.mime || '') ? '📕' : /sheet|excel|csv/.test(f.mime || '') ? '📊' : /word|document/.test(f.mime || '') ? '📄'
+  : /zip|compressed/.test(f.mime || '') ? '🗜️' : /video/.test(f.mime || '') ? '🎬' : '📎';
+
+async function wsLoad(v, force) {
+  if (v === 'files' && (force || !WS.files)) { const r = await rpc('team_files', {}); WS.files = r.ok ? r.data || [] : []; }
+  if (v === 'meet' && (force || !WS.meets)) {
+    const [r, p] = await Promise.all([rpc('team_meetings', { p_days_back: 30 }), WS.people ? { ok: true, data: WS.people } : rpc('team_people')]);
+    WS.meets = r.ok ? r.data || [] : []; WS.people = p.ok ? p.data || [] : [];
+  }
+  if (v === 'report' && (force || !WS.reports)) { const r = await rpc('team_reports', { p_days: 60 }); WS.reports = r.ok ? r.data || [] : []; }
+  if (VIEW === v) render(false);
+  wsBadges();
+}
+function wsBadges() {
+  const bm = $('bMeet'); if (bm && WS.meets) { const n = WS.meets.filter(m => m.status === 'scheduled' && new Date(m.starts_at) > Date.now() && new Date(m.starts_at) - Date.now() < 864e5).length; bm.classList.toggle('hide', !n); bm.textContent = n; }
+  const br = $('bReport'); if (br && WS.reports) { const done = WS.reports.some(x => String(x.day).slice(0, 10) === istDay() && x.staff_id === ME.id); br.classList.toggle('hide', done); br.textContent = '!'; }
+}
+
+/* ---------- task sheet ---------- */
+function sheetRows() {
+  const q = (WS.q || '').toLowerCase(), sf = WS.view === 'board' && WS.sf === 'open' ? 'all' : WS.sf;   /* board always shows its Done column */
+  return TASKS.filter(t => (sf === 'all' || (sf === 'open' ? (t.status === 'todo' || t.status === 'doing') : sf === 'admin' ? t.source === 'admin' : t.status === sf))
+    && (WS.scat === 'all' || (t.category || 'Other') === WS.scat)
+    && (!q || [t.title, t.details, t.category].some(x => String(x || '').toLowerCase().includes(q))));
+}
+function vSheet(el, rv) {
+  const today = istDay(), all = TASKS, open = all.filter(TF.open), done = all.filter(t => t.status === 'done');
+  const late = open.filter(t => t.due_date && String(t.due_date).slice(0, 10) < today).length;
+  const wk = all.filter(t => t.status === 'done' && t.completed_at && daysBetween(String(t.completed_at).slice(0, 10), today) < 7).length;
+  const pct = all.length ? Math.round(done.length / all.length * 100) : 0;
+  const rows = sheetRows();
+  const prSel = (t, dis) => `<select class="cell-sel pr-${t.priority}" data-cell="priority" data-id="${t.id}" ${dis}>${[['high', '🔴 High'], ['normal', '🟠 Normal'], ['low', '🟢 Low']].map(([v, l]) => `<option value="${v}" ${t.priority === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+  const stSel = t => `<select class="cell-sel st-${t.status}" data-cell="status" data-id="${t.id}">${[['todo', '📝 To do'], ['doing', '🔄 Doing'], ['done', '✅ Done'], ['not_done', '❌ Not done']].map(([v, l]) => `<option value="${v}" ${t.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+  const catSel = (t, dis) => `<select class="cell-sel" data-cell="category" data-id="${t.id}" ${dis}><option value="">—</option>${CATS.map(([c, i]) => `<option value="${c}" ${t.category === c ? 'selected' : ''}>${i} ${c}</option>`).join('')}</select>`;
+  const dueCell = (t, dis) => { const d = t.due_date ? String(t.due_date).slice(0, 10) : ''; const lateC = d && d < today && (t.status === 'todo' || t.status === 'doing');
+    return `<input type="date" class="cell-in ${lateC ? 'late' : ''}" data-cell="due_date" data-id="${t.id}" value="${d}" ${dis}>`; };
+  const row = t => { const mine = t.source === 'self', dis = mine ? '' : 'disabled';
+    return `<tr class="${t.status === 'done' ? 'is-done' : ''}">
+      <td class="c-chk"><input type="checkbox" data-act="taskCheck" data-arg="${t.id}" ${t.status === 'done' ? 'checked' : ''} aria-label="Done"></td>
+      <td class="c-title">${mine ? `<input class="cell-in title" data-cell="title" data-id="${t.id}" value="${esc(t.title)}" maxlength="200">` : `<b>${esc(t.title)}</b>`}
+        ${t.details ? `<div class="mu cell-note">${esc(t.details).slice(0, 120)}</div>` : ''}</td>
+      <td>${catSel(t, dis)}</td><td>${prSel(t, dis)}</td><td>${stSel(t)}</td><td>${dueCell(t, dis)}</td>
+      <td class="c-link">${t.link ? `<a href="${esc(t.link)}" target="_blank" rel="noopener" title="${esc(t.link)}">🔗 Open</a>` : '<span class="mu">—</span>'}${t.files ? ` <span class="pill p-m">📎 ${t.files}</span>` : ''}</td>
+      <td>${mine ? '<span class="pill p-b">Me</span>' : '<span class="pill p-y">Admin</span>'}</td>
+      <td class="c-act"><button class="btn btn-o btn-sm" data-act="taskOpen" data-arg="${t.id}" title="Open">⋯</button></td></tr>`; };
+  const card = t => { const mine = t.source === 'self', i = STCOL.findIndex(c => c[0] === t.status);
+    return `<div class="card bcard pr-${t.priority}" data-act="taskOpen" data-arg="${t.id}">
+      <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><b style="flex:1;min-width:0">${esc(t.title)}</b>${mine ? '' : '<span class="pill p-y">Admin</span>'}</div>
+      <div class="row" style="margin-top:8px">${t.category ? `<span class="pill p-m">${catIc(t.category)} ${esc(t.category)}</span>` : ''}${dueChip(t.due_date, t.status === 'doing' ? 'todo' : t.status, today)}${t.link ? '<span class="pill p-b">🔗</span>' : ''}</div>
+      <div class="row" style="margin-top:10px;justify-content:space-between">
+        ${i > 0 ? `<button class="btn btn-o btn-sm" data-act="taskMove" data-arg="${t.id}" data-arg2="${STCOL[i - 1][0]}">← ${STCOL[i - 1][1]}</button>` : '<span></span>'}
+        ${i >= 0 && i < 2 ? `<button class="btn btn-g btn-sm" data-act="taskMove" data-arg="${t.id}" data-arg2="${STCOL[i + 1][0]}">${STCOL[i + 1][1]} →</button>` : ''}</div></div>`; };
+  el.innerHTML = `
+    <div class="grid k4 ${rv} d1">
+      ${kpi('To do', open.length, open.filter(t => t.status === 'doing').length + ' in progress', open.length ? 'warn' : 'good', '📝')}
+      ${kpi('Late', late, 'past the due date', late ? 'bad' : '', '⏰')}
+      ${kpi('Done this week', wk, pct + '% of all tasks done', wk ? 'good' : '', '✅')}
+      ${kpi('From the admin', all.filter(t => t.source === 'admin' && TF.open(t)).length, 'still open', '', '📥')}
+    </div>
+    <div class="card ${rv} d2" style="margin-top:14px;padding:14px">
+      <div class="toolbar" style="margin-bottom:10px">
+        <div class="tabs" style="margin:0"><button class="tab ${WS.view === 'sheet' ? 'on' : ''}" data-act="sv" data-arg="sheet">▦ Sheet</button><button class="tab ${WS.view === 'board' ? 'on' : ''}" data-act="sv" data-arg="board">▥ Board</button></div>
+        <div class="search"><input class="fld" id="sq" placeholder="Search tasks" value="${esc(WS.q || '')}"></div>
+        <button class="btn btn-o btn-sm" data-act="csvSheet" title="Download — opens in Google Sheets / Excel">⬇ CSV</button>
+        <button class="btn btn-g btn-sm" data-act="taskOpen" data-arg="">＋ New task</button>
+      </div>
+      <div class="chips">${[['open', 'Open'], ['doing', 'Doing'], ['done', 'Done'], ['not_done', 'Not done'], ['admin', 'From admin'], ['all', 'All']].map(([k, l]) =>
+        `<button class="chip ${WS.sf === k ? 'on' : ''}" data-act="sf" data-arg="${k}">${l}</button>`).join('')}
+        <span style="width:1px;background:var(--line);margin:0 2px"></span>
+        ${[['all', 'All types']].concat(CATS.map(([c, i]) => [c, i + ' ' + c])).map(([k, l]) => `<button class="chip ${WS.scat === k ? 'on' : ''}" data-act="scat" data-arg="${k}">${l}</button>`).join('')}</div>
+    </div>
+    ${WS.view === 'sheet' ? `<div class="card sheet ${rv} d3" style="margin-top:12px;padding:0">
+      <div class="sheet-wrap"><table class="sheet-t"><thead><tr><th></th><th>Task</th><th>Type</th><th>Priority</th><th>Status</th><th>Due</th><th>Link / files</th><th>From</th><th></th></tr></thead>
+      <tbody>${rows.map(row).join('') || `<tr><td colspan="9"><div class="empty" style="padding:26px"><div class="e">${WS.sf === 'open' ? '🎉' : '📭'}</div><b>${WS.sf === 'open' ? 'Nothing open — add your next task below' : 'Nothing here'}</b></div></td></tr>`}
+      <tr class="add-row"><td>＋</td><td colspan="8"><input class="cell-in" id="newRow" placeholder="Type a new task and press Enter…" maxlength="200"></td></tr></tbody></table></div></div>`
+    : `<div class="board ${rv} d3">${STCOL.map(([k, l, ic]) => { const list = rows.filter(t => t.status === k);
+        return `<div class="bcol"><div class="bcol-h">${ic} ${l}<span>${list.length}</span></div>${list.map(card).join('') || '<div class="mu" style="padding:14px;text-align:center">Empty</div>'}</div>`; }).join('')}</div>
+      ${rows.some(t => t.status === 'not_done') ? `<div class="sec"><h2>❌ Not done</h2></div>${rows.filter(t => t.status === 'not_done').map(card).join('')}` : ''}`}
+    <p class="mu ${rv} d4" style="margin-top:12px">Tip: tasks you add are yours to edit or delete. Tasks from the admin (yellow) can only change status. Tap ⋯ to add notes, a link or files.</p>`;
+  const sq = $('sq'); if (sq) sq.oninput = () => { WS.q = sq.value; rerenderKeep('sq'); };
+}
+async function sheetAdd() {
+  const inp = $('newRow'); const title = inp ? inp.value.trim() : ''; if (!title) return inp && inp.focus();
+  inp.disabled = true;
+  const r = await rpc('staff_task_save', { p_id: null, p_title: title, p_details: null, p_priority: 'normal', p_due: null,
+    p_category: WS.scat !== 'all' ? WS.scat : null, p_link: null, p_status: 'todo' });
+  if (!r.ok) { inp.disabled = false; return toast('⚠️ ' + (r.error || 'Could not add')); }
+  TASKS.unshift(r.data); if (WS.sf !== 'open' && WS.sf !== 'all') WS.sf = 'open';
+  render(false); const n = $('newRow'); if (n) n.focus(); toast('Added ✓');
+}
+async function cellSave(id, cell, val) {
+  const t = TASKS.find(x => x.id === id); if (!t) return;
+  if (cell === 'status') return taskMove(id, val);
+  if (t.source !== 'self') return;
+  const nt = { ...t, [cell]: val || null };
+  if (cell === 'title' && !String(val).trim()) { render(false); return toast('A task needs a name'); }
+  const r = await rpc('staff_task_save', { p_id: id, p_title: nt.title, p_details: nt.details, p_priority: nt.priority,
+    p_due: nt.due_date ? String(nt.due_date).slice(0, 10) : null, p_category: nt.category, p_link: nt.link, p_status: nt.status });
+  if (!r.ok) { toast('⚠️ ' + (r.error || 'Not saved')); render(false); return; }
+  Object.assign(t, r.data); toast('Saved ✓'); if (cell !== 'title') render(false);
+}
+async function taskMove(id, st) {
+  const t = TASKS.find(x => x.id === id); if (!t || t.status === st) return;
+  let note = null;
+  if (st === 'not_done') {
+    const v = await modal({ title: 'Why couldn\'t you do it?', sub: t.source === 'admin' ? 'The admin will see this reason.' : 'A short note for yourself.', ok: 'Save', danger: true,
+      fields: [{ id: 'note', label: 'Reason', type: 'textarea', ph: 'e.g. waiting for the logo file' }] });
+    if (!v || !v.note) { render(false); return; } note = v.note;
+  }
+  const r = await rpc('staff_set_task_status', { p_task: id, p_status: st, p_note: note });
+  if (!r.ok) { toast('⚠️ ' + (r.error || 'Not saved')); render(false); return; }
+  t.status = st; if (note) t.staff_note = note; t.completed_at = st === 'done' ? new Date().toISOString() : null;
+  toast(st === 'done' ? '🎉 Done!' : st === 'doing' ? '🔄 Moved to Doing' : st === 'not_done' ? 'Marked not done' : 'Back to To do');
+  render(false); const bt = $('bTasks'), n = TASKS.filter(TF.open).length; bt.classList.toggle('hide', !n); bt.textContent = n;
+}
+/* task detail / new task (drawer) */
+async function taskDrawer(id) {
+  const t = id ? TASKS.find(x => x.id === id) : null, mine = !t || t.source === 'self';
+  if (!WS.files) await wsLoad('files');
+  const files = t ? (WS.files || []).filter(f => f.task_id === t.id) : [];
+  $('drawer').dataset.kind = 'task';
+  $('drTitle').textContent = t ? (mine ? 'Edit task' : 'Task from the admin') : 'New task';
+  $('drBody').innerHTML = `
+    ${!mine ? `<div class="card" style="margin-bottom:12px;background:#FFF9DD"><b>${esc(t.title)}</b>${t.details ? `<p class="mu" style="margin-top:6px;white-space:pre-wrap">${esc(t.details)}</p>` : ''}
+      <div class="row" style="margin-top:10px">${dueChip(t.due_date, t.status === 'doing' ? 'todo' : t.status, istDay())}<span class="pill ${TST[t.status][1]}">${tstL(t.status)}</span></div>
+      ${t.link ? `<a class="btn btn-o btn-sm" style="margin-top:10px" href="${esc(t.link)}" target="_blank" rel="noopener">🔗 Open link</a>` : ''}</div>` : `
+    <label class="lbl">Task</label><input class="fld" id="tdTitle" value="${esc(t ? t.title : '')}" maxlength="200" placeholder="e.g. Make 3 Instagram reels for Diwali">
+    <label class="lbl" style="margin-top:10px">Notes</label><textarea class="fld" id="tdDet" rows="4" placeholder="Steps, ideas, anything useful">${esc(t ? t.details || '' : '')}</textarea>
+    <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:10px;gap:10px">
+      <div><label class="lbl">Type</label><select class="fld" id="tdCat"><option value="">—</option>${CATS.map(([c, i]) => `<option value="${c}" ${t && t.category === c ? 'selected' : ''}>${i} ${c}</option>`).join('')}</select></div>
+      <div><label class="lbl">Priority</label><select class="fld" id="tdPri">${[['high', '🔴 High'], ['normal', '🟠 Normal'], ['low', '🟢 Low']].map(([v, l]) => `<option value="${v}" ${(t ? t.priority : 'normal') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+      <div><label class="lbl">Due date</label><input class="fld" type="date" id="tdDue" value="${t && t.due_date ? String(t.due_date).slice(0, 10) : ''}"></div>
+      <div><label class="lbl">Status</label><select class="fld" id="tdSt">${[['todo', '📝 To do'], ['doing', '🔄 Doing'], ['done', '✅ Done'], ['not_done', '❌ Not done']].map(([v, l]) => `<option value="${v}" ${(t ? t.status : 'todo') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+    </div>
+    <label class="lbl" style="margin-top:10px">Link (Figma, GitHub, Google Doc, Canva…)</label><input class="fld" type="url" id="tdLink" value="${esc(t ? t.link || '' : '')}" placeholder="https://">
+    <div class="row" style="margin-top:14px"><button class="btn btn-g" id="tdSave">${t ? 'Save changes' : '＋ Add task'}</button>
+      ${t ? `<button class="btn btn-r" data-act="taskDel" data-arg="${t.id}">🗑 Delete</button>` : ''}</div>`}
+    ${!mine ? `<label class="lbl">Status</label><div class="chips">${[['todo', '📝 To do'], ['doing', '🔄 Doing'], ['done', '✅ Done'], ['not_done', '❌ Not done']].map(([v, l]) =>
+        `<button class="chip ${t.status === v ? 'on' : ''}" data-act="taskMove" data-arg="${t.id}" data-arg2="${v}">${l}</button>`).join('')}</div>` : ''}
+    ${t ? `<div class="sec" style="margin-top:22px"><h2>📎 Files for this task</h2><span class="act row"><button class="btn btn-o btn-sm" data-act="addLink" data-arg="${t.id}">🔗 Link</button><button class="btn btn-g btn-sm" data-act="upload" data-arg="${t.id}">⬆ Upload</button></span></div>
+      ${files.map(fileRow).join('') || '<div class="mu">Nothing attached yet.</div>'}
+      ${t.staff_note ? `<div class="card" style="margin-top:12px"><b>Your note</b><p class="mu" style="margin-top:4px">${esc(t.staff_note)}</p></div>` : ''}
+      <p class="mu" style="margin-top:14px">Added ${when(t.created_at)}${t.completed_at ? ' · done ' + when(t.completed_at) : ''}</p>` : ''}`;
+  openDrawer();
+  const sv = $('tdSave'); if (sv) sv.onclick = async () => {
+    const title = $('tdTitle').value.trim(); if (!title) return toast('Write the task');
+    sv.disabled = true;
+    const r = await rpc('staff_task_save', { p_id: t ? t.id : null, p_title: title, p_details: $('tdDet').value, p_priority: $('tdPri').value,
+      p_due: $('tdDue').value || null, p_category: $('tdCat').value || null, p_link: $('tdLink').value.trim() || null, p_status: $('tdSt').value });
+    sv.disabled = false;
+    if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
+    if (t) Object.assign(t, r.data); else TASKS.unshift(r.data);
+    toast(t ? 'Saved ✓' : 'Task added ✓'); closeAll(); render(false);
+  };
+  if (!t) setTimeout(() => $('tdTitle') && $('tdTitle').focus(), 80);
+}
+async function taskDelete(id) {
+  const v = await modal({ title: 'Delete this task?', sub: 'This can\'t be undone.', ok: 'Delete', danger: true, fields: [] }); if (!v) return;
+  const r = await rpc('staff_task_delete', { p_id: id });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not deleted'));
+  TASKS = TASKS.filter(t => t.id !== id); closeAll(); render(false); toast('Deleted');
+}
+function csvSheet() {
+  download(`rozbazaar-my-tasks-${istDay()}.csv`, [['Task', 'Notes', 'Type', 'Priority', 'Status', 'Due', 'Link', 'From', 'Added', 'Done on']]
+    .concat(TASKS.map(t => [t.title, t.details || '', t.category || '', t.priority, t.status, t.due_date ? String(t.due_date).slice(0, 10) : '', t.link || '',
+      t.source === 'self' ? 'Me' : 'Admin', String(t.created_at).slice(0, 10), t.completed_at ? String(t.completed_at).slice(0, 10) : ''])));
+}
+
+/* ---------- files & links ---------- */
+function fileRow(f) {
+  return `<div class="card frow">
+    <span class="fic">${fileIc(f)}</span>
+    <div style="flex:1;min-width:0"><b class="fname" data-act="fileOpen" data-arg="${f.id}">${esc(f.name)}</b>
+      <div class="mu">${f.kind === 'link' ? esc((f.url || '').replace(/^https?:\/\//, '').slice(0, 40)) : fmtSize(f.size)} · ${when(f.created_at)}
+        · ${f.from_admin ? '<span class="pill p-y">from Admin</span>' : 'by ' + esc(f.uploader_name || 'me')}${f.task_title ? ` · 📝 ${esc(f.task_title).slice(0, 30)}` : ''}</div>
+      ${f.note ? `<div class="mu" style="margin-top:3px">💬 ${esc(f.note)}</div>` : ''}</div>
+    <button class="btn btn-o btn-sm" data-act="fileOpen" data-arg="${f.id}">${f.kind === 'link' ? 'Open' : 'View'}</button>
+    ${!f.from_admin ? `<button class="btn btn-r btn-sm" data-act="fileDel" data-arg="${f.id}" aria-label="Delete">🗑</button>` : ''}</div>`;
+}
+function vFiles(el, rv) {
+  if (!WS.files) { el.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
+  const list = WS.files.filter(f => WS.ff === 'all' || (WS.ff === 'admin' ? f.from_admin : WS.ff === 'mine' ? !f.from_admin : f.kind === WS.ff));
+  el.innerHTML = `
+    <div class="card drop ${rv} d1" id="dropZone">
+      <div style="font-size:34px">📤</div><b>Share a file with the admin</b>
+      <p class="mu" style="margin:4px 0 12px">Designs, screenshots, reports, code zips — up to 25 MB each. Or share a link (Figma, GitHub, Google Drive, Canva).</p>
+      <div class="row" style="justify-content:center"><button class="btn btn-g" data-act="upload">⬆ Upload files</button><button class="btn btn-o" data-act="addLink">🔗 Add a link</button></div>
+    </div>
+    <div class="chips ${rv} d2" style="margin:16px 0 12px">${[['all', 'All'], ['file', '📎 Files'], ['link', '🔗 Links'], ['mine', 'Shared by me'], ['admin', 'From admin']].map(([k, l]) =>
+      `<button class="chip ${WS.ff === k ? 'on' : ''}" data-act="ff" data-arg="${k}">${l}<span class="c">${WS.files.filter(f => k === 'all' || (k === 'admin' ? f.from_admin : k === 'mine' ? !f.from_admin : f.kind === k)).length}</span></button>`).join('')}</div>
+    <div class="${rv} d3">${list.map(fileRow).join('') || '<div class="empty"><div class="e">🗂️</div><b>Nothing shared yet</b><p>Upload a file or add a link — the admin sees it straight away.</p></div>'}</div>`;
+  const dz = $('dropZone');
+  if (dz) { dz.ondragover = e => { e.preventDefault(); dz.classList.add('over'); }; dz.ondragleave = () => dz.classList.remove('over');
+    dz.ondrop = e => { e.preventDefault(); dz.classList.remove('over'); uploadFiles([...e.dataTransfer.files], null); }; }
+}
+function pickFiles(taskId) {
+  const inp = document.createElement('input'); inp.type = 'file'; inp.multiple = true;
+  inp.onchange = () => uploadFiles([...inp.files], taskId); inp.click();
+}
+async function uploadFiles(files, taskId) {
+  if (!files.length) return;
+  for (const file of files) {
+    if (file.size > 25 * 1048576) { toast(`⚠️ ${file.name} is bigger than 25 MB`); continue; }
+    toast(`⬆ Uploading ${file.name}…`);
+    const safe = file.name.replace(/[^\w.\-]+/g, '_').slice(-80), path = `${ME.id}/${Date.now().toString(36)}-${safe}`;
+    const up = await sb.storage.from('staff-files').upload(path, file, { contentType: file.type || 'application/octet-stream', upsert: false });
+    if (up.error) { toast('⚠️ Upload failed: ' + up.error.message); continue; }
+    const r = await rpc('team_file_add', { p_staff: null, p_kind: 'file', p_name: file.name, p_path: path, p_url: null, p_size: file.size,
+      p_mime: file.type || null, p_task: taskId, p_note: null });
+    if (!r.ok) { toast('⚠️ ' + (r.error || 'Not saved')); await sb.storage.from('staff-files').remove([path]); continue; }
+    (WS.files = WS.files || []).unshift(r.data);
+    if (taskId) { const t = TASKS.find(x => x.id === taskId); if (t) t.files = (t.files || 0) + 1; }
+  }
+  toast('✓ Shared with the admin');
+  if ($('drawer').dataset.kind === 'task' && taskId) taskDrawer(taskId); else render(false);
+}
+async function addLink(taskId) {
+  const v = await modal({ title: 'Share a link', sub: 'Figma, GitHub, Google Drive / Docs / Sheets, Canva, a website…', ok: 'Share',
+    fields: [{ id: 'url', label: 'Link', type: 'url', ph: 'https://' }, { id: 'name', label: 'Name', ph: 'e.g. Homepage design v2' }, { id: 'note', label: 'Note (optional)', type: 'textarea' }] });
+  if (!v) return; if (!v.url) return toast('Paste the link');
+  const r = await rpc('team_file_add', { p_staff: null, p_kind: 'link', p_name: v.name || v.url.replace(/^https?:\/\//, '').slice(0, 60), p_path: null,
+    p_url: v.url, p_size: null, p_mime: null, p_task: taskId, p_note: v.note || null });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
+  (WS.files = WS.files || []).unshift(r.data);
+  if (taskId) { const t = TASKS.find(x => x.id === taskId); if (t) t.files = (t.files || 0) + 1; taskDrawer(taskId); } else render(false);
+  toast('🔗 Link shared ✓');
+}
+async function fileOpen(id) {
+  const f = (WS.files || []).find(x => x.id === id); if (!f) return;
+  if (f.kind === 'link') return window.open(f.url, '_blank', 'noopener');
+  const w = window.open('', '_blank');
+  const r = await sb.storage.from('staff-files').createSignedUrl(f.path, 600);
+  if (r.error) { if (w) w.close(); return toast('⚠️ ' + r.error.message); }
+  if (w) w.location = r.data.signedUrl; else location.href = r.data.signedUrl;
+}
+async function fileDelete(id) {
+  const v = await modal({ title: 'Remove this?', sub: 'The admin will no longer see it.', ok: 'Remove', danger: true, fields: [] }); if (!v) return;
+  const r = await rpc('team_file_delete', { p_id: id });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not removed'));
+  if (r.data && r.data.path) await sb.storage.from('staff-files').remove([r.data.path]);
+  const f = WS.files.find(x => x.id === id); WS.files = WS.files.filter(x => x.id !== id);
+  if (f && f.task_id) { const t = TASKS.find(x => x.id === f.task_id); if (t && t.files) t.files--; }
+  render(false); toast('Removed');
+}
+
+/* ---------- meetings ---------- */
+const calLink = m => { const s = new Date(m.starts_at), e = new Date(s.getTime() + m.duration_min * 60000), z = d => d.toISOString().replace(/[-:]|\.\d{3}/g, '');
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(m.title) + '&dates=' + z(s) + '/' + z(e)
+    + '&details=' + encodeURIComponent((m.agenda || '') + (m.meet_link ? '\n\nJoin: ' + m.meet_link : '')) + (m.meet_link ? '&location=' + encodeURIComponent(m.meet_link) : ''); };
+function meetCard(m) {
+  const s = new Date(m.starts_at), e = new Date(s.getTime() + m.duration_min * 60000), now = Date.now();
+  const live = m.status === 'scheduled' && now >= s - 10 * 60000 && now <= e, past = now > e, cancelled = m.status === 'cancelled';
+  return `<div class="card mcard ${live ? 'live' : ''} ${cancelled ? 'cx' : ''}">
+    <div class="mdate"><b>${s.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric' })}</b><span>${s.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short' })}</span></div>
+    <div style="flex:1;min-width:0">
+      <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><b style="flex:1;min-width:0;font-size:15px">${esc(m.title)}</b>
+        ${cancelled ? '<span class="pill p-r">Cancelled</span>' : live ? '<span class="pill p-g">● Live now</span>' : past ? '<span class="pill p-m">Done</span>' : ''}</div>
+      <div class="mu" style="margin-top:3px">🕒 ${s.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' })} · ${m.duration_min} min · by ${esc(m.created_by_name || '—')}</div>
+      <div class="mu" style="margin-top:3px">👥 ${(m.attendee_names || []).map(esc).join(', ') || '—'}${m.with_admin ? ' + Admin' : ''}</div>
+      ${m.agenda ? `<div style="margin-top:6px;font-size:13px;white-space:pre-wrap">${esc(m.agenda)}</div>` : ''}
+      ${m.notes ? `<div class="note" style="margin-top:8px">📝 ${esc(m.notes)}</div>` : ''}
+      ${cancelled ? '' : `<div class="row" style="margin-top:10px">
+        ${m.meet_link && !past ? `<a class="btn ${live ? 'btn-g' : 'btn-o'} btn-sm" href="${esc(m.meet_link)}" target="_blank" rel="noopener">🎥 Join Google Meet</a>` : ''}
+        ${!past ? `<a class="btn btn-o btn-sm" href="${calLink(m)}" target="_blank" rel="noopener">📅 Add to Google Calendar</a>` : ''}
+        <button class="btn btn-o btn-sm" data-act="meetNotes" data-arg="${m.id}">📝 ${m.notes ? 'Edit notes' : 'Add notes'}</button>
+        ${m.mine && !past ? `<button class="btn btn-o btn-sm" data-act="meetEdit" data-arg="${m.id}">✏️ Edit</button><button class="btn btn-r btn-sm" data-act="meetCancel" data-arg="${m.id}">Cancel</button>` : ''}</div>`}
+    </div></div>`;
+}
+function vMeet(el, rv) {
+  if (!WS.meets) { el.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
+  const now = Date.now(), up = WS.meets.filter(m => new Date(m.starts_at).getTime() + m.duration_min * 60000 >= now && m.status === 'scheduled');
+  const past = WS.meets.filter(m => !up.includes(m)).reverse();
+  el.innerHTML = `
+    <div class="row ${rv} d1" style="justify-content:space-between;margin-bottom:6px"><div class="mu">Everyone invited gets a notification now and a reminder 15 minutes before.</div>
+      <button class="btn btn-g" data-act="meetNew">＋ Schedule a meeting</button></div>
+    <div class="sec ${rv} d2"><h2>Upcoming</h2><span class="r">${up.length}</span></div>
+    <div class="${rv} d2">${up.map(meetCard).join('') || '<div class="empty" style="padding:26px"><div class="e">📅</div><b>No meetings coming up</b><p>Schedule one — pick a time, create a Google Meet link, invite the team.</p></div>'}</div>
+    ${past.length ? `<div class="sec ${rv} d3"><h2>Past 30 days</h2><span class="r">${past.length}</span></div><div class="${rv} d3">${past.map(meetCard).join('')}</div>` : ''}`;
+}
+async function meetEdit(id) {
+  const m = id ? WS.meets.find(x => x.id === id) : null;
+  if (!WS.people) await wsLoad('meet');
+  const s = m ? new Date(m.starts_at) : new Date(Date.now() + 3600e3);
+  const dIST = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(s);
+  const tIST = s.toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' });
+  const people = (WS.people || []).filter(p => p.id !== ME.id);
+  const v = await modal({ title: m ? 'Edit meeting' : 'Schedule a meeting', sub: 'Tip: tap “Create Google Meet” to open a new Meet in another tab, copy its link and paste it below.', ok: m ? 'Save' : 'Schedule',
+    fields: [{ id: 'title', label: 'Title', value: m ? m.title : '', ph: 'e.g. Weekly design review' },
+      { id: 'date', label: 'Date', type: 'date', value: dIST }, { id: 'time', label: 'Time (IST)', type: 'time', value: m ? tIST : tIST.slice(0, 2) + ':00' },
+      { id: 'dur', label: 'Length', type: 'select', value: String(m ? m.duration_min : 30), options: [['15', '15 min'], ['30', '30 min'], ['45', '45 min'], ['60', '1 hour'], ['90', '1.5 hours'], ['120', '2 hours']] },
+      { id: 'link', label: 'Google Meet link', type: 'url', value: m ? m.meet_link || '' : '', ph: 'https://meet.google.com/…', hint: '<button type="button" class="btn btn-o btn-sm" data-act="newMeet">🎥 Create Google Meet</button>' },
+      { id: 'who', label: 'Invite', type: 'checks', options: people.map(p => [p.id, p.name + (p.kind === 'intern' ? ' (intern)' : '')]) },
+      { id: 'agenda', label: 'Agenda (optional)', type: 'textarea', value: m ? m.agenda || '' : '', ph: 'What will you talk about?' }] });
+  if (!v) return;
+  if (m) (m.attendees || []).forEach(() => {});
+  if (!v.title) return toast('Give the meeting a title');
+  if (!v.date || !v.time) return toast('Pick a date and time');
+  const starts = new Date(`${v.date}T${v.time}:00+05:30`).toISOString();
+  const att = (v.who && v.who.length) ? v.who : m ? (m.attendees || []).filter(x => x !== ME.id) : [];
+  const r = await rpc('team_meeting_save', { p_id: m ? m.id : null, p_title: v.title, p_agenda: v.agenda || null, p_starts: starts,
+    p_duration: +v.dur || 30, p_link: v.link || null, p_attendees: att, p_with_admin: true });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
+  toast(m ? 'Meeting updated ✓' : '📅 Meeting scheduled — everyone is notified'); wsLoad('meet', true);
+}
+async function meetCancel(id) {
+  const v = await modal({ title: 'Cancel this meeting?', sub: 'Everyone invited gets a notification.', ok: 'Cancel meeting', danger: true, fields: [] }); if (!v) return;
+  const r = await rpc('team_meeting_cancel', { p_id: id });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not cancelled')); toast('Meeting cancelled'); wsLoad('meet', true);
+}
+async function meetNotes(id) {
+  const m = WS.meets.find(x => x.id === id);
+  const v = await modal({ title: 'Meeting notes', sub: 'What was decided? Who does what next?', ok: 'Save',
+    fields: [{ id: 'notes', label: 'Notes', type: 'textarea', value: m ? m.notes || '' : '' }] });
+  if (!v) return;
+  const r = await rpc('team_meeting_notes', { p_id: id, p_notes: v.notes || null });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved')); if (m) m.notes = v.notes || null; render(false); toast('Notes saved ✓');
+}
+
+/* ---------- daily report ---------- */
+function vReport(el, rv) {
+  if (!WS.reports) { el.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
+  const today = istDay(), mine = WS.reports.filter(x => x.staff_id === ME.id);
+  const day = WS.rday || today, cur = mine.find(x => String(x.day).slice(0, 10) === day) || {};
+  let streak = 0; for (let i = 0; i < 60; i++) { if (mine.some(x => String(x.day).slice(0, 10) === istDay(-i))) streak++; else if (i > 0) break; }
+  const days = [0, -1, -2, -3, -4, -5, -6].map(o => istDay(o));
+  el.innerHTML = `
+    <div class="grid k4 ${rv} d1">
+      ${kpi('Today', mine.some(x => String(x.day).slice(0, 10) === today) ? 'Sent ✓' : 'Not yet', 'daily report', mine.some(x => String(x.day).slice(0, 10) === today) ? 'good' : 'warn', '🗒️')}
+      ${kpi('Streak', streak + (streak === 1 ? ' day' : ' days'), 'in a row', streak >= 3 ? 'good' : '', '🔥')}
+      ${kpi('This week', mine.filter(x => daysBetween(String(x.day).slice(0, 10), today) < 7).length + ' / 7', 'reports sent', '', '📅')}
+      ${kpi('Hours this week', mine.filter(x => daysBetween(String(x.day).slice(0, 10), today) < 7).reduce((a, x) => a + (+x.hours || 0), 0), 'you logged', '', '⏱️')}
+    </div>
+    <div class="card ${rv} d2" style="margin-top:14px">
+      <div class="row" style="justify-content:space-between"><b style="font-size:16px">${day === today ? 'Today’s report' : 'Report for ' + shortD(day)}</b>
+        <div class="chips">${days.map(d => `<button class="chip ${d === day ? 'on' : ''}" data-act="reportDay" data-arg="${d}">${d === today ? 'Today' : shortD(d)}${mine.some(x => String(x.day).slice(0, 10) === d) ? ' ✓' : ''}</button>`).join('')}</div></div>
+      <label class="lbl" style="margin-top:12px">✅ What did you do?</label><textarea class="fld" id="rpDone" rows="4" placeholder="e.g. Finished the login page, made 2 reels, fixed the menu bug">${esc(cur.done || '')}</textarea>
+      <label class="lbl" style="margin-top:10px">🎯 What's next (tomorrow)?</label><textarea class="fld" id="rpPlan" rows="3" placeholder="e.g. Start the payment screen">${esc(cur.plan || '')}</textarea>
+      <label class="lbl" style="margin-top:10px">⚠️ Anything blocking you?</label><textarea class="fld" id="rpBlock" rows="2" placeholder="e.g. Need the logo file / waiting for approval (leave empty if nothing)">${esc(cur.blockers || '')}</textarea>
+      <div class="row" style="margin-top:10px;align-items:flex-end"><div style="width:150px"><label class="lbl">⏱️ Hours worked</label><input class="fld" id="rpHours" inputmode="decimal" value="${cur.hours ?? ''}" placeholder="e.g. 6"></div>
+        <button class="btn btn-g" data-act="saveReport" style="margin-left:auto">${cur.done ? 'Update report' : 'Send to admin'}</button></div>
+    </div>
+    <div class="sec ${rv} d3"><h2>Your past reports</h2><span class="r">${mine.length}</span></div>
+    <div class="${rv} d3">${mine.map(x => `<div class="card" style="margin-bottom:10px">
+      <div class="row" style="justify-content:space-between"><b>${shortD(x.day)}</b><span class="mu">${x.hours ? '⏱️ ' + x.hours + ' h' : ''}</span></div>
+      <div style="margin-top:6px;white-space:pre-wrap;font-size:13.5px">✅ ${esc(x.done)}</div>
+      ${x.plan ? `<div class="mu" style="margin-top:4px;white-space:pre-wrap">🎯 ${esc(x.plan)}</div>` : ''}
+      ${x.blockers ? `<div class="note" style="margin-top:6px">⚠️ ${esc(x.blockers)}</div>` : ''}</div>`).join('') || '<div class="empty" style="padding:24px"><div class="e">🗒️</div><b>No reports yet</b><p>Send your first one above — it takes a minute.</p></div>'}</div>`;
+}
+async function saveReport() {
+  const done = $('rpDone').value.trim(); if (!done) return toast('Write what you did');
+  const hours = $('rpHours').value.trim() ? parseFloat($('rpHours').value) : null;
+  const r = await rpc('staff_report_save', { p_day: WS.rday || istDay(), p_done: done, p_plan: $('rpPlan').value, p_blockers: $('rpBlock').value, p_hours: hours });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
+  toast('🗒️ Report sent to the admin ✓'); wsLoad('report', true);
 }
 
 /* ---------- Account ---------- */
@@ -1078,7 +1504,7 @@ function modal({ title, sub, fields, ok, danger }) {
         x.type === 'textarea' ? `<textarea class="fld" id="m_${x.id}" rows="3" placeholder="${esc(x.ph || '')}">${esc(x.value || '')}</textarea>`
         : x.type === 'select' ? `<select class="fld" id="m_${x.id}">${x.options.map(([v, l]) => `<option value="${esc(v)}" ${v === x.value ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`
         : x.type === 'checks' ? `<div class="chips" id="m_${x.id}">${x.options.map(([v, l]) => `<label class="chip"><input type="checkbox" value="${esc(v)}" style="margin-right:6px">${esc(l)}</label>`).join('')}</div>`
-        : `<input class="fld" id="m_${x.id}" type="${x.type === 'number' ? 'text' : 'text'}" ${x.type === 'number' ? 'inputmode="decimal"' : ''} value="${esc(x.value ?? '')}" placeholder="${esc(x.ph || '')}">`}</div>`).join('')}
+        : `<input class="fld" id="m_${x.id}" type="${['date', 'time', 'url'].includes(x.type) ? x.type : 'text'}" ${x.type === 'number' ? 'inputmode="decimal"' : ''} value="${esc(x.value ?? '')}" placeholder="${esc(x.ph || '')}">`}${x.hint ? `<div class="mu" style="margin-top:4px">${x.hint}</div>` : ''}</div>`).join('')}
       </div><div class="foot"><button class="btn btn-o" data-act="modalCancel">${L('Rehne do', 'Cancel')}</button>
       <button class="btn ${danger ? 'btn-r' : 'btn-g'}" data-act="modalOk">${esc(ok || 'Save')}</button></div>`;
     $('ov').classList.add('show'); $('modal').classList.add('show');
@@ -1233,8 +1659,8 @@ function targetCard(t, admin) {
 
 /* ---------- task card (shared; admin gets edit/reopen/delete, staff gets complete/not-done) ---------- */
 const PRI = { high: ['🔴 Zaroori', 'p-r'], normal: ['🟠 Normal', 'p-o'], low: ['🟢 Aaram se', 'p-g'] };
-const TST = { todo: ['Baaki', 'p-b'], done: ['✅ Complete', 'p-g'], not_done: ['❌ Nahi hua', 'p-r'] };
-const PRI_EN = { high: '🔴 Urgent', normal: '🟠 Normal', low: '🟢 No rush' }, TST_EN = { todo: 'To do', done: '✅ Done', not_done: '❌ Not done' };
+const TST = { todo: ['Baaki', 'p-b'], doing: ['🔄 Chal raha', 'p-y'], done: ['✅ Complete', 'p-g'], not_done: ['❌ Nahi hua', 'p-r'] };
+const PRI_EN = { high: '🔴 Urgent', normal: '🟠 Normal', low: '🟢 No rush' }, TST_EN = { todo: 'To do', doing: '🔄 Doing', done: '✅ Done', not_done: '❌ Not done' };
 const priL = p => isIntern() ? PRI_EN[p] : PRI[p][0], tstL = t => isIntern() ? TST_EN[t] : TST[t][0];
 function dueChip(due, status, today) {
   if (!due) return '';
@@ -1297,12 +1723,41 @@ document.addEventListener('click', e => {
     case 'csvOrders': csvOrders(); break;
     case 'csvSale': csvSale(); break;
     case 'changePw': changePw(); break;
+    /* intern workspace */
+    case 'sv': WS.view = a; render(false); break;
+    case 'sf': WS.sf = a; render(false); break;
+    case 'scat': WS.scat = a; render(false); break;
+    case 'addRow': sheetAdd(); break;
+    case 'taskOpen': taskDrawer(a); break;
+    case 'taskDel': taskDelete(a); break;
+    case 'taskMove': taskMove(a, el.dataset.arg2); break;
+    case 'taskCheck': taskMove(a, el.checked ? 'done' : 'todo'); break;
+    case 'csvSheet': csvSheet(); break;
+    case 'upload': pickFiles(a || null); break;
+    case 'addLink': addLink(a || null); break;
+    case 'fileOpen': fileOpen(a); break;
+    case 'fileDel': fileDelete(a); break;
+    case 'ff': WS.ff = a; render(false); break;
+    case 'meetNew': meetEdit(null); break;
+    case 'meetEdit': meetEdit(a); break;
+    case 'meetCancel': meetCancel(a); break;
+    case 'meetNotes': meetNotes(a); break;
+    case 'newMeet': window.open('https://meet.google.com/new', '_blank', 'noopener'); break;
+    case 'saveReport': saveReport(); break;
+    case 'reportDay': WS.rday = a; render(false); break;
   }
+});
+/* inline edits in the task sheet */
+document.addEventListener('change', e => {
+  const el = e.target.closest('[data-cell]'); if (!el) return;
+  cellSave(el.dataset.id, el.dataset.cell, el.value);
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && (e.target.id === 'pw' || e.target.id === 'ph')) login();
   if (e.key === 'Enter' && (e.target.id === 'np2')) changePw();
   if (e.key === 'Enter' && (e.target.id === 'myName')) saveName();
+  if (e.key === 'Enter' && e.target.id === 'newRow') { e.preventDefault(); sheetAdd(); }
+  if (e.key === 'Enter' && e.target.dataset && e.target.dataset.cell === 'title') { e.preventDefault(); e.target.blur(); }
   if (e.key === 'Escape') { if ($('modal').classList.contains('show')) modalCancel(); else closeAll(); }
 });
 document.addEventListener('visibilitychange', () => { if (!document.hidden && D) refresh(true); });

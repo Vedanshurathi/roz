@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-tyABMESD0OFmqtPmzoY+pVjjBetoy7/fr4zOhamPwdc=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ueX2ThQjrMJk19/OXTGgeZvAZ2ZnToRf98TGbbqs71A=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -202,6 +202,20 @@ td.acts .btn+.btn{margin-left:6px}
 .msg{margin-bottom:12px}
 .msg.unread{border-left:4px solid var(--blue)}
 .empty{text-align:center;padding:44px 16px;color:var(--tx2)}
+/* intern workspace */
+.wst{width:100%;border-collapse:collapse;min-width:900px;font-size:13px}
+.wst th{text-align:left;font-size:11.5px;font-weight:800;color:var(--tx2);background:var(--grey);padding:9px 10px;white-space:nowrap}
+.wst td{padding:9px 10px;border-top:1px solid var(--line);vertical-align:top}
+.wst .wt{min-width:220px}.wst td.late{color:var(--red);font-weight:800}
+.wst tr.is-done .wt b{text-decoration:line-through;color:var(--mut)}
+.wst a{color:var(--blue);font-weight:700;text-decoration:none;white-space:nowrap}
+.wfrow{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:8px}
+.wfic{width:42px;height:42px;border-radius:12px;background:var(--grey);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+.wfname{display:block;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wmc{display:flex;gap:14px;margin-bottom:10px}.wmc.live{border:2px solid var(--g)}
+.wmd{width:52px;flex-shrink:0;text-align:center;background:var(--lime-s);border-radius:12px;padding:8px 0;height:max-content}
+.wmd b{display:block;font-size:20px;line-height:1.1;color:var(--g-dk)}.wmd span{font-size:11px;font-weight:800;color:var(--g-dk);text-transform:uppercase}
+.wnote{background:var(--grey);border-radius:10px;padding:8px 10px;font-size:12.5px;white-space:pre-wrap;margin-top:6px}
 .empty .e{font-size:40px;margin-bottom:8px}
 .empty b{display:block;color:var(--tx);font-size:16px;margin-bottom:4px}
 .sk{background:linear-gradient(90deg,var(--grey),#fff,var(--grey));background-size:200% 100%;animation:sk 1.2s linear infinite;border-radius:16px;height:90px;margin-bottom:12px}
@@ -349,6 +363,7 @@ td.acts .btn+.btn{margin-left:6px}
     <button class="nav" data-act="go" data-arg="messages"><span class="ic">💬</span>Messages<span class="badge hide" id="bMessages"></span></button>
     <button class="nav" data-act="go" data-arg="staff"><span class="ic">🧑‍💼</span>Team<span class="badge o hide" id="bStaff"></span></button>
     <button class="nav" data-act="go" data-arg="tasks"><span class="ic">📝</span>Kaam (tasks)<span class="badge hide" id="bTasks"></span></button>
+    <button class="nav" data-act="go" data-arg="ws"><span class="ic">🧑‍💻</span>Intern workspace</button>
     <button class="nav" data-act="go" data-arg="targets"><span class="ic">🎯</span>Sales targets</button>
     <button class="nav" data-act="go" data-arg="broadcast"><span class="ic">📣</span>Notification bhejo</button>
     <button class="nav" data-act="go" data-arg="dreport"><span class="ic">📬</span>Kisko mila / khola</button>
@@ -383,6 +398,7 @@ td.acts .btn+.btn{margin-left:6px}
       <section class="scr" id="v-messages"></section>
       <section class="scr" id="v-staff"></section>
       <section class="scr" id="v-tasks"></section>
+      <section class="scr" id="v-ws"></section>
       <section class="scr" id="v-targets"></section>
       <section class="scr" id="v-broadcast"></section>
       <section class="scr" id="v-dreport"></section>
@@ -597,6 +613,7 @@ const TITLES = {
   vendors: ['Vendors', 'approve, block, performance'], products: ['Products', 'approval, price, stock, master catalog'],
   customers: ['Customers', 'naam pe click karo — saare orders'], areas: ['Villages', 'gaon, location, coverage'],
   messages: ['Messages', 'customers kya bol rahe hain'], staff: ['Team', 'sales + interns — role, type, password approval'], tasks: ['Kaam (tasks)', 'sales ya intern ko kaam do — status yahan dikhega'],
+  ws: ['Intern workspace', 'har intern ki to-do sheet, files, meetings aur daily report'],
   targets: ['Sales targets', 'sale ka target aur time — progress apne aap'], broadcast: ['Notification bhejo', 'sab customers / vendors / staff ke phone pe ek saath'], dreport: ['Kisko mila / khola', 'har notification — kis phone number pe pahuncha, kisne khola'], settings: ['Settings', 'commission aur notifications'], traffic: ['Traffic', 'kitne log aa rahe hain'],
   launch: ['Launch check', 'real order ke liye kya baaki hai']
 };
@@ -612,7 +629,7 @@ function render(animate) {
   const el = $('v-' + VIEW);
   if (!D) { el.innerHTML = '<div class="sk"></div><div class="sk"></div><div class="sk"></div>'; return; }
   ({ home: vHome, orders: vOrders, vendors: vVendors, products: vProducts, customers: vCustomers,
-     areas: vAreas, messages: vMessages, staff: vStaff, tasks: vTasks, targets: vTargets, broadcast: vBroadcast, dreport: vReport, settings: vSettings, traffic: vTraffic, launch: vLaunch })[VIEW](el, animate ? 'rv' : '');
+     areas: vAreas, messages: vMessages, staff: vStaff, tasks: vTasks, ws: vWs, targets: vTargets, broadcast: vBroadcast, dreport: vReport, settings: vSettings, traffic: vTraffic, launch: vLaunch })[VIEW](el, animate ? 'rv' : '');
 }
 /* re-render but keep focus + caret in a search box */
 function rerenderKeep(id) {
@@ -1163,8 +1180,8 @@ const todayIST = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkat
 UI.tf = 'open'; UI.tperson = 'all';
 function vTasks(el, rv) {
   const T = D.tasks, today = todayIST();
-  const F = { open: t => t.status === 'todo', done: t => t.status === 'done', not_done: t => t.status === 'not_done',
-    late: t => t.status === 'todo' && t.due_date && String(t.due_date).slice(0, 10) < today, all: () => true };
+  const F = { open: t => t.status === 'todo' || t.status === 'doing', done: t => t.status === 'done', not_done: t => t.status === 'not_done',
+    late: t => (t.status === 'todo' || t.status === 'doing') && t.due_date && String(t.due_date).slice(0, 10) < today, all: () => true };
   const list = T.filter(F[UI.tf]).filter(t => UI.tperson === 'all' || t.staff_id === UI.tperson);
   const done = T.filter(F.done).length;
   el.innerHTML = `
@@ -1201,13 +1218,197 @@ async function editTask(id) {
   const v = await modal({ title: 'Kaam edit karo', sub: `${esc(t.staff_name)} ka kaam`, fields: [
     { id: 'title', label: 'Kaam', value: t.title }, { id: 'details', label: 'Detail', type: 'textarea', value: t.details || '' },
     { id: 'priority', label: 'Kitna zaroori', type: 'select', value: t.priority, options: [['high', '🔴 Zaroori'], ['normal', '🟠 Normal'], ['low', '🟢 Aaram se']] },
-    { id: 'due', label: 'Kab tak', type: 'date', value: t.due_date ? String(t.due_date).slice(0, 10) : '' }] });
-  if (v) await act('admin_update_task', { p_task: id, p_title: v.title, p_details: v.details || null, p_priority: v.priority, p_due: v.due || null });
+    { id: 'due', label: 'Kab tak', type: 'date', value: t.due_date ? String(t.due_date).slice(0, 10) : '' },
+    { id: 'cat', label: 'Type', type: 'select', value: t.category || '', options: [['', '—']].concat(WCATS.map(([c, i]) => [c, i + ' ' + c])) },
+    { id: 'link', label: 'Link (optional)', type: 'url', value: t.link || '', ph: 'https://' }] });
+  if (!v) return;
+  const r = await rpc('admin_task_meta', { p_task: id, p_category: v.cat || null, p_link: v.link || null });
+  if (!r.ok) toast('⚠️ ' + (r.error || 'Type/link save nahi hua'));
+  await act('admin_update_task', { p_task: id, p_title: v.title, p_details: v.details || null, p_priority: v.priority, p_due: v.due || null });
 }
 async function delTask(id) {
   const t = D.tasks.find(x => x.id === id);
   const v = await modal({ title: 'Kaam hatayein?', sub: esc(t ? t.title : ''), ok: 'Hatao', danger: true });
   if (v) await act('admin_delete_task', { p_task: id });
+}
+
+/* ---------- Intern workspace (admin) ----------
+   Every intern's own to-do sheet + the tasks you gave them, their files & links (Storage bucket
+   staff-files, private), Google Meet meetings and daily reports. Same RPCs as the staff site. */
+const WSA = { files: null, meets: null, reports: null, people: null };
+const WCATS = [['Development', '💻'], ['Marketing', '📣'], ['Design', '🎨'], ['Content', '✍️'], ['Research', '🔎'], ['Other', '📌']];
+const wcatIc = c => (WCATS.find(x => x[0] === c) || [0, '📌'])[1];
+const fmtSizeA = b => !b ? '' : b < 1048576 ? Math.round(b / 1024) + ' KB' : (b / 1048576).toFixed(1) + ' MB';
+const fileIcA = f => f.kind === 'link' ? (/figma/.test(f.url) ? '🎨' : /github/.test(f.url) ? '🐙' : /google/.test(f.url) ? '📄' : '🔗')
+  : /^image\//.test(f.mime || '') ? '🖼️' : /pdf/.test(f.mime || '') ? '📕' : /zip/.test(f.mime || '') ? '🗜️' : /video/.test(f.mime || '') ? '🎬' : '📎';
+async function wsaLoad(force) {
+  if (!force && WSA.files && WSA.meets && WSA.reports) return;
+  const [f, m, r, p] = await Promise.all([rpc('team_files', { p_staff: null }), rpc('team_meetings', { p_days_back: 30 }),
+    rpc('team_reports', { p_days: 30, p_staff: null }), rpc('team_people')]);
+  WSA.files = f.ok ? f.data || [] : []; WSA.meets = m.ok ? m.data || [] : []; WSA.reports = r.ok ? r.data || [] : []; WSA.people = p.ok ? p.data || [] : [];
+  if (VIEW === 'ws') render(false);
+}
+function vWs(el, rv) {
+  const today = todayIST(), interns = D.staff.filter(x => x.kind === 'intern' && x.is_active);
+  const pid = UI.wsp || 'all', tab = UI.wst || 'tasks', mine = x => pid === 'all' || x.staff_id === pid;
+  if (!WSA.files) { wsaLoad(); }
+  const tasks = D.tasks.filter(t => t.staff_kind === 'intern' && mine(t));
+  const open = tasks.filter(t => t.status === 'todo' || t.status === 'doing');
+  const late = open.filter(t => t.due_date && String(t.due_date).slice(0, 10) < today);
+  const repToday = (WSA.reports || []).filter(x => String(x.day).slice(0, 10) === today);
+  const missing = interns.filter(i => (pid === 'all' || i.id === pid) && !repToday.some(x => x.staff_id === i.id));
+  const nextMeet = (WSA.meets || []).filter(m => m.status === 'scheduled' && new Date(m.starts_at) > Date.now())[0];
+  let body = '';
+  if (tab === 'tasks') {
+    const q = (UI.wsq || '').toLowerCase(), f = UI.wsf || 'open';
+    const list = tasks.filter(t => (f === 'all' || (f === 'open' ? (t.status === 'todo' || t.status === 'doing') : f === 'self' ? t.source === 'self' : f === 'admin' ? t.source !== 'self' : t.status === f))
+      && (!q || [t.title, t.details, t.staff_name, t.category].some(x => String(x || '').toLowerCase().includes(q))));
+    body = `<div class="toolbar"><div class="chips">${[['open', 'Chal rahe'], ['doing', 'Doing'], ['done', 'Done'], ['not_done', 'Nahi hua'], ['self', 'Intern ne khud banaye'], ['admin', 'Aapne diye'], ['all', 'Sab']].map(([k, l]) =>
+        `<button class="chip ${f === k ? 'on' : ''}" data-act="wsf" data-arg="${k}">${l}</button>`).join('')}</div>
+      <div class="search" style="min-width:180px"><input class="fld" id="wsq" placeholder="Search" value="${esc(UI.wsq || '')}"></div>
+      <button class="btn btn-o btn-sm" data-act="wsCsv">⬇ CSV</button>
+      <button class="btn btn-g" data-act="addTask" data-arg="${pid !== 'all' ? esc(pid) : ''}">＋ Kaam do</button></div>
+      <div class="card" style="padding:0"><div class="tw"><table class="wst"><thead><tr><th>Intern</th><th>Task</th><th>Type</th><th>Priority</th><th>Status</th><th>Due</th><th>Link</th><th>From</th><th></th></tr></thead><tbody>
+      ${list.map(t => { const d = t.due_date ? String(t.due_date).slice(0, 10) : '', lt = d && d < today && (t.status === 'todo' || t.status === 'doing');
+        return `<tr class="${t.status === 'done' ? 'is-done' : ''}"><td><b>${esc(t.staff_name)}</b></td>
+          <td class="wt"><b>${esc(t.title)}</b>${t.details ? `<div class="mu">${esc(t.details).slice(0, 90)}</div>` : ''}${t.staff_note ? `<div class="mu">💬 ${esc(t.staff_note)}</div>` : ''}</td>
+          <td>${t.category ? wcatIc(t.category) + ' ' + esc(t.category) : '<span class="mu">—</span>'}</td>
+          <td><span class="pill ${PRI[t.priority][1]}">${PRI[t.priority][0]}</span></td>
+          <td><span class="pill ${TST[t.status][1]}">${TST[t.status][0]}</span></td>
+          <td class="${lt ? 'late' : ''}">${d ? shortD(d) : '—'}</td>
+          <td>${t.link ? `<a href="${esc(t.link)}" target="_blank" rel="noopener">🔗 Open</a>` : '—'}${t.files ? ` <span class="pill p-m">📎 ${t.files}</span>` : ''}</td>
+          <td>${t.source === 'self' ? '<span class="pill p-b">Intern</span>' : '<span class="pill p-y">Aap</span>'}</td>
+          <td style="white-space:nowrap">${t.source !== 'self' ? `<button class="btn btn-o btn-sm" data-act="editTask" data-arg="${esc(t.id)}">✏️</button> <button class="btn btn-r btn-sm" data-act="delTask" data-arg="${esc(t.id)}">🗑</button>` : ''}</td></tr>`; }).join('')
+        || `<tr><td colspan="9"><div class="empty" style="padding:24px"><div class="e">📭</div><b>Yahan koi kaam nahi</b></div></td></tr>`}</tbody></table></div></div>`;
+  } else if (tab === 'files') {
+    const list = (WSA.files || []).filter(mine);
+    body = `<div class="toolbar"><span class="mu">Intern jo file / link share karte hain yahan aata hai. Aap bhi unhe file bhej sakte ho.</span>
+      <button class="btn btn-o" style="margin-left:auto" data-act="wsLink">🔗 Link bhejo</button><button class="btn btn-g" data-act="wsUpload">⬆ File bhejo</button></div>
+      ${!WSA.files ? '<div class="sk"></div>' : list.map(f => `<div class="card wfrow"><span class="wfic">${fileIcA(f)}</span>
+        <div style="flex:1;min-width:0"><b class="wfname" data-act="wsOpen" data-arg="${esc(f.id)}">${esc(f.name)}</b>
+        <div class="mu">${esc(f.staff_name)} · ${f.kind === 'link' ? esc((f.url || '').replace(/^https?:\/\//, '').slice(0, 40)) : fmtSizeA(f.size)} · ${when(f.created_at)}${f.from_admin ? ' · <span class="pill p-y">aapne bheja</span>' : ''}${f.task_title ? ' · 📝 ' + esc(f.task_title).slice(0, 30) : ''}</div>
+        ${f.note ? `<div class="mu">💬 ${esc(f.note)}</div>` : ''}</div>
+        <button class="btn btn-o btn-sm" data-act="wsOpen" data-arg="${esc(f.id)}">${f.kind === 'link' ? 'Open' : 'Dekho'}</button>
+        <button class="btn btn-r btn-sm" data-act="wsFileDel" data-arg="${esc(f.id)}">🗑</button></div>`).join('')
+        || '<div class="empty"><div class="e">🗂️</div><b>Abhi koi file nahi</b></div>'}`;
+  } else if (tab === 'meet') {
+    const ms = (WSA.meets || []).filter(m => pid === 'all' || (m.attendees || []).includes(pid));
+    const up = ms.filter(m => new Date(m.starts_at).getTime() + m.duration_min * 60000 >= Date.now() && m.status === 'scheduled'), past = ms.filter(m => !up.includes(m)).reverse();
+    const card = m => { const s = new Date(m.starts_at), e = new Date(s.getTime() + m.duration_min * 60000), now = Date.now(), live = m.status === 'scheduled' && now >= s - 6e5 && now <= e, pastM = now > e;
+      return `<div class="card wmc ${live ? 'live' : ''}"><div class="wmd"><b>${s.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric' })}</b><span>${s.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short' })}</span></div>
+        <div style="flex:1;min-width:0"><div class="row" style="flex-wrap:nowrap"><b style="flex:1">${esc(m.title)}</b>${m.status === 'cancelled' ? '<span class="pill p-r">Cancelled</span>' : live ? '<span class="pill p-g">● Live</span>' : pastM ? '<span class="pill p-m">Ho gayi</span>' : ''}</div>
+        <div class="mu">🕒 ${s.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' })} · ${m.duration_min} min · ${esc(m.created_by_name || '')} ne rakhi</div>
+        <div class="mu">👥 ${(m.attendee_names || []).map(esc).join(', ') || '—'}</div>
+        ${m.agenda ? `<div style="margin-top:4px;font-size:13px;white-space:pre-wrap">${esc(m.agenda)}</div>` : ''}${m.notes ? `<div class="wnote">📝 ${esc(m.notes)}</div>` : ''}
+        ${m.status === 'cancelled' ? '' : `<div class="row" style="margin-top:8px">${m.meet_link && !pastM ? `<a class="btn ${live ? 'btn-g' : 'btn-o'} btn-sm" href="${esc(m.meet_link)}" target="_blank" rel="noopener">🎥 Join</a>` : ''}
+          <button class="btn btn-o btn-sm" data-act="wsMeetNotes" data-arg="${esc(m.id)}">📝 Notes</button>
+          ${!pastM ? `<button class="btn btn-o btn-sm" data-act="wsMeet" data-arg="${esc(m.id)}">✏️ Edit</button><button class="btn btn-r btn-sm" data-act="wsMeetCancel" data-arg="${esc(m.id)}">Cancel</button>` : ''}</div>`}</div></div>`; };
+    body = `<div class="toolbar"><span class="mu">Sabko turant notification + 15 min pehle reminder jaata hai.</span><button class="btn btn-g" style="margin-left:auto" data-act="wsMeet" data-arg="">＋ Meeting rakho</button></div>
+      ${!WSA.meets ? '<div class="sk"></div>' : `<div class="sec"><h2>Aane wali</h2><span class="r">${up.length}</span></div>${up.map(card).join('') || '<div class="mu">Koi meeting nahi.</div>'}
+      ${past.length ? `<div class="sec"><h2>Pichhle 30 din</h2></div>${past.map(card).join('')}` : ''}`}`;
+  } else {
+    const reps = (WSA.reports || []).filter(mine);
+    body = `${missing.length ? `<div class="card" style="background:var(--or-s);margin-bottom:12px"><b>⏳ Aaj report nahi bheji:</b> ${missing.map(i => esc(i.name)).join(', ')}</div>` : WSA.reports ? '<div class="card" style="background:var(--lime-s);margin-bottom:12px"><b>✅ Sabne aaj ki report bhej di</b></div>' : ''}
+      ${!WSA.reports ? '<div class="sk"></div>' : reps.map(x => `<div class="card" style="margin-bottom:10px"><div class="row" style="justify-content:space-between"><b>${esc(x.staff_name)} · ${shortD(x.day)}</b><span class="mu">${x.hours ? '⏱️ ' + x.hours + ' h' : ''}</span></div>
+        <div style="margin-top:6px;white-space:pre-wrap;font-size:13.5px">✅ ${esc(x.done)}</div>${x.plan ? `<div class="mu" style="margin-top:4px;white-space:pre-wrap">🎯 ${esc(x.plan)}</div>` : ''}
+        ${x.blockers ? `<div class="wnote" style="background:var(--red-s)">⚠️ ${esc(x.blockers)}</div>` : ''}</div>`).join('') || '<div class="empty"><div class="e">🗒️</div><b>Abhi koi report nahi</b></div>'}`;
+  }
+  el.innerHTML = `
+    <div class="chips ${rv} d1" style="margin-bottom:14px"><button class="chip ${pid === 'all' ? 'on' : ''}" data-act="wsp" data-arg="all">👥 Sab interns</button>
+      ${interns.map(i => `<button class="chip ${pid === i.id ? 'on' : ''}" data-act="wsp" data-arg="${esc(i.id)}">🌱 ${esc(i.name)}</button>`).join('')}</div>
+    <div class="grid k4 ${rv} d1">
+      ${kpi('Chal rahe kaam', open.length, open.filter(t => t.status === 'doing').length + ' abhi kar rahe', '', '📝')}
+      ${kpi('Late', late.length, 'due date nikal gayi', late.length ? 'bad' : '', '⏰')}
+      ${kpi('Aaj ki report', WSA.reports ? (interns.filter(i => pid === 'all' || i.id === pid).length - missing.length) + ' / ' + interns.filter(i => pid === 'all' || i.id === pid).length : '…', missing.length ? missing.length + ' ne nahi bheji' : 'sab aa gayi', missing.length ? 'warn' : 'good', '🗒️')}
+      ${kpi('Agli meeting', nextMeet ? new Date(nextMeet.starts_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' }) : '—',
+        nextMeet ? new Date(nextMeet.starts_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' }) + ' · ' + esc(nextMeet.title) : 'koi nahi', '', '📅')}
+    </div>
+    <div class="tabs ${rv} d2" style="margin-top:16px">${[['tasks', '▦ Kaam sheet'], ['files', '📎 Files & links'], ['meet', '📅 Meetings'], ['reports', '🗒️ Daily reports']].map(([k, l]) =>
+      `<button class="tab ${tab === k ? 'on' : ''}" data-act="wst" data-arg="${k}">${l}</button>`).join('')}</div>
+    <div class="${rv} d3">${body}</div>`;
+  const s = $('wsq'); if (s) s.oninput = () => { UI.wsq = s.value; rerenderKeep('wsq'); };
+}
+function wsCsv() {
+  const rows = D.tasks.filter(t => t.staff_kind === 'intern' && (!UI.wsp || UI.wsp === 'all' || t.staff_id === UI.wsp));
+  const csv = '﻿' + [['Intern', 'Task', 'Notes', 'Type', 'Priority', 'Status', 'Due', 'Link', 'From', 'Added', 'Done on']].concat(rows.map(t => [t.staff_name, t.title, t.details || '',
+    t.category || '', t.priority, t.status, t.due_date ? String(t.due_date).slice(0, 10) : '', t.link || '', t.source === 'self' ? 'Intern' : 'Admin', String(t.created_at).slice(0, 10),
+    t.completed_at ? String(t.completed_at).slice(0, 10) : ''])).map(r => r.map(v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }).join(',')).join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = `rozbazaar-intern-tasks-${todayIST()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+async function wsPickIntern(title) {
+  if (UI.wsp && UI.wsp !== 'all') return UI.wsp;
+  const interns = D.staff.filter(x => x.kind === 'intern' && x.is_active);
+  const v = await modal({ title, fields: [{ id: 'who', label: 'Kisko', type: 'select', value: interns[0] && interns[0].id, options: interns.map(i => [i.id, i.name]) }] });
+  return v ? v.who : null;
+}
+async function wsUpload() {
+  const sid = await wsPickIntern('File kisko bhejni hai?'); if (!sid) return;
+  const inp = document.createElement('input'); inp.type = 'file'; inp.multiple = true;
+  inp.onchange = async () => {
+    for (const file of inp.files) {
+      if (file.size > 25 * 1048576) { toast(`⚠️ ${file.name} 25 MB se bada hai`); continue; }
+      toast('⬆ Upload ho raha: ' + file.name);
+      const path = `${sid}/${Date.now().toString(36)}-${file.name.replace(/[^\w.\-]+/g, '_').slice(-80)}`;
+      const up = await sb.storage.from('staff-files').upload(path, file, { contentType: file.type || 'application/octet-stream' });
+      if (up.error) { toast('⚠️ ' + up.error.message); continue; }
+      const r = await rpc('team_file_add', { p_staff: sid, p_kind: 'file', p_name: file.name, p_path: path, p_url: null, p_size: file.size, p_mime: file.type || null, p_task: null, p_note: null });
+      if (!r.ok) { toast('⚠️ ' + (r.error || 'Save nahi hua')); await sb.storage.from('staff-files').remove([path]); }
+    }
+    toast('✓ Intern ko bhej diya'); wsaLoad(true);
+  };
+  inp.click();
+}
+async function wsLink() {
+  const sid = await wsPickIntern('Link kisko bhejna hai?'); if (!sid) return;
+  const v = await modal({ title: '🔗 Link bhejo', fields: [{ id: 'url', label: 'Link', type: 'url', ph: 'https://' }, { id: 'name', label: 'Naam', ph: 'Jaise: Brand guide' }, { id: 'note', label: 'Note (optional)', type: 'textarea' }] });
+  if (!v || !v.url) return;
+  const r = await rpc('team_file_add', { p_staff: sid, p_kind: 'link', p_name: v.name || v.url, p_path: null, p_url: v.url, p_size: null, p_mime: null, p_task: null, p_note: v.note || null });
+  toast(r.ok ? '🔗 Bhej diya ✓' : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
+}
+async function wsOpen(id) {
+  const f = (WSA.files || []).find(x => x.id === id); if (!f) return;
+  if (f.kind === 'link') return window.open(f.url, '_blank', 'noopener');
+  const w = window.open('', '_blank');
+  const r = await sb.storage.from('staff-files').createSignedUrl(f.path, 600);
+  if (r.error) { if (w) w.close(); return toast('⚠️ ' + r.error.message); }
+  if (w) w.location = r.data.signedUrl; else location.href = r.data.signedUrl;
+}
+async function wsFileDel(id) {
+  const v = await modal({ title: 'File hatayein?', sub: 'Intern ko bhi nahi dikhegi.', ok: 'Hatao', danger: true }); if (!v) return;
+  const r = await rpc('team_file_delete', { p_id: id });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Nahi hua'));
+  if (r.data && r.data.path) await sb.storage.from('staff-files').remove([r.data.path]);
+  toast('Hata diya'); wsaLoad(true);
+}
+async function wsMeet(id) {
+  const m = id ? (WSA.meets || []).find(x => x.id === id) : null;
+  if (!WSA.people) await wsaLoad(true);
+  const s = m ? new Date(m.starts_at) : new Date(Date.now() + 3600e3);
+  const d = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(s), t = s.toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' });
+  const v = await modal({ title: m ? 'Meeting badlo' : '📅 Meeting rakho', sub: '“Google Meet banao” dabao → naya Meet khulega → uska link yahan paste karo.', ok: m ? 'Save' : 'Meeting rakho',
+    fields: [{ id: 'title', label: 'Title', value: m ? m.title : '', ph: 'Jaise: Weekly review' }, { id: 'date', label: 'Date', type: 'date', value: d },
+      { id: 'time', label: 'Time (IST)', type: 'time', value: m ? t : t.slice(0, 2) + ':00' },
+      { id: 'dur', label: 'Kitni der', type: 'select', value: String(m ? m.duration_min : 30), options: [['15', '15 min'], ['30', '30 min'], ['45', '45 min'], ['60', '1 ghanta'], ['90', '1.5 ghante'], ['120', '2 ghante']] },
+      { id: 'link', label: 'Google Meet link', type: 'url', value: m ? m.meet_link || '' : '', ph: 'https://meet.google.com/…', hint: '<button type="button" class="btn btn-o btn-sm" data-act="newMeet">🎥 Google Meet banao</button>' },
+      { id: 'who', label: 'Kisko bulana hai', type: 'checks', options: (WSA.people || []).map(p => [p.id, (p.kind === 'intern' ? '🌱 ' : '💼 ') + p.name]) },
+      { id: 'agenda', label: 'Agenda', type: 'textarea', value: m ? m.agenda || '' : '' }] }, UI.wsp && UI.wsp !== 'all' ? UI.wsp : undefined);
+  if (!v) return;
+  if (!v.title || !v.date || !v.time) return toast('Title, date aur time daalo');
+  const att = v.who && v.who.length ? v.who : m ? m.attendees || [] : [];
+  if (!att.length) return toast('Kam se kam ek insaan bulao');
+  const r = await rpc('team_meeting_save', { p_id: m ? m.id : null, p_title: v.title, p_agenda: v.agenda || null, p_starts: new Date(`${v.date}T${v.time}:00+05:30`).toISOString(),
+    p_duration: +v.dur || 30, p_link: v.link || null, p_attendees: att, p_with_admin: true });
+  toast(r.ok ? '📅 Meeting set — sabko notification gaya' : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
+}
+async function wsMeetCancel(id) {
+  const v = await modal({ title: 'Meeting cancel karein?', sub: 'Sabko notification jaayega.', ok: 'Cancel karo', danger: true }); if (!v) return;
+  const r = await rpc('team_meeting_cancel', { p_id: id }); toast(r.ok ? 'Cancel ho gayi' : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
+}
+async function wsMeetNotes(id) {
+  const m = (WSA.meets || []).find(x => x.id === id);
+  const v = await modal({ title: 'Meeting notes', sub: 'Kya tay hua, kaun kya karega', fields: [{ id: 'notes', label: 'Notes', type: 'textarea', value: m ? m.notes || '' : '' }] }); if (!v) return;
+  const r = await rpc('team_meeting_notes', { p_id: id, p_notes: v.notes || null }); toast(r.ok ? 'Save ho gaya ✓' : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
 }
 
 /* ---------- Sales targets ---------- */
@@ -1553,7 +1754,7 @@ function targetCard(t, admin) {
 
 /* ---------- task card (shared; admin gets edit/reopen/delete, staff gets complete/not-done) ---------- */
 const PRI = { high: ['🔴 Zaroori', 'p-r'], normal: ['🟠 Normal', 'p-o'], low: ['🟢 Aaram se', 'p-g'] };
-const TST = { todo: ['Baaki', 'p-b'], done: ['✅ Complete', 'p-g'], not_done: ['❌ Nahi hua', 'p-r'] };
+const TST = { todo: ['Baaki', 'p-b'], doing: ['🔄 Chal raha', 'p-y'], done: ['✅ Complete', 'p-g'], not_done: ['❌ Nahi hua', 'p-r'] };
 function dueChip(due, status, today) {
   if (!due) return '';
   const d = String(due).slice(0, 10), diff = daysBetween(today, d);
@@ -1624,7 +1825,7 @@ function modal({ title, sub, fields, ok, danger }, preselect) {
         x.type === 'textarea' ? `<textarea class="fld" id="m_${x.id}" rows="3" placeholder="${esc(x.ph || '')}">${esc(x.value || '')}</textarea>`
         : x.type === 'select' ? `<select class="fld" id="m_${x.id}">${x.options.map(([v, l]) => `<option value="${esc(v)}" ${v === x.value ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`
         : x.type === 'checks' ? `<div class="chips" id="m_${x.id}">${x.options.map(([v, l]) => `<label class="chip"><input type="checkbox" value="${esc(v)}" style="margin-right:6px">${esc(l)}</label>`).join('')}</div>`
-        : `<input class="fld" id="m_${x.id}" type="${x.type === 'date' ? 'date' : 'text'}" ${x.type === 'number' ? 'inputmode="decimal"' : ''} value="${esc(x.value ?? '')}" placeholder="${esc(x.ph || '')}">`}</div>`).join('')}
+        : `<input class="fld" id="m_${x.id}" type="${['date', 'time', 'url'].includes(x.type) ? x.type : 'text'}" ${x.type === 'number' ? 'inputmode="decimal"' : ''} value="${esc(x.value ?? '')}" placeholder="${esc(x.ph || '')}">`}${x.hint ? `<div class="mu" style="margin-top:4px">${x.hint}</div>` : ''}</div>`).join('')}
       </div><div class="foot"><button class="btn btn-o" data-act="modalCancel">Rehne do</button>
       <button class="btn ${danger ? 'btn-r' : 'btn-g'}" data-act="modalOk">${esc(ok || 'Save')}</button></div>`;
     $('ov').classList.add('show'); $('modal').classList.add('show');
@@ -1813,6 +2014,18 @@ document.addEventListener('click', e => {
     case 'pushOn': enablePush(); break;
     case 'tf': UI.tf = a; render(false); break;
     case 'addTask': addTask(a); break;
+    case 'wsp': UI.wsp = a; render(false); break;
+    case 'wst': UI.wst = a; if (a !== 'tasks') wsaLoad(); render(false); break;
+    case 'wsf': UI.wsf = a; render(false); break;
+    case 'wsCsv': wsCsv(); break;
+    case 'wsUpload': wsUpload(); break;
+    case 'wsLink': wsLink(); break;
+    case 'wsOpen': wsOpen(a); break;
+    case 'wsFileDel': wsFileDel(a); break;
+    case 'wsMeet': wsMeet(a || null); break;
+    case 'wsMeetCancel': wsMeetCancel(a); break;
+    case 'wsMeetNotes': wsMeetNotes(a); break;
+    case 'newMeet': window.open('https://meet.google.com/new', '_blank', 'noopener'); break;
     case 'editTask': editTask(a); break;
     case 'reopenTask': act('admin_reopen_task', { p_task: a }); break;
     case 'delTask': delTask(a); break;

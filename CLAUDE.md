@@ -317,6 +317,18 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   Sales keep Hinglish. The login screen is still Hinglish (shown before we know who logs in). Server side,
   `admin_add_task` / `admin_reopen_task` send interns English notifications (migration
   `20260927d_intern_english_notifications.sql`).
+- **Intern workspace** (28 Sep, migration `20260928a_intern_workspace.sql`): interns get **My tasks** as their own to-do
+  sheet (inline-edit table + Board view To do/Doing/Done, filters, search, CSV) — rows they add are `staff_tasks.source='self'`
+  (full edit/delete via `staff_task_save` / `staff_task_delete`, interns only = `my_intern_id()`); admin-given rows
+  (`source='admin'`) only change status (`staff_set_task_status`, now also `doing`; admins notified only for admin tasks).
+  New columns `category`, `link`. **Files & links** (`staff_files` + private Storage bucket `staff-files`, path
+  `<staff_id>/…`, 25 MB; storage policies = own folder or `is_admin()`; `team_file_add/team_files/team_file_delete`; opened with
+  signed URLs). **Meetings** (`staff_meetings`; `team_meeting_save/team_meetings/team_meeting_cancel/team_meeting_notes`,
+  `team_people`; Google Meet link pasted from meet.google.com/new + "Add to Google Calendar" template link; cron
+  `rz-meeting-reminders` every 5 min → 15-min reminder). **Daily report** (`staff_daily_reports`, `staff_report_save`,
+  `team_reports`; admins notified). Admin console → "🧑‍💻 Intern workspace" tab shows all of it per intern (sheet, files +
+  send file/link to an intern, meetings, reports + who hasn't reported today); admin task edit also sets type + link
+  (`admin_task_meta`). Meetings nav is visible to sales too.
 - Tabs: Aaj ka plan (KPIs, slot board Subah/Dopahar/Shaam, village + vendor load),
   Orders (day/status/type/village filters, search, detail drawer, CSV), Vendors (cards,
   7-day chart drawer), Sale (today/yesterday/7/30/custom range, Sabzi/Pyaaz-Aloo/Fruits,
