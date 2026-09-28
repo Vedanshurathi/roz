@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-z04+ngtehFhokPGDX1y2Vq9Z6dQUplwKJxzH+57epIg=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-izUUl1JGtfOyHuiG3XBxe4IgcTMgJnfCzWoCHRc+URY=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -223,6 +223,18 @@ td.acts .btn+.btn{margin-left:6px}
 .wncard{display:flex;flex-direction:column}.wncard.pin{border:2px solid #F2D14B;background:#FFFCEB}
 .wnbody{margin-top:8px;font-size:13px;white-space:pre-wrap;color:var(--tx2);max-height:160px;overflow:auto;overflow-wrap:anywhere}
 .wlrow{display:flex;gap:12px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.wchat{padding:0;display:flex;flex-direction:column;height:calc(100vh - 330px);min-height:380px;overflow:hidden}
+.wchat-l{flex:1;overflow-y:auto;padding:14px 16px;background:#FBFAF6}
+.wcm{display:flex;margin-top:8px}.wcm.mine{justify-content:flex-end}
+.wcb{max-width:78%;background:#fff;border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:8px 12px}
+.wcm.mine .wcb{background:var(--lime-s);border-color:#cfe9bd;border-radius:14px 14px 4px 14px}
+.wcn{font-size:11.5px;font-weight:800;color:var(--g-dk);display:flex;gap:6px;align-items:center}.wcn span{color:var(--mut);font-weight:700}
+.wcdel{margin-left:auto;opacity:.3;font-size:11px}.wcb:hover .wcdel{opacity:1}
+.wct{font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:2px}
+.wchat-in{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line);align-items:flex-end}
+.wchat-in textarea{flex:1;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;resize:none;outline:0}
+.wchat-in textarea:focus{border-color:var(--g)}
+.wcmt{border-top:1px solid var(--line);padding:8px 0;text-align:left;color:var(--tx)}.wcmt div{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:2px}
 .empty .e{font-size:40px;margin-bottom:8px}
 .empty b{display:block;color:var(--tx);font-size:16px;margin-bottom:4px}
 .sk{background:linear-gradient(90deg,var(--grey),#fff,var(--grey));background-size:200% 100%;animation:sk 1.2s linear infinite;border-radius:16px;height:90px;margin-bottom:12px}
@@ -1281,14 +1293,14 @@ function vWs(el, rv) {
       <div class="card" style="padding:0"><div class="tw"><table class="wst"><thead><tr><th>Intern</th><th>Task</th><th>Type</th><th>Priority</th><th>Status</th><th>Due</th><th>Link</th><th>From</th><th></th></tr></thead><tbody>
       ${list.map(t => { const d = t.due_date ? String(t.due_date).slice(0, 10) : '', lt = d && d < today && (t.status === 'todo' || t.status === 'doing');
         return `<tr class="${t.status === 'done' ? 'is-done' : ''}"><td><b>${esc(t.staff_name)}</b></td>
-          <td class="wt"><b>${esc(t.title)}</b>${clProgA(t)}${t.details ? `<div class="mu">${esc(t.details).slice(0, 90)}</div>` : ''}${t.staff_note ? `<div class="mu">💬 ${esc(t.staff_note)}</div>` : ''}</td>
+          <td class="wt"><b>${esc(t.title)}</b>${clProgA(t)}${(t.collab_names || []).length ? ` <span class="pill p-m">🤝 ${t.collab_names.map(esc).join(', ')}</span>` : ''}${t.details ? `<div class="mu">${esc(t.details).slice(0, 90)}</div>` : ''}${t.staff_note ? `<div class="mu">💬 ${esc(t.staff_note)}</div>` : ''}</td>
           <td>${t.category ? wcatIc(t.category) + ' ' + esc(t.category) : '<span class="mu">—</span>'}</td>
           <td><span class="pill ${PRI[t.priority][1]}">${PRI[t.priority][0]}</span></td>
           <td><span class="pill ${TST[t.status][1]}">${TST[t.status][0]}</span></td>
           <td class="${lt ? 'late' : ''}">${d ? shortD(d) : '—'}</td>
           <td>${t.link ? `<a href="${esc(t.link)}" target="_blank" rel="noopener">🔗 Open</a>` : '—'}${t.files ? ` <span class="pill p-m">📎 ${t.files}</span>` : ''}</td>
           <td>${t.source === 'self' ? '<span class="pill p-b">Intern</span>' : '<span class="pill p-y">Aap</span>'}</td>
-          <td style="white-space:nowrap">${t.source !== 'self' ? `<button class="btn btn-o btn-sm" data-act="editTask" data-arg="${esc(t.id)}">✏️</button> <button class="btn btn-r btn-sm" data-act="delTask" data-arg="${esc(t.id)}">🗑</button>` : ''}</td></tr>`; }).join('')
+          <td style="white-space:nowrap"><button class="btn btn-o btn-sm" data-act="wsComments" data-arg="${esc(t.id)}" title="Comments">💬${t.comments ? ' ' + t.comments : ''}</button> ${t.source !== 'self' ? `<button class="btn btn-o btn-sm" data-act="editTask" data-arg="${esc(t.id)}">✏️</button> <button class="btn btn-r btn-sm" data-act="delTask" data-arg="${esc(t.id)}">🗑</button>` : ''}</td></tr>`; }).join('')
         || `<tr><td colspan="9"><div class="empty" style="padding:24px"><div class="e">📭</div><b>Yahan koi kaam nahi</b></div></td></tr>`}</tbody></table></div></div>`;
   } else if (tab === 'files') {
     const list = (WSA.files || []).filter(mine);
@@ -1296,7 +1308,7 @@ function vWs(el, rv) {
       <button class="btn btn-o" style="margin-left:auto" data-act="wsLink">🔗 Link bhejo</button><button class="btn btn-g" data-act="wsUpload">⬆ File bhejo</button></div>
       ${!WSA.files ? '<div class="sk"></div>' : list.map(f => `<div class="card wfrow"><span class="wfic">${fileIcA(f)}</span>
         <div style="flex:1;min-width:0"><b class="wfname" data-act="wsOpen" data-arg="${esc(f.id)}">${esc(f.name)}</b>
-        <div class="mu">${esc(f.staff_name)} · ${f.kind === 'link' ? esc((f.url || '').replace(/^https?:\/\//, '').slice(0, 40)) : fmtSizeA(f.size)} · ${when(f.created_at)}${f.from_admin ? ' · <span class="pill p-y">aapne bheja</span>' : ''}${f.task_title ? ' · 📝 ' + esc(f.task_title).slice(0, 30) : ''}</div>
+        <div class="mu">${esc(f.staff_name)} · ${f.kind === 'link' ? esc((f.url || '').replace(/^https?:\/\//, '').slice(0, 40)) : fmtSizeA(f.size)} · ${when(f.created_at)}${f.from_admin ? ' · <span class="pill p-y">aapne bheja</span>' : ''}${f.task_title ? ' · 📝 ' + esc(f.task_title).slice(0, 30) : ''}${(f.shared_names || []).length ? ' · 👥 ' + f.shared_names.map(esc).join(', ') : ''}</div>
         ${f.note ? `<div class="mu">💬 ${esc(f.note)}</div>` : ''}</div>
         <button class="btn btn-o btn-sm" data-act="wsOpen" data-arg="${esc(f.id)}">${f.kind === 'link' ? 'Open' : 'Dekho'}</button>
         <button class="btn btn-r btn-sm" data-act="wsFileDel" data-arg="${esc(f.id)}">🗑</button></div>`).join('')
@@ -1311,12 +1323,14 @@ function vWs(el, rv) {
         <div class="mu">👥 ${(m.attendee_names || []).map(esc).join(', ') || '—'}${(m.guest_emails || []).length ? ' · ✉️ ' + m.guest_emails.map(esc).join(', ') : ''}</div>
         ${m.agenda ? `<div style="margin-top:4px;font-size:13px;white-space:pre-wrap">${esc(m.agenda)}</div>` : ''}${m.notes ? `<div class="wnote">📝 ${esc(m.notes)}</div>` : ''}
         ${m.status === 'cancelled' ? '' : `<div class="row" style="margin-top:8px">${m.meet_link && !pastM ? `<a class="btn ${live ? 'btn-g' : 'btn-o'} btn-sm" href="${esc(m.meet_link)}" target="_blank" rel="noopener">🎥 Join</a>` : ''}
-          ${!pastM ? `<a class="btn btn-o btn-sm" href="${calLinkA(m)}" target="_blank" rel="noopener">${(m.guest_emails || []).length ? '✉️ Gmail invite bhejo' : '📅 Google Calendar'}</a>` : ''}
+          ${m.meet_link && !pastM ? `<button class="btn btn-o btn-sm" data-act="wsCopy" data-arg="${esc(m.meet_link)}">⧉ Link copy</button>` : ''}${!pastM ? `<a class="btn btn-o btn-sm" href="${calLinkA(m)}" target="_blank" rel="noopener">${(m.guest_emails || []).length ? '✉️ Gmail invite bhejo' : '📅 Google Calendar'}</a>` : ''}
           <button class="btn btn-o btn-sm" data-act="wsMeetNotes" data-arg="${esc(m.id)}">📝 Notes</button>
           ${!pastM ? `<button class="btn btn-o btn-sm" data-act="wsMeet" data-arg="${esc(m.id)}">✏️ Edit</button><button class="btn btn-r btn-sm" data-act="wsMeetCancel" data-arg="${esc(m.id)}">Cancel</button>` : ''}</div>`}</div></div>`; };
-    body = `<div class="toolbar"><span class="mu">Sabko turant notification + 15 min pehle reminder jaata hai.</span><button class="btn btn-g" style="margin-left:auto" data-act="wsMeet" data-arg="">＋ Meeting rakho</button></div>
+    body = `<div class="toolbar"><span class="mu">Jisko bulaya unhe turant notification (time + Meet link), 15 min pehle aur shuru hote hi — notification dabate hi Meet khul jaata hai.</span><button class="btn btn-g" style="margin-left:auto" data-act="wsMeet" data-arg="">＋ Meeting rakho</button></div>
       ${!WSA.meets ? '<div class="sk"></div>' : `<div class="sec"><h2>Aane wali</h2><span class="r">${up.length}</span></div>${up.map(card).join('') || '<div class="mu">Koi meeting nahi.</div>'}
       ${past.length ? `<div class="sec"><h2>Pichhle 30 din</h2></div>${past.map(card).join('')}` : ''}`}`;
+  } else if (tab === 'chat') {
+    body = wsChatHtml();
   } else if (tab !== 'reports') {
     body = wsTools(tab, pid, interns, today);
   } else {
@@ -1337,12 +1351,13 @@ function vWs(el, rv) {
         nextMeet ? new Date(nextMeet.starts_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' }) + ' · ' + esc(nextMeet.title) : 'koi nahi', '', '📅')}
     </div>
     ${WSA.leaves && WSA.leaves.some(l => l.status === 'pending') && tab !== 'leave' ? `<div class="alert info ${rv} d2" style="margin-top:14px"><div class="e">🏖️</div><div><b>${WSA.leaves.filter(l => l.status === 'pending').length} leave request pending</b><span>Approve ya reject karo</span></div><button class="btn btn-g btn-sm" data-act="wst" data-arg="leave">Dekho</button></div>` : ''}
-    <div class="tabs ${rv} d2" style="margin-top:16px">${[['tasks', '▦ Kaam sheet'], ['files', '📎 Files & links'], ['meet', '📅 Meetings'], ['reports', '🗒️ Daily reports'], ['time', '⏱️ Timesheet'], ['content', '📣 Content'],
+    <div class="tabs ${rv} d2" style="margin-top:16px">${[['tasks', '▦ Kaam sheet'], ['chat', '💬 Team chat'], ['files', '📎 Files & links'], ['meet', '📅 Meetings'], ['reports', '🗒️ Daily reports'], ['time', '⏱️ Timesheet'], ['content', '📣 Content'],
       ['bugs', '🐞 Bugs & ideas' + (WSA.issues && WSA.issues.some(i => i.kind === 'bug' && i.severity === 'critical' && i.status === 'open') ? ' 🚨' : '')], ['notes', '📚 Notes'],
       ['leave', '🏖️ Leave' + (WSA.leaves && WSA.leaves.some(l => l.status === 'pending') ? ' (' + WSA.leaves.filter(l => l.status === 'pending').length + ')' : '')]].map(([k, l]) =>
       `<button class="tab ${tab === k ? 'on' : ''}" data-act="wst" data-arg="${k}">${l}</button>`).join('')}</div>
     <div class="${rv} d3">${body}</div>`;
   const s = $('wsq'); if (s) s.oninput = () => { UI.wsq = s.value; rerenderKeep('wsq'); };
+  if (tab === 'chat') { if (WSA.chat) wsChatPaint(); else wsChatLoad(); const ci = $('wChatIn'); if (ci) ci.oninput = () => { UI.wchatDraft = ci.value; }; }
 }
 function wsCsv() {
   const rows = D.tasks.filter(t => t.staff_kind === 'intern' && (!UI.wsp || UI.wsp === 'all' || t.staff_id === UI.wsp));
@@ -1410,6 +1425,7 @@ async function wsMeet(id) {
       { id: 'who', label: 'Team se kisko bulana hai', type: 'checks', options: (WSA.people || []).map(p => [p.id, (p.kind === 'intern' ? '🌱 ' : '💼 ') + p.name]), checked: m ? m.attendees || [] : [] },
       { id: 'guests', label: 'Gmail se bulao (koi bhi — comma se alag)', type: 'textarea', value: m ? (m.guest_emails || []).join(', ') : '', ph: 'riya@gmail.com, amit@gmail.com',
         hint: 'Save ke baad meeting pe “✉️ Gmail invite bhejo” dabao — Google Calendar khulega, Save dabao, Google sabko invite + Meet link email kar dega.' },
+      { id: 'adm', label: 'Admin', type: 'checks', options: [['yes', '👑 Doosre admins ko bhi bulao (notification + link)']], checked: !m || m.with_admin ? ['yes'] : [] },
       { id: 'agenda', label: 'Agenda', type: 'textarea', value: m ? m.agenda || '' : '' }] }, UI.wsp && UI.wsp !== 'all' ? UI.wsp : undefined);
   if (!v) return;
   if (!v.title || !v.date || !v.time) return toast('Title, date aur time daalo');
@@ -1417,7 +1433,7 @@ async function wsMeet(id) {
   const bad = guests.filter(g => !/^[^\s@,;]+@[^\s@,;]+\.[a-z]{2,}$/i.test(g)); if (bad.length) return toast('⚠️ Ye email sahi nahi: ' + bad.join(', '));
   if (!att.length && !guests.length) return toast('Kam se kam ek insaan bulao');
   const r = await rpc('team_meeting_save', { p_id: m ? m.id : null, p_title: v.title, p_agenda: v.agenda || null, p_starts: new Date(`${v.date}T${v.time}:00+05:30`).toISOString(),
-    p_duration: +v.dur || 30, p_link: v.link || null, p_attendees: att, p_with_admin: true, p_guests: guests });
+    p_duration: +v.dur || 30, p_link: v.link || null, p_attendees: att, p_with_admin: (v.adm || []).includes('yes'), p_guests: guests });
   toast(r.ok ? (guests.length ? '📅 Save — ab “✉️ Gmail invite bhejo” dabao' : '📅 Meeting set — sabko notification gaya') : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
 }
 async function wsMeetCancel(id) {
@@ -1565,6 +1581,45 @@ async function wsLeave(id, approve) {
   if (!v) return;
   const r = await rpc('admin_leave_decide', { p_id: id, p_approve: approve, p_note: v.note || null });
   toast(r.ok ? (r.msg || 'Ho gaya ✓') : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
+}
+
+/* ---- round 3: team chat (admin joins the same channel), task comments ---- */
+const linkifyA = t => esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/(^|\s)@([A-Za-zऀ-ॿ]+)/g, '$1<b style="color:var(--blue)">@$2</b>');
+const tmA2 = iso => new Date(iso).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+function wsChatHtml() {
+  return `<div class="card wchat"><div class="wchat-l" id="wChatList"></div>
+    <div class="wchat-in"><textarea id="wChatIn" rows="2" placeholder="Team ko message…  @naam likho to usko notification jaayega (Enter = bhejo)" maxlength="2000">${esc(UI.wchatDraft || '')}</textarea>
+    <button class="btn btn-g" data-act="wChatSend">Bhejo ➤</button></div></div>`;
+}
+function wsChatPaint() {
+  const box = $('wChatList'); if (!box) return;
+  const near = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+  box.innerHTML = (WSA.chat || []).map(m => `<div class="wcm ${m.mine ? 'mine' : ''}"><div class="wcb"><div class="wcn">${esc(m.author_name)}${m.author_kind === 'admin' ? ' · admin' : m.author_kind === 'intern' ? ' · intern' : ''} <span>${tmA2(m.created_at)}</span>
+      <button class="wcdel" data-act="wChatDel" data-arg="${esc(m.id)}">✕</button></div><div class="wct">${linkifyA(m.body)}</div></div></div>`).join('')
+    || '<div class="empty" style="padding:30px"><div class="e">💬</div><b>Abhi koi message nahi</b></div>';
+  if (near || !box.dataset.init) { box.scrollTop = box.scrollHeight; box.dataset.init = '1'; }
+}
+async function wsChatLoad() { const r = await rpc('team_chat', { p_limit: 200 }); if (r.ok) { WSA.chat = r.data || []; if ($('wChatList')) wsChatPaint(); } }
+async function wsChatSend() {
+  const ta = $('wChatIn'); const body = ta ? ta.value.trim() : ''; if (!body) return;
+  ta.value = ''; UI.wchatDraft = ''; const r = await rpc('team_chat_send', { p_body: body });
+  if (!r.ok) { ta.value = body; return toast('⚠️ ' + (r.error || 'Nahi gaya')); }
+  (WSA.chat = WSA.chat || []).push(r.data); const b = $('wChatList'); if (b) b.dataset.init = ''; wsChatPaint(); ta.focus();
+}
+async function wsChatDel(id) { const r = await rpc('team_chat_delete', { p_id: id }); if (!r.ok) return toast('⚠️ ' + (r.error || 'Nahi hua')); WSA.chat = WSA.chat.filter(m => m.id !== id); wsChatPaint(); }
+setInterval(() => { if (VIEW === 'ws' && UI.wst === 'chat' && !document.hidden) wsChatLoad(); }, 8000);
+async function wsComments(id) {
+  const t = D.tasks.find(x => x.id === id);
+  const r = await rpc('task_comments_list', { p_task: id });
+  const list = r.ok ? r.data || [] : [];
+  const v = await modal({ title: '💬 ' + (t ? t.title : 'Comments').slice(0, 60),
+    sub: (t && (t.collab_names || []).length ? '🤝 ' + esc(t.staff_name) + ' + ' + t.collab_names.map(esc).join(', ') + '<br>' : '')
+      + (list.map(c => `<div class="wcmt"><b>${esc(c.author_name)}</b> <span class="mu">${tmA2(c.created_at)}</span><div>${linkifyA(c.body)}</div></div>`).join('') || '<span class="mu">Abhi koi comment nahi.</span>'),
+    ok: 'Comment bhejo', fields: [{ id: 'body', label: 'Aapka comment', type: 'textarea', ph: 'Jaise: accha hai, bas logo bada karo' }] });
+  if (!v || !v.body) return;
+  const a = await rpc('task_comment_add', { p_task: id, p_body: v.body });
+  toast(a.ok ? '💬 Bhej diya — intern ko notification gaya' : '⚠️ ' + (a.error || 'Nahi hua'));
+  if (a.ok && t) { t.comments = (t.comments || 0) + 1; render(false); }
 }
 
 /* ---------- Sales targets ---------- */
@@ -1830,7 +1885,7 @@ function openNotifs() {
       <button class="btn btn-o btn-sm" data-act="readAll">✓ Sab padh liya</button></div>` +
     NOTIFS.map(n => `<div class="card nrow ${n.is_read ? '' : 'unread'}" data-act="readOne" data-arg="${esc(n.id)}">
       <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><span style="font-size:20px">${NICON[n.type] || '🔔'}</span>
-        <div style="flex:1;min-width:0"><b style="display:block">${esc(n.title)}</b><span class="mu" style="display:block;margin-top:2px">${esc(n.message)}</span></div>
+        <div style="flex:1;min-width:0"><b style="display:block">${esc(n.title)}</b><span class="mu" style="display:block;margin-top:2px;white-space:pre-line;overflow-wrap:anywhere">${esc(n.message)}</span>${n.url ? `<a class="btn btn-g btn-sm" style="margin-top:8px" href="${esc(n.url)}" target="_blank" rel="noopener">🎥 Meeting join karo</a>` : ''}</div>
         <span class="mu" style="white-space:nowrap">${when(n.created_at)}</span></div></div>`).join('')
     : `<div class="empty"><div class="e">🔕</div><b>Abhi koi notification nahi</b></div>`);
   $('ov').classList.add('show'); $('drawer').classList.add('show'); $('drawer').setAttribute('aria-hidden', 'false');
@@ -2187,6 +2242,10 @@ document.addEventListener('click', e => {
     case 'wsNote': wsNote(a || null); break;
     case 'wsPin': wsPin(a); break;
     case 'wsLeave': wsLeave(a, el.dataset.arg2 === '1'); break;
+    case 'wChatSend': wsChatSend(); break;
+    case 'wChatDel': wsChatDel(a); break;
+    case 'wsComments': wsComments(a); break;
+    case 'wsCopy': (navigator.clipboard ? navigator.clipboard.writeText(a) : Promise.reject()).then(() => toast('⧉ Link copy ho gaya'), () => toast(a)); break;
     case 'newMeet': window.open('https://meet.google.com/new', '_blank', 'noopener'); break;
     case 'editTask': editTask(a); break;
     case 'reopenTask': act('admin_reopen_task', { p_task: a }); break;
@@ -2201,6 +2260,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && (e.target.id === 'pw' || e.target.id === 'em')) login();
+  if (e.key === 'Enter' && !e.shiftKey && e.target.id === 'wChatIn') { e.preventDefault(); wsChatSend(); }
   if (e.key === 'Enter' && e.target.dataset && e.target.dataset.price) e.target.blur();
   if (e.key === 'Enter' && e.target.closest && e.target.closest('#modal') && e.target.tagName === 'INPUT') modalOk();
   if (e.key === 'Escape') { if ($('modal').classList.contains('show')) modalCancel(); else closeAll(); }

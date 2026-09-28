@@ -6,7 +6,7 @@
 <title>RozBazaar Staff</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sqTyPyjK8AgtLyJL1Nc6B8IwqI5ahD1NcEJXF2YeZsY=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+lCD2X1zCo4RoWpa4na+g0To7Zworbn/WI2tKcnMFfU=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -306,6 +306,78 @@ td.acts .btn+.btn{margin-left:6px}
 .ncard{display:flex;flex-direction:column}.ncard.pin{border:2px solid #F2D14B;background:#FFFCEB}
 .nic{font-size:20px}.nbody{margin-top:8px;font-size:13px;white-space:pre-wrap;color:var(--tx2);max-height:180px;overflow:auto;overflow-wrap:anywhere}
 .lrow{display:flex;gap:14px;align-items:center;margin-bottom:10px}
+.nav-h{font-size:10.5px;font-weight:800;color:var(--mut);letter-spacing:1.6px;text-transform:uppercase;padding:14px 12px 4px}
+.av{width:30px;height:30px;border-radius:50%;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;box-shadow:0 0 0 2px #fff}
+.avs{display:flex}.avs .av{margin-left:-8px}.avs .av:first-child{margin-left:0}
+.person{display:inline-flex;align-items:center;gap:7px;background:var(--grey);border-radius:20px;padding:3px 10px 3px 3px;font-size:13px;font-weight:700}
+.tag.tg-sh{background:#EEE8FB;color:#5B3FA3}
+.ment{color:var(--blue);font-weight:800}
+.lnk{margin-left:auto;color:var(--blue);font-weight:800;font-size:12.5px}
+/* home */
+.hhero{display:flex;gap:18px;align-items:center;background:linear-gradient(135deg,#1c8a3b 0%,#0f5a26 60%,#101B30 130%);color:#fff;border-radius:24px;padding:24px 26px;box-shadow:var(--shl);position:relative;overflow:hidden}
+.hhero::after{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.07)}
+.hhero h2{font-size:27px;font-weight:800;letter-spacing:-.8px;line-height:1.15;margin-top:2px}
+.hhero p{color:rgba(255,255,255,.88);margin-top:6px;font-size:14.5px}.hhero p b{color:#fff}
+.hdate{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.hb1{background:#fff;color:var(--g-dk)}.hb2{background:rgba(255,255,255,.16);color:#fff}.hb2:hover{background:rgba(255,255,255,.26)}
+.hbdg{font-style:normal;background:var(--red);color:#fff;border-radius:10px;padding:0 6px;font-size:11px;margin-left:4px}
+.hring{z-index:1;background:conic-gradient(#9BE36B calc(var(--p)*1%),rgba(255,255,255,.2) 0)}
+.hring i{background:#135f2b;color:#fff;flex-direction:column;line-height:1}.hring small{font-size:9.5px;font-weight:700;opacity:.8;margin-top:2px}
+.hgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:16px}
+.hgrid .span2{grid-column:span 2}
+@media (max-width:1100px){.hgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.hgrid{grid-template-columns:1fr}.hgrid .span2{grid-column:auto}.hhero{flex-direction:column-reverse;align-items:flex-start;padding:20px}.hhero h2{font-size:22px}}
+.hcard{display:flex;flex-direction:column;min-height:150px}
+.hcard .li{box-shadow:none;border:1px solid var(--line);margin-bottom:6px}
+.hc-h{display:flex;align-items:center;gap:8px;margin-bottom:10px}.hc-h b{font-size:14.5px}
+.hcard.hlive{border:2px solid var(--g);background:linear-gradient(160deg,#fff,var(--lime-s))}
+.hcard.hwarn{background:linear-gradient(160deg,#fff,#FFF4E5)}
+.hbig{font-size:26px;font-weight:900;letter-spacing:-.6px;color:var(--navy)}
+.hm-t{font-size:16px;font-weight:800}.hm-cd{margin-top:8px;font-weight:800;color:var(--g-dk)}
+.hempty{color:var(--mut);font-size:13px;text-align:center;padding:14px 6px;margin:auto 0}
+.hmsg{display:flex;gap:9px;padding:7px 0;border-top:1px solid var(--line)}.hmsg:first-of-type{border-top:0}
+.hmsg-b{font-size:13px;color:var(--tx2);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hsh{padding:8px 10px;border-radius:10px;background:var(--grey);margin-bottom:6px;cursor:pointer;font-size:13px}.hsh:hover{background:var(--lime-s)}
+.hsh div{margin-top:4px}
+.qlinks{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:16px}
+@media (max-width:640px){.qlinks{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.ql{background:#fff;border-radius:16px;padding:14px 6px;box-shadow:var(--sh);font-size:12.5px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s var(--sp)}
+.ql span{font-size:22px}.ql:hover{transform:translateY(-2px)}.ql:active{transform:scale(.95)}
+/* chat */
+.chat{padding:0;display:flex;flex-direction:column;height:calc(100vh - 150px);min-height:420px;overflow:hidden}
+.chat-h{display:flex;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+.chat-l{flex:1;overflow-y:auto;padding:14px 16px;background:linear-gradient(180deg,#FBFAF6,#fff);overscroll-behavior:contain}
+.cdate{text-align:center;margin:12px 0 8px}.cdate span{background:var(--grey);border-radius:20px;padding:3px 12px;font-size:11px;font-weight:800;color:var(--tx2)}
+.cm{display:flex;gap:8px;align-items:flex-end;margin-top:10px;max-width:78%}.cm.cont{margin-top:3px}
+.cm.mine{margin-left:auto;flex-direction:row-reverse}.avsp{width:32px;flex-shrink:0}.cm.mine .avsp{display:none}
+.cb{background:#fff;border:1px solid var(--line);border-radius:16px 16px 16px 5px;padding:8px 12px;min-width:0;box-shadow:0 1px 2px rgba(16,27,48,.05)}
+.cm.mine .cb{background:var(--g);color:#fff;border-color:var(--g);border-radius:16px 16px 5px 16px}
+.cm.mine .cb a,.cm.mine .ment{color:#fff;text-decoration:underline}
+.cn{font-size:12px;font-weight:800;color:var(--g-dk);margin-bottom:2px}
+.ct{font-size:14px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;font-weight:600}
+.cmeta{font-size:10.5px;opacity:.65;margin-top:3px;text-align:right}
+.cdel{font-size:10.5px;text-decoration:underline;color:inherit;opacity:.9}
+.chat-ment{display:flex;gap:6px;overflow-x:auto;padding:8px 12px 0;scrollbar-width:none}.chat-ment .chip{padding:4px 10px;font-size:12px}
+.chat-in{display:flex;gap:8px;padding:10px 12px 12px;align-items:flex-end}
+.chat-in textarea{flex:1;border:1.5px solid var(--line);border-radius:14px;padding:11px 14px;font:inherit;resize:none;max-height:140px;outline:0}
+.chat-in textarea:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(30,142,62,.12)}
+.chat-in .btn{border-radius:14px;padding:11px 16px;font-size:16px}
+@media (max-width:860px){.chat{height:calc(100vh - 205px)}.cm{max-width:88%}}
+/* comments */
+.cmt{display:flex;gap:9px;padding:9px 0;border-top:1px solid var(--line)}.cmt:first-child{border-top:0}
+.cmt-b{font-size:13.5px;margin-top:2px;white-space:pre-wrap;overflow-wrap:anywhere}.cmt .cdel{color:var(--red);margin-left:6px}
+/* phone bottom bar (interns) */
+.bnav{display:none}
+@media (max-width:860px){
+  .bnav:not(.hide){display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);
+    border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+  .bnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:10.5px;font-weight:800;color:var(--mut);position:relative;padding:4px 0}
+  .bnav button span{font-size:20px;line-height:1.1;transition:transform .2s var(--sp)}
+  .bnav button.on{color:var(--g-dk)}.bnav button.on span{transform:translateY(-2px) scale(1.12)}
+  .bn-b{position:absolute;top:0;left:calc(50% + 6px);background:var(--red);color:#fff;font-style:normal;font-size:9.5px;border-radius:9px;padding:0 5px;min-width:16px;text-align:center}
+  #app.intern .content{padding-bottom:96px}
+  #app.intern ~ .toast{bottom:84px}
+}
 @media (max-width:560px){
   .hero-t{gap:12px;padding:14px}.wk{display:none}.ring.big{width:62px;height:62px}.ring.big i{width:50px;height:50px;font-size:14px}
   .hero-mid{min-width:0}.hero-mid>b{font-size:16px}.hstats{gap:4px 12px;font-size:12px}
@@ -490,20 +562,23 @@ td.acts .btn+.btn{margin-left:6px}
   <aside class="side">
     <svg class="wm wm-side" role="img" aria-label="RozBazaar"><use href="#wordmark"/></svg>
     <div class="role">STAFF</div>
-    <button class="nav hide" data-kind="intern" data-act="go" data-arg="welcome"><span class="ic">🌱</span>Welcome</button>
+    <button class="nav hide" data-kind="intern" data-act="go" data-arg="welcome"><span class="ic">🏠</span>Home</button>
     <button class="nav on" data-kind="sales" data-act="go" data-arg="today"><span class="ic">☀️</span>Aaj ka plan</button>
     <button class="nav" data-kind="sales" data-act="go" data-arg="orders"><span class="ic">📋</span>Orders<span class="badge hide" id="bOrders"></span></button>
     <button class="nav" data-kind="sales" data-act="go" data-arg="vendors"><span class="ic">🧑‍🌾</span>Vendors</button>
     <button class="nav" data-kind="sales" data-act="go" data-arg="sale"><span class="ic">💰</span>Sale</button>
     <button class="nav" data-kind="sales" data-act="go" data-arg="customers"><span class="ic">👥</span>Customers</button>
     <button class="nav" data-act="go" data-arg="tasks"><span class="ic">📝</span><span data-h="Mere kaam" data-e="My tasks">Mere kaam</span><span class="badge hide" id="bTasks"></span></button>
-    <button class="nav hide" data-kind="intern" data-act="go" data-arg="files"><span class="ic">📎</span>Files &amp; links</button>
+    <button class="nav" data-act="go" data-arg="chat"><span class="ic">💬</span>Team chat<span class="badge hide" id="bChat"></span></button>
     <button class="nav" data-act="go" data-arg="meet"><span class="ic">📅</span><span data-h="Meetings" data-e="Meetings">Meetings</span><span class="badge hide" id="bMeet"></span></button>
-    <button class="nav hide" data-kind="intern" data-act="go" data-arg="report"><span class="ic">🗒️</span>Daily report<span class="badge hide" id="bReport"></span></button>
+    <div class="nav-h hide" data-kind="intern">Work</div>
+    <button class="nav hide" data-kind="intern" data-act="go" data-arg="files"><span class="ic">📎</span>Files &amp; links<span class="badge hide" id="bFiles"></span></button>
     <button class="nav hide" data-kind="intern" data-act="go" data-arg="timer"><span class="ic">⏱️</span>Work timer<span class="badge hide" id="bTimer"></span></button>
     <button class="nav hide" data-kind="intern" data-act="go" data-arg="content"><span class="ic">📣</span>Content calendar</button>
     <button class="nav hide" data-kind="intern" data-act="go" data-arg="bugs"><span class="ic">🐞</span>Bugs &amp; ideas<span class="badge hide" id="bBugs"></span></button>
     <button class="nav hide" data-kind="intern" data-act="go" data-arg="notes"><span class="ic">📚</span>Team notes</button>
+    <div class="nav-h hide" data-kind="intern">Me</div>
+    <button class="nav hide" data-kind="intern" data-act="go" data-arg="report"><span class="ic">🗒️</span>Daily report<span class="badge hide" id="bReport"></span></button>
     <button class="nav hide" data-kind="intern" data-act="go" data-arg="leave"><span class="ic">🏖️</span>Leave</button>
     <button class="nav" data-act="go" data-arg="account"><span class="ic">🔑</span><span data-h="Mera account" data-e="My account">Mera account</span></button>
     <div class="foot">
@@ -541,6 +616,7 @@ td.acts .btn+.btn{margin-left:6px}
       <section class="scr" id="v-bugs"></section>
       <section class="scr" id="v-notes"></section>
       <section class="scr" id="v-leave"></section>
+      <section class="scr" id="v-chat"></section>
     </div>
   </div>
 </div>
@@ -551,6 +627,13 @@ td.acts .btn+.btn{margin-left:6px}
   <div class="dr-b" id="drBody"></div>
 </aside>
 <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+<nav class="bnav hide" id="bnav" aria-label="Quick menu">
+  <button data-act="go" data-arg="welcome" data-bn="welcome"><span>🏠</span>Home</button>
+  <button data-act="go" data-arg="tasks" data-bn="tasks"><span>📝</span>Tasks<i class="bn-b hide" id="bnTasks"></i></button>
+  <button data-act="go" data-arg="chat" data-bn="chat"><span>💬</span>Chat<i class="bn-b hide" id="bnChat"></i></button>
+  <button data-act="go" data-arg="meet" data-bn="meet"><span>📅</span>Meet</button>
+  <button data-act="openNav"><span>☰</span>More</button>
+</nav>
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
@@ -653,11 +736,12 @@ function showApp() {
   $('login').classList.add('hide'); $('app').classList.remove('hide');
   $('meName').textContent = ME.name || 'Staff'; $('mePhone').textContent = [ME.role, ME.phone].filter(Boolean).join(' · ') || (ME.is_admin ? 'Admin' : '');
   $('meAv').textContent = (ME.name || 'S').trim()[0].toUpperCase();
-  document.querySelectorAll('.nav[data-kind]').forEach(b => b.classList.toggle('hide', b.dataset.kind !== (isIntern() ? 'intern' : 'sales')));
+  document.querySelectorAll('.side [data-kind]').forEach(b => b.classList.toggle('hide', b.dataset.kind !== (isIntern() ? 'intern' : 'sales')));
+  $('bnav').classList.toggle('hide', !isIntern());
   $('app').classList.toggle('intern', isIntern());
   document.querySelectorAll('[data-e]').forEach(x => { x.textContent = isIntern() ? x.dataset.e : x.dataset.h; });
   VIEW = isIntern() ? 'welcome' : 'today';
-  go(VIEW); refresh(); refreshPushSub(); if (isIntern()) { wsLoad('timer'); wsLoad('bugs'); }
+  go(VIEW); refresh(); refreshPushSub(); wsLoad('chat'); if (isIntern()) homeLoad();
   clearInterval(timer);
   timer = setInterval(() => { if (!document.hidden && !$('drawer').classList.contains('show')) refresh(true); }, 45_000);
 }
@@ -695,6 +779,7 @@ async function refresh(silent) {
   if (tg.ok) TARGETS = tg.data || [];
   const openTasks = TASKS.filter(t => t.status === 'todo' || t.status === 'doing').length, bt = $('bTasks');
   bt.classList.toggle('hide', !openTasks); bt.textContent = openTasks;
+  const bnt = $('bnTasks'); if (bnt) { bnt.classList.toggle('hide', !openTasks); bnt.textContent = openTasks > 9 ? '9+' : openTasks; }
   const first = !LOADED; LOADED = true;
   let alerted = false;
   if (!intern) {
@@ -715,6 +800,7 @@ async function refresh(silent) {
   }
   $('stamp').textContent = L('Update ', 'Updated ') + new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
   if (!(silent && typing())) render(false);   /* don't wipe what someone is typing */
+  wsLoad('chat', true); if (intern) homeLoad(true);
   if (!silent && !first && !alerted) toast(L('Naya data aa gaya ✓', 'Up to date ✓'));
 }
 /* a notification we haven't shown yet arrived while the page is open */
@@ -732,9 +818,10 @@ const TITLES = {
   vendors: ['Vendors', 'kaun kya bech raha, kitna bika'], sale: ['Sale', 'kitna bika — din, type, item, vendor, gaon'],
   customers: ['Customers', 'naam pe click karo — saare orders'], account: ['Mera account', 'naam, password, notifications'],
   meet: ['Meetings', 'team ke saath Google Meet'], files: ['Files & links', ''], report: ['Daily report', ''], timer: ['Work timer', ''],
-  content: ['Content calendar', ''], bugs: ['Bugs & ideas', ''], notes: ['Team notes', ''], leave: ['Leave', '']
+  content: ['Content calendar', ''], bugs: ['Bugs & ideas', ''], notes: ['Team notes', ''], leave: ['Leave', ''],
+  chat: ['Team chat', 'poori team se baat karo — @naam likho to usko notification jaayega']
 };
-const TITLES_EN = { welcome: ['Welcome', 'Welcome to RozBazaar'], tasks: ['My tasks', 'your own to-do sheet + tasks from the admin'],
+const TITLES_EN = { welcome: ['Home', 'your day at a glance'], chat: ['Team chat', 'talk to the whole team — type @name to ping someone'], tasks: ['My tasks', 'your own to-do sheet + tasks from the admin'],
   files: ['Files & links', 'share files and links with the admin'], meet: ['Meetings', 'schedule a Google Meet with the team'],
   report: ['Daily report', 'what you did today, what\'s next, anything blocking you'],
   timer: ['Work timer', 'start when you begin, stop when you finish — your hours add up by themselves'],
@@ -747,9 +834,11 @@ function go(v) {
   VIEW = v;
   document.querySelectorAll('.scr').forEach(x => x.classList.toggle('on', x.id === 'v-' + v));
   document.querySelectorAll('.nav[data-arg]').forEach(b => b.classList.toggle('on', b.dataset.arg === v));
+  document.querySelectorAll('.bnav [data-bn]').forEach(b => b.classList.toggle('on', b.dataset.bn === v));
   const tt = (isIntern() && TITLES_EN[v]) || TITLES[v]; $('pgTitle').textContent = tt[0]; $('pgSub').textContent = tt[1];
   if (v === 'orders') { NEWCOUNT = 0; $('bOrders').classList.add('hide'); }
-  if (['files', 'meet', 'report', 'timer', 'content', 'bugs', 'notes', 'leave'].includes(v)) wsLoad(v);
+  if (['files', 'meet', 'report', 'timer', 'content', 'bugs', 'notes', 'leave', 'chat'].includes(v)) wsLoad(v, v === 'chat');
+  if (v === 'welcome' && isIntern()) homeLoad();
   document.body.classList.remove('nav-open');
   window.scrollTo(0, 0); render(true);
 }
@@ -766,7 +855,8 @@ function render(animate) {
   if (VIEW === 'bugs') return vBugs(el, rv);
   if (VIEW === 'notes') return vNotes(el, rv);
   if (VIEW === 'leave') return vLeave(el, rv);
-  if (VIEW === 'welcome') return vWelcome(el, rv);
+  if (VIEW === 'welcome') return isIntern() ? vHome(el, rv) : vWelcome(el, rv);
+  if (VIEW === 'chat') return vChat(el, rv);
   if (!D) { el.innerHTML = '<div class="sk"></div><div class="sk"></div><div class="sk"></div>'; return; }
   ({ today: vToday, orders: vOrders, vendors: vVendors, sale: vSale, customers: vCustomers })[VIEW](el, rv);
 }
@@ -1174,7 +1264,8 @@ async function wsLoad(v, force) {
   }
   if (v === 'report' && (force || !WS.reports)) { const r = await rpc('team_reports', { p_days: 60 }); WS.reports = r.ok ? r.data || [] : []; }
   await wsLoad2(v, force);
-  if (VIEW === v && !(typing() && !force)) render(false);
+  if (v === 'chat' && VIEW === 'chat' && $('chatList')) { chatPaint(); wsBadges(); return; }
+  if ((VIEW === v || (VIEW === 'welcome' && isIntern())) && !(typing() && !force)) render(false);
   wsBadges();
 }
 function wsBadges() {
@@ -1187,7 +1278,7 @@ function wsBadges() {
 /* ---------- task sheet ---------- */
 function sheetRows() {
   const q = (WS.q || '').toLowerCase(), sf = WS.view !== 'sheet' && WS.sf === 'open' ? 'all' : WS.sf;   /* board + list always show Done (list folds it) */
-  return TASKS.filter(t => (sf === 'all' || (sf === 'open' ? (t.status === 'todo' || t.status === 'doing') : sf === 'admin' ? t.source === 'admin' : t.status === sf))
+  return TASKS.filter(t => (sf === 'all' || (sf === 'open' ? (t.status === 'todo' || t.status === 'doing') : sf === 'admin' ? t.source === 'admin' : sf === 'shared' ? (t.owner === false || (t.collab_names || []).length > 0) : t.status === sf))
     && (WS.scat === 'all' || (t.category || 'Other') === WS.scat)
     && (!q || [t.title, t.details, t.category].some(x => String(x || '').toLowerCase().includes(q))));
 }
@@ -1206,7 +1297,7 @@ function clProg(t) {
   return `<span class="clp" title="${n} of ${c.length} steps done"><span class="clbar"><i style="width:${Math.round(n / c.length * 100)}%"></i></span>${n}/${c.length}</span>`;
 }
 function listItem(t, today) {
-  const done = t.status === 'done', mine = t.source === 'self';
+  const done = t.status === 'done';
   return `<div class="li pr-${t.priority} ${done ? 'is-done' : ''} ${t.status === 'not_done' ? 'is-nd' : ''}">
     <button class="tick ${done ? 'on' : ''} ${t.status === 'doing' ? 'half' : ''}" data-act="tick" data-arg="${t.id}" aria-label="${done ? 'Mark not done' : 'Mark done'}">${done ? '✓' : ''}</button>
     <div class="li-main" data-act="taskOpen" data-arg="${t.id}">
@@ -1214,7 +1305,7 @@ function listItem(t, today) {
       <div class="li-m">${t.status === 'doing' ? '<span class="pill p-y">🔄 Doing</span>' : ''}${!done ? dueChip(t.due_date, t.status === 'doing' ? 'todo' : t.status, today) : ''}
         ${t.category ? `<span class="tag">${catIc(t.category)} ${esc(t.category)}</span>` : ''}${clProg(t)}
         ${t.link ? '<span class="tag">🔗 link</span>' : ''}${t.files ? `<span class="tag">📎 ${t.files}</span>` : ''}${t.details ? '<span class="tag">📝</span>' : ''}
-        ${mine ? '' : '<span class="pill p-y">From admin</span>'}</div>
+        ${sharedTag(t)}${t.comments ? `<span class="tag">💬 ${t.comments}</span>` : ''}${t.source === 'admin' ? '<span class="pill p-y">From admin</span>' : ''}</div>
     </div>
     <span class="pdot" title="${t.priority} priority"></span></div>`;
 }
@@ -1235,19 +1326,19 @@ function vSheet(el, rv) {
   const catSel = (t, dis) => `<select class="cell-sel" data-cell="category" data-id="${t.id}" ${dis}><option value="">—</option>${CATS.map(([c, i]) => `<option value="${c}" ${t.category === c ? 'selected' : ''}>${i} ${c}</option>`).join('')}</select>`;
   const dueCell = (t, dis) => { const d = t.due_date ? String(t.due_date).slice(0, 10) : ''; const lateC = d && d < today && (t.status === 'todo' || t.status === 'doing');
     return `<input type="date" class="cell-in ${lateC ? 'late' : ''}" data-cell="due_date" data-id="${t.id}" value="${d}" ${dis}>`; };
-  const row = t => { const mine = t.source === 'self', dis = mine ? '' : 'disabled';
+  const row = t => { const mine = isOwner(t), dis = mine ? '' : 'disabled';
     return `<tr class="${t.status === 'done' ? 'is-done' : ''}">
       <td class="c-chk"><input type="checkbox" data-act="taskCheck" data-arg="${t.id}" ${t.status === 'done' ? 'checked' : ''} aria-label="Done"></td>
       <td class="c-title">${mine ? `<input class="cell-in title" data-cell="title" data-id="${t.id}" value="${esc(t.title)}" maxlength="200">` : `<b>${esc(t.title)}</b>`}
         ${t.details || clOf(t).length ? `<div class="mu cell-note">${clProg(t)} ${esc(t.details || '').slice(0, 100)}</div>` : ''}</td>
       <td>${catSel(t, dis)}</td><td>${prSel(t, dis)}</td><td>${stSel(t)}</td><td>${dueCell(t, dis)}</td>
       <td class="c-link">${t.link ? `<a href="${esc(t.link)}" target="_blank" rel="noopener" title="${esc(t.link)}">🔗 Open</a>` : '<span class="mu">—</span>'}${t.files ? ` <span class="pill p-m">📎 ${t.files}</span>` : ''}</td>
-      <td>${mine ? '<span class="pill p-b">Me</span>' : '<span class="pill p-y">Admin</span>'}</td>
+      <td>${t.source === 'admin' ? '<span class="pill p-y">Admin</span>' : t.owner === false ? `<span class="pill p-m">🤝 ${esc(t.owner_name || '')}</span>` : '<span class="pill p-b">Me</span>'}${(t.collab_names || []).length && t.owner !== false ? ' <span class="pill p-m">🤝 ' + t.collab_names.length + '</span>' : ''}</td>
       <td class="c-act"><button class="btn btn-o btn-sm" data-act="taskOpen" data-arg="${t.id}" title="Open">⋯</button></td></tr>`; };
-  const card = t => { const mine = t.source === 'self', i = STCOL.findIndex(c => c[0] === t.status);
+  const card = t => { const mine = t.source !== 'admin', i = STCOL.findIndex(c => c[0] === t.status);
     return `<div class="card bcard pr-${t.priority}" data-act="taskOpen" data-arg="${t.id}">
       <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><b style="flex:1;min-width:0">${esc(t.title)}</b>${mine ? '' : '<span class="pill p-y">Admin</span>'}</div>
-      <div class="row" style="margin-top:8px">${t.category ? `<span class="tag">${catIc(t.category)} ${esc(t.category)}</span>` : ''}${dueChip(t.due_date, t.status === 'doing' ? 'todo' : t.status, today)}${clProg(t)}${t.link ? '<span class="tag">🔗</span>' : ''}</div>
+      <div class="row" style="margin-top:8px">${t.category ? `<span class="tag">${catIc(t.category)} ${esc(t.category)}</span>` : ''}${dueChip(t.due_date, t.status === 'doing' ? 'todo' : t.status, today)}${clProg(t)}${t.link ? '<span class="tag">🔗</span>' : ''}${sharedTag(t)}${t.comments ? `<span class="tag">💬 ${t.comments}</span>` : ''}</div>
       <div class="row" style="margin-top:10px;justify-content:space-between">
         ${i > 0 ? `<button class="btn btn-o btn-sm" data-act="taskMove" data-arg="${t.id}" data-arg2="${STCOL[i - 1][0]}">← ${STCOL[i - 1][1]}</button>` : '<span></span>'}
         ${i >= 0 && i < 2 ? `<button class="btn btn-g btn-sm" data-act="taskMove" data-arg="${t.id}" data-arg2="${STCOL[i + 1][0]}">${STCOL[i + 1][1]} →</button>` : ''}</div></div>`; };
@@ -1292,7 +1383,7 @@ function vSheet(el, rv) {
         <button class="btn btn-o btn-sm" data-act="csvSheet" title="Download — opens in Google Sheets / Excel">⬇ CSV</button>
         <button class="btn btn-g btn-sm" data-act="taskOpen" data-arg="">＋ New task</button>
       </div>
-      <div class="chips">${[['open', 'Open'], ['doing', 'Doing'], ['done', 'Done'], ['not_done', 'Not done'], ['admin', 'From admin'], ['all', 'All']].map(([k, l]) =>
+      <div class="chips">${[['open', 'Open'], ['doing', 'Doing'], ['done', 'Done'], ['not_done', 'Not done'], ['admin', 'From admin'], ['shared', '🤝 Shared'], ['all', 'All']].map(([k, l]) =>
         `<button class="chip ${WS.sf === k ? 'on' : ''}" data-act="sf" data-arg="${k}">${l}</button>`).join('')}
         <span style="width:1px;background:var(--line);margin:0 2px"></span>
         ${[['all', 'All types']].concat(CATS.map(([c, i]) => [c, i + ' ' + c])).map(([k, l]) => `<button class="chip ${WS.scat === k ? 'on' : ''}" data-act="scat" data-arg="${k}">${l}</button>`).join('')}</div>
@@ -1325,7 +1416,7 @@ async function sheetAdd() {
 async function cellSave(id, cell, val) {
   const t = TASKS.find(x => x.id === id); if (!t) return;
   if (cell === 'status') return taskMove(id, val);
-  if (t.source !== 'self') return;
+  if (!isOwner(t)) return;
   const nt = { ...t, [cell]: val || null };
   if (cell === 'title' && !String(val).trim()) { render(false); return toast('A task needs a name'); }
   const r = await rpc('staff_task_save', { p_id: id, p_title: nt.title, p_details: nt.details, p_priority: nt.priority,
@@ -1350,11 +1441,11 @@ async function taskMove(id, st) {
 }
 /* task detail / new task (drawer) */
 async function taskDrawer(id) {
-  const t = id ? TASKS.find(x => x.id === id) : null, mine = !t || t.source === 'self';
+  const t = id ? TASKS.find(x => x.id === id) : null, mine = isOwner(t);
   if (!WS.files) await wsLoad('files');
   const files = t ? (WS.files || []).filter(f => f.task_id === t.id) : [];
   $('drawer').dataset.kind = 'task';
-  $('drTitle').textContent = t ? (mine ? 'Edit task' : 'Task from the admin') : 'New task';
+  $('drTitle').textContent = t ? (mine ? 'Edit task' : t.source === 'admin' ? 'Task from the admin' : '🤝 Shared by ' + (t.owner_name || 'a teammate')) : 'New task';
   $('drBody').innerHTML = `
     ${!mine ? `<div class="card" style="margin-bottom:12px;background:#FFF9DD"><b>${esc(t.title)}</b>${t.details ? `<p class="mu" style="margin-top:6px;white-space:pre-wrap">${esc(t.details)}</p>` : ''}
       <div class="row" style="margin-top:10px">${dueChip(t.due_date, t.status === 'doing' ? 'todo' : t.status, istDay())}<span class="pill ${TST[t.status][1]}">${tstL(t.status)}</span></div>
@@ -1372,12 +1463,13 @@ async function taskDrawer(id) {
       ${t ? `<button class="btn btn-r" data-act="taskDel" data-arg="${t.id}">🗑 Delete</button>` : ''}</div>`}
     ${!mine ? `<label class="lbl">Status</label><div class="chips">${[['todo', '📝 To do'], ['doing', '🔄 Doing'], ['done', '✅ Done'], ['not_done', '❌ Not done']].map(([v, l]) =>
         `<button class="chip ${t.status === v ? 'on' : ''}" data-act="taskMove" data-arg="${t.id}" data-arg2="${v}">${l}</button>`).join('')}</div>` : ''}
-    ${t ? `<div id="clWrap">${clHtml(t)}</div>` : '<p class="mu" style="margin-top:14px">☑️ After you add the task you can break it into steps (a checklist) and attach files.</p>'}
+    ${t ? `<div id="clWrap">${clHtml(t)}</div>${peopleHtml(t)}` : '<p class="mu" style="margin-top:14px">☑️ After you add the task you can break it into steps, add teammates, attach files and comment.</p>'}
     ${t ? `<div class="sec" style="margin-top:22px"><h2>📎 Files for this task</h2><span class="act row"><button class="btn btn-o btn-sm" data-act="addLink" data-arg="${t.id}">🔗 Link</button><button class="btn btn-g btn-sm" data-act="upload" data-arg="${t.id}">⬆ Upload</button></span></div>
       ${files.map(fileRow).join('') || '<div class="mu">Nothing attached yet.</div>'}
       ${t.staff_note ? `<div class="card" style="margin-top:12px"><b>Your note</b><p class="mu" style="margin-top:4px">${esc(t.staff_note)}</p></div>` : ''}
+      ${commentsHtml(t)}
       <p class="mu" style="margin-top:14px">Added ${when(t.created_at)}${t.completed_at ? ' · done ' + when(t.completed_at) : ''}</p>` : ''}`;
-  openDrawer();
+  openDrawer(); if (t) commentsPaint(t.id);
   const sv = $('tdSave'); if (sv) sv.onclick = async () => {
     const title = $('tdTitle').value.trim(); if (!title) return toast('Write the task');
     sv.disabled = true;
@@ -1435,23 +1527,24 @@ function fileRow(f) {
     <span class="fic">${fileIc(f)}</span>
     <div style="flex:1;min-width:0"><b class="fname" data-act="fileOpen" data-arg="${f.id}">${esc(f.name)}</b>
       <div class="mu">${f.kind === 'link' ? esc((f.url || '').replace(/^https?:\/\//, '').slice(0, 40)) : fmtSize(f.size)} · ${when(f.created_at)}
-        · ${f.from_admin ? '<span class="pill p-y">from Admin</span>' : 'by ' + esc(f.uploader_name || 'me')}${f.task_title ? ` · 📝 ${esc(f.task_title).slice(0, 30)}` : ''}</div>
+        · ${f.from_admin ? '<span class="pill p-y">from Admin</span>' : f.mine === false ? `<span class="pill p-m">from ${esc(f.uploader_name || 'teammate')}</span>` : 'by me'}${f.task_title ? ` · 📝 ${esc(f.task_title).slice(0, 30)}` : ''}${(f.shared_names || []).length && f.mine !== false ? ` · 👥 ${f.shared_names.map(esc).join(', ')}` : ''}</div>
       ${f.note ? `<div class="mu" style="margin-top:3px">💬 ${esc(f.note)}</div>` : ''}</div>
     <button class="btn btn-o btn-sm" data-act="fileOpen" data-arg="${f.id}">${f.kind === 'link' ? 'Open' : 'View'}</button>
-    ${!f.from_admin ? `<button class="btn btn-r btn-sm" data-act="fileDel" data-arg="${f.id}" aria-label="Delete">🗑</button>` : ''}</div>`;
+    ${f.mine !== false && !f.from_admin ? `<button class="btn btn-o btn-sm" data-act="fileShare" data-arg="${f.id}" title="Share with teammates">👥</button><button class="btn btn-r btn-sm" data-act="fileDel" data-arg="${f.id}" aria-label="Delete">🗑</button>` : ''}</div>`;
 }
 function vFiles(el, rv) {
   if (!WS.files) { el.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
-  const list = WS.files.filter(f => WS.ff === 'all' || (WS.ff === 'admin' ? f.from_admin : WS.ff === 'mine' ? !f.from_admin : f.kind === WS.ff));
+  const ffx = (f, k) => k === 'all' || (k === 'admin' ? f.from_admin : k === 'mine' ? f.mine !== false && !f.from_admin : k === 'team' ? f.mine === false && !f.from_admin : f.kind === k);
+  const list = WS.files.filter(f => ffx(f, WS.ff));
   el.innerHTML = `
     <div class="card drop ${rv} d1" id="dropZone">
-      <div style="font-size:34px">📤</div><b>Share a file with the admin</b>
-      <p class="mu" style="margin:4px 0 12px">Designs, screenshots, reports, code zips — up to 25 MB each. Or share a link (Figma, GitHub, Google Drive, Canva).</p>
+      <div style="font-size:34px">📤</div><b>Share files with the admin and your team</b>
+      <p class="mu" style="margin:4px 0 12px">Designs, screenshots, reports, code zips — up to 25 MB each. Or share a link (Figma, GitHub, Google Drive, Canva). Tap 👥 on a file to share it with teammates.</p>
       <div class="row" style="justify-content:center"><button class="btn btn-g" data-act="upload">⬆ Upload files</button><button class="btn btn-o" data-act="addLink">🔗 Add a link</button></div>
     </div>
-    <div class="chips ${rv} d2" style="margin:16px 0 12px">${[['all', 'All'], ['file', '📎 Files'], ['link', '🔗 Links'], ['mine', 'Shared by me'], ['admin', 'From admin']].map(([k, l]) =>
-      `<button class="chip ${WS.ff === k ? 'on' : ''}" data-act="ff" data-arg="${k}">${l}<span class="c">${WS.files.filter(f => k === 'all' || (k === 'admin' ? f.from_admin : k === 'mine' ? !f.from_admin : f.kind === k)).length}</span></button>`).join('')}</div>
-    <div class="${rv} d3">${list.map(fileRow).join('') || '<div class="empty"><div class="e">🗂️</div><b>Nothing shared yet</b><p>Upload a file or add a link — the admin sees it straight away.</p></div>'}</div>`;
+    <div class="chips ${rv} d2" style="margin:16px 0 12px">${[['all', 'All'], ['file', '📎 Files'], ['link', '🔗 Links'], ['mine', 'Mine'], ['team', '👥 From teammates'], ['admin', 'From admin']].map(([k, l]) =>
+      `<button class="chip ${WS.ff === k ? 'on' : ''}" data-act="ff" data-arg="${k}">${l}<span class="c">${WS.files.filter(f => ffx(f, k)).length}</span></button>`).join('')}</div>
+    <div class="${rv} d3">${list.map(fileRow).join('') || '<div class="empty"><div class="e">🗂️</div><b>Nothing here yet</b><p>Upload a file or add a link — the admin sees it straight away, and 👥 shares it with teammates.</p></div>'}</div>`;
   const dz = $('dropZone');
   if (dz) { dz.ondragover = e => { e.preventDefault(); dz.classList.add('over'); }; dz.ondragleave = () => dz.classList.remove('over');
     dz.ondrop = e => { e.preventDefault(); dz.classList.remove('over'); uploadFiles([...e.dataTransfer.files], null); }; }
@@ -1527,7 +1620,7 @@ function meetCard(m) {
       ${m.agenda ? `<div style="margin-top:6px;font-size:13px;white-space:pre-wrap">${esc(m.agenda)}</div>` : ''}
       ${m.notes ? `<div class="note" style="margin-top:8px">📝 ${esc(m.notes)}</div>` : ''}
       ${cancelled ? '' : `<div class="row" style="margin-top:10px">
-        ${m.meet_link && !past ? `<a class="btn ${live ? 'btn-g' : 'btn-o'} btn-sm" href="${esc(m.meet_link)}" target="_blank" rel="noopener">🎥 Join Google Meet</a>` : ''}
+        ${m.meet_link && !past ? `<a class="btn ${live ? 'btn-g' : 'btn-o'} btn-sm" href="${esc(m.meet_link)}" target="_blank" rel="noopener">🎥 Join Google Meet</a><button class="btn btn-o btn-sm" data-act="copyLink" data-arg="${esc(m.meet_link)}">⧉ Copy link</button>` : ''}
         ${!past ? `<a class="btn btn-o btn-sm" href="${calLink(m)}" target="_blank" rel="noopener">${(m.guest_emails || []).length && m.mine ? '✉️ Send Gmail invites' : '📅 Add to Google Calendar'}</a>` : ''}
         <button class="btn btn-o btn-sm" data-act="meetNotes" data-arg="${m.id}">📝 ${m.notes ? 'Edit notes' : 'Add notes'}</button>
         ${m.mine && !past ? `<button class="btn btn-o btn-sm" data-act="meetEdit" data-arg="${m.id}">✏️ Edit</button><button class="btn btn-r btn-sm" data-act="meetCancel" data-arg="${m.id}">Cancel</button>` : ''}</div>`}
@@ -1538,7 +1631,7 @@ function vMeet(el, rv) {
   const now = Date.now(), up = WS.meets.filter(m => new Date(m.starts_at).getTime() + m.duration_min * 60000 >= now && m.status === 'scheduled');
   const past = WS.meets.filter(m => !up.includes(m)).reverse();
   el.innerHTML = `
-    <div class="row ${rv} d1" style="justify-content:space-between;margin-bottom:6px"><div class="mu">Everyone invited gets a notification now and a reminder 15 minutes before.</div>
+    <div class="row ${rv} d1" style="justify-content:space-between;margin-bottom:6px"><div class="mu">Everyone invited (and the admin, if ticked) gets a notification with the time and the Meet link now, 15 minutes before, and when it starts.</div>
       <button class="btn btn-g" data-act="meetNew">＋ Schedule a meeting</button></div>
     <div class="sec ${rv} d2"><h2>Upcoming</h2><span class="r">${up.length}</span></div>
     <div class="${rv} d2">${up.map(meetCard).join('') || '<div class="empty" style="padding:26px"><div class="e">📅</div><b>No meetings coming up</b><p>Schedule one — pick a time, create a Google Meet link, invite the team.</p></div>'}</div>
@@ -1559,6 +1652,7 @@ async function meetEdit(id) {
       { id: 'who', label: 'Invite from the team', type: 'checks', options: people.map(p => [p.id, p.name + (p.kind === 'intern' ? ' (intern)' : '')]), checked: m ? m.attendees || [] : [] },
       { id: 'guests', label: 'Invite by Gmail (anyone — comma separated)', type: 'textarea', value: m ? (m.guest_emails || []).join(', ') : '', ph: 'e.g. riya@gmail.com, amit@gmail.com',
         hint: 'After saving, tap “✉️ Send Gmail invites” on the meeting — Google Calendar opens with these people added; press Save there and Google emails them the invite + Meet link.' },
+      { id: 'adm', label: 'Admin', type: 'checks', options: [['yes', '👑 Invite the admin (gets the notification + link)']], checked: !m || m.with_admin ? ['yes'] : [] },
       { id: 'agenda', label: 'Agenda (optional)', type: 'textarea', value: m ? m.agenda || '' : '', ph: 'What will you talk about?' }] });
   if (!v) return;
   if (!v.title) return toast('Give the meeting a title');
@@ -1568,7 +1662,7 @@ async function meetEdit(id) {
   const starts = new Date(`${v.date}T${v.time}:00+05:30`).toISOString();
   const att = v.who || [];
   const r = await rpc('team_meeting_save', { p_id: m ? m.id : null, p_title: v.title, p_agenda: v.agenda || null, p_starts: starts,
-    p_duration: +v.dur || 30, p_link: v.link || null, p_attendees: att, p_with_admin: true, p_guests: guests });
+    p_duration: +v.dur || 30, p_link: v.link || null, p_attendees: att, p_with_admin: (v.adm || []).includes('yes'), p_guests: guests });
   if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
   toast(guests.length ? '📅 Saved — now tap “✉️ Send Gmail invites” on it' : m ? 'Meeting updated ✓' : '📅 Meeting scheduled — everyone is notified'); wsLoad('meet', true);
 }
@@ -1643,6 +1737,7 @@ async function wsLoad2(v, force) {
   }
   if (v === 'notes' && (force || !WS.notes)) { const r = await rpc('team_notes_list'); WS.notes = r.ok ? r.data || [] : []; }
   if (v === 'leave' && (force || !WS.leaves)) { const r = await rpc('team_leaves', { p_staff: null }); WS.leaves = r.ok ? r.data || [] : []; }
+  if (v === 'chat' && (force || !WS.chat)) { const r = await rpc('team_chat', { p_limit: 150 }); if (r.ok) WS.chat = r.data || []; else WS.chat = WS.chat || []; chatBadge(); }
 }
 
 /* ---------- 1. work timer ---------- */
@@ -1683,6 +1778,7 @@ function clockTxt(start) { const s = Math.max(0, Math.floor((Date.now() - new Da
 setInterval(() => {
   const o = WS.timer && WS.timer.open; if (!o) return;
   const c = $('tmClock'); if (c) c.textContent = clockTxt(o.started_at);
+  const hc = $('hmClock'); if (hc) hc.textContent = clockTxt(o.started_at);
   const t = $('tmToday'); if (t) t.textContent = hm(timerMins(istDay()));
 }, 1000);
 async function clock(action) {
@@ -1883,6 +1979,212 @@ async function leaveCancel(id) {
   toast('Request cancelled'); wsLoad('leave', true);
 }
 
+/* ============================================================
+   Round 3 — Home (intern day view), team chat, shared tasks + comments,
+   sharing files with teammates. Data: team_chat / team_chat_send /
+   team_chat_delete, staff_task_share, task_comments_list / task_comment_add /
+   task_comment_delete, team_file_share.
+   ============================================================ */
+const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+const initials = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase();
+const AVC = ['#1E8E3E', '#2874F0', '#F2760D', '#8E44AD', '#C62828', '#00897B', '#6D4C41'];
+const avColor = n => AVC[[...String(n || '')].reduce((a, c) => a + c.charCodeAt(0), 0) % AVC.length];
+const av = (n, sz) => `<span class="av" style="background:${avColor(n)};${sz ? `width:${sz}px;height:${sz}px;font-size:${Math.round(sz * .4)}px` : ''}" title="${esc(n)}">${esc(initials(n))}</span>`;
+const linkify = t => esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>')
+  .replace(/(^|\s)@([A-Za-zऀ-ॿ]+)/g, '$1<b class="ment">@$2</b>');
+const isOwner = t => !t || (t.source === 'self' && t.owner !== false);
+const sharedTag = t => t.owner === false ? `<span class="tag tg-sh">🤝 from ${esc(t.owner_name || 'teammate')}</span>`
+  : (t.collab_names || []).length ? `<span class="tag tg-sh">🤝 with ${(t.collab_names || []).map(esc).join(', ')}</span>` : '';
+async function peopleLoad() { if (!WS.people) { const p = await rpc('team_people'); WS.people = p.ok ? p.data || [] : []; } return WS.people; }
+
+/* ---------- Home ---------- */
+async function homeLoad(force) {
+  const jobs = [];
+  if (force || !WS.meets) jobs.push(rpc('team_meetings', { p_days_back: 30 }).then(r => { if (r.ok) WS.meets = r.data || []; }));
+  if (force || !WS.reports) jobs.push(rpc('team_reports', { p_days: 60 }).then(r => { if (r.ok) WS.reports = r.data || []; }));
+  jobs.push(wsLoad2('timer', force), wsLoad2('bugs', force), wsLoad2('leave', force));
+  await Promise.all(jobs); wsBadges();
+  if (VIEW === 'welcome' && !typing()) render(false);
+}
+function vHome(el, rv) {
+  const today = istDay(), open = TASKS.filter(TF.open);
+  const focus = open.filter(t => t.status === 'doing' || (t.due_date && String(t.due_date).slice(0, 10) <= today))
+    .sort((a, b) => (a.status === 'doing' ? -1 : 0) - (b.status === 'doing' ? -1 : 0) || String(a.due_date || '').localeCompare(String(b.due_date || '')));
+  const doneToday = TASKS.filter(t => t.status === 'done' && t.completed_at && istOf(t.completed_at) === today).length;
+  const tot = focus.length + doneToday, pct = tot ? Math.round(doneToday / tot * 100) : 100;
+  const now = Date.now(), meets = (WS.meets || []).filter(m => m.status === 'scheduled' && new Date(m.starts_at).getTime() + m.duration_min * 6e4 > now);
+  const nm = meets[0], tOpen = WS.timer && WS.timer.open, mins = WS.timer ? timerMins(today) : 0;
+  const repDone = (WS.reports || []).some(x => String(x.day).slice(0, 10) === today && x.staff_id === ME.id);
+  const chat = (WS.chat || []).slice(-3), unread = chatUnread();
+  const shared = TASKS.filter(t => TF.open(t) && (t.owner === false || (t.collab_names || []).length));
+  const myBugs = (WS.issues || []).filter(i => i.assignee === ME.id && (i.status === 'open' || i.status === 'in_progress'));
+  const hr = +new Date().toLocaleString('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', hour12: false });
+  const greet = hr < 5 ? 'Working late' : hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  const dstr = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'long', day: 'numeric', month: 'long' });
+  const live = nm && now >= new Date(nm.starts_at) - 10 * 6e4;
+  el.innerHTML = `
+    <div class="hhero ${rv} d1">
+      <div style="flex:1;min-width:0"><div class="hdate">${dstr}</div><h2>${greet}, ${esc((ME.name || '').split(' ')[0])} 👋</h2>
+        <p>${focus.length ? `You have <b>${focus.length}</b> thing${focus.length === 1 ? '' : 's'} to focus on today${nm ? ` and a meeting at <b>${tm(nm.starts_at)}</b>` : ''}.` : 'Nothing urgent today — pick something from your list or plan tomorrow.'}</p>
+        <div class="row" style="margin-top:14px">
+          <button class="btn hb1" data-act="clock" data-arg="${tOpen ? 'out' : 'in'}">${tOpen ? '⏹ Stop timer · <span id="hmClock">' + clockTxt(tOpen.started_at) + '</span>' : '▶ Start work'}</button>
+          <button class="btn hb2" data-act="homeAdd">＋ Task</button>
+          <button class="btn hb2" data-act="go" data-arg="chat">💬 Chat${unread ? ` <i class="hbdg">${unread}</i>` : ''}</button></div></div>
+      <div class="ring big hring" style="--p:${pct}"><i>${pct}%<small>today</small></i></div>
+    </div>
+    <div class="hgrid ${rv} d2">
+      <div class="card hcard span2">
+        <div class="hc-h"><b>🎯 Today’s focus</b><button class="lnk" data-act="go" data-arg="tasks">All tasks →</button></div>
+        ${focus.slice(0, 6).map(t => listItem(t, today)).join('') || `<div class="hempty">🎉 Nothing due today.<br><button class="btn btn-o btn-sm" style="margin-top:8px" data-act="homeAdd">＋ Add a task</button></div>`}
+        ${focus.length > 6 ? `<button class="lnk" data-act="go" data-arg="tasks">+ ${focus.length - 6} more</button>` : ''}
+      </div>
+      <div class="card hcard ${live ? 'hlive' : ''}">
+        <div class="hc-h"><b>📅 Next meeting</b><button class="lnk" data-act="go" data-arg="meet">All →</button></div>
+        ${nm ? `<div class="hm-t">${esc(nm.title)}</div><div class="mu" style="margin-top:3px">${fmtWhen(nm.starts_at)} · ${nm.duration_min} min</div>
+          <div class="hm-cd">${live ? '● Live now' : 'in ' + countdown(nm.starts_at)}</div>
+          <div class="row" style="margin-top:10px">${nm.meet_link ? `<a class="btn ${live ? 'btn-g' : 'btn-o'} btn-sm" href="${esc(nm.meet_link)}" target="_blank" rel="noopener">🎥 Join</a><button class="btn btn-o btn-sm" data-act="copyLink" data-arg="${esc(nm.meet_link)}">⧉ Copy link</button>` : '<span class="mu">No Meet link yet</span>'}</div>`
+        : `<div class="hempty">No meetings coming up.<br><button class="btn btn-o btn-sm" style="margin-top:8px" data-act="meetNew">＋ Schedule</button></div>`}
+      </div>
+      <div class="card hcard">
+        <div class="hc-h"><b>⏱️ Hours today</b><button class="lnk" data-act="go" data-arg="timer">Timesheet →</button></div>
+        <div class="hbig" id="hmToday">${hm(mins)}</div><div class="mu">${tOpen ? '● timer running since ' + tm(tOpen.started_at) : 'timer is off'}</div>
+        <div class="row" style="margin-top:10px"><button class="btn ${tOpen ? 'btn-r' : 'btn-g'} btn-sm" data-act="clock" data-arg="${tOpen ? 'out' : 'in'}">${tOpen ? '⏹ Stop' : '▶ Start'}</button></div>
+      </div>
+      <div class="card hcard ${repDone ? '' : 'hwarn'}">
+        <div class="hc-h"><b>🗒️ Daily report</b></div>
+        <div class="hbig">${repDone ? 'Sent ✓' : 'Not yet'}</div><div class="mu">${repDone ? 'the admin can see it' : 'takes one minute — send before you finish'}</div>
+        <div class="row" style="margin-top:10px"><button class="btn ${repDone ? 'btn-o' : 'btn-g'} btn-sm" data-act="go" data-arg="report">${repDone ? 'Edit' : 'Write report'}</button></div>
+      </div>
+      <div class="card hcard span2">
+        <div class="hc-h"><b>💬 Team chat</b>${unread ? `<span class="pill p-r">${unread} new</span>` : ''}<button class="lnk" data-act="go" data-arg="chat">Open →</button></div>
+        ${chat.map(m => `<div class="hmsg">${av(m.author_name, 28)}<div style="min-width:0"><b>${esc(m.author_name)}</b> <span class="mu">${tm(m.created_at)}</span><div class="hmsg-b">${linkify(m.body)}</div></div></div>`).join('') || '<div class="hempty">No messages yet — say hi to the team 👋</div>'}
+      </div>
+      <div class="card hcard">
+        <div class="hc-h"><b>🤝 Working together</b></div>
+        ${shared.slice(0, 4).map(t => `<div class="hsh" data-act="taskOpen" data-arg="${t.id}"><b>${esc(t.title)}</b><div>${sharedTag(t)}${t.comments ? ` <span class="tag">💬 ${t.comments}</span>` : ''}</div></div>`).join('')
+          || '<div class="hempty">Open a task → “＋ Add teammate” to work on it together.</div>'}
+      </div>
+      <div class="card hcard">
+        <div class="hc-h"><b>🐞 On me</b><button class="lnk" data-act="go" data-arg="bugs">All →</button></div>
+        ${myBugs.slice(0, 4).map(i => `<div class="hsh" data-act="issueEdit" data-arg="${i.id}"><b>${esc(i.title)}</b><div><span class="pill ${ISEV[i.severity][1]}">${ISEV[i.severity][0]}</span></div></div>`).join('')
+          || '<div class="hempty">No bugs assigned to you 🎉</div>'}
+      </div>
+    </div>
+    <div class="qlinks ${rv} d3">${[['files', '📎', 'Files'], ['content', '📣', 'Content'], ['notes', '📚', 'Notes'], ['leave', '🏖️', 'Leave'], ['report', '🗒️', 'Report'], ['account', '🔑', 'Account']]
+      .map(([v, i, l]) => `<button class="ql" data-act="go" data-arg="${v}"><span>${i}</span>${l}</button>`).join('')}</div>`;
+}
+function countdown(iso) { const m = Math.max(0, Math.round((new Date(iso) - Date.now()) / 6e4)); return m < 60 ? m + ' min' : m < 1440 ? Math.floor(m / 60) + 'h ' + (m % 60) + 'm' : Math.floor(m / 1440) + ' days'; }
+async function homeAdd() {
+  const v = await modal({ title: 'New task', ok: 'Add', fields: [{ id: 'title', label: 'Task', ph: 'e.g. Write 3 captions for Diwali' },
+    { id: 'due', label: 'When', type: 'select', value: 'today', options: [['today', '☀️ Today'], ['tom', '🌤️ Tomorrow'], ['week', '📅 In a week'], ['', '📌 No date']] },
+    { id: 'cat', label: 'Type', type: 'select', value: '', options: [['', '—']].concat(CATS.map(([c, i]) => [c, i + ' ' + c])) }] });
+  if (!v || !v.title) return;
+  const r = await rpc('staff_task_save', { p_id: null, p_title: v.title, p_details: null, p_priority: 'normal', p_due: v.due === 'today' ? istDay() : v.due === 'tom' ? istDay(1) : v.due === 'week' ? istDay(7) : null,
+    p_category: v.cat || null, p_link: null, p_status: 'todo' });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not added')); TASKS.unshift(r.data); render(false); toast('Added ✓');
+}
+
+/* ---------- Team chat ---------- */
+function chatUnread() { const seen = lsGet('rb_chat_seen_' + (ME && ME.id)) || ''; return (WS.chat || []).filter(m => !m.mine && m.created_at > seen).length; }
+function chatBadge() {
+  const n = VIEW === 'chat' ? 0 : chatUnread();
+  [['bChat', n], ['bnChat', n]].forEach(([id, x]) => { const b = $(id); if (b) { b.classList.toggle('hide', !x); b.textContent = x > 9 ? '9+' : x; } });
+}
+function chatSeen() { const last = (WS.chat || []).slice(-1)[0]; if (last && ME) lsSet('rb_chat_seen_' + ME.id, last.created_at); chatBadge(); }
+function chatPaint() {
+  const box = $('chatList'); if (!box) return;
+  const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+  let lastDay = '', lastAuthor = '', lastT = 0;
+  box.innerHTML = (WS.chat || []).map(m => {
+    const d = istOf(m.created_at), t = new Date(m.created_at).getTime(), same = m.author_name === lastAuthor && d === lastDay && t - lastT < 5 * 6e4;
+    const sep = d !== lastDay ? `<div class="cdate"><span>${d === istDay() ? 'Today' : d === istDay(-1) ? 'Yesterday' : shortD(d)}</span></div>` : '';
+    lastDay = d; lastAuthor = m.author_name; lastT = t;
+    return `${sep}<div class="cm ${m.mine ? 'mine' : ''} ${same ? 'cont' : ''}">${!m.mine && !same ? av(m.author_name, 32) : '<span class="avsp"></span>'}
+      <div class="cb">${!m.mine && !same ? `<div class="cn">${esc(m.author_name)}${m.author_kind === 'admin' ? ' <span class="pill p-y">Admin</span>' : ''}</div>` : ''}
+        <div class="ct">${linkify(m.body)}</div><div class="cmeta">${tm(m.created_at)}${m.mine ? ` · <button class="cdel" data-act="chatDel" data-arg="${m.id}">delete</button>` : ''}</div></div></div>`;
+  }).join('') || '<div class="empty"><div class="e">💬</div><b>No messages yet</b><p>Say hi to the team! Type @name to ping someone, @all for everyone, @admin for the admin.</p></div>';
+  if (nearBottom || !box.dataset.init) { box.scrollTop = box.scrollHeight; box.dataset.init = '1'; }
+  chatSeen();
+}
+function vChat(el, rv) {
+  if (!WS.chat) { el.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
+  const people = (WS.people || []).filter(p => p.id !== (ME && ME.id));
+  el.innerHTML = `<div class="card chat ${rv} d1">
+    <div class="chat-h"><div class="avs">${people.slice(0, 5).map(p => av(p.name, 30)).join('')}</div><div style="flex:1;min-width:0"><b>RozBazaar team</b><div class="mu">${people.length + 1} people · admin included</div></div></div>
+    <div class="chat-l" id="chatList"></div>
+    <div class="chat-ment">${[['all', 'everyone'], ['admin', 'admin']].concat(people.map(p => [String(p.name).split(' ')[0], p.name])).map(([k, l]) => `<button class="chip" data-act="mention" data-arg="${esc(k)}">@${esc(l)}</button>`).join('')}</div>
+    <div class="chat-in"><textarea id="chatIn" rows="1" placeholder="Message the team…  (Enter to send, Shift+Enter for a new line)" maxlength="2000">${esc(WS.chatDraft || '')}</textarea>
+      <button class="btn btn-g" data-act="chatSend" aria-label="Send">➤</button></div></div>`;
+  chatPaint(); peopleLoad().then(() => { if (VIEW === 'chat' && !people.length && (WS.people || []).length > 1) render(false); });
+  const ta = $('chatIn'); ta.oninput = () => { WS.chatDraft = ta.value; ta.style.height = 'auto'; ta.style.height = Math.min(140, ta.scrollHeight) + 'px'; };
+}
+async function chatSend() {
+  const ta = $('chatIn'); const body = ta ? ta.value.trim() : ''; if (!body) return;
+  ta.value = ''; WS.chatDraft = ''; ta.style.height = 'auto';
+  const r = await rpc('team_chat_send', { p_body: body });
+  if (!r.ok) { ta.value = body; return toast('⚠️ ' + (r.error || 'Not sent')); }
+  (WS.chat = WS.chat || []).push(r.data); const box = $('chatList'); if (box) box.dataset.init = ''; chatPaint(); ta.focus();
+}
+async function chatDel(id) {
+  const r = await rpc('team_chat_delete', { p_id: id }); if (!r.ok) return toast('⚠️ ' + (r.error || 'Not deleted'));
+  WS.chat = WS.chat.filter(m => m.id !== id); chatPaint();
+}
+setInterval(() => { if (VIEW === 'chat' && !document.hidden && ME) wsLoad('chat', true); }, 8000);
+
+/* ---------- shared tasks + comments (task drawer parts) ---------- */
+function peopleHtml(t) {
+  const names = [t.owner_name || (ME && ME.name)].concat(t.collab_names || []);
+  return `<div class="sec" style="margin-top:22px"><h2>👥 People</h2>${isOwner(t) ? `<span class="act"><button class="btn btn-o btn-sm" data-act="taskShare" data-arg="${t.id}">＋ Add teammate</button></span>` : ''}</div>
+    <div class="row">${names.map((n, i) => `<span class="person">${av(n, 26)}${esc(n)}${i === 0 ? ' <span class="mu">owner</span>' : ''}</span>`).join('')}</div>
+    ${t.source === 'admin' ? '<div class="mu" style="margin-top:6px">Given by the admin — the admin sees comments too.</div>' : ''}`;
+}
+async function taskShare(id) {
+  const t = TASKS.find(x => x.id === id); if (!t) return;
+  const people = (await peopleLoad()).filter(p => p.id !== ME.id);
+  const v = await modal({ title: 'Work on this together', sub: 'Teammates you pick see this task in their list, can move it, tick steps, add files and comment. You stay the owner.', ok: 'Save',
+    fields: [{ id: 'who', label: 'Teammates', type: 'checks', options: people.map(p => [p.id, p.name + (p.kind === 'intern' ? '' : ' (' + p.kind + ')')]), checked: t.collaborators || [] }] });
+  if (!v) return;
+  const r = await rpc('staff_task_share', { p_id: id, p_staff: v.who || [] });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
+  Object.assign(t, r.data); toast((v.who || []).length ? '🤝 Shared — they are notified' : 'Only you now'); taskDrawer(id); render(false);
+}
+async function commentsPaint(id) {
+  const box = $('cmBox'); if (!box) return;
+  const r = await rpc('task_comments_list', { p_task: id }); if (!r.ok) { box.innerHTML = '<div class="mu">Could not load comments</div>'; return; }
+  box.innerHTML = (r.data || []).map(c => `<div class="cmt">${av(c.author_name, 28)}<div style="flex:1;min-width:0"><b>${esc(c.author_name)}</b> <span class="mu">${when(c.created_at)}</span>
+      ${c.mine ? `<button class="cdel" data-act="cmDel" data-arg="${c.id}" data-arg2="${id}">delete</button>` : ''}<div class="cmt-b">${linkify(c.body)}</div></div></div>`).join('')
+    || '<div class="mu">No comments yet — ask a question or post an update.</div>';
+}
+function commentsHtml(t) {
+  return `<div class="sec" style="margin-top:22px"><h2>💬 Comments</h2></div><div id="cmBox"><div class="sk" style="height:40px"></div></div>
+    <div class="row" style="flex-wrap:nowrap;margin-top:8px;align-items:flex-end"><textarea class="fld" id="cmIn" data-id="${t.id}" rows="2" placeholder="Write an update or a question…" maxlength="2000"></textarea>
+      <button class="btn btn-g" data-act="cmAdd" data-arg="${t.id}">Send</button></div>`;
+}
+async function cmAdd(id) {
+  const ta = $('cmIn'); const body = ta ? ta.value.trim() : ''; if (!body) return ta && ta.focus();
+  ta.disabled = true; const r = await rpc('task_comment_add', { p_task: id, p_body: body }); ta.disabled = false;
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not sent'));
+  ta.value = ''; const t = TASKS.find(x => x.id === id); if (t) t.comments = (t.comments || 0) + 1; commentsPaint(id); ta.focus();
+}
+async function cmDel(cid, tid) {
+  const r = await rpc('task_comment_delete', { p_id: cid }); if (!r.ok) return toast('⚠️ ' + (r.error || 'Not deleted'));
+  const t = TASKS.find(x => x.id === tid); if (t && t.comments) t.comments--; commentsPaint(tid);
+}
+
+/* ---------- share files with teammates ---------- */
+async function fileShare(id) {
+  const f = (WS.files || []).find(x => x.id === id); if (!f) return;
+  const people = (await peopleLoad()).filter(p => p.id !== ME.id);
+  const v = await modal({ title: 'Share with teammates', sub: esc(f.name) + ' — the admin can always see it.', ok: 'Share',
+    fields: [{ id: 'who', label: 'Who can see it', type: 'checks', options: people.map(p => [p.id, p.name]), checked: f.shared_with || [] }] });
+  if (!v) return;
+  const r = await rpc('team_file_share', { p_id: id, p_staff: v.who || [] });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not shared'));
+  Object.assign(f, r.data); render(false); toast((v.who || []).length ? '👥 Shared — they are notified' : 'Only you and the admin now');
+}
+function copyText(t) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast('⧉ Link copied'), () => toast(t)); }
+
 /* ---------- Account ---------- */
 const PWS = { pending: ['⏳ Admin ke approval ka intezaar', 'p-o'], approved: ['✅ Approve ho gaya — naya password chal raha hai', 'p-g'], rejected: ['❌ Admin ne reject kiya', 'p-r'] };
 const PWS_EN = { pending: '⏳ Waiting for the admin to approve', approved: '✅ Approved — your new password works now', rejected: '❌ The admin rejected it' };
@@ -2043,7 +2345,7 @@ function openNotifs() {
       <button class="btn btn-o btn-sm" data-act="readAll">✓ ${L('Sab padh liya', 'Mark all read')}</button></div>` +
     NOTIFS.map(n => `<div class="card nrow ${n.is_read ? '' : 'unread'}" data-act="readOne" data-arg="${esc(n.id)}">
       <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><span style="font-size:20px">${NICON[n.type] || '🔔'}</span>
-        <div style="flex:1;min-width:0"><b style="display:block">${esc(n.title)}</b><span class="mu" style="display:block;margin-top:2px">${esc(n.message)}</span></div>
+        <div style="flex:1;min-width:0"><b style="display:block">${esc(n.title)}</b><span class="mu" style="display:block;margin-top:2px;white-space:pre-line;overflow-wrap:anywhere">${esc(n.message)}</span>${n.url ? `<a class="btn btn-g btn-sm" style="margin-top:8px" href="${esc(n.url)}" target="_blank" rel="noopener">🎥 Join meeting</a>` : ''}</div>
         <span class="mu" style="white-space:nowrap">${when(n.created_at)}</span></div></div>`).join('')
     : `<div class="empty"><div class="e">🔕</div><b>${L('Abhi koi notification nahi', 'No notifications yet')}</b></div>`);
   $('ov').classList.add('show'); $('drawer').classList.add('show'); $('drawer').setAttribute('aria-hidden', 'false');
@@ -2228,6 +2530,15 @@ document.addEventListener('click', e => {
     case 'noteEdit': noteEdit(a || null); break;
     case 'leaveNew': leaveNew(); break;
     case 'leaveCancel': leaveCancel(a); break;
+    case 'homeAdd': homeAdd(); break;
+    case 'copyLink': copyText(a); break;
+    case 'mention': { const ta = $('chatIn'); if (ta) { ta.value = (ta.value && !/\s$/.test(ta.value) ? ta.value + ' ' : ta.value) + '@' + a + ' '; WS.chatDraft = ta.value; ta.focus(); } break; }
+    case 'chatSend': chatSend(); break;
+    case 'chatDel': chatDel(a); break;
+    case 'taskShare': taskShare(a); break;
+    case 'cmAdd': cmAdd(a); break;
+    case 'cmDel': cmDel(a, el.dataset.arg2); break;
+    case 'fileShare': fileShare(a); break;
   }
 });
 /* inline edits in the task sheet */
@@ -2242,6 +2553,9 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.id === 'newRow') { e.preventDefault(); sheetAdd(); }
   if (e.key === 'Enter' && e.target.id === 'qaT') { e.preventDefault(); quickAdd(); }
   if (e.key === 'Enter' && e.target.id === 'clNew') { e.preventDefault(); clAdd(e.target.dataset.id); }
+  if (e.key === 'Enter' && !e.shiftKey && e.target.id === 'chatIn') { e.preventDefault(); chatSend(); }
+  if (e.key === 'Enter' && !e.shiftKey && e.target.id === 'cmIn') { e.preventDefault(); cmAdd(e.target.dataset.id); }
+  if (e.key === 'n' && !e.ctrlKey && !e.metaKey && !/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) && !$('modal').classList.contains('show') && ME && isIntern()) { e.preventDefault(); if (VIEW === 'tasks' && $('qaT')) $('qaT').focus(); else homeAdd(); }
   if (e.key === 'Enter' && e.target.dataset && e.target.dataset.cell === 'title') { e.preventDefault(); e.target.blur(); }
   if (e.key === 'Escape') { if ($('modal').classList.contains('show')) modalCancel(); else closeAll(); }
 });

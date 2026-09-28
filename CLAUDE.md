@@ -343,6 +343,19 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   `staff_leave_request/team_leaves/staff_leave_cancel`, admin `admin_leave_decide` → notifications both ways). Admin →
   Intern workspace has sub-tabs Timesheet / Content / Bugs & ideas / Notes / Leave (pending-leave banner). A silent 45 s refresh no
   longer re-renders while someone is typing in the staff site (`typing()`).
+- **Team collaboration round 3** (28 Sep, migration `20260928c_team_collab.sql`): `notifications.url` (push_note sends it;
+  both sites' `sw.js` open an https url on tap, 🔔 rows show "Join"). Meetings notify every invitee + admins with time + Meet
+  link (`team_notify_url`), again 15 min before and at start (`start_notified`); `with_admin` is a real choice now ("👑 Invite
+  the admin" / "Doosre admins ko bhi bulao"), the creator is never notified about their own meeting. **Shared tasks**:
+  `staff_tasks.collaborators` (owner picks via `staff_task_share`); collaborators see the task (`staff_my_tasks`), change status,
+  tick checklist, attach files; `task_json` has `owner`, `owner_name`, `collab_names`, `comments`. **Task comments**
+  (`task_comments`, `task_comments_list/task_comment_add/task_comment_delete`; owner + collaborators + admins; admin comments from
+  Intern workspace 💬). **File sharing between teammates**: `staff_files.shared_with` (`team_file_share`), Storage read policy
+  also allows `can_read_staff_file(name)` (shared with me / on a task I work on). **Team chat** (`team_messages`,
+  `team_chat/team_chat_send/team_chat_delete`; @firstname / @all / @admin notify) — staff nav for everyone + admin Intern
+  workspace tab. Staff site for interns: **🏠 Home** day view (`vHome`: today's focus, next meeting + Join, hours + timer, report,
+  chat preview, shared tasks, bugs on me), nav grouped Work / Me, phone bottom bar (`#bnav`), "n" = new task. The chat bubble class
+  is `.cm.mine` — `.me` is the sidebar user block (`.me b{display:block}` broke bubbles).
 - Tabs: Aaj ka plan (KPIs, slot board Subah/Dopahar/Shaam, village + vendor load),
   Orders (day/status/type/village filters, search, detail drawer, CSV), Vendors (cards,
   7-day chart drawer), Sale (today/yesterday/7/30/custom range, Sabzi/Pyaaz-Aloo/Fruits,

@@ -27,13 +27,16 @@ self.addEventListener('push', event => {
     tag: 'rb-' + Date.now(),
     renotify: true,
     vibrate: [140, 70, 140],
-    data: { url: './', nid: d.nid || null }
+    data: { url: /^https:\/\//.test(d.url || '') ? d.url : './', nid: d.nid || null }
   })]));
 });
 
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   const nid = event.notification.data && event.notification.data.nid;
+  const url = event.notification.data && event.notification.data.url;
+  /* a meeting push carries its Google Meet link — open it straight away */
+  if (/^https:\/\//.test(url || '')) { event.waitUntil(Promise.all([rbTrack(nid, 'opened'), self.clients.openWindow(url)])); return; }
   event.waitUntil(Promise.all([rbTrack(nid, 'opened'), self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
     for (const c of list) if ('focus' in c) return c.focus();
     return self.clients.openWindow ? self.clients.openWindow(self.registration.scope) : undefined;
