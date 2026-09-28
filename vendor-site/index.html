@@ -1634,12 +1634,40 @@ function istISO(offset){
   const t=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata'}).format(new Date());
   const d=new Date(t+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+(offset||0)); return d.toISOString().slice(0,10);
 }
+/* DEMO only: a dashboard in the same shape as vendor_dashboard(), built from the demo orders
+   completed on this screen plus a few sample sales on earlier days */
+function demoDash(from, to){
+  const rate=10, today=istISO(0), month=today.slice(0,7);
+  const h=s=>[...s].reduce((a,c)=>(a*31+c.charCodeAt(0))%9973,7);
+  const NAMES=['Sunita Devi','Rajesh Yadav','Meena Kumari','Anil Sharma','Pooja Rani','Ramesh Chand'];
+  const all=[];
+  RUNS.filter(r=>r.status==='done').forEach(r=>all.push({customer:r.name, code:r.code, d:today, slot:r.slot,
+    amount:Math.round(r.final||runTotal(r)), method:r.paid==='cash'?'cash':'upi_direct'}));
+  for(let i=1;i<=45;i++){
+    const d=istISO(-i), n=h(d)%3+1;
+    for(let k=0;k<n;k++) all.push({customer:NAMES[(h(d)+k)%NAMES.length], code:'RB-10'+(3000+h(d+k)%900), d,
+      slot:['morning','afternoon','evening'][(h(d)+k)%3], amount:80+h(d+'x'+k)%170, method:(h(d)+k)%2?'cash':'upi_direct'});
+  }
+  const list=all.filter(x=>x.d>=from && x.d<=to).sort((a,b)=>b.d.localeCompare(a.d));
+  const sum=a=>a.reduce((t,x)=>t+x.amount,0), sale=sum(list), com=Math.round(sale*rate/100);
+  const days=[]; for(let d=from; d<=to && days.length<62; d=(()=>{ const x=new Date(d+'T00:00:00Z'); x.setUTCDate(x.getUTCDate()+1); return x.toISOString().slice(0,10); })()) days.push(d);
+  const mon=all.filter(x=>x.d.startsWith(month)), open=from<=today && today<=to ? RUNS.filter(r=>r.status!=='done').length : 0;
+  const share=[['Tomato','kg',.32],['Potato','kg',.26],['Onion','kg',.2],['Coriander','100 g',.12],['Spinach','gaddi',.1]];
+  return {from, to, rate, sale, orders:list.length, avg:list.length?Math.round(sale/list.length):0, commission:com, net:sale-com,
+    month_sale:sum(mon), month_commission:Math.round(sum(mon)*rate/100),
+    cash:sum(list.filter(x=>x.method==='cash')), upi:sum(list.filter(x=>x.method!=='cash')),
+    booked:list.length+open, open, cancelled:0, missed:0, rating:4.8, ratings:REVIEWS.length, monthly:false,
+    chart:days.map(d=>({d, total:sum(list.filter(x=>x.d===d))})),
+    items:sale?share.map(([name,unit,f])=>({name, unit, qty:Math.max(1,Math.round(sale*f/30)), amount:Math.round(sale*f)})):[],
+    list};
+}
 async function api(fn, args={}){
   if(DEMO){
     await new Promise(r=>setTimeout(r,260+Math.random()*260));
     switch(fn){
       case 'getRuns':     return {ok:true, data:RUNS};
       case 'verifyCode':  return {ok:true, data:{verified:true}};
+      case 'dashboard':   return {ok:true, data:demoDash(args.from, args.to)};
       default:            return {ok:true, data:{saved:true}};
     }
   }

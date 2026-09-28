@@ -4563,7 +4563,9 @@ async function phoneLogin(){
     toast(T('Hello, '+n.split(' ')[0]+' 🙏','नमस्ते, '+n.split(' ')[0]+' 🙏'));
     renderAcct(); paintHeaderIdentity();
     if(count()===0){ go('acct'); return; }
-    addr ? createBooking() : go('loc');
+    /* same path as a real login — go('loc') here skipped LOC_FROM_CHECKOUT, so saving the
+       address went back to Home instead of placing the order */
+    pendingCheckout=false; placeBooking();
     return;
   }
 
