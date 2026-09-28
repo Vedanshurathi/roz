@@ -329,6 +329,20 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   `team_reports`; admins notified). Admin console → "🧑‍💻 Intern workspace" tab shows all of it per intern (sheet, files +
   send file/link to an intern, meetings, reports + who hasn't reported today); admin task edit also sets type + link
   (`admin_task_meta`). Meetings nav is visible to sales too.
+- **Intern workspace round 2** (28 Sep, migration `20260928b_intern_tools.sql`): My tasks default = **List view** (groups
+  Overdue / Today / Tomorrow / Next 7 days / Later / No date / Done-folded, round tick buttons, quick-add bar with due/type/priority,
+  "Good morning" hero with today's % ring + 7-day bars); Sheet + Board still there. **Checklist** per task (`staff_tasks.checklist`
+  jsonb `[{t,d}]`, `staff_task_checklist(p_id, p_checklist)` — works on admin tasks too; `staff_task_save` unchanged).
+  **Meetings: Gmail guests** (`staff_meetings.guest_emails`; `team_meeting_save` got `p_guests text[]` — old 8-arg version dropped)
+  → the card's "✉️ Send Gmail invites" opens a Google Calendar template with `&add=<emails>`; saving there makes Google email the
+  invite (we have no Google API — the person's own Calendar sends it). 5 new intern tools (intern nav only): **Work timer**
+  (`work_sessions`, one open per person, `staff_clock('in'|'out')`, `team_timesheet`; caps a session at 14 h), **Content calendar**
+  (`content_posts`, week grid + ideas, `team_posts/team_post_save/team_post_delete`), **Bugs & ideas** (`dev_issues`,
+  `team_issues/team_issue_save/team_issue_delete`; high/critical bugs notify admins, assignee notified), **Team notes**
+  (`team_notes`, pin = admin only, `team_notes_list/team_note_save/team_note_delete`), **Leave** (`leave_requests`,
+  `staff_leave_request/team_leaves/staff_leave_cancel`, admin `admin_leave_decide` → notifications both ways). Admin →
+  Intern workspace has sub-tabs Timesheet / Content / Bugs & ideas / Notes / Leave (pending-leave banner). A silent 45 s refresh no
+  longer re-renders while someone is typing in the staff site (`typing()`).
 - Tabs: Aaj ka plan (KPIs, slot board Subah/Dopahar/Shaam, village + vendor load),
   Orders (day/status/type/village filters, search, detail drawer, CSV), Vendors (cards,
   7-day chart drawer), Sale (today/yesterday/7/30/custom range, Sabzi/Pyaaz-Aloo/Fruits,

@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ueX2ThQjrMJk19/OXTGgeZvAZ2ZnToRf98TGbbqs71A=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-z04+ngtehFhokPGDX1y2Vq9Z6dQUplwKJxzH+57epIg=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -216,6 +216,13 @@ td.acts .btn+.btn{margin-left:6px}
 .wmd{width:52px;flex-shrink:0;text-align:center;background:var(--lime-s);border-radius:12px;padding:8px 0;height:max-content}
 .wmd b{display:block;font-size:20px;line-height:1.1;color:var(--g-dk)}.wmd span{font-size:11px;font-weight:800;color:var(--g-dk);text-transform:uppercase}
 .wnote{background:var(--grey);border-radius:10px;padding:8px 10px;font-size:12.5px;white-space:pre-wrap;margin-top:6px}
+.wclp{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:var(--tx2);margin-left:8px}
+.wclbar{display:inline-block;width:40px;height:6px;border-radius:4px;background:var(--line);overflow:hidden}.wclbar i{display:block;height:100%;background:var(--g)}
+.wtv{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line)}.wtv:first-child{border-top:0}
+.wngrid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.wncard{display:flex;flex-direction:column}.wncard.pin{border:2px solid #F2D14B;background:#FFFCEB}
+.wnbody{margin-top:8px;font-size:13px;white-space:pre-wrap;color:var(--tx2);max-height:160px;overflow:auto;overflow-wrap:anywhere}
+.wlrow{display:flex;gap:12px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
 .empty .e{font-size:40px;margin-bottom:8px}
 .empty b{display:block;color:var(--tx);font-size:16px;margin-bottom:4px}
 .sk{background:linear-gradient(90deg,var(--grey),#fff,var(--grey));background-size:200% 100%;animation:sk 1.2s linear infinite;border-radius:16px;height:90px;margin-bottom:12px}
@@ -1235,7 +1242,7 @@ async function delTask(id) {
 /* ---------- Intern workspace (admin) ----------
    Every intern's own to-do sheet + the tasks you gave them, their files & links (Storage bucket
    staff-files, private), Google Meet meetings and daily reports. Same RPCs as the staff site. */
-const WSA = { files: null, meets: null, reports: null, people: null };
+const WSA = { files: null, meets: null, reports: null, people: null, timer: null, posts: null, issues: null, notes: null, leaves: null };
 const WCATS = [['Development', '💻'], ['Marketing', '📣'], ['Design', '🎨'], ['Content', '✍️'], ['Research', '🔎'], ['Other', '📌']];
 const wcatIc = c => (WCATS.find(x => x[0] === c) || [0, '📌'])[1];
 const fmtSizeA = b => !b ? '' : b < 1048576 ? Math.round(b / 1024) + ' KB' : (b / 1048576).toFixed(1) + ' MB';
@@ -1243,9 +1250,12 @@ const fileIcA = f => f.kind === 'link' ? (/figma/.test(f.url) ? '🎨' : /github
   : /^image\//.test(f.mime || '') ? '🖼️' : /pdf/.test(f.mime || '') ? '📕' : /zip/.test(f.mime || '') ? '🗜️' : /video/.test(f.mime || '') ? '🎬' : '📎';
 async function wsaLoad(force) {
   if (!force && WSA.files && WSA.meets && WSA.reports) return;
-  const [f, m, r, p] = await Promise.all([rpc('team_files', { p_staff: null }), rpc('team_meetings', { p_days_back: 30 }),
-    rpc('team_reports', { p_days: 30, p_staff: null }), rpc('team_people')]);
+  const [f, m, r, p, tm, po, is, no, lv] = await Promise.all([rpc('team_files', { p_staff: null }), rpc('team_meetings', { p_days_back: 30 }),
+    rpc('team_reports', { p_days: 30, p_staff: null }), rpc('team_people'), rpc('team_timesheet', { p_days: 14, p_staff: null }), rpc('team_posts', { p_from: null, p_to: null }),
+    rpc('team_issues'), rpc('team_notes_list'), rpc('team_leaves', { p_staff: null })]);
   WSA.files = f.ok ? f.data || [] : []; WSA.meets = m.ok ? m.data || [] : []; WSA.reports = r.ok ? r.data || [] : []; WSA.people = p.ok ? p.data || [] : [];
+  WSA.timer = tm.ok ? tm.data || { sessions: [] } : { sessions: [] }; WSA.posts = po.ok ? po.data || [] : []; WSA.issues = is.ok ? is.data || [] : [];
+  WSA.notes = no.ok ? no.data || [] : []; WSA.leaves = lv.ok ? lv.data || [] : [];
   if (VIEW === 'ws') render(false);
 }
 function vWs(el, rv) {
@@ -1271,7 +1281,7 @@ function vWs(el, rv) {
       <div class="card" style="padding:0"><div class="tw"><table class="wst"><thead><tr><th>Intern</th><th>Task</th><th>Type</th><th>Priority</th><th>Status</th><th>Due</th><th>Link</th><th>From</th><th></th></tr></thead><tbody>
       ${list.map(t => { const d = t.due_date ? String(t.due_date).slice(0, 10) : '', lt = d && d < today && (t.status === 'todo' || t.status === 'doing');
         return `<tr class="${t.status === 'done' ? 'is-done' : ''}"><td><b>${esc(t.staff_name)}</b></td>
-          <td class="wt"><b>${esc(t.title)}</b>${t.details ? `<div class="mu">${esc(t.details).slice(0, 90)}</div>` : ''}${t.staff_note ? `<div class="mu">💬 ${esc(t.staff_note)}</div>` : ''}</td>
+          <td class="wt"><b>${esc(t.title)}</b>${clProgA(t)}${t.details ? `<div class="mu">${esc(t.details).slice(0, 90)}</div>` : ''}${t.staff_note ? `<div class="mu">💬 ${esc(t.staff_note)}</div>` : ''}</td>
           <td>${t.category ? wcatIc(t.category) + ' ' + esc(t.category) : '<span class="mu">—</span>'}</td>
           <td><span class="pill ${PRI[t.priority][1]}">${PRI[t.priority][0]}</span></td>
           <td><span class="pill ${TST[t.status][1]}">${TST[t.status][0]}</span></td>
@@ -1298,14 +1308,17 @@ function vWs(el, rv) {
       return `<div class="card wmc ${live ? 'live' : ''}"><div class="wmd"><b>${s.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric' })}</b><span>${s.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short' })}</span></div>
         <div style="flex:1;min-width:0"><div class="row" style="flex-wrap:nowrap"><b style="flex:1">${esc(m.title)}</b>${m.status === 'cancelled' ? '<span class="pill p-r">Cancelled</span>' : live ? '<span class="pill p-g">● Live</span>' : pastM ? '<span class="pill p-m">Ho gayi</span>' : ''}</div>
         <div class="mu">🕒 ${s.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' })} · ${m.duration_min} min · ${esc(m.created_by_name || '')} ne rakhi</div>
-        <div class="mu">👥 ${(m.attendee_names || []).map(esc).join(', ') || '—'}</div>
+        <div class="mu">👥 ${(m.attendee_names || []).map(esc).join(', ') || '—'}${(m.guest_emails || []).length ? ' · ✉️ ' + m.guest_emails.map(esc).join(', ') : ''}</div>
         ${m.agenda ? `<div style="margin-top:4px;font-size:13px;white-space:pre-wrap">${esc(m.agenda)}</div>` : ''}${m.notes ? `<div class="wnote">📝 ${esc(m.notes)}</div>` : ''}
         ${m.status === 'cancelled' ? '' : `<div class="row" style="margin-top:8px">${m.meet_link && !pastM ? `<a class="btn ${live ? 'btn-g' : 'btn-o'} btn-sm" href="${esc(m.meet_link)}" target="_blank" rel="noopener">🎥 Join</a>` : ''}
+          ${!pastM ? `<a class="btn btn-o btn-sm" href="${calLinkA(m)}" target="_blank" rel="noopener">${(m.guest_emails || []).length ? '✉️ Gmail invite bhejo' : '📅 Google Calendar'}</a>` : ''}
           <button class="btn btn-o btn-sm" data-act="wsMeetNotes" data-arg="${esc(m.id)}">📝 Notes</button>
           ${!pastM ? `<button class="btn btn-o btn-sm" data-act="wsMeet" data-arg="${esc(m.id)}">✏️ Edit</button><button class="btn btn-r btn-sm" data-act="wsMeetCancel" data-arg="${esc(m.id)}">Cancel</button>` : ''}</div>`}</div></div>`; };
     body = `<div class="toolbar"><span class="mu">Sabko turant notification + 15 min pehle reminder jaata hai.</span><button class="btn btn-g" style="margin-left:auto" data-act="wsMeet" data-arg="">＋ Meeting rakho</button></div>
       ${!WSA.meets ? '<div class="sk"></div>' : `<div class="sec"><h2>Aane wali</h2><span class="r">${up.length}</span></div>${up.map(card).join('') || '<div class="mu">Koi meeting nahi.</div>'}
       ${past.length ? `<div class="sec"><h2>Pichhle 30 din</h2></div>${past.map(card).join('')}` : ''}`}`;
+  } else if (tab !== 'reports') {
+    body = wsTools(tab, pid, interns, today);
   } else {
     const reps = (WSA.reports || []).filter(mine);
     body = `${missing.length ? `<div class="card" style="background:var(--or-s);margin-bottom:12px"><b>⏳ Aaj report nahi bheji:</b> ${missing.map(i => esc(i.name)).join(', ')}</div>` : WSA.reports ? '<div class="card" style="background:var(--lime-s);margin-bottom:12px"><b>✅ Sabne aaj ki report bhej di</b></div>' : ''}
@@ -1323,7 +1336,10 @@ function vWs(el, rv) {
       ${kpi('Agli meeting', nextMeet ? new Date(nextMeet.starts_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' }) : '—',
         nextMeet ? new Date(nextMeet.starts_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' }) + ' · ' + esc(nextMeet.title) : 'koi nahi', '', '📅')}
     </div>
-    <div class="tabs ${rv} d2" style="margin-top:16px">${[['tasks', '▦ Kaam sheet'], ['files', '📎 Files & links'], ['meet', '📅 Meetings'], ['reports', '🗒️ Daily reports']].map(([k, l]) =>
+    ${WSA.leaves && WSA.leaves.some(l => l.status === 'pending') && tab !== 'leave' ? `<div class="alert info ${rv} d2" style="margin-top:14px"><div class="e">🏖️</div><div><b>${WSA.leaves.filter(l => l.status === 'pending').length} leave request pending</b><span>Approve ya reject karo</span></div><button class="btn btn-g btn-sm" data-act="wst" data-arg="leave">Dekho</button></div>` : ''}
+    <div class="tabs ${rv} d2" style="margin-top:16px">${[['tasks', '▦ Kaam sheet'], ['files', '📎 Files & links'], ['meet', '📅 Meetings'], ['reports', '🗒️ Daily reports'], ['time', '⏱️ Timesheet'], ['content', '📣 Content'],
+      ['bugs', '🐞 Bugs & ideas' + (WSA.issues && WSA.issues.some(i => i.kind === 'bug' && i.severity === 'critical' && i.status === 'open') ? ' 🚨' : '')], ['notes', '📚 Notes'],
+      ['leave', '🏖️ Leave' + (WSA.leaves && WSA.leaves.some(l => l.status === 'pending') ? ' (' + WSA.leaves.filter(l => l.status === 'pending').length + ')' : '')]].map(([k, l]) =>
       `<button class="tab ${tab === k ? 'on' : ''}" data-act="wst" data-arg="${k}">${l}</button>`).join('')}</div>
     <div class="${rv} d3">${body}</div>`;
   const s = $('wsq'); if (s) s.oninput = () => { UI.wsq = s.value; rerenderKeep('wsq'); };
@@ -1391,15 +1407,18 @@ async function wsMeet(id) {
       { id: 'time', label: 'Time (IST)', type: 'time', value: m ? t : t.slice(0, 2) + ':00' },
       { id: 'dur', label: 'Kitni der', type: 'select', value: String(m ? m.duration_min : 30), options: [['15', '15 min'], ['30', '30 min'], ['45', '45 min'], ['60', '1 ghanta'], ['90', '1.5 ghante'], ['120', '2 ghante']] },
       { id: 'link', label: 'Google Meet link', type: 'url', value: m ? m.meet_link || '' : '', ph: 'https://meet.google.com/…', hint: '<button type="button" class="btn btn-o btn-sm" data-act="newMeet">🎥 Google Meet banao</button>' },
-      { id: 'who', label: 'Kisko bulana hai', type: 'checks', options: (WSA.people || []).map(p => [p.id, (p.kind === 'intern' ? '🌱 ' : '💼 ') + p.name]) },
+      { id: 'who', label: 'Team se kisko bulana hai', type: 'checks', options: (WSA.people || []).map(p => [p.id, (p.kind === 'intern' ? '🌱 ' : '💼 ') + p.name]), checked: m ? m.attendees || [] : [] },
+      { id: 'guests', label: 'Gmail se bulao (koi bhi — comma se alag)', type: 'textarea', value: m ? (m.guest_emails || []).join(', ') : '', ph: 'riya@gmail.com, amit@gmail.com',
+        hint: 'Save ke baad meeting pe “✉️ Gmail invite bhejo” dabao — Google Calendar khulega, Save dabao, Google sabko invite + Meet link email kar dega.' },
       { id: 'agenda', label: 'Agenda', type: 'textarea', value: m ? m.agenda || '' : '' }] }, UI.wsp && UI.wsp !== 'all' ? UI.wsp : undefined);
   if (!v) return;
   if (!v.title || !v.date || !v.time) return toast('Title, date aur time daalo');
-  const att = v.who && v.who.length ? v.who : m ? m.attendees || [] : [];
-  if (!att.length) return toast('Kam se kam ek insaan bulao');
+  const att = v.who || [], guests = [...new Set(String(v.guests || '').split(/[\s,;]+/).map(x => x.trim().toLowerCase()).filter(Boolean))];
+  const bad = guests.filter(g => !/^[^\s@,;]+@[^\s@,;]+\.[a-z]{2,}$/i.test(g)); if (bad.length) return toast('⚠️ Ye email sahi nahi: ' + bad.join(', '));
+  if (!att.length && !guests.length) return toast('Kam se kam ek insaan bulao');
   const r = await rpc('team_meeting_save', { p_id: m ? m.id : null, p_title: v.title, p_agenda: v.agenda || null, p_starts: new Date(`${v.date}T${v.time}:00+05:30`).toISOString(),
-    p_duration: +v.dur || 30, p_link: v.link || null, p_attendees: att, p_with_admin: true });
-  toast(r.ok ? '📅 Meeting set — sabko notification gaya' : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
+    p_duration: +v.dur || 30, p_link: v.link || null, p_attendees: att, p_with_admin: true, p_guests: guests });
+  toast(r.ok ? (guests.length ? '📅 Save — ab “✉️ Gmail invite bhejo” dabao' : '📅 Meeting set — sabko notification gaya') : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
 }
 async function wsMeetCancel(id) {
   const v = await modal({ title: 'Meeting cancel karein?', sub: 'Sabko notification jaayega.', ok: 'Cancel karo', danger: true }); if (!v) return;
@@ -1409,6 +1428,143 @@ async function wsMeetNotes(id) {
   const m = (WSA.meets || []).find(x => x.id === id);
   const v = await modal({ title: 'Meeting notes', sub: 'Kya tay hua, kaun kya karega', fields: [{ id: 'notes', label: 'Notes', type: 'textarea', value: m ? m.notes || '' : '' }] }); if (!v) return;
   const r = await rpc('team_meeting_notes', { p_id: id, p_notes: v.notes || null }); toast(r.ok ? 'Save ho gaya ✓' : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
+}
+
+/* ---- intern tools (round 2): timesheet, content calendar, bugs & ideas, team notes, leave ---- */
+const hmA = min => { min = Math.max(0, Math.round(min || 0)); const h = Math.floor(min / 60), m = min % 60; return h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`; };
+const istOfA = iso => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date(iso));
+const tmA = iso => new Date(iso).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' });
+const sessMin = x => x.ended_at ? +x.minutes || 0 : Math.min(840, (Date.now() - new Date(x.started_at)) / 60000);
+const calLinkA = m => { const s = new Date(m.starts_at), e = new Date(s.getTime() + m.duration_min * 60000), z = d => d.toISOString().replace(/[-:]|\.\d{3}/g, '');
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(m.title) + '&dates=' + z(s) + '/' + z(e)
+    + '&details=' + encodeURIComponent((m.agenda || '') + (m.meet_link ? '\n\nJoin: ' + m.meet_link : '')) + (m.meet_link ? '&location=' + encodeURIComponent(m.meet_link) : '')
+    + ((m.guest_emails || []).length ? '&add=' + encodeURIComponent(m.guest_emails.join(',')) : ''); };
+const clOfA = t => Array.isArray(t.checklist) ? t.checklist : [];
+const clProgA = t => { const c = clOfA(t); if (!c.length) return ''; const n = c.filter(x => x.d).length;
+  return `<span class="wclp"><span class="wclbar"><i style="width:${Math.round(n / c.length * 100)}%"></i></span>${n}/${c.length} steps</span>`; };
+const PLATA = [['Instagram', '📸'], ['Facebook', '📘'], ['WhatsApp', '💬'], ['YouTube', '▶️'], ['Google', '🔎'], ['Website', '🌐'], ['Other', '📌']];
+const PSTA = { idea: ['💡 Idea', 'p-m'], draft: ['✍️ Draft', 'p-y'], ready: ['✅ Ready', 'p-b'], posted: ['🚀 Posted', 'p-g'] };
+const IKA = { bug: '🐞 Bug', feature: '✨ Feature', idea: '💡 Idea' };
+const IAPPA = [['customer', '🛒 Customer app'], ['vendor', '🧑‍🌾 Vendor app'], ['staff', '👥 Staff app'], ['admin', '🛠️ Admin'], ['website', '🌐 Website'], ['other', '📌 Other']];
+const ISEVA = { critical: ['🚨 Critical', 'p-r'], high: ['🔴 High', 'p-r'], normal: ['🟠 Normal', 'p-o'], low: ['🟢 Low', 'p-g'] };
+const ISTA = { open: ['Open', 'p-b'], in_progress: ['🔧 Chal raha', 'p-y'], fixed: ['✅ Fixed', 'p-g'], wont_fix: ['🚫 Nahi karenge', 'p-m'] };
+const NCATA = [['Guide', '📘'], ['Brand', '🎨'], ['Marketing', '📣'], ['Development', '💻'], ['Links', '🔗'], ['Other', '📌']];
+const LKA = { leave: '🏖️ Chhutti', sick: '🤒 Bimaar', half_day: '🌗 Half day', wfh: '🏠 Work from home' };
+const LSTA = { pending: ['⏳ Pending', 'p-o'], approved: ['✅ Approved', 'p-g'], rejected: ['❌ Rejected', 'p-r'], cancelled: ['Cancelled', 'p-m'] };
+function wsTools(tab, pid, interns, today) {
+  const mineS = x => pid === 'all' || x.staff_id === pid;
+  if (tab === 'time') {
+    if (!WSA.timer) return '<div class="sk"></div>';
+    const ss = (WSA.timer.sessions || []).filter(mineS), days = [-6, -5, -4, -3, -2, -1, 0].map(o => addDaysA(today, o));
+    const who = interns.filter(i => pid === 'all' || i.id === pid);
+    return `<div class="card" style="padding:0"><div class="tw"><table class="wst"><thead><tr><th>Intern</th><th>Abhi</th><th>Aaj</th>${days.slice(0, 6).map(d => `<th>${shortD(d)}</th>`).join('')}<th>7 din</th></tr></thead><tbody>
+      ${who.map(i => { const my = ss.filter(x => x.staff_id === i.id), per = days.map(d => my.filter(x => istOfA(x.started_at) === d).reduce((a, x) => a + sessMin(x), 0)), run = my.find(x => !x.ended_at);
+        return `<tr><td><b>${esc(i.name)}</b></td><td>${run ? `<span class="pill p-g">● ${tmA(run.started_at)} se</span>` : '<span class="mu">—</span>'}</td><td><b>${per[6] ? hmA(per[6]) : '—'}</b></td>
+          ${per.slice(0, 6).map(m => `<td class="mu">${m ? hmA(m) : '—'}</td>`).join('')}<td><b>${hmA(per.reduce((a, b) => a + b, 0))}</b></td></tr>`; }).join('')
+        || '<tr><td colspan="10"><div class="mu" style="padding:14px">Koi intern nahi</div></td></tr>'}</tbody></table></div></div>
+      <div class="sec"><h2>Sessions</h2><span class="r">${ss.length}</span></div>
+      <div class="card" style="padding:0">${ss.slice(0, 60).map(x => `<div class="wtv"><div style="flex:1;min-width:0"><b>${esc(x.staff_name)}</b> <span class="mu">${shortD(istOfA(x.started_at))} · ${tmA(x.started_at)} – ${x.ended_at ? tmA(x.ended_at) : 'abhi'}</span>
+        ${x.note ? `<div class="mu">💬 ${esc(x.note)}</div>` : ''}</div><b>${x.ended_at ? hmA(x.minutes) : '<span class="pill p-g">chal raha</span>'}</b></div>`).join('') || '<div class="mu" style="padding:14px">Abhi koi session nahi — intern staff app me “Start work” dabayenge.</div>'}</div>`;
+  }
+  if (tab === 'content') {
+    if (!WSA.posts) return '<div class="sk"></div>';
+    const up = WSA.posts.filter(p => p.post_date && String(p.post_date).slice(0, 10) >= addDaysA(today, -7)), ideas = WSA.posts.filter(p => !p.post_date);
+    const row = p => `<tr data-act="wsPost" data-arg="${esc(p.id)}" style="cursor:pointer"><td>${p.post_date ? shortD(p.post_date) : '—'}${p.post_time ? ' <span class="mu">' + String(p.post_time).slice(0, 5) + '</span>' : ''}</td>
+      <td>${(PLATA.find(x => x[0] === p.platform) || PLATA[6])[1]} ${esc(p.platform)}</td><td class="wt"><b>${esc(p.title)}</b>${p.caption ? `<div class="mu">${esc(p.caption).slice(0, 80)}</div>` : ''}</td>
+      <td><span class="pill ${PSTA[p.status][1]}">${PSTA[p.status][0]}</span></td><td>${esc(p.owner_name || p.created_by_name || '—')}</td><td>${p.link ? `<a href="${esc(p.link)}" target="_blank" rel="noopener">🔗</a>` : ''}</td></tr>`;
+    return `<div class="toolbar"><span class="mu">Interns ka content plan — Instagram, WhatsApp, YouTube… Aap bhi post jod / badal sakte ho.</span><button class="btn btn-g" style="margin-left:auto" data-act="wsPost" data-arg="">＋ Post</button></div>
+      <div class="row" style="margin-bottom:12px">${Object.entries(PSTA).map(([k, x]) => `<span class="pill ${x[1]}">${x[0]} · ${WSA.posts.filter(p => p.status === k).length}</span>`).join('')}</div>
+      <div class="card" style="padding:0"><div class="tw"><table class="wst"><thead><tr><th>Date</th><th>Kahan</th><th>Post</th><th>Stage</th><th>Kaun</th><th></th></tr></thead><tbody>
+      ${up.map(row).join('') || '<tr><td colspan="6"><div class="mu" style="padding:14px">Is hafte koi post planned nahi</div></td></tr>'}</tbody></table></div></div>
+      ${ideas.length ? `<div class="sec"><h2>💡 Ideas (date nahi)</h2><span class="r">${ideas.length}</span></div><div class="card" style="padding:0"><div class="tw"><table class="wst"><tbody>${ideas.map(row).join('')}</tbody></table></div></div>` : ''}`;
+  }
+  if (tab === 'bugs') {
+    if (!WSA.issues) return '<div class="sk"></div>';
+    const f = UI.wbf || 'open', list = WSA.issues.filter(i => f === 'all' || (f === 'open' ? (i.status === 'open' || i.status === 'in_progress') : i.status === f));
+    return `<div class="toolbar"><div class="chips">${[['open', 'Open'], ['fixed', 'Fixed'], ['wont_fix', 'Nahi karenge'], ['all', 'Sab']].map(([k, l]) => `<button class="chip ${f === k ? 'on' : ''}" data-act="wbf" data-arg="${k}">${l}</button>`).join('')}</div>
+      <button class="btn btn-g" style="margin-left:auto" data-act="wsIssue" data-arg="">＋ Bug / idea</button></div>
+      <div class="card" style="padding:0"><div class="tw"><table class="wst"><thead><tr><th>Type</th><th>Kya</th><th>Kahan</th><th>Kitna bura</th><th>Status</th><th>Kaun fix karega</th><th>Kisne bataya</th></tr></thead><tbody>
+      ${list.map(i => `<tr data-act="wsIssue" data-arg="${esc(i.id)}" style="cursor:pointer"><td>${IKA[i.kind]}</td><td class="wt"><b>${esc(i.title)}</b>${i.details ? `<div class="mu">${esc(i.details).slice(0, 90)}</div>` : ''}</td>
+        <td>${(IAPPA.find(a => a[0] === i.app) || IAPPA[5])[1]}</td><td>${i.kind === 'bug' ? `<span class="pill ${ISEVA[i.severity][1]}">${ISEVA[i.severity][0]}</span>` : '—'}</td>
+        <td><span class="pill ${ISTA[i.status][1]}">${ISTA[i.status][0]}</span></td><td>${esc(i.assignee_name || '—')}</td><td class="mu">${esc(i.created_by_name || '')} · ${shortD(istOfA(i.created_at))}</td></tr>`).join('')
+        || '<tr><td colspan="7"><div class="mu" style="padding:14px">Kuch nahi 🎉</div></td></tr>'}</tbody></table></div></div>`;
+  }
+  if (tab === 'notes') {
+    if (!WSA.notes) return '<div class="sk"></div>';
+    return `<div class="toolbar"><span class="mu">Poori team ke liye guides, brand rules, links. 📌 Pin sirf admin kar sakta hai. Password yahan mat rakho.</span><button class="btn btn-g" style="margin-left:auto" data-act="wsNote" data-arg="">＋ Note</button></div>
+      <div class="grid wngrid">${WSA.notes.map(n => `<div class="card wncard ${n.pinned ? 'pin' : ''}"><div class="row" style="flex-wrap:nowrap"><span style="font-size:19px">${(NCATA.find(x => x[0] === n.category) || NCATA[5])[1]}</span><b style="flex:1;min-width:0">${esc(n.title)}</b>
+        <button class="btn btn-o btn-sm" data-act="wsPin" data-arg="${esc(n.id)}" title="${n.pinned ? 'Unpin' : 'Pin'}">${n.pinned ? '📌' : '📍'}</button></div>
+        ${n.body ? `<div class="wnbody">${esc(n.body)}</div>` : ''}<div class="row" style="margin-top:auto;padding-top:8px">${n.url ? `<a class="btn btn-o btn-sm" href="${esc(n.url)}" target="_blank" rel="noopener">🔗 Open</a>` : ''}
+        <button class="btn btn-o btn-sm" data-act="wsNote" data-arg="${esc(n.id)}">✏️</button><span class="mu" style="margin-left:auto">${esc(n.created_by_name || '')}</span></div></div>`).join('')
+        || '<div class="empty" style="grid-column:1/-1"><div class="e">📚</div><b>Abhi koi note nahi</b></div>'}</div>`;
+  }
+  if (tab === 'leave') {
+    if (!WSA.leaves) return '<div class="sk"></div>';
+    const ls = WSA.leaves.filter(mineS), pend = ls.filter(l => l.status === 'pending'), rest = ls.filter(l => l.status !== 'pending');
+    const card = l => `<div class="card wlrow"><div class="wmd"><b>${new Date(String(l.from_date).slice(0, 10) + 'T00:00:00Z').getUTCDate()}</b><span>${shortD(l.from_date).split(' ')[1]}</span></div>
+      <div style="flex:1;min-width:0"><div class="row"><b>${esc(l.staff_name)}</b><span>${LKA[l.kind]}</span><span class="pill ${LSTA[l.status][1]}">${LSTA[l.status][0]}</span></div>
+        <div class="mu">${shortD(l.from_date)}${String(l.to_date).slice(0, 10) !== String(l.from_date).slice(0, 10) ? ' – ' + shortD(l.to_date) : ''}${l.reason ? ' · ' + esc(l.reason) : ''}${l.admin_note ? ' · 💬 ' + esc(l.admin_note) : ''}</div></div>
+      ${l.status === 'pending' ? `<button class="btn btn-g btn-sm" data-act="wsLeave" data-arg="${esc(l.id)}" data-arg2="1">✓ Approve</button><button class="btn btn-r btn-sm" data-act="wsLeave" data-arg="${esc(l.id)}" data-arg2="0">✕ Reject</button>` : ''}</div>`;
+    return `${pend.length ? `<div class="sec" style="margin-top:0"><h2>⏳ Faisla karna hai</h2><span class="r">${pend.length}</span></div>${pend.map(card).join('')}` : '<div class="card" style="background:var(--lime-s);margin-bottom:12px"><b>✅ Koi pending leave nahi</b></div>'}
+      ${rest.length ? `<div class="sec"><h2>Pichhli</h2><span class="r">${rest.length}</span></div>${rest.map(card).join('')}` : ''}`;
+  }
+  return '';
+}
+const addDaysA = (iso, n) => { const d = new Date(iso + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+async function wsPost(id) {
+  const p = id ? WSA.posts.find(x => x.id === id) : null;
+  const v = await modal({ title: p ? 'Post badlo' : '＋ Post plan karo', ok: 'Save',
+    fields: [{ id: 'title', label: 'Post kya hai', value: p ? p.title : '', ph: 'Jaise: Reel — subah ki taaza sabzi' },
+      { id: 'platform', label: 'Kahan', type: 'select', value: p ? p.platform : 'Instagram', options: PLATA.map(([x, i]) => [x, i + ' ' + x]) },
+      { id: 'status', label: 'Stage', type: 'select', value: p ? p.status : 'idea', options: Object.entries(PSTA).map(([k, x]) => [k, x[0]]) },
+      { id: 'date', label: 'Date', type: 'date', value: p ? String(p.post_date || '').slice(0, 10) : '' }, { id: 'time', label: 'Time', type: 'time', value: p && p.post_time ? String(p.post_time).slice(0, 5) : '' },
+      { id: 'caption', label: 'Caption', type: 'textarea', value: p ? p.caption || '' : '' }, { id: 'tags', label: 'Hashtags', value: p ? p.hashtags || '' : '' },
+      { id: 'link', label: 'Link', type: 'url', value: p ? p.link || '' : '', ph: 'https://' }].concat(p ? [{ id: 'del', label: 'Delete?', type: 'select', value: '', options: [['', 'Nahi'], ['yes', '🗑 Haan, delete']] }] : []) });
+  if (!v) return;
+  if (v.del === 'yes') { const r = await rpc('team_post_delete', { p_id: p.id }); toast(r.ok ? 'Delete ho gaya' : '⚠️ ' + (r.error || 'Nahi hua')); return r.ok && wsaLoad(true); }
+  if (!v.title) return toast('Post ka naam likho');
+  const r = await rpc('team_post_save', { p_id: p ? p.id : null, p_title: v.title, p_platform: v.platform, p_date: v.date || null, p_time: v.time || null, p_caption: v.caption || null, p_hashtags: v.tags || null, p_status: v.status, p_link: v.link || null });
+  toast(r.ok ? 'Save ho gaya ✓' : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
+}
+async function wsIssue(id) {
+  const i = id ? WSA.issues.find(x => x.id === id) : null;
+  const v = await modal({ title: i ? IKA[i.kind] + ' · ' + i.title.slice(0, 40) : '＋ Bug / idea', sub: i ? esc(i.details || '') + (i.link ? `<br><a href="${esc(i.link)}" target="_blank" rel="noopener">🔗 Link</a>` : '') : '', ok: 'Save',
+    fields: [{ id: 'kind', label: 'Type', type: 'select', value: i ? i.kind : 'bug', options: Object.entries(IKA) }, { id: 'app', label: 'Kahan', type: 'select', value: i ? i.app : 'customer', options: IAPPA },
+      { id: 'title', label: 'Title', value: i ? i.title : '' }, { id: 'details', label: 'Details', type: 'textarea', value: i ? i.details || '' : '' },
+      { id: 'sev', label: 'Kitna bura', type: 'select', value: i ? i.severity : 'normal', options: Object.entries(ISEVA).map(([k, x]) => [k, x[0]]) },
+      { id: 'status', label: 'Status', type: 'select', value: i ? i.status : 'open', options: Object.entries(ISTA).map(([k, x]) => [k, x[0]]) },
+      { id: 'who', label: 'Kaun fix karega', type: 'select', value: i ? i.assignee || '' : '', options: [['', '— koi nahi —']].concat((WSA.people || []).map(p => [p.id, p.name])) },
+      { id: 'link', label: 'Link', type: 'url', value: i ? i.link || '' : '' }].concat(i ? [{ id: 'del', label: 'Delete?', type: 'select', value: '', options: [['', 'Nahi'], ['yes', '🗑 Haan, delete']] }] : []) });
+  if (!v) return;
+  if (v.del === 'yes') { const r = await rpc('team_issue_delete', { p_id: i.id }); toast(r.ok ? 'Delete ho gaya' : '⚠️ ' + (r.error || 'Nahi hua')); return r.ok && wsaLoad(true); }
+  if (!v.title) return toast('Title likho');
+  const r = await rpc('team_issue_save', { p_id: i ? i.id : null, p_kind: v.kind, p_app: v.app, p_title: v.title, p_details: v.details || null, p_severity: v.sev, p_status: v.status, p_link: v.link || null, p_assignee: v.who || null });
+  toast(r.ok ? 'Save ho gaya ✓' : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
+}
+async function wsNote(id) {
+  const n = id ? WSA.notes.find(x => x.id === id) : null;
+  const v = await modal({ title: n ? 'Note badlo' : '＋ Note / link', sub: 'Poori team padh sakti hai. Password mat daalo.', ok: 'Save',
+    fields: [{ id: 'title', label: 'Title', value: n ? n.title : '' }, { id: 'cat', label: 'Section', type: 'select', value: n ? n.category : 'Guide', options: NCATA.map(([c, i]) => [c, i + ' ' + c]) },
+      { id: 'body', label: 'Note', type: 'textarea', value: n ? n.body || '' : '' }, { id: 'url', label: 'Link', type: 'url', value: n ? n.url || '' : '', ph: 'https://' },
+      { id: 'pin', label: 'Upar pin karo?', type: 'select', value: n && n.pinned ? 'yes' : '', options: [['', 'Nahi'], ['yes', '📌 Haan']] }].concat(n ? [{ id: 'del', label: 'Delete?', type: 'select', value: '', options: [['', 'Nahi'], ['yes', '🗑 Haan, delete']] }] : []) });
+  if (!v) return;
+  if (v.del === 'yes') { const r = await rpc('team_note_delete', { p_id: n.id }); toast(r.ok ? 'Delete ho gaya' : '⚠️ ' + (r.error || 'Nahi hua')); return r.ok && wsaLoad(true); }
+  if (!v.title) return toast('Title likho');
+  const r = await rpc('team_note_save', { p_id: n ? n.id : null, p_title: v.title, p_body: v.body || null, p_url: v.url || null, p_category: v.cat, p_pinned: v.pin === 'yes' });
+  toast(r.ok ? 'Save ho gaya ✓' : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
+}
+async function wsPin(id) {
+  const n = WSA.notes.find(x => x.id === id); if (!n) return;
+  const r = await rpc('team_note_save', { p_id: n.id, p_title: n.title, p_body: n.body, p_url: n.url, p_category: n.category, p_pinned: !n.pinned });
+  toast(r.ok ? (n.pinned ? 'Unpin ✓' : '📌 Pin ho gaya') : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
+}
+async function wsLeave(id, approve) {
+  const l = WSA.leaves.find(x => x.id === id);
+  const v = await modal({ title: approve ? '✓ Leave approve karein?' : '✕ Leave reject karein?', sub: l ? esc(l.staff_name) + ' · ' + LKA[l.kind] + ' · ' + shortD(l.from_date) : '', ok: approve ? 'Approve' : 'Reject', danger: !approve,
+    fields: [{ id: 'note', label: 'Intern ke liye note (optional)', type: 'textarea', ph: approve ? 'Jaise: theek hai, dhyan rakhna' : 'Jaise: us din launch hai' }] });
+  if (!v) return;
+  const r = await rpc('admin_leave_decide', { p_id: id, p_approve: approve, p_note: v.note || null });
+  toast(r.ok ? (r.msg || 'Ho gaya ✓') : '⚠️ ' + (r.error || 'Nahi hua')); if (r.ok) wsaLoad(true);
 }
 
 /* ---------- Sales targets ---------- */
@@ -1824,7 +1980,7 @@ function modal({ title, sub, fields, ok, danger }, preselect) {
       ${f.map(x => `<div><label class="lbl" for="m_${x.id}">${esc(x.label)}</label>${
         x.type === 'textarea' ? `<textarea class="fld" id="m_${x.id}" rows="3" placeholder="${esc(x.ph || '')}">${esc(x.value || '')}</textarea>`
         : x.type === 'select' ? `<select class="fld" id="m_${x.id}">${x.options.map(([v, l]) => `<option value="${esc(v)}" ${v === x.value ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`
-        : x.type === 'checks' ? `<div class="chips" id="m_${x.id}">${x.options.map(([v, l]) => `<label class="chip"><input type="checkbox" value="${esc(v)}" style="margin-right:6px">${esc(l)}</label>`).join('')}</div>`
+        : x.type === 'checks' ? `<div class="chips" id="m_${x.id}">${x.options.map(([v, l]) => `<label class="chip"><input type="checkbox" value="${esc(v)}" style="margin-right:6px" ${(x.checked || []).includes(v) ? 'checked' : ''}>${esc(l)}</label>`).join('')}</div>`
         : `<input class="fld" id="m_${x.id}" type="${['date', 'time', 'url'].includes(x.type) ? x.type : 'text'}" ${x.type === 'number' ? 'inputmode="decimal"' : ''} value="${esc(x.value ?? '')}" placeholder="${esc(x.ph || '')}">`}${x.hint ? `<div class="mu" style="margin-top:4px">${x.hint}</div>` : ''}</div>`).join('')}
       </div><div class="foot"><button class="btn btn-o" data-act="modalCancel">Rehne do</button>
       <button class="btn ${danger ? 'btn-r' : 'btn-g'}" data-act="modalOk">${esc(ok || 'Save')}</button></div>`;
@@ -2025,6 +2181,12 @@ document.addEventListener('click', e => {
     case 'wsMeet': wsMeet(a || null); break;
     case 'wsMeetCancel': wsMeetCancel(a); break;
     case 'wsMeetNotes': wsMeetNotes(a); break;
+    case 'wsPost': wsPost(a || null); break;
+    case 'wsIssue': wsIssue(a || null); break;
+    case 'wbf': UI.wbf = a; render(false); break;
+    case 'wsNote': wsNote(a || null); break;
+    case 'wsPin': wsPin(a); break;
+    case 'wsLeave': wsLeave(a, el.dataset.arg2 === '1'); break;
     case 'newMeet': window.open('https://meet.google.com/new', '_blank', 'noopener'); break;
     case 'editTask': editTask(a); break;
     case 'reopenTask': act('admin_reopen_task', { p_task: a }); break;

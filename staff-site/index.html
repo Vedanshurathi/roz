@@ -6,7 +6,7 @@
 <title>RozBazaar Staff</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NLjyI3r1SwI7pRm76uu5CwwrOInnp9dN81qSnGf0XBQ=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sqTyPyjK8AgtLyJL1Nc6B8IwqI5ahD1NcEJXF2YeZsY=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -236,6 +236,84 @@ td.acts .btn+.btn{margin-left:6px}
 .mdate{width:52px;flex-shrink:0;text-align:center;background:var(--lime-s);border-radius:12px;padding:8px 0;height:max-content}
 .mdate b{display:block;font-size:20px;line-height:1.1;color:var(--g-dk)}.mdate span{font-size:11px;font-weight:800;color:var(--g-dk);text-transform:uppercase}
 .note{background:var(--grey);border-radius:10px;padding:8px 10px;font-size:12.5px;white-space:pre-wrap}
+.tag{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--tx2);background:var(--grey);border-radius:7px;padding:3px 7px;white-space:nowrap}
+/* to-do: hero, quick add, list */
+.hero-t{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:linear-gradient(120deg,#fff 55%,var(--lime-s))}
+.ring.big{width:78px;height:78px}.ring.big i{width:62px;height:62px;font-size:17px}
+.hero-mid{flex:1;min-width:210px}.hero-mid>b{font-size:18px}
+.hstats{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--tx2)}.hstats b{color:var(--tx)}.hstats .bad,.hstats .bad b{color:var(--red)}
+.wk{text-align:center}.wk-b{display:flex;align-items:flex-end;gap:5px;height:54px;margin-bottom:5px}
+.wk-b span{width:12px;border-radius:4px 4px 2px 2px;background:var(--line)}.wk-b span.on{background:var(--g)}
+.qa{margin-top:12px;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1.5px solid var(--line)}
+.qa:focus-within{border-color:var(--g);box-shadow:0 0 0 4px rgba(30,142,62,.10)}
+.qa-in{flex:1;min-width:220px;border:0;outline:0;font:inherit;font-size:15px;padding:8px 4px;background:transparent}
+.qa-opts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.qa-sel{border:1.4px solid var(--line);border-radius:9px;padding:6px 8px;font:inherit;font-size:12.5px;background:#fff;cursor:pointer}
+.grp{margin-top:16px}
+.grp-h{display:flex;align-items:center;gap:8px;width:100%;font-size:13px;font-weight:800;color:var(--tx2);padding:0 4px 8px;text-align:left}
+.grp-h span{background:var(--grey);border-radius:20px;padding:1px 8px;font-size:11px}.grp-h em{font-style:normal;margin-left:auto;color:var(--blue);font-size:12px}
+.g-late .grp-h{color:var(--red)}.g-today .grp-h{color:var(--g-dk)}
+.li{display:flex;align-items:center;gap:12px;background:#fff;border-radius:14px;padding:11px 14px;margin-bottom:7px;box-shadow:var(--sh);border:1px solid transparent;transition:transform .15s var(--ez),border-color .15s}
+.li:hover{border-color:var(--line);transform:translateY(-1px)}
+.li-main{flex:1;min-width:0;cursor:pointer}.li-t{font-weight:700;font-size:14.5px;overflow-wrap:anywhere}
+.li-m{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;align-items:center}.li-m:empty{display:none}
+.li.is-done .li-t{text-decoration:line-through;color:var(--mut)}.li.is-done{opacity:.75}.li.is-nd .li-t{color:var(--red)}
+.tick{width:24px;height:24px;border-radius:50%;border:2px solid #C9C3B6;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:900;transition:all .2s var(--sp)}
+.tick:hover{border-color:var(--g);background:var(--lime-s)}.tick.half{border-color:#E5B700;background:conic-gradient(#FFD814 50%,#fff 0)}
+.tick.on{background:var(--g);border-color:var(--g);transform:scale(1.05)}
+.li.pr-high .tick:not(.on){border-color:var(--red)}
+.pdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:var(--or)}.li.pr-high .pdot{background:var(--red)}.li.pr-low .pdot{background:var(--g)}
+.clp{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:var(--tx2)}
+.clbar{display:inline-block;width:46px;height:6px;border-radius:4px;background:var(--line);overflow:hidden}.clbar i{display:block;height:100%;background:var(--g);border-radius:4px}
+.clbar.big{display:block;width:100%;height:8px;margin-bottom:8px}
+.cl{display:flex;flex-direction:column;gap:2px}
+.cli{display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:9px;cursor:pointer}.cli:hover{background:var(--grey)}
+.cli input{width:18px;height:18px;accent-color:var(--g);flex-shrink:0}.cli span{flex:1;min-width:0;overflow-wrap:anywhere}
+.cli.on span{text-decoration:line-through;color:var(--mut)}
+.cl-x{opacity:.35;padding:2px 6px;border-radius:6px}.cli:hover .cl-x{opacity:1}.cl-x:hover{background:var(--red-s);color:var(--red)}
+/* work timer */
+.timer{text-align:center;padding:26px 18px}
+.timer.run{background:linear-gradient(160deg,#fff,var(--lime-s));border:2px solid var(--g)}
+.t-state{font-weight:800;color:var(--tx2);display:flex;align-items:center;justify-content:center;gap:8px}
+.t-state .dot{width:10px;height:10px;border-radius:50%;background:var(--g);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.t-clock{font-size:52px;font-weight:900;letter-spacing:1px;font-variant-numeric:tabular-nums;margin:6px 0 14px;color:var(--navy)}
+.t-note{display:block;max-width:420px;margin:0 auto 12px}.t-btn{font-size:16px;padding:14px 30px;border-radius:14px;display:inline-flex}
+.timer.run .t-btn{background:var(--red);color:#fff;border-color:var(--red)}
+.hbars{display:flex;gap:8px;align-items:flex-end;margin-top:12px}
+.hb{flex:1;text-align:center;min-width:0}.hb-v{display:block;font-size:10.5px;font-weight:800;color:var(--tx2);height:16px;white-space:nowrap;overflow:hidden}
+.hb-c{height:110px;display:flex;align-items:flex-end;justify-content:center;background:var(--grey);border-radius:9px;margin:3px 0 5px;overflow:hidden}
+.hb-c i{display:block;width:100%;background:var(--lime);border-radius:9px 9px 0 0}.hb-c i.on{background:var(--g)}
+/* content calendar */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-top:12px}
+@media (max-width:1100px){.cal{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:640px){.cal{grid-template-columns:1fr 1fr}}
+.cday{background:var(--grey);border-radius:14px;padding:8px;min-height:120px}
+.cday.today{background:var(--lime-s);box-shadow:inset 0 0 0 2px var(--g)}
+.cday-h{display:flex;align-items:baseline;gap:6px;padding:2px 2px 8px}.cday-h span{font-size:11px;color:var(--mut)}
+.cadd{margin-left:auto;width:24px;height:24px;border-radius:8px;background:#fff;font-weight:900;color:var(--g-dk)}.cadd:hover{background:var(--g);color:#fff}
+.pcard{padding:9px 10px;margin-bottom:7px;cursor:pointer;border-left:4px solid var(--line);font-size:12.5px}
+.pcard.ps-draft{border-left-color:#E5B700}.pcard.ps-ready{border-left-color:var(--blue)}.pcard.ps-posted{border-left-color:var(--g);opacity:.8}
+.pcard .pt{flex:1;min-width:0;overflow-wrap:anywhere;font-size:13px}.pplat{font-size:16px}
+.pgrid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+/* bugs */
+.irow{display:flex;gap:12px;align-items:flex-start;margin-bottom:9px;cursor:pointer;border-left:4px solid var(--line)}
+.irow.sev-critical{border-left-color:var(--red);background:#FFF8F8}.irow.sev-high{border-left-color:var(--red)}.irow.sev-normal{border-left-color:var(--or)}.irow.sev-low{border-left-color:var(--g)}
+.irow.closed{opacity:.65}.irow:hover{box-shadow:var(--shl)}
+.ik{width:38px;height:38px;border-radius:11px;background:var(--grey);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+/* notes */
+.ngrid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.ncard{display:flex;flex-direction:column}.ncard.pin{border:2px solid #F2D14B;background:#FFFCEB}
+.nic{font-size:20px}.nbody{margin-top:8px;font-size:13px;white-space:pre-wrap;color:var(--tx2);max-height:180px;overflow:auto;overflow-wrap:anywhere}
+.lrow{display:flex;gap:14px;align-items:center;margin-bottom:10px}
+@media (max-width:560px){
+  .hero-t{gap:12px;padding:14px}.wk{display:none}.ring.big{width:62px;height:62px}.ring.big i{width:50px;height:50px;font-size:14px}
+  .hero-mid{min-width:0}.hero-mid>b{font-size:16px}.hstats{gap:4px 12px;font-size:12px}
+  .tfilt .chips,#v-content .chips,#v-bugs .chips,#v-notes .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-14px;padding-right:14px}
+  .tfilt .toolbar .search{min-width:0;flex-basis:100%}
+  .qa-opts{width:100%}.qa-sel{flex:1;min-width:0}
+  .li{padding:10px 12px}.t-clock{font-size:42px}
+}
 .empty .e{font-size:40px;margin-bottom:8px}
 .empty b{display:block;color:var(--tx);font-size:16px;margin-bottom:4px}
 .sk{background:linear-gradient(90deg,var(--grey),#fff,var(--grey));background-size:200% 100%;animation:sk 1.2s linear infinite;border-radius:16px;height:90px;margin-bottom:12px}
@@ -422,6 +500,11 @@ td.acts .btn+.btn{margin-left:6px}
     <button class="nav hide" data-kind="intern" data-act="go" data-arg="files"><span class="ic">📎</span>Files &amp; links</button>
     <button class="nav" data-act="go" data-arg="meet"><span class="ic">📅</span><span data-h="Meetings" data-e="Meetings">Meetings</span><span class="badge hide" id="bMeet"></span></button>
     <button class="nav hide" data-kind="intern" data-act="go" data-arg="report"><span class="ic">🗒️</span>Daily report<span class="badge hide" id="bReport"></span></button>
+    <button class="nav hide" data-kind="intern" data-act="go" data-arg="timer"><span class="ic">⏱️</span>Work timer<span class="badge hide" id="bTimer"></span></button>
+    <button class="nav hide" data-kind="intern" data-act="go" data-arg="content"><span class="ic">📣</span>Content calendar</button>
+    <button class="nav hide" data-kind="intern" data-act="go" data-arg="bugs"><span class="ic">🐞</span>Bugs &amp; ideas<span class="badge hide" id="bBugs"></span></button>
+    <button class="nav hide" data-kind="intern" data-act="go" data-arg="notes"><span class="ic">📚</span>Team notes</button>
+    <button class="nav hide" data-kind="intern" data-act="go" data-arg="leave"><span class="ic">🏖️</span>Leave</button>
     <button class="nav" data-act="go" data-arg="account"><span class="ic">🔑</span><span data-h="Mera account" data-e="My account">Mera account</span></button>
     <div class="foot">
       <div class="me"><div class="av" id="meAv">S</div><div><b id="meName">Staff</b><span id="mePhone"></span></div></div>
@@ -453,6 +536,11 @@ td.acts .btn+.btn{margin-left:6px}
       <section class="scr" id="v-files"></section>
       <section class="scr" id="v-meet"></section>
       <section class="scr" id="v-report"></section>
+      <section class="scr" id="v-timer"></section>
+      <section class="scr" id="v-content"></section>
+      <section class="scr" id="v-bugs"></section>
+      <section class="scr" id="v-notes"></section>
+      <section class="scr" id="v-leave"></section>
     </div>
   </div>
 </div>
@@ -569,7 +657,7 @@ function showApp() {
   $('app').classList.toggle('intern', isIntern());
   document.querySelectorAll('[data-e]').forEach(x => { x.textContent = isIntern() ? x.dataset.e : x.dataset.h; });
   VIEW = isIntern() ? 'welcome' : 'today';
-  go(VIEW); refresh(); refreshPushSub();
+  go(VIEW); refresh(); refreshPushSub(); if (isIntern()) { wsLoad('timer'); wsLoad('bugs'); }
   clearInterval(timer);
   timer = setInterval(() => { if (!document.hidden && !$('drawer').classList.contains('show')) refresh(true); }, 45_000);
 }
@@ -588,6 +676,7 @@ async function login() {
 async function logout() { const bye = L('Logout ho gaye', 'Logged out'); await sb.auth.signOut(); D = null; ME = null; SEEN = null; NOTIF_SEEN = null; TASKS = []; TARGETS = []; LOADED = false; showLogin(bye); }
 
 /* ---------- data ---------- */
+function typing() { const a = document.activeElement; return !!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.closest('.scr')); }
 async function refresh(silent) {
   if (busy) return; busy = true; $('rfIc').classList.add('spin');
   const intern = isIntern();
@@ -625,7 +714,7 @@ async function refresh(silent) {
     D = { today: new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date()), bookings: [], vendors: [] };
   }
   $('stamp').textContent = L('Update ', 'Updated ') + new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-  render(false);
+  if (!(silent && typing())) render(false);   /* don't wipe what someone is typing */
   if (!silent && !first && !alerted) toast(L('Naya data aa gaya ✓', 'Up to date ✓'));
 }
 /* a notification we haven't shown yet arrived while the page is open */
@@ -642,11 +731,17 @@ const TITLES = {
   today: ['Aaj ka plan', 'aaj ke orders, slot ke hisaab se'], orders: ['Orders', 'har order — search, filter, detail'],
   vendors: ['Vendors', 'kaun kya bech raha, kitna bika'], sale: ['Sale', 'kitna bika — din, type, item, vendor, gaon'],
   customers: ['Customers', 'naam pe click karo — saare orders'], account: ['Mera account', 'naam, password, notifications'],
-  meet: ['Meetings', 'team ke saath Google Meet'], files: ['Files & links', ''], report: ['Daily report', '']
+  meet: ['Meetings', 'team ke saath Google Meet'], files: ['Files & links', ''], report: ['Daily report', ''], timer: ['Work timer', ''],
+  content: ['Content calendar', ''], bugs: ['Bugs & ideas', ''], notes: ['Team notes', ''], leave: ['Leave', '']
 };
 const TITLES_EN = { welcome: ['Welcome', 'Welcome to RozBazaar'], tasks: ['My tasks', 'your own to-do sheet + tasks from the admin'],
   files: ['Files & links', 'share files and links with the admin'], meet: ['Meetings', 'schedule a Google Meet with the team'],
   report: ['Daily report', 'what you did today, what\'s next, anything blocking you'],
+  timer: ['Work timer', 'start when you begin, stop when you finish — your hours add up by themselves'],
+  content: ['Content calendar', 'plan every Instagram / WhatsApp / YouTube post — idea → draft → ready → posted'],
+  bugs: ['Bugs & ideas', 'report a bug, suggest a feature, track what is being fixed'],
+  notes: ['Team notes', 'guides, brand rules, useful links — written once, used by everyone'],
+  leave: ['Leave', 'ask for a day off, sick leave or work from home'],
   account: ['My account', 'name, password, notifications'] };
 function go(v) {
   VIEW = v;
@@ -654,7 +749,7 @@ function go(v) {
   document.querySelectorAll('.nav[data-arg]').forEach(b => b.classList.toggle('on', b.dataset.arg === v));
   const tt = (isIntern() && TITLES_EN[v]) || TITLES[v]; $('pgTitle').textContent = tt[0]; $('pgSub').textContent = tt[1];
   if (v === 'orders') { NEWCOUNT = 0; $('bOrders').classList.add('hide'); }
-  if (v === 'files' || v === 'meet' || v === 'report') wsLoad(v);
+  if (['files', 'meet', 'report', 'timer', 'content', 'bugs', 'notes', 'leave'].includes(v)) wsLoad(v);
   document.body.classList.remove('nav-open');
   window.scrollTo(0, 0); render(true);
 }
@@ -666,6 +761,11 @@ function render(animate) {
   if (VIEW === 'files') return vFiles(el, rv);
   if (VIEW === 'meet') return vMeet(el, rv);
   if (VIEW === 'report') return vReport(el, rv);
+  if (VIEW === 'timer') return vTimer(el, rv);
+  if (VIEW === 'content') return vContent(el, rv);
+  if (VIEW === 'bugs') return vBugs(el, rv);
+  if (VIEW === 'notes') return vNotes(el, rv);
+  if (VIEW === 'leave') return vLeave(el, rv);
   if (VIEW === 'welcome') return vWelcome(el, rv);
   if (!D) { el.innerHTML = '<div class="sk"></div><div class="sk"></div><div class="sk"></div>'; return; }
   ({ today: vToday, orders: vOrders, vendors: vVendors, sale: vSale, customers: vCustomers })[VIEW](el, rv);
@@ -1055,7 +1155,7 @@ async function setTask(id, status) {
    team_meeting_cancel / team_meeting_notes / team_people,
    staff_report_save / team_reports.
    ============================================================ */
-const WS = { view: 'sheet', sf: 'open', scat: 'all', ff: 'all', files: null, meets: null, reports: null, people: null, rday: null };
+const WS = { view: 'list', showDone: false, qaDue: 'today', posts: null, issues: null, timer: null, notes: null, leaves: null, cf: 'all', bf: 'open', bk: 'all', nq: '', ncat: 'all', cwk: 0, sf: 'open', scat: 'all', ff: 'all', files: null, meets: null, reports: null, people: null, rday: null };
 const CATS = [['Development', '💻'], ['Marketing', '📣'], ['Design', '🎨'], ['Content', '✍️'], ['Research', '🔎'], ['Other', '📌']];
 const catIc = c => (CATS.find(x => x[0] === c) || [0, '📌'])[1];
 const STCOL = [['todo', 'To do', '📝'], ['doing', 'Doing', '🔄'], ['done', 'Done', '✅']];
@@ -1073,26 +1173,62 @@ async function wsLoad(v, force) {
     WS.meets = r.ok ? r.data || [] : []; WS.people = p.ok ? p.data || [] : [];
   }
   if (v === 'report' && (force || !WS.reports)) { const r = await rpc('team_reports', { p_days: 60 }); WS.reports = r.ok ? r.data || [] : []; }
-  if (VIEW === v) render(false);
+  await wsLoad2(v, force);
+  if (VIEW === v && !(typing() && !force)) render(false);
   wsBadges();
 }
 function wsBadges() {
   const bm = $('bMeet'); if (bm && WS.meets) { const n = WS.meets.filter(m => m.status === 'scheduled' && new Date(m.starts_at) > Date.now() && new Date(m.starts_at) - Date.now() < 864e5).length; bm.classList.toggle('hide', !n); bm.textContent = n; }
+  const bt = $('bTimer'); if (bt && WS.timer) { bt.classList.toggle('hide', !WS.timer.open); bt.textContent = '●'; }
+  const bb = $('bBugs'); if (bb && WS.issues) { const n = WS.issues.filter(i => i.assignee === ME.id && (i.status === 'open' || i.status === 'in_progress')).length; bb.classList.toggle('hide', !n); bb.textContent = n; }
   const br = $('bReport'); if (br && WS.reports) { const done = WS.reports.some(x => String(x.day).slice(0, 10) === istDay() && x.staff_id === ME.id); br.classList.toggle('hide', done); br.textContent = '!'; }
 }
 
 /* ---------- task sheet ---------- */
 function sheetRows() {
-  const q = (WS.q || '').toLowerCase(), sf = WS.view === 'board' && WS.sf === 'open' ? 'all' : WS.sf;   /* board always shows its Done column */
+  const q = (WS.q || '').toLowerCase(), sf = WS.view !== 'sheet' && WS.sf === 'open' ? 'all' : WS.sf;   /* board + list always show Done (list folds it) */
   return TASKS.filter(t => (sf === 'all' || (sf === 'open' ? (t.status === 'todo' || t.status === 'doing') : sf === 'admin' ? t.source === 'admin' : t.status === sf))
     && (WS.scat === 'all' || (t.category || 'Other') === WS.scat)
     && (!q || [t.title, t.details, t.category].some(x => String(x || '').toLowerCase().includes(q))));
 }
+const BUCKETS = [['late', '⏰ Overdue'], ['today', '☀️ Today'], ['tom', '🌤️ Tomorrow'], ['week', '📅 Next 7 days'], ['later', '🗓️ Later'],
+  ['none', '📌 No date'], ['nd', '❌ Not done'], ['done', '✅ Done']];
+function bucketOf(t, today) {
+  if (t.status === 'done') return 'done'; if (t.status === 'not_done') return 'nd';
+  const d = t.due_date ? String(t.due_date).slice(0, 10) : '';
+  if (!d) return 'none'; if (d < today) return 'late'; if (d === today) return 'today'; if (d === addDays(today, 1)) return 'tom';
+  return daysBetween(today, d) < 7 ? 'week' : 'later';
+}
+const clOf = t => Array.isArray(t.checklist) ? t.checklist : [];
+function clProg(t) {
+  const c = clOf(t); if (!c.length) return '';
+  const n = c.filter(x => x.d).length;
+  return `<span class="clp" title="${n} of ${c.length} steps done"><span class="clbar"><i style="width:${Math.round(n / c.length * 100)}%"></i></span>${n}/${c.length}</span>`;
+}
+function listItem(t, today) {
+  const done = t.status === 'done', mine = t.source === 'self';
+  return `<div class="li pr-${t.priority} ${done ? 'is-done' : ''} ${t.status === 'not_done' ? 'is-nd' : ''}">
+    <button class="tick ${done ? 'on' : ''} ${t.status === 'doing' ? 'half' : ''}" data-act="tick" data-arg="${t.id}" aria-label="${done ? 'Mark not done' : 'Mark done'}">${done ? '✓' : ''}</button>
+    <div class="li-main" data-act="taskOpen" data-arg="${t.id}">
+      <div class="li-t">${esc(t.title)}</div>
+      <div class="li-m">${t.status === 'doing' ? '<span class="pill p-y">🔄 Doing</span>' : ''}${!done ? dueChip(t.due_date, t.status === 'doing' ? 'todo' : t.status, today) : ''}
+        ${t.category ? `<span class="tag">${catIc(t.category)} ${esc(t.category)}</span>` : ''}${clProg(t)}
+        ${t.link ? '<span class="tag">🔗 link</span>' : ''}${t.files ? `<span class="tag">📎 ${t.files}</span>` : ''}${t.details ? '<span class="tag">📝</span>' : ''}
+        ${mine ? '' : '<span class="pill p-y">From admin</span>'}</div>
+    </div>
+    <span class="pdot" title="${t.priority} priority"></span></div>`;
+}
 function vSheet(el, rv) {
   const today = istDay(), all = TASKS, open = all.filter(TF.open), done = all.filter(t => t.status === 'done');
   const late = open.filter(t => t.due_date && String(t.due_date).slice(0, 10) < today).length;
-  const wk = all.filter(t => t.status === 'done' && t.completed_at && daysBetween(String(t.completed_at).slice(0, 10), today) < 7).length;
-  const pct = all.length ? Math.round(done.length / all.length * 100) : 0;
+  const dueToday = open.filter(t => t.due_date && String(t.due_date).slice(0, 10) === today).length;
+  const doneToday = done.filter(t => t.completed_at && new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date(t.completed_at)) === today).length;
+  const focus = doneToday + dueToday + late, pctT = focus ? Math.round(doneToday / focus * 100) : (open.length ? 0 : 100);
+  const wkDays = [-6, -5, -4, -3, -2, -1, 0].map(o => istDay(o));
+  const perDay = wkDays.map(d => done.filter(t => t.completed_at && new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date(t.completed_at)) === d).length);
+  const mx = Math.max(1, ...perDay), wk = perDay.reduce((a, b) => a + b, 0);
+  const hr = +new Date().toLocaleString('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', hour12: false });
+  const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
   const rows = sheetRows();
   const prSel = (t, dis) => `<select class="cell-sel pr-${t.priority}" data-cell="priority" data-id="${t.id}" ${dis}>${[['high', '🔴 High'], ['normal', '🟠 Normal'], ['low', '🟢 Low']].map(([v, l]) => `<option value="${v}" ${t.priority === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
   const stSel = t => `<select class="cell-sel st-${t.status}" data-cell="status" data-id="${t.id}">${[['todo', '📝 To do'], ['doing', '🔄 Doing'], ['done', '✅ Done'], ['not_done', '❌ Not done']].map(([v, l]) => `<option value="${v}" ${t.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
@@ -1103,7 +1239,7 @@ function vSheet(el, rv) {
     return `<tr class="${t.status === 'done' ? 'is-done' : ''}">
       <td class="c-chk"><input type="checkbox" data-act="taskCheck" data-arg="${t.id}" ${t.status === 'done' ? 'checked' : ''} aria-label="Done"></td>
       <td class="c-title">${mine ? `<input class="cell-in title" data-cell="title" data-id="${t.id}" value="${esc(t.title)}" maxlength="200">` : `<b>${esc(t.title)}</b>`}
-        ${t.details ? `<div class="mu cell-note">${esc(t.details).slice(0, 120)}</div>` : ''}</td>
+        ${t.details || clOf(t).length ? `<div class="mu cell-note">${clProg(t)} ${esc(t.details || '').slice(0, 100)}</div>` : ''}</td>
       <td>${catSel(t, dis)}</td><td>${prSel(t, dis)}</td><td>${stSel(t)}</td><td>${dueCell(t, dis)}</td>
       <td class="c-link">${t.link ? `<a href="${esc(t.link)}" target="_blank" rel="noopener" title="${esc(t.link)}">🔗 Open</a>` : '<span class="mu">—</span>'}${t.files ? ` <span class="pill p-m">📎 ${t.files}</span>` : ''}</td>
       <td>${mine ? '<span class="pill p-b">Me</span>' : '<span class="pill p-y">Admin</span>'}</td>
@@ -1111,20 +1247,47 @@ function vSheet(el, rv) {
   const card = t => { const mine = t.source === 'self', i = STCOL.findIndex(c => c[0] === t.status);
     return `<div class="card bcard pr-${t.priority}" data-act="taskOpen" data-arg="${t.id}">
       <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><b style="flex:1;min-width:0">${esc(t.title)}</b>${mine ? '' : '<span class="pill p-y">Admin</span>'}</div>
-      <div class="row" style="margin-top:8px">${t.category ? `<span class="pill p-m">${catIc(t.category)} ${esc(t.category)}</span>` : ''}${dueChip(t.due_date, t.status === 'doing' ? 'todo' : t.status, today)}${t.link ? '<span class="pill p-b">🔗</span>' : ''}</div>
+      <div class="row" style="margin-top:8px">${t.category ? `<span class="tag">${catIc(t.category)} ${esc(t.category)}</span>` : ''}${dueChip(t.due_date, t.status === 'doing' ? 'todo' : t.status, today)}${clProg(t)}${t.link ? '<span class="tag">🔗</span>' : ''}</div>
       <div class="row" style="margin-top:10px;justify-content:space-between">
         ${i > 0 ? `<button class="btn btn-o btn-sm" data-act="taskMove" data-arg="${t.id}" data-arg2="${STCOL[i - 1][0]}">← ${STCOL[i - 1][1]}</button>` : '<span></span>'}
         ${i >= 0 && i < 2 ? `<button class="btn btn-g btn-sm" data-act="taskMove" data-arg="${t.id}" data-arg2="${STCOL[i + 1][0]}">${STCOL[i + 1][1]} →</button>` : ''}</div></div>`; };
+  let body, qa = '';
+  if (WS.view === 'list') {
+    const groups = BUCKETS.map(([k, l]) => [k, l, rows.filter(t => bucketOf(t, today) === k)]).filter(g => g[2].length);
+    qa = `<div class="card qa ${rv} d2">
+        <input class="qa-in" id="qaT" placeholder="＋  Add a task — e.g. “Design Diwali banner” — press Enter" maxlength="200">
+        <div class="qa-opts">
+          <select class="qa-sel" id="qaDue" aria-label="Due">${[['today', '☀️ Today'], ['tom', '🌤️ Tomorrow'], ['week', '📅 In a week'], ['', '📌 No date']].map(([v, l]) => `<option value="${v}" ${WS.qaDue === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+          <select class="qa-sel" id="qaCat" aria-label="Type"><option value="">🏷️ Type</option>${CATS.map(([c, i]) => `<option value="${c}" ${(WS.qaCat || (WS.scat !== 'all' ? WS.scat : '')) === c ? 'selected' : ''}>${i} ${c}</option>`).join('')}</select>
+          <select class="qa-sel" id="qaPri" aria-label="Priority">${[['normal', '🟠 Normal'], ['high', '🔴 High'], ['low', '🟢 Low']].map(([v, l]) => `<option value="${v}" ${(WS.qaPri || 'normal') === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+          <button class="btn btn-g btn-sm" data-act="qaAdd">Add</button></div></div>`;
+    body = `<div class="${rv} d3">${groups.map(([k, l, list]) => { const fold = k === 'done' && !WS.showDone, shown = fold ? [] : k === 'done' ? list.slice(0, 15) : list;
+        return `<div class="grp g-${k}"><button class="grp-h" ${k === 'done' ? 'data-act="toggleDone"' : ''}>${l}<span>${list.length}</span>${k === 'done' ? `<em>${fold ? 'show ▾' : 'hide ▴'}</em>` : ''}</button>
+          ${shown.map(t => listItem(t, today)).join('')}</div>`; }).join('')
+        || `<div class="empty"><div class="e">${WS.sf === 'open' ? '🎉' : '📭'}</div><b>${WS.sf === 'open' ? 'All clear!' : 'Nothing here'}</b><p>${WS.sf === 'open' ? 'Add your next task above.' : 'Try another filter.'}</p></div>`}</div>`;
+  } else if (WS.view === 'sheet') {
+    body = `<div class="card sheet ${rv} d3" style="margin-top:12px;padding:0">
+      <div class="sheet-wrap"><table class="sheet-t"><thead><tr><th></th><th>Task</th><th>Type</th><th>Priority</th><th>Status</th><th>Due</th><th>Link / files</th><th>From</th><th></th></tr></thead>
+      <tbody>${rows.map(row).join('') || `<tr><td colspan="9"><div class="empty" style="padding:26px"><div class="e">${WS.sf === 'open' ? '🎉' : '📭'}</div><b>${WS.sf === 'open' ? 'Nothing open — add your next task below' : 'Nothing here'}</b></div></td></tr>`}
+      <tr class="add-row"><td>＋</td><td colspan="8"><input class="cell-in" id="newRow" placeholder="Type a new task and press Enter…" maxlength="200"></td></tr></tbody></table></div></div>`;
+  } else {
+    body = `<div class="board ${rv} d3">${STCOL.map(([k, l, ic]) => { const list = rows.filter(t => t.status === k);
+        return `<div class="bcol"><div class="bcol-h">${ic} ${l}<span>${list.length}</span></div>${list.map(card).join('') || '<div class="mu" style="padding:14px;text-align:center">Empty</div>'}</div>`; }).join('')}</div>
+      ${rows.some(t => t.status === 'not_done') ? `<div class="sec"><h2>❌ Not done</h2></div>${rows.filter(t => t.status === 'not_done').map(card).join('')}` : ''}`;
+  }
   el.innerHTML = `
-    <div class="grid k4 ${rv} d1">
-      ${kpi('To do', open.length, open.filter(t => t.status === 'doing').length + ' in progress', open.length ? 'warn' : 'good', '📝')}
-      ${kpi('Late', late, 'past the due date', late ? 'bad' : '', '⏰')}
-      ${kpi('Done this week', wk, pct + '% of all tasks done', wk ? 'good' : '', '✅')}
-      ${kpi('From the admin', all.filter(t => t.source === 'admin' && TF.open(t)).length, 'still open', '', '📥')}
+    <div class="card hero-t ${rv} d1">
+      <div class="ring big" style="--p:${pctT}"><i>${pctT}%</i></div>
+      <div class="hero-mid"><b>${greet}, ${esc((ME.name || '').split(' ')[0] || 'there')} 👋</b>
+        <div class="mu" style="font-size:13px;margin-top:2px">${focus ? `${doneToday} of ${focus} done for today` : open.length ? 'Nothing due today — pick something from the list' : 'Everything is done. Nice work! 🎉'}</div>
+        <div class="hstats"><span class="${late ? 'bad' : ''}">⏰ <b>${late}</b> overdue</span><span>☀️ <b>${dueToday}</b> due today</span><span>🔄 <b>${open.filter(t => t.status === 'doing').length}</b> doing</span><span>📥 <b>${all.filter(t => t.source === 'admin' && TF.open(t)).length}</b> from admin</span></div></div>
+      <div class="wk" title="Tasks done in the last 7 days"><div class="wk-b">${perDay.map((n, i) => `<span style="height:${Math.max(6, n / mx * 100)}%" class="${n ? 'on' : ''}" title="${shortD(wkDays[i])}: ${n}"></span>`).join('')}</div>
+        <div class="mu">${wk} done this week</div></div>
     </div>
-    <div class="card ${rv} d2" style="margin-top:14px;padding:14px">
+    ${qa}
+    <div class="card tfilt ${rv} d2" style="margin-top:12px;padding:14px">
       <div class="toolbar" style="margin-bottom:10px">
-        <div class="tabs" style="margin:0"><button class="tab ${WS.view === 'sheet' ? 'on' : ''}" data-act="sv" data-arg="sheet">▦ Sheet</button><button class="tab ${WS.view === 'board' ? 'on' : ''}" data-act="sv" data-arg="board">▥ Board</button></div>
+        <div class="tabs" style="margin:0">${[['list', '☰ List'], ['sheet', '▦ Sheet'], ['board', '▥ Board']].map(([k, l]) => `<button class="tab ${WS.view === k ? 'on' : ''}" data-act="sv" data-arg="${k}">${l}</button>`).join('')}</div>
         <div class="search"><input class="fld" id="sq" placeholder="Search tasks" value="${esc(WS.q || '')}"></div>
         <button class="btn btn-o btn-sm" data-act="csvSheet" title="Download — opens in Google Sheets / Excel">⬇ CSV</button>
         <button class="btn btn-g btn-sm" data-act="taskOpen" data-arg="">＋ New task</button>
@@ -1134,15 +1297,21 @@ function vSheet(el, rv) {
         <span style="width:1px;background:var(--line);margin:0 2px"></span>
         ${[['all', 'All types']].concat(CATS.map(([c, i]) => [c, i + ' ' + c])).map(([k, l]) => `<button class="chip ${WS.scat === k ? 'on' : ''}" data-act="scat" data-arg="${k}">${l}</button>`).join('')}</div>
     </div>
-    ${WS.view === 'sheet' ? `<div class="card sheet ${rv} d3" style="margin-top:12px;padding:0">
-      <div class="sheet-wrap"><table class="sheet-t"><thead><tr><th></th><th>Task</th><th>Type</th><th>Priority</th><th>Status</th><th>Due</th><th>Link / files</th><th>From</th><th></th></tr></thead>
-      <tbody>${rows.map(row).join('') || `<tr><td colspan="9"><div class="empty" style="padding:26px"><div class="e">${WS.sf === 'open' ? '🎉' : '📭'}</div><b>${WS.sf === 'open' ? 'Nothing open — add your next task below' : 'Nothing here'}</b></div></td></tr>`}
-      <tr class="add-row"><td>＋</td><td colspan="8"><input class="cell-in" id="newRow" placeholder="Type a new task and press Enter…" maxlength="200"></td></tr></tbody></table></div></div>`
-    : `<div class="board ${rv} d3">${STCOL.map(([k, l, ic]) => { const list = rows.filter(t => t.status === k);
-        return `<div class="bcol"><div class="bcol-h">${ic} ${l}<span>${list.length}</span></div>${list.map(card).join('') || '<div class="mu" style="padding:14px;text-align:center">Empty</div>'}</div>`; }).join('')}</div>
-      ${rows.some(t => t.status === 'not_done') ? `<div class="sec"><h2>❌ Not done</h2></div>${rows.filter(t => t.status === 'not_done').map(card).join('')}` : ''}`}
-    <p class="mu ${rv} d4" style="margin-top:12px">Tip: tasks you add are yours to edit or delete. Tasks from the admin (yellow) can only change status. Tap ⋯ to add notes, a link or files.</p>`;
+    ${body}
+    <p class="mu ${rv} d4" style="margin-top:12px">Tip: tap a task to add notes, a checklist, a link or files. Tasks from the admin can only change status and checklist.</p>`;
   const sq = $('sq'); if (sq) sq.oninput = () => { WS.q = sq.value; rerenderKeep('sq'); };
+  ['qaDue', 'qaCat', 'qaPri'].forEach(k => { const x = $(k); if (x) x.onchange = () => { WS[k] = x.value; }; });
+}
+async function quickAdd() {
+  const inp = $('qaT'); const title = inp ? inp.value.trim() : ''; if (!title) return inp && inp.focus();
+  const dv = $('qaDue').value, due = dv === 'today' ? istDay() : dv === 'tom' ? istDay(1) : dv === 'week' ? istDay(7) : null;
+  WS.qaDue = dv; WS.qaCat = $('qaCat').value; WS.qaPri = $('qaPri').value;
+  inp.disabled = true;
+  const r = await rpc('staff_task_save', { p_id: null, p_title: title, p_details: null, p_priority: WS.qaPri || 'normal', p_due: due,
+    p_category: WS.qaCat || null, p_link: null, p_status: 'todo' });
+  if (!r.ok) { inp.disabled = false; return toast('⚠️ ' + (r.error || 'Could not add')); }
+  TASKS.unshift(r.data); if (WS.sf !== 'open' && WS.sf !== 'all') WS.sf = 'open';
+  render(false); const n = $('qaT'); if (n) n.focus(); toast('Added ✓');
 }
 async function sheetAdd() {
   const inp = $('newRow'); const title = inp ? inp.value.trim() : ''; if (!title) return inp && inp.focus();
@@ -1177,6 +1346,7 @@ async function taskMove(id, st) {
   t.status = st; if (note) t.staff_note = note; t.completed_at = st === 'done' ? new Date().toISOString() : null;
   toast(st === 'done' ? '🎉 Done!' : st === 'doing' ? '🔄 Moved to Doing' : st === 'not_done' ? 'Marked not done' : 'Back to To do');
   render(false); const bt = $('bTasks'), n = TASKS.filter(TF.open).length; bt.classList.toggle('hide', !n); bt.textContent = n;
+  if ($('drawer').classList.contains('show') && $('drawer').dataset.kind === 'task') { const w = $('clWrap'); if (w) w.innerHTML = clHtml(t); }
 }
 /* task detail / new task (drawer) */
 async function taskDrawer(id) {
@@ -1202,6 +1372,7 @@ async function taskDrawer(id) {
       ${t ? `<button class="btn btn-r" data-act="taskDel" data-arg="${t.id}">🗑 Delete</button>` : ''}</div>`}
     ${!mine ? `<label class="lbl">Status</label><div class="chips">${[['todo', '📝 To do'], ['doing', '🔄 Doing'], ['done', '✅ Done'], ['not_done', '❌ Not done']].map(([v, l]) =>
         `<button class="chip ${t.status === v ? 'on' : ''}" data-act="taskMove" data-arg="${t.id}" data-arg2="${v}">${l}</button>`).join('')}</div>` : ''}
+    ${t ? `<div id="clWrap">${clHtml(t)}</div>` : '<p class="mu" style="margin-top:14px">☑️ After you add the task you can break it into steps (a checklist) and attach files.</p>'}
     ${t ? `<div class="sec" style="margin-top:22px"><h2>📎 Files for this task</h2><span class="act row"><button class="btn btn-o btn-sm" data-act="addLink" data-arg="${t.id}">🔗 Link</button><button class="btn btn-g btn-sm" data-act="upload" data-arg="${t.id}">⬆ Upload</button></span></div>
       ${files.map(fileRow).join('') || '<div class="mu">Nothing attached yet.</div>'}
       ${t.staff_note ? `<div class="card" style="margin-top:12px"><b>Your note</b><p class="mu" style="margin-top:4px">${esc(t.staff_note)}</p></div>` : ''}
@@ -1214,11 +1385,38 @@ async function taskDrawer(id) {
       p_due: $('tdDue').value || null, p_category: $('tdCat').value || null, p_link: $('tdLink').value.trim() || null, p_status: $('tdSt').value });
     sv.disabled = false;
     if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
-    if (t) Object.assign(t, r.data); else TASKS.unshift(r.data);
-    toast(t ? 'Saved ✓' : 'Task added ✓'); closeAll(); render(false);
+    if (t) { Object.assign(t, r.data); toast('Saved ✓'); closeAll(); render(false); return; }
+    TASKS.unshift(r.data); render(false); toast('Task added ✓ — add steps or files below'); taskDrawer(r.data.id);
   };
   if (!t) setTimeout(() => $('tdTitle') && $('tdTitle').focus(), 80);
 }
+/* checklist (sub-steps) — works on own and admin tasks */
+function clHtml(t) {
+  const c = clOf(t), n = c.filter(x => x.d).length, pct = c.length ? Math.round(n / c.length * 100) : 0;
+  return `<div class="sec" style="margin-top:22px"><h2>☑️ Checklist</h2><span class="r">${c.length ? n + ' / ' + c.length : ''}</span></div>
+    ${c.length ? `<div class="clbar big"><i style="width:${pct}%"></i></div>` : ''}
+    <div class="cl">${c.map((x, i) => `<label class="cli ${x.d ? 'on' : ''}"><input type="checkbox" data-act="clTick" data-arg="${t.id}" data-arg2="${i}" ${x.d ? 'checked' : ''}>
+      <span>${esc(x.t)}</span><button type="button" class="cl-x" data-act="clDel" data-arg="${t.id}" data-arg2="${i}" aria-label="Remove step">✕</button></label>`).join('')}</div>
+    <div class="row" style="flex-wrap:nowrap;margin-top:8px"><input class="fld" id="clNew" data-id="${t.id}" placeholder="Add a step… e.g. “Write the caption”" maxlength="200">
+      <button class="btn btn-o" data-act="clAdd" data-arg="${t.id}">Add</button></div>
+    ${c.length && n === c.length && t.status !== 'done' ? `<button class="btn btn-g" style="margin-top:10px" data-act="taskMove" data-arg="${t.id}" data-arg2="done">🎉 All steps done — mark the task done</button>` : ''}`;
+}
+async function clSave(id, list, refocus) {
+  const t = TASKS.find(x => x.id === id); if (!t) return;
+  const r = await rpc('staff_task_checklist', { p_id: id, p_checklist: list });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
+  t.checklist = r.data.checklist || list;
+  const w = $('clWrap'); if (w) w.innerHTML = clHtml(t);
+  if (refocus) { const n = $('clNew'); if (n) n.focus(); }
+  if (VIEW === 'tasks') render(false);
+}
+function clAdd(id) {
+  const t = TASKS.find(x => x.id === id), inp = $('clNew'); if (!t || !inp) return;
+  const v = inp.value.trim(); if (!v) return inp.focus();
+  clSave(id, clOf(t).concat([{ t: v, d: false }]), true);
+}
+function clTick(id, i, on) { const t = TASKS.find(x => x.id === id); if (!t) return; const c = clOf(t).map(x => ({ ...x })); if (!c[i]) return; c[i].d = on; clSave(id, c); }
+function clDel(id, i) { const t = TASKS.find(x => x.id === id); if (!t) return; clSave(id, clOf(t).filter((_, k) => k !== i)); }
 async function taskDelete(id) {
   const v = await modal({ title: 'Delete this task?', sub: 'This can\'t be undone.', ok: 'Delete', danger: true, fields: [] }); if (!v) return;
   const r = await rpc('staff_task_delete', { p_id: id });
@@ -1311,7 +1509,10 @@ async function fileDelete(id) {
 /* ---------- meetings ---------- */
 const calLink = m => { const s = new Date(m.starts_at), e = new Date(s.getTime() + m.duration_min * 60000), z = d => d.toISOString().replace(/[-:]|\.\d{3}/g, '');
   return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(m.title) + '&dates=' + z(s) + '/' + z(e)
-    + '&details=' + encodeURIComponent((m.agenda || '') + (m.meet_link ? '\n\nJoin: ' + m.meet_link : '')) + (m.meet_link ? '&location=' + encodeURIComponent(m.meet_link) : ''); };
+    + '&details=' + encodeURIComponent((m.agenda || '') + (m.meet_link ? '\n\nJoin: ' + m.meet_link : '')) + (m.meet_link ? '&location=' + encodeURIComponent(m.meet_link) : '')
+    + ((m.guest_emails || []).length ? '&add=' + encodeURIComponent(m.guest_emails.join(',')) : ''); };
+const EMAIL_RE = /^[^\s@,;]+@[^\s@,;]+\.[a-z]{2,}$/i;
+const splitEmails = v => [...new Set(String(v || '').split(/[\s,;]+/).map(x => x.trim().toLowerCase()).filter(Boolean))];
 function meetCard(m) {
   const s = new Date(m.starts_at), e = new Date(s.getTime() + m.duration_min * 60000), now = Date.now();
   const live = m.status === 'scheduled' && now >= s - 10 * 60000 && now <= e, past = now > e, cancelled = m.status === 'cancelled';
@@ -1322,11 +1523,12 @@ function meetCard(m) {
         ${cancelled ? '<span class="pill p-r">Cancelled</span>' : live ? '<span class="pill p-g">● Live now</span>' : past ? '<span class="pill p-m">Done</span>' : ''}</div>
       <div class="mu" style="margin-top:3px">🕒 ${s.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' })} · ${m.duration_min} min · by ${esc(m.created_by_name || '—')}</div>
       <div class="mu" style="margin-top:3px">👥 ${(m.attendee_names || []).map(esc).join(', ') || '—'}${m.with_admin ? ' + Admin' : ''}</div>
+      ${(m.guest_emails || []).length ? `<div class="row" style="margin-top:5px;gap:5px">${m.guest_emails.map(g => `<span class="tag">✉️ ${esc(g)}</span>`).join('')}</div>` : ''}
       ${m.agenda ? `<div style="margin-top:6px;font-size:13px;white-space:pre-wrap">${esc(m.agenda)}</div>` : ''}
       ${m.notes ? `<div class="note" style="margin-top:8px">📝 ${esc(m.notes)}</div>` : ''}
       ${cancelled ? '' : `<div class="row" style="margin-top:10px">
         ${m.meet_link && !past ? `<a class="btn ${live ? 'btn-g' : 'btn-o'} btn-sm" href="${esc(m.meet_link)}" target="_blank" rel="noopener">🎥 Join Google Meet</a>` : ''}
-        ${!past ? `<a class="btn btn-o btn-sm" href="${calLink(m)}" target="_blank" rel="noopener">📅 Add to Google Calendar</a>` : ''}
+        ${!past ? `<a class="btn btn-o btn-sm" href="${calLink(m)}" target="_blank" rel="noopener">${(m.guest_emails || []).length && m.mine ? '✉️ Send Gmail invites' : '📅 Add to Google Calendar'}</a>` : ''}
         <button class="btn btn-o btn-sm" data-act="meetNotes" data-arg="${m.id}">📝 ${m.notes ? 'Edit notes' : 'Add notes'}</button>
         ${m.mine && !past ? `<button class="btn btn-o btn-sm" data-act="meetEdit" data-arg="${m.id}">✏️ Edit</button><button class="btn btn-r btn-sm" data-act="meetCancel" data-arg="${m.id}">Cancel</button>` : ''}</div>`}
     </div></div>`;
@@ -1354,18 +1556,21 @@ async function meetEdit(id) {
       { id: 'date', label: 'Date', type: 'date', value: dIST }, { id: 'time', label: 'Time (IST)', type: 'time', value: m ? tIST : tIST.slice(0, 2) + ':00' },
       { id: 'dur', label: 'Length', type: 'select', value: String(m ? m.duration_min : 30), options: [['15', '15 min'], ['30', '30 min'], ['45', '45 min'], ['60', '1 hour'], ['90', '1.5 hours'], ['120', '2 hours']] },
       { id: 'link', label: 'Google Meet link', type: 'url', value: m ? m.meet_link || '' : '', ph: 'https://meet.google.com/…', hint: '<button type="button" class="btn btn-o btn-sm" data-act="newMeet">🎥 Create Google Meet</button>' },
-      { id: 'who', label: 'Invite', type: 'checks', options: people.map(p => [p.id, p.name + (p.kind === 'intern' ? ' (intern)' : '')]) },
+      { id: 'who', label: 'Invite from the team', type: 'checks', options: people.map(p => [p.id, p.name + (p.kind === 'intern' ? ' (intern)' : '')]), checked: m ? m.attendees || [] : [] },
+      { id: 'guests', label: 'Invite by Gmail (anyone — comma separated)', type: 'textarea', value: m ? (m.guest_emails || []).join(', ') : '', ph: 'e.g. riya@gmail.com, amit@gmail.com',
+        hint: 'After saving, tap “✉️ Send Gmail invites” on the meeting — Google Calendar opens with these people added; press Save there and Google emails them the invite + Meet link.' },
       { id: 'agenda', label: 'Agenda (optional)', type: 'textarea', value: m ? m.agenda || '' : '', ph: 'What will you talk about?' }] });
   if (!v) return;
-  if (m) (m.attendees || []).forEach(() => {});
   if (!v.title) return toast('Give the meeting a title');
   if (!v.date || !v.time) return toast('Pick a date and time');
+  const guests = splitEmails(v.guests), badG = guests.filter(g => !EMAIL_RE.test(g));
+  if (badG.length) return toast('⚠️ Not an email: ' + badG.join(', '));
   const starts = new Date(`${v.date}T${v.time}:00+05:30`).toISOString();
-  const att = (v.who && v.who.length) ? v.who : m ? (m.attendees || []).filter(x => x !== ME.id) : [];
+  const att = v.who || [];
   const r = await rpc('team_meeting_save', { p_id: m ? m.id : null, p_title: v.title, p_agenda: v.agenda || null, p_starts: starts,
-    p_duration: +v.dur || 30, p_link: v.link || null, p_attendees: att, p_with_admin: true });
+    p_duration: +v.dur || 30, p_link: v.link || null, p_attendees: att, p_with_admin: true, p_guests: guests });
   if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
-  toast(m ? 'Meeting updated ✓' : '📅 Meeting scheduled — everyone is notified'); wsLoad('meet', true);
+  toast(guests.length ? '📅 Saved — now tap “✉️ Send Gmail invites” on it' : m ? 'Meeting updated ✓' : '📅 Meeting scheduled — everyone is notified'); wsLoad('meet', true);
 }
 async function meetCancel(id) {
   const v = await modal({ title: 'Cancel this meeting?', sub: 'Everyone invited gets a notification.', ok: 'Cancel meeting', danger: true, fields: [] }); if (!v) return;
@@ -1417,6 +1622,265 @@ async function saveReport() {
   const r = await rpc('staff_report_save', { p_day: WS.rday || istDay(), p_done: done, p_plan: $('rpPlan').value, p_blockers: $('rpBlock').value, p_hours: hours });
   if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
   toast('🗒️ Report sent to the admin ✓'); wsLoad('report', true);
+}
+
+/* ============================================================
+   Intern tools (round 2) — work timer, content calendar, bugs & ideas,
+   team notes, leave. Data: staff_clock / team_timesheet, team_posts /
+   team_post_save / team_post_delete, team_issues / team_issue_save /
+   team_issue_delete, team_notes_list / team_note_save / team_note_delete,
+   staff_leave_request / team_leaves / staff_leave_cancel.
+   ============================================================ */
+const hm = min => { min = Math.max(0, Math.round(min || 0)); const h = Math.floor(min / 60), m = min % 60; return h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`; };
+const istOf = iso => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date(iso));
+const tm = iso => new Date(iso).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' });
+async function wsLoad2(v, force) {
+  if (v === 'timer' && (force || !WS.timer)) { const r = await rpc('team_timesheet', { p_days: 30, p_staff: null }); WS.timer = r.ok ? r.data || { sessions: [] } : { sessions: [] }; }
+  if (v === 'content' && (force || !WS.posts)) { const r = await rpc('team_posts', { p_from: null, p_to: null }); WS.posts = r.ok ? r.data || [] : []; }
+  if (v === 'bugs' && (force || !WS.issues)) {
+    const [r, p] = await Promise.all([rpc('team_issues'), WS.people ? { ok: true, data: WS.people } : rpc('team_people')]);
+    WS.issues = r.ok ? r.data || [] : []; WS.people = p.ok ? p.data || [] : [];
+  }
+  if (v === 'notes' && (force || !WS.notes)) { const r = await rpc('team_notes_list'); WS.notes = r.ok ? r.data || [] : []; }
+  if (v === 'leave' && (force || !WS.leaves)) { const r = await rpc('team_leaves', { p_staff: null }); WS.leaves = r.ok ? r.data || [] : []; }
+}
+
+/* ---------- 1. work timer ---------- */
+function timerMins(day) {
+  return (WS.timer.sessions || []).filter(x => x.staff_id === ME.id && istOf(x.started_at) === day)
+    .reduce((a, x) => a + (x.ended_at ? +x.minutes || 0 : (Date.now() - new Date(x.started_at)) / 60000), 0);
+}
+function vTimer(el, rv) {
+  if (!WS.timer) { el.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
+  const open = WS.timer.open, today = istDay();
+  const days = [-6, -5, -4, -3, -2, -1, 0].map(o => istDay(o)), mins = days.map(timerMins), mx = Math.max(60, ...mins);
+  const week = mins.reduce((a, b) => a + b, 0), worked = mins.filter(x => x > 0).length;
+  const list = (WS.timer.sessions || []).filter(x => x.staff_id === ME.id);
+  el.innerHTML = `
+    <div class="card timer ${open ? 'run' : ''} ${rv} d1">
+      <div class="t-state">${open ? '<span class="dot"></span> Working since ' + tm(open.started_at) : 'Not working right now'}</div>
+      <div class="t-clock" id="tmClock">${open ? clockTxt(open.started_at) : '00:00:00'}</div>
+      ${open ? `<input class="fld t-note" id="tmNote" placeholder="What did you work on? (optional)" maxlength="300" value="${esc(open.note || '')}">` : ''}
+      <button class="btn ${open ? 'btn-r' : 'btn-g'} t-btn" data-act="clock" data-arg="${open ? 'out' : 'in'}">${open ? '⏹ Stop — I’m done' : '▶ Start work'}</button>
+      <div class="mu" style="margin-top:10px">Today: <b id="tmToday">${hm(timerMins(today))}</b></div>
+    </div>
+    <div class="grid k4 ${rv} d2" style="margin-top:14px">
+      ${kpi('Today', hm(timerMins(today)), open ? 'timer running' : 'worked', open ? 'good' : '', '⏱️')}
+      ${kpi('This week', hm(week), worked + ' of 7 days', '', '📅')}
+      ${kpi('Daily average', hm(worked ? week / worked : 0), 'on days you worked', '', '📊')}
+      ${kpi('Sessions', list.filter(x => daysBetween(istOf(x.started_at), today) < 7).length, 'last 7 days', '', '🔁')}
+    </div>
+    <div class="card ${rv} d3" style="margin-top:14px"><b>Last 7 days</b>
+      <div class="hbars">${days.map((d, i) => `<div class="hb"><span class="hb-v">${mins[i] ? hm(mins[i]) : ''}</span><div class="hb-c"><i style="height:${Math.round(mins[i] / mx * 100)}%" class="${d === today ? 'on' : ''}"></i></div><span class="mu">${d === today ? 'Today' : shortD(d)}</span></div>`).join('')}</div></div>
+    <div class="sec ${rv} d3"><h2>Sessions</h2><span class="r">last 30 days</span></div>
+    <div class="card ${rv} d4" style="padding:0">${list.slice(0, 40).map(x => `<div class="tv" style="padding:10px 14px">
+      <div style="flex:1;min-width:0"><b>${shortD(istOf(x.started_at))}</b> <span class="mu">${tm(x.started_at)} – ${x.ended_at ? tm(x.ended_at) : 'now'}</span>
+        ${x.note ? `<div class="mu" style="margin-top:2px">💬 ${esc(x.note)}</div>` : ''}</div><b>${x.ended_at ? hm(x.minutes) : '<span class="pill p-g">running</span>'}</b></div>`).join('')
+      || '<div class="empty" style="padding:24px"><div class="e">⏱️</div><b>No sessions yet</b><p>Press “Start work” when you begin — your hours are counted for you.</p></div>'}</div>
+    <p class="mu" style="margin-top:10px">A session left running stops counting after 14 hours. Your daily report can use these hours.</p>`;
+}
+function clockTxt(start) { const s = Math.max(0, Math.floor((Date.now() - new Date(start)) / 1000)); return [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60].map(n => String(n).padStart(2, '0')).join(':'); }
+setInterval(() => {
+  const o = WS.timer && WS.timer.open; if (!o) return;
+  const c = $('tmClock'); if (c) c.textContent = clockTxt(o.started_at);
+  const t = $('tmToday'); if (t) t.textContent = hm(timerMins(istDay()));
+}, 1000);
+async function clock(action) {
+  const note = action === 'out' && $('tmNote') ? $('tmNote').value.trim() : null;
+  const r = await rpc('staff_clock', { p_action: action, p_note: note || null });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
+  toast(action === 'in' ? '▶ Timer started — have a good session!' : '⏹ Stopped — ' + hm((Date.now() - new Date(r.data.started_at)) / 60000) + ' saved');
+  await wsLoad('timer', true);
+}
+
+/* ---------- 2. content calendar ---------- */
+const PLAT = [['Instagram', '📸'], ['Facebook', '📘'], ['WhatsApp', '💬'], ['YouTube', '▶️'], ['Google', '🔎'], ['Website', '🌐'], ['Other', '📌']];
+const platIc = p => (PLAT.find(x => x[0] === p) || [0, '📌'])[1];
+const PST = [['idea', '💡 Idea', 'p-m'], ['draft', '✍️ Draft', 'p-y'], ['ready', '✅ Ready', 'p-b'], ['posted', '🚀 Posted', 'p-g']];
+const pst = k => PST.find(x => x[0] === k) || PST[0];
+function postCard(p, small) {
+  return `<div class="card pcard ps-${p.status}" data-act="postEdit" data-arg="${p.id}">
+    <div class="row" style="flex-wrap:nowrap;gap:6px"><span class="pplat">${platIc(p.platform)}</span><b class="pt">${esc(p.title)}</b></div>
+    <div class="row" style="margin-top:6px;gap:5px"><span class="pill ${pst(p.status)[2]}">${pst(p.status)[1]}</span>${p.post_time ? `<span class="tag">🕒 ${String(p.post_time).slice(0, 5)}</span>` : ''}
+      ${!small && p.owner_name ? `<span class="tag">👤 ${esc(p.owner_name)}</span>` : ''}${p.link ? '<span class="tag">🔗</span>' : ''}</div></div>`;
+}
+function vContent(el, rv) {
+  if (!WS.posts) { el.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
+  const today = istDay(), dow = (new Date(today + 'T00:00:00Z').getUTCDay() + 6) % 7, mon = addDays(today, -dow + WS.cwk * 7);
+  const week = [0, 1, 2, 3, 4, 5, 6].map(i => addDays(mon, i));
+  const ps = WS.posts.filter(p => WS.cf === 'all' || p.platform === WS.cf);
+  const ideas = ps.filter(p => !p.post_date && p.status !== 'posted');
+  const thisMonth = today.slice(0, 7), posted = WS.posts.filter(p => p.status === 'posted' && String(p.post_date || '').slice(0, 7) === thisMonth).length;
+  el.innerHTML = `
+    <div class="grid k4 ${rv} d1">
+      ${PST.map(([k, l]) => kpi(l.replace(/^\S+ /, ''), WS.posts.filter(p => p.status === k).length, k === 'posted' ? posted + ' this month' : k === 'ready' ? 'waiting to go out' : k === 'draft' ? 'being made' : 'to try', k === 'ready' ? 'good' : '', l.split(' ')[0])).join('')}
+    </div>
+    <div class="card ${rv} d2" style="margin-top:14px;padding:14px">
+      <div class="toolbar" style="margin-bottom:10px">
+        <div class="row"><button class="btn btn-o btn-sm" data-act="cwk" data-arg="-1" aria-label="Previous week">‹</button>
+          <b style="min-width:150px;text-align:center">${WS.cwk === 0 ? 'This week' : shortD(week[0]) + ' – ' + shortD(week[6])}</b>
+          <button class="btn btn-o btn-sm" data-act="cwk" data-arg="1" aria-label="Next week">›</button>${WS.cwk ? '<button class="btn btn-o btn-sm" data-act="cwk" data-arg="0">Today</button>' : ''}</div>
+        <button class="btn btn-o btn-sm" data-act="csvPosts" style="margin-left:auto">⬇ CSV</button>
+        <button class="btn btn-g btn-sm" data-act="postEdit" data-arg="">＋ New post</button></div>
+      <div class="chips">${[['all', 'All']].concat(PLAT.map(([p, i]) => [p, i + ' ' + p])).map(([k, l]) => `<button class="chip ${WS.cf === k ? 'on' : ''}" data-act="cf" data-arg="${k}">${l}</button>`).join('')}</div>
+    </div>
+    <div class="cal ${rv} d3">${week.map(d => { const list = ps.filter(p => String(p.post_date || '').slice(0, 10) === d);
+      return `<div class="cday ${d === today ? 'today' : ''}"><div class="cday-h"><b>${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][week.indexOf(d)]}</b><span>${shortD(d)}</span>
+        <button class="cadd" data-act="postNew" data-arg="${d}" aria-label="Add post on ${shortD(d)}">＋</button></div>${list.map(p => postCard(p, true)).join('')}</div>`; }).join('')}</div>
+    <div class="sec ${rv} d4"><h2>💡 Ideas without a date</h2><span class="r">${ideas.length}</span></div>
+    <div class="grid pgrid ${rv} d4">${ideas.map(p => postCard(p)).join('') || '<div class="mu">No loose ideas — jot one down with “＋ New post”.</div>'}</div>
+    <p class="mu" style="margin-top:12px">Tip: for village customers, WhatsApp status + Instagram reels around 7–9 AM and 6–9 PM usually get seen most. Keep captions in Hindi + English.</p>`;
+}
+async function postEdit(id, day) {
+  const p = id ? WS.posts.find(x => x.id === id) : null;
+  const v = await modal({ title: p ? 'Edit post' : 'Plan a post', ok: p ? 'Save' : 'Add',
+    fields: [{ id: 'title', label: 'What is the post?', value: p ? p.title : '', ph: 'e.g. Reel: fresh tomatoes at 7 AM' },
+      { id: 'platform', label: 'Where', type: 'select', value: p ? p.platform : 'Instagram', options: PLAT.map(([x, i]) => [x, i + ' ' + x]) },
+      { id: 'status', label: 'Stage', type: 'select', value: p ? p.status : 'idea', options: PST.map(([k, l]) => [k, l]) },
+      { id: 'date', label: 'Post on (date)', type: 'date', value: p ? String(p.post_date || '').slice(0, 10) : day || '' },
+      { id: 'time', label: 'Time (IST)', type: 'time', value: p && p.post_time ? String(p.post_time).slice(0, 5) : '' },
+      { id: 'caption', label: 'Caption', type: 'textarea', value: p ? p.caption || '' : '', ph: 'Hindi + English caption' },
+      { id: 'tags', label: 'Hashtags', value: p ? p.hashtags || '' : '', ph: '#RozBazaar #Pataudi #FreshSabzi' },
+      { id: 'link', label: 'Link (Canva design / Drive / the live post)', type: 'url', value: p ? p.link || '' : '', ph: 'https://' }].concat(p ? [{ id: 'del', label: 'Delete this post?', type: 'select', value: '', options: [['', 'No, keep it'], ['yes', '🗑 Yes, delete it']] }] : []) });
+  if (!v) return;
+  if (v.del === 'yes') { const r = await rpc('team_post_delete', { p_id: p.id }); if (!r.ok) return toast('⚠️ ' + (r.error || 'Not deleted')); toast('Deleted'); return wsLoad('content', true); }
+  if (!v.title) return toast('Write what the post is');
+  const r = await rpc('team_post_save', { p_id: p ? p.id : null, p_title: v.title, p_platform: v.platform, p_date: v.date || null, p_time: v.time || null,
+    p_caption: v.caption || null, p_hashtags: v.tags || null, p_status: v.status, p_link: v.link || null });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
+  toast(v.status === 'posted' ? '🚀 Nice — marked as posted' : 'Saved ✓'); wsLoad('content', true);
+}
+function csvPosts() {
+  download(`rozbazaar-content-${istDay()}.csv`, [['Date', 'Time', 'Platform', 'Title', 'Stage', 'Caption', 'Hashtags', 'Link', 'By']]
+    .concat(WS.posts.map(p => [String(p.post_date || '').slice(0, 10), String(p.post_time || '').slice(0, 5), p.platform, p.title, p.status, p.caption || '', p.hashtags || '', p.link || '', p.created_by_name || ''])));
+}
+
+/* ---------- 3. bugs & ideas ---------- */
+const IKIND = { bug: ['🐞', 'Bug'], feature: ['✨', 'Feature'], idea: ['💡', 'Idea'] };
+const IAPP = [['customer', '🛒 Customer app'], ['vendor', '🧑‍🌾 Vendor app'], ['staff', '👥 Staff app'], ['admin', '🛠️ Admin'], ['website', '🌐 Website'], ['other', '📌 Other']];
+const ISEV = { critical: ['🚨 Critical', 'p-r'], high: ['🔴 High', 'p-r'], normal: ['🟠 Normal', 'p-o'], low: ['🟢 Low', 'p-g'] };
+const IST = { open: ['Open', 'p-b'], in_progress: ['🔧 Working on it', 'p-y'], fixed: ['✅ Fixed', 'p-g'], wont_fix: ['🚫 Won’t fix', 'p-m'] };
+function vBugs(el, rv) {
+  if (!WS.issues) { el.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
+  const all = WS.issues, openF = i => i.status === 'open' || i.status === 'in_progress';
+  const list = all.filter(i => (WS.bf === 'all' || (WS.bf === 'open' ? openF(i) : WS.bf === 'mine' ? i.assignee === ME.id : i.status === WS.bf)) && (WS.bk === 'all' || i.kind === WS.bk));
+  const wk = all.filter(i => i.status === 'fixed' && i.closed_at && daysBetween(istOf(i.closed_at), istDay()) < 7).length;
+  el.innerHTML = `
+    <div class="grid k4 ${rv} d1">
+      ${kpi('Open bugs', all.filter(i => i.kind === 'bug' && openF(i)).length, all.filter(i => i.kind === 'bug' && openF(i) && (i.severity === 'critical' || i.severity === 'high')).length + ' high / critical', all.some(i => i.kind === 'bug' && openF(i) && i.severity === 'critical') ? 'bad' : '', '🐞')}
+      ${kpi('Features & ideas', all.filter(i => i.kind !== 'bug' && openF(i)).length, 'waiting', '', '✨')}
+      ${kpi('On me', all.filter(i => i.assignee === ME.id && openF(i)).length, 'assigned to you', '', '🙋')}
+      ${kpi('Fixed this week', wk, 'closed in 7 days', wk ? 'good' : '', '✅')}
+    </div>
+    <div class="card ${rv} d2" style="margin-top:14px;padding:14px">
+      <div class="toolbar" style="margin-bottom:10px"><div class="chips">${[['all', 'All'], ['bug', '🐞 Bugs'], ['feature', '✨ Features'], ['idea', '💡 Ideas']].map(([k, l]) => `<button class="chip ${WS.bk === k ? 'on' : ''}" data-act="bk" data-arg="${k}">${l}</button>`).join('')}</div>
+        <button class="btn btn-g btn-sm" data-act="issueEdit" data-arg="" style="margin-left:auto">＋ Report</button></div>
+      <div class="chips">${[['open', 'Open'], ['mine', 'On me'], ['fixed', 'Fixed'], ['wont_fix', 'Won’t fix'], ['all', 'All']].map(([k, l]) => `<button class="chip ${WS.bf === k ? 'on' : ''}" data-act="bf" data-arg="${k}">${l}</button>`).join('')}</div>
+    </div>
+    <div class="${rv} d3" style="margin-top:12px">${list.map(i => `<div class="card irow sev-${i.severity} ${openF(i) ? '' : 'closed'}" data-act="issueEdit" data-arg="${i.id}">
+      <span class="ik">${IKIND[i.kind][0]}</span>
+      <div style="flex:1;min-width:0"><b>${esc(i.title)}</b>
+        <div class="row" style="margin-top:6px;gap:5px"><span class="pill ${IST[i.status][1]}">${IST[i.status][0]}</span>${i.kind === 'bug' ? `<span class="pill ${ISEV[i.severity][1]}">${ISEV[i.severity][0]}</span>` : ''}
+          <span class="tag">${(IAPP.find(a => a[0] === i.app) || IAPP[5])[1]}</span>${i.assignee_name ? `<span class="tag">🙋 ${esc(i.assignee_name)}</span>` : ''}${i.link ? '<span class="tag">🔗</span>' : ''}</div>
+        <div class="mu" style="margin-top:5px">by ${esc(i.created_by_name || '—')} · ${when(i.created_at)}</div></div></div>`).join('')
+      || '<div class="empty"><div class="e">🐞</div><b>Nothing here</b><p>Found something broken or have an idea? Tap “＋ Report”.</p></div>'}</div>`;
+}
+async function issueEdit(id) {
+  const i = id ? WS.issues.find(x => x.id === id) : null;
+  const people = (WS.people || []);
+  const v = await modal({ title: i ? 'Bug / idea' : 'Report a bug or idea', sub: i ? 'by ' + esc(i.created_by_name || '—') + ' · ' + when(i.created_at) : 'Say where it happens and the steps to see it — a screenshot link helps a lot.', ok: 'Save',
+    fields: [{ id: 'kind', label: 'Type', type: 'select', value: i ? i.kind : 'bug', options: [['bug', '🐞 Bug — something is broken'], ['feature', '✨ Feature — something new to build'], ['idea', '💡 Idea — worth discussing']] },
+      { id: 'app', label: 'Where', type: 'select', value: i ? i.app : 'customer', options: IAPP },
+      { id: 'title', label: 'Short title', value: i ? i.title : '', ph: 'e.g. Basket empties after login' },
+      { id: 'details', label: 'Details / steps', type: 'textarea', value: i ? i.details || '' : '', ph: '1. Open …  2. Tap …  3. See …  (phone + browser)' },
+      { id: 'sev', label: 'How bad (bugs)', type: 'select', value: i ? i.severity : 'normal', options: Object.entries(ISEV).map(([k, x]) => [k, x[0]]) },
+      { id: 'status', label: 'Status', type: 'select', value: i ? i.status : 'open', options: Object.entries(IST).map(([k, x]) => [k, x[0]]) },
+      { id: 'who', label: 'Who fixes it', type: 'select', value: i ? i.assignee || '' : '', options: [['', '— nobody yet —']].concat(people.map(p => [p.id, p.name])) },
+      { id: 'link', label: 'Link (screenshot, GitHub, Figma)', type: 'url', value: i ? i.link || '' : '', ph: 'https://' }]
+      .concat(i && i.mine ? [{ id: 'del', label: 'Delete it?', type: 'select', value: '', options: [['', 'No, keep it'], ['yes', '🗑 Yes, delete']] }] : []) });
+  if (!v) return;
+  if (v.del === 'yes') { const r = await rpc('team_issue_delete', { p_id: i.id }); if (!r.ok) return toast('⚠️ ' + (r.error || 'Not deleted')); toast('Deleted'); return wsLoad('bugs', true); }
+  if (!v.title) return toast('Write a short title');
+  const r = await rpc('team_issue_save', { p_id: i ? i.id : null, p_kind: v.kind, p_app: v.app, p_title: v.title, p_details: v.details || null,
+    p_severity: v.sev, p_status: v.status, p_link: v.link || null, p_assignee: v.who || null });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
+  toast(i ? 'Saved ✓' : v.kind === 'bug' && (v.sev === 'critical' || v.sev === 'high') ? '🐞 Reported — the admin is notified' : 'Reported ✓'); wsLoad('bugs', true);
+}
+
+/* ---------- 4. team notes ---------- */
+const NCAT = [['Guide', '📘'], ['Brand', '🎨'], ['Marketing', '📣'], ['Development', '💻'], ['Links', '🔗'], ['Other', '📌']];
+const ncIc = c => (NCAT.find(x => x[0] === c) || [0, '📌'])[1];
+function vNotes(el, rv) {
+  if (!WS.notes) { el.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
+  const q = WS.nq.toLowerCase(), list = WS.notes.filter(n => (WS.ncat === 'all' || n.category === WS.ncat) && (!q || [n.title, n.body, n.url].some(x => String(x || '').toLowerCase().includes(q))));
+  el.innerHTML = `
+    <div class="card ${rv} d1" style="padding:14px">
+      <div class="toolbar" style="margin-bottom:10px"><div class="search"><input class="fld" id="nq" placeholder="Search notes and links" value="${esc(WS.nq)}"></div>
+        <button class="btn btn-g btn-sm" data-act="noteEdit" data-arg="">＋ New note / link</button></div>
+      <div class="chips">${[['all', 'All']].concat(NCAT.map(([c, i]) => [c, i + ' ' + c])).map(([k, l]) => `<button class="chip ${WS.ncat === k ? 'on' : ''}" data-act="ncat" data-arg="${k}">${l}<span class="c">${WS.notes.filter(n => k === 'all' || n.category === k).length}</span></button>`).join('')}</div></div>
+    <div class="grid ngrid ${rv} d2" style="margin-top:12px">${list.map(n => `<div class="card ncard ${n.pinned ? 'pin' : ''}">
+      <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><span class="nic">${ncIc(n.category)}</span><b style="flex:1;min-width:0">${esc(n.title)}</b>${n.pinned ? '<span class="pill p-y">📌 Pinned</span>' : ''}</div>
+      ${n.body ? `<div class="nbody">${esc(n.body)}</div>` : ''}
+      <div class="row" style="margin-top:auto;padding-top:10px">${n.url ? `<a class="btn btn-o btn-sm" href="${esc(n.url)}" target="_blank" rel="noopener">🔗 Open</a>` : ''}
+        ${n.mine ? `<button class="btn btn-o btn-sm" data-act="noteEdit" data-arg="${n.id}">✏️ Edit</button>` : ''}<span class="mu" style="margin-left:auto">${esc(n.created_by_name || '')}</span></div></div>`).join('')
+      || '<div class="empty" style="grid-column:1/-1"><div class="e">📚</div><b>No notes yet</b><p>Write down how-tos, brand colours, useful links — so nobody has to ask twice.</p></div>'}</div>
+    <p class="mu" style="margin-top:12px">⚠️ Don’t put passwords here — everyone on the team can read these notes.</p>`;
+  const nq = $('nq'); if (nq) nq.oninput = () => { WS.nq = nq.value; rerenderKeep('nq'); };
+}
+async function noteEdit(id) {
+  const n = id ? WS.notes.find(x => x.id === id) : null;
+  const v = await modal({ title: n ? 'Edit note' : 'New note / link', sub: 'Everyone on the team can read it. No passwords.', ok: 'Save',
+    fields: [{ id: 'title', label: 'Title', value: n ? n.title : '', ph: 'e.g. How to post a reel for RozBazaar' },
+      { id: 'cat', label: 'Section', type: 'select', value: n ? n.category : 'Guide', options: NCAT.map(([c, i]) => [c, i + ' ' + c]) },
+      { id: 'body', label: 'Note', type: 'textarea', value: n ? n.body || '' : '', ph: 'Steps, rules, tips…' },
+      { id: 'url', label: 'Link (optional)', type: 'url', value: n ? n.url || '' : '', ph: 'https://' }]
+      .concat(n ? [{ id: 'del', label: 'Delete it?', type: 'select', value: '', options: [['', 'No, keep it'], ['yes', '🗑 Yes, delete']] }] : []) });
+  if (!v) return;
+  if (v.del === 'yes') { const r = await rpc('team_note_delete', { p_id: n.id }); if (!r.ok) return toast('⚠️ ' + (r.error || 'Not deleted')); toast('Deleted'); return wsLoad('notes', true); }
+  if (!v.title) return toast('Give it a title');
+  const r = await rpc('team_note_save', { p_id: n ? n.id : null, p_title: v.title, p_body: v.body || null, p_url: v.url || null, p_category: v.cat, p_pinned: n ? n.pinned : false });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved')); toast('Saved ✓'); wsLoad('notes', true);
+}
+
+/* ---------- 5. leave ---------- */
+const LKIND = { leave: '🏖️ Day off', sick: '🤒 Sick', half_day: '🌗 Half day', wfh: '🏠 Work from home' };
+const LST = { pending: ['⏳ Waiting', 'p-o'], approved: ['✅ Approved', 'p-g'], rejected: ['❌ Not approved', 'p-r'], cancelled: ['Cancelled', 'p-m'] };
+function vLeave(el, rv) {
+  if (!WS.leaves) { el.innerHTML = '<div class="sk"></div><div class="sk"></div>'; return; }
+  const today = istDay(), yr = today.slice(0, 4);
+  const daysOf = l => daysBetween(String(l.from_date).slice(0, 10), String(l.to_date).slice(0, 10)) + 1;
+  const taken = WS.leaves.filter(l => l.status === 'approved' && String(l.from_date).startsWith(yr) && l.kind !== 'wfh').reduce((a, l) => a + (l.kind === 'half_day' ? .5 : daysOf(l)), 0);
+  const next = WS.leaves.filter(l => l.status === 'approved' && String(l.to_date).slice(0, 10) >= today).sort((a, b) => String(a.from_date).localeCompare(b.from_date))[0];
+  el.innerHTML = `
+    <div class="grid k4 ${rv} d1">
+      ${kpi('Taken this year', taken + (taken === 1 ? ' day' : ' days'), 'approved leave', '', '🏖️')}
+      ${kpi('Waiting', WS.leaves.filter(l => l.status === 'pending').length, 'for the admin', '', '⏳')}
+      ${kpi('Next off', next ? shortD(next.from_date) : '—', next ? LKIND[next.kind] : 'nothing planned', next ? 'good' : '', '📅')}
+      ${kpi('WFH days', WS.leaves.filter(l => l.status === 'approved' && l.kind === 'wfh' && String(l.from_date).startsWith(yr)).reduce((a, l) => a + daysOf(l), 0), 'this year', '', '🏠')}
+    </div>
+    <div class="row ${rv} d2" style="justify-content:space-between;margin:16px 0 8px"><div class="mu">Ask early — the admin gets a notification and you get the answer as a notification too.</div>
+      <button class="btn btn-g" data-act="leaveNew">＋ Ask for leave</button></div>
+    <div class="${rv} d3">${WS.leaves.map(l => `<div class="card lrow">
+      <div class="mdate"><b>${new Date(String(l.from_date).slice(0, 10) + 'T00:00:00Z').getUTCDate()}</b><span>${MON[new Date(String(l.from_date).slice(0, 10) + 'T00:00:00Z').getUTCMonth()]}</span></div>
+      <div style="flex:1;min-width:0"><div class="row"><b>${LKIND[l.kind]}</b><span class="pill ${LST[l.status][1]}">${LST[l.status][0]}</span></div>
+        <div class="mu" style="margin-top:3px">${shortD(l.from_date)}${String(l.to_date).slice(0, 10) !== String(l.from_date).slice(0, 10) ? ' – ' + shortD(l.to_date) + ' · ' + daysOf(l) + ' days' : ''}${l.reason ? ' · ' + esc(l.reason) : ''}</div>
+        ${l.admin_note ? `<div class="note" style="margin-top:6px">💬 Admin: ${esc(l.admin_note)}</div>` : ''}</div>
+      ${l.status === 'pending' ? `<button class="btn btn-o btn-sm" data-act="leaveCancel" data-arg="${l.id}">Cancel</button>` : ''}</div>`).join('')
+      || '<div class="empty"><div class="e">🏖️</div><b>No leave requests</b><p>Need a day off? Tap “＋ Ask for leave”.</p></div>'}</div>`;
+}
+async function leaveNew() {
+  const v = await modal({ title: 'Ask for leave', ok: 'Send to admin',
+    fields: [{ id: 'kind', label: 'Type', type: 'select', value: 'leave', options: Object.entries(LKIND) },
+      { id: 'from', label: 'From', type: 'date', value: istDay(1) }, { id: 'to', label: 'To (same day for one day)', type: 'date', value: istDay(1) },
+      { id: 'reason', label: 'Reason', type: 'textarea', ph: 'e.g. family function / fever' }] });
+  if (!v) return;
+  if (!v.from) return toast('Pick the date');
+  const r = await rpc('staff_leave_request', { p_kind: v.kind, p_from: v.from, p_to: v.to || v.from, p_reason: v.reason || null });
+  if (!r.ok) return toast('⚠️ ' + (r.error || 'Not sent')); toast('🏖️ Sent — the admin is notified'); wsLoad('leave', true);
+}
+async function leaveCancel(id) {
+  const r = await rpc('staff_leave_cancel', { p_id: id }); if (!r.ok) return toast('⚠️ ' + (r.error || 'Not cancelled'));
+  toast('Request cancelled'); wsLoad('leave', true);
 }
 
 /* ---------- Account ---------- */
@@ -1503,7 +1967,7 @@ function modal({ title, sub, fields, ok, danger }) {
       ${f.map(x => `<div><label class="lbl" for="m_${x.id}">${esc(x.label)}</label>${
         x.type === 'textarea' ? `<textarea class="fld" id="m_${x.id}" rows="3" placeholder="${esc(x.ph || '')}">${esc(x.value || '')}</textarea>`
         : x.type === 'select' ? `<select class="fld" id="m_${x.id}">${x.options.map(([v, l]) => `<option value="${esc(v)}" ${v === x.value ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`
-        : x.type === 'checks' ? `<div class="chips" id="m_${x.id}">${x.options.map(([v, l]) => `<label class="chip"><input type="checkbox" value="${esc(v)}" style="margin-right:6px">${esc(l)}</label>`).join('')}</div>`
+        : x.type === 'checks' ? `<div class="chips" id="m_${x.id}">${x.options.map(([v, l]) => `<label class="chip"><input type="checkbox" value="${esc(v)}" style="margin-right:6px" ${(x.checked || []).includes(v) ? 'checked' : ''}>${esc(l)}</label>`).join('')}</div>`
         : `<input class="fld" id="m_${x.id}" type="${['date', 'time', 'url'].includes(x.type) ? x.type : 'text'}" ${x.type === 'number' ? 'inputmode="decimal"' : ''} value="${esc(x.value ?? '')}" placeholder="${esc(x.ph || '')}">`}${x.hint ? `<div class="mu" style="margin-top:4px">${x.hint}</div>` : ''}</div>`).join('')}
       </div><div class="foot"><button class="btn btn-o" data-act="modalCancel">${L('Rehne do', 'Cancel')}</button>
       <button class="btn ${danger ? 'btn-r' : 'btn-g'}" data-act="modalOk">${esc(ok || 'Save')}</button></div>`;
@@ -1745,6 +2209,25 @@ document.addEventListener('click', e => {
     case 'newMeet': window.open('https://meet.google.com/new', '_blank', 'noopener'); break;
     case 'saveReport': saveReport(); break;
     case 'reportDay': WS.rday = a; render(false); break;
+    case 'tick': { const t = TASKS.find(x => x.id === a); if (t) taskMove(a, t.status === 'done' ? 'todo' : 'done'); break; }
+    case 'qaAdd': quickAdd(); break;
+    case 'toggleDone': WS.showDone = !WS.showDone; render(false); break;
+    case 'clAdd': clAdd(a); break;
+    case 'clTick': clTick(a, +el.dataset.arg2, el.checked); break;
+    case 'clDel': e.preventDefault(); clDel(a, +el.dataset.arg2); break;
+    case 'clock': clock(a); break;
+    case 'cf': WS.cf = a; render(false); break;
+    case 'cwk': WS.cwk = a === '0' ? 0 : WS.cwk + (+a); render(false); break;
+    case 'postEdit': postEdit(a || null); break;
+    case 'postNew': postEdit(null, a); break;
+    case 'csvPosts': csvPosts(); break;
+    case 'bf': WS.bf = a; render(false); break;
+    case 'bk': WS.bk = a; render(false); break;
+    case 'issueEdit': issueEdit(a || null); break;
+    case 'ncat': WS.ncat = a; render(false); break;
+    case 'noteEdit': noteEdit(a || null); break;
+    case 'leaveNew': leaveNew(); break;
+    case 'leaveCancel': leaveCancel(a); break;
   }
 });
 /* inline edits in the task sheet */
@@ -1757,6 +2240,8 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && (e.target.id === 'np2')) changePw();
   if (e.key === 'Enter' && (e.target.id === 'myName')) saveName();
   if (e.key === 'Enter' && e.target.id === 'newRow') { e.preventDefault(); sheetAdd(); }
+  if (e.key === 'Enter' && e.target.id === 'qaT') { e.preventDefault(); quickAdd(); }
+  if (e.key === 'Enter' && e.target.id === 'clNew') { e.preventDefault(); clAdd(e.target.dataset.id); }
   if (e.key === 'Enter' && e.target.dataset && e.target.dataset.cell === 'title') { e.preventDefault(); e.target.blur(); }
   if (e.key === 'Escape') { if ($('modal').classList.contains('show')) modalCancel(); else closeAll(); }
 });
