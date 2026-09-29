@@ -356,6 +356,15 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   workspace tab. Staff site for interns: **🏠 Home** day view (`vHome`: today's focus, next meeting + Join, hours + timer, report,
   chat preview, shared tasks, bugs on me), nav grouped Work / Me, phone bottom bar (`#bnav`), "n" = new task. The chat bubble class
   is `.cm.mine` — `.me` is the sidebar user block (`.me b{display:block}` broke bubbles).
+- **Interns give tasks to each other** (29 Sep, migration `20260929a_intern_give_tasks.sql`): `staff_tasks.source='peer'` +
+  `assigned_by` (giver's staff id). `staff_task_assign(p_to uuid[], p_title, p_details, p_priority, p_due, p_category, p_link)` —
+  interns only, to active interns only, one copy per person, each notified "📌 X gave you a task". The receiver owns it like an admin
+  task (status / checklist / files / comments / add teammates); the giver sees it (`staff_my_tasks` returns it with `given_by_me`),
+  can edit or delete it (`staff_task_save` / `staff_task_delete`), can't change its status, and is notified on done / not done /
+  comments (`task_people` includes `assigned_by`). Staff site: the front end splits these into `GIVEN` (not in `TASKS`, so they
+  don't count as my work); New-task drawer has "Who does it?" chips (Me / interns); Home has "📤 Give a task", **📌 Given to you**
+  (open admin + peer tasks) and **📤 You gave** cards; task filters "📌 Given to me" / "📤 I gave". Admin → Intern workspace shows
+  them with a "📌 giver" pill and a filter.
 - Tabs: Aaj ka plan (KPIs, slot board Subah/Dopahar/Shaam, village + vendor load),
   Orders (day/status/type/village filters, search, detail drawer, CSV), Vendors (cards,
   7-day chart drawer), Sale (today/yesterday/7/30/custom range, Sabzi/Pyaaz-Aloo/Fruits,

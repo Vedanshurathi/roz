@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-izUUl1JGtfOyHuiG3XBxe4IgcTMgJnfCzWoCHRc+URY=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NwI4ypt4yLprKEhxFKKBj9+/OC+rCypy38eW6KJmTxk=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -1283,9 +1283,9 @@ function vWs(el, rv) {
   let body = '';
   if (tab === 'tasks') {
     const q = (UI.wsq || '').toLowerCase(), f = UI.wsf || 'open';
-    const list = tasks.filter(t => (f === 'all' || (f === 'open' ? (t.status === 'todo' || t.status === 'doing') : f === 'self' ? t.source === 'self' : f === 'admin' ? t.source !== 'self' : t.status === f))
+    const list = tasks.filter(t => (f === 'all' || (f === 'open' ? (t.status === 'todo' || t.status === 'doing') : f === 'self' ? t.source === 'self' : f === 'peer' ? t.source === 'peer' : f === 'admin' ? t.source === 'admin' : t.status === f))
       && (!q || [t.title, t.details, t.staff_name, t.category].some(x => String(x || '').toLowerCase().includes(q))));
-    body = `<div class="toolbar"><div class="chips">${[['open', 'Chal rahe'], ['doing', 'Doing'], ['done', 'Done'], ['not_done', 'Nahi hua'], ['self', 'Intern ne khud banaye'], ['admin', 'Aapne diye'], ['all', 'Sab']].map(([k, l]) =>
+    body = `<div class="toolbar"><div class="chips">${[['open', 'Chal rahe'], ['doing', 'Doing'], ['done', 'Done'], ['not_done', 'Nahi hua'], ['self', 'Intern ne khud banaye'], ['peer', '📌 Intern ne intern ko diye'], ['admin', 'Aapne diye'], ['all', 'Sab']].map(([k, l]) =>
         `<button class="chip ${f === k ? 'on' : ''}" data-act="wsf" data-arg="${k}">${l}</button>`).join('')}</div>
       <div class="search" style="min-width:180px"><input class="fld" id="wsq" placeholder="Search" value="${esc(UI.wsq || '')}"></div>
       <button class="btn btn-o btn-sm" data-act="wsCsv">⬇ CSV</button>
@@ -1299,8 +1299,8 @@ function vWs(el, rv) {
           <td><span class="pill ${TST[t.status][1]}">${TST[t.status][0]}</span></td>
           <td class="${lt ? 'late' : ''}">${d ? shortD(d) : '—'}</td>
           <td>${t.link ? `<a href="${esc(t.link)}" target="_blank" rel="noopener">🔗 Open</a>` : '—'}${t.files ? ` <span class="pill p-m">📎 ${t.files}</span>` : ''}</td>
-          <td>${t.source === 'self' ? '<span class="pill p-b">Intern</span>' : '<span class="pill p-y">Aap</span>'}</td>
-          <td style="white-space:nowrap"><button class="btn btn-o btn-sm" data-act="wsComments" data-arg="${esc(t.id)}" title="Comments">💬${t.comments ? ' ' + t.comments : ''}</button> ${t.source !== 'self' ? `<button class="btn btn-o btn-sm" data-act="editTask" data-arg="${esc(t.id)}">✏️</button> <button class="btn btn-r btn-sm" data-act="delTask" data-arg="${esc(t.id)}">🗑</button>` : ''}</td></tr>`; }).join('')
+          <td>${t.source === 'self' ? '<span class="pill p-b">Intern</span>' : t.source === 'peer' ? `<span class="pill p-m">📌 ${esc(t.assigned_by_name || 'Intern')}</span>` : '<span class="pill p-y">Aap</span>'}</td>
+          <td style="white-space:nowrap"><button class="btn btn-o btn-sm" data-act="wsComments" data-arg="${esc(t.id)}" title="Comments">💬${t.comments ? ' ' + t.comments : ''}</button> ${t.source === 'admin' ? `<button class="btn btn-o btn-sm" data-act="editTask" data-arg="${esc(t.id)}">✏️</button> <button class="btn btn-r btn-sm" data-act="delTask" data-arg="${esc(t.id)}">🗑</button>` : ''}</td></tr>`; }).join('')
         || `<tr><td colspan="9"><div class="empty" style="padding:24px"><div class="e">📭</div><b>Yahan koi kaam nahi</b></div></td></tr>`}</tbody></table></div></div>`;
   } else if (tab === 'files') {
     const list = (WSA.files || []).filter(mine);
@@ -1362,7 +1362,7 @@ function vWs(el, rv) {
 function wsCsv() {
   const rows = D.tasks.filter(t => t.staff_kind === 'intern' && (!UI.wsp || UI.wsp === 'all' || t.staff_id === UI.wsp));
   const csv = '﻿' + [['Intern', 'Task', 'Notes', 'Type', 'Priority', 'Status', 'Due', 'Link', 'From', 'Added', 'Done on']].concat(rows.map(t => [t.staff_name, t.title, t.details || '',
-    t.category || '', t.priority, t.status, t.due_date ? String(t.due_date).slice(0, 10) : '', t.link || '', t.source === 'self' ? 'Intern' : 'Admin', String(t.created_at).slice(0, 10),
+    t.category || '', t.priority, t.status, t.due_date ? String(t.due_date).slice(0, 10) : '', t.link || '', t.source === 'self' ? 'Intern' : t.source === 'peer' ? 'From ' + (t.assigned_by_name || 'intern') : 'Admin', String(t.created_at).slice(0, 10),
     t.completed_at ? String(t.completed_at).slice(0, 10) : ''])).map(r => r.map(v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }).join(',')).join('\r\n');
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = `rozbazaar-intern-tasks-${todayIST()}.csv`;
   document.body.appendChild(a); a.click(); a.remove();

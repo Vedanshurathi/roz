@@ -6,7 +6,7 @@
 <title>RozBazaar Staff</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+lCD2X1zCo4RoWpa4na+g0To7Zworbn/WI2tKcnMFfU=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-dLuN+sPnsIv5LTmt/JQ4CevKI+ASPLvWN/H1Ky4Tfi4=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -655,7 +655,7 @@ const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY,
 const loginEmail = ph => ph + '@staff.rozbazaar.shop';
 
 let D = null, VIEW = 'today', ME = null, busy = false, timer = null, SEEN = null, NEWCOUNT = 0;
-let TASKS = [], TARGETS = [], LOADED = false;
+let TASKS = [], GIVEN = [], TARGETS = [], LOADED = false;
 const TEAM_APP = 'staff';
 const isIntern = () => ME && ME.kind === 'intern';
 /* Interns see the site in plain English (Vedanshu, 27 Sep); sales staff keep the Hinglish. L(hinglish, english) */
@@ -757,7 +757,7 @@ async function login() {
   if (!me.ok) { await sb.auth.signOut(); $('loginMsg').textContent = me.error || 'Ye account staff ka nahi hai'; return; }
   $('pw').value = ''; ME = me.data; showApp();
 }
-async function logout() { const bye = L('Logout ho gaye', 'Logged out'); await sb.auth.signOut(); D = null; ME = null; SEEN = null; NOTIF_SEEN = null; TASKS = []; TARGETS = []; LOADED = false; showLogin(bye); }
+async function logout() { const bye = L('Logout ho gaye', 'Logged out'); await sb.auth.signOut(); D = null; ME = null; SEEN = null; NOTIF_SEEN = null; TASKS = []; GIVEN = []; TARGETS = []; LOADED = false; showLogin(bye); }
 
 /* ---------- data ---------- */
 function typing() { const a = document.activeElement; return !!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.closest('.scr')); }
@@ -775,7 +775,8 @@ async function refresh(silent) {
       <button class="btn btn-g" style="margin-top:14px" data-act="refresh">${L('Dubara try karo', 'Try again')}</button></div>`;
     return;
   }
-  if (tk.ok) TASKS = tk.data || [];
+  if (tk.ok) { const all = tk.data || [], gave = t => t.given_by_me && t.owner === false && !(t.collaborators || []).includes(ME && ME.id);
+    GIVEN = all.filter(gave); TASKS = all.filter(t => !gave(t)); }
   if (tg.ok) TARGETS = tg.data || [];
   const openTasks = TASKS.filter(t => t.status === 'todo' || t.status === 'doing').length, bt = $('bTasks');
   bt.classList.toggle('hide', !openTasks); bt.textContent = openTasks;
@@ -1278,7 +1279,7 @@ function wsBadges() {
 /* ---------- task sheet ---------- */
 function sheetRows() {
   const q = (WS.q || '').toLowerCase(), sf = WS.view !== 'sheet' && WS.sf === 'open' ? 'all' : WS.sf;   /* board + list always show Done (list folds it) */
-  return TASKS.filter(t => (sf === 'all' || (sf === 'open' ? (t.status === 'todo' || t.status === 'doing') : sf === 'admin' ? t.source === 'admin' : sf === 'shared' ? (t.owner === false || (t.collab_names || []).length > 0) : t.status === sf))
+  return (sf === 'gave' ? GIVEN : TASKS).filter(t => (sf === 'all' || sf === 'gave' || (sf === 'open' ? (t.status === 'todo' || t.status === 'doing') : sf === 'admin' ? t.source === 'admin' : sf === 'given' ? t.source === 'peer' : sf === 'shared' ? (t.owner === false || (t.collab_names || []).length > 0) : t.status === sf))
     && (WS.scat === 'all' || (t.category || 'Other') === WS.scat)
     && (!q || [t.title, t.details, t.category].some(x => String(x || '').toLowerCase().includes(q))));
 }
@@ -1299,13 +1300,14 @@ function clProg(t) {
 function listItem(t, today) {
   const done = t.status === 'done';
   return `<div class="li pr-${t.priority} ${done ? 'is-done' : ''} ${t.status === 'not_done' ? 'is-nd' : ''}">
-    <button class="tick ${done ? 'on' : ''} ${t.status === 'doing' ? 'half' : ''}" data-act="tick" data-arg="${t.id}" aria-label="${done ? 'Mark not done' : 'Mark done'}">${done ? '✓' : ''}</button>
+    ${t.given_by_me ? `<span class="tick ${done ? 'on' : ''} ${t.status === 'doing' ? 'half' : ''}" title="${esc(t.owner_name || '')} marks this">${done ? '✓' : ''}</span>`
+      : `<button class="tick ${done ? 'on' : ''} ${t.status === 'doing' ? 'half' : ''}" data-act="tick" data-arg="${t.id}" aria-label="${done ? 'Mark not done' : 'Mark done'}">${done ? '✓' : ''}</button>`}
     <div class="li-main" data-act="taskOpen" data-arg="${t.id}">
       <div class="li-t">${esc(t.title)}</div>
       <div class="li-m">${t.status === 'doing' ? '<span class="pill p-y">🔄 Doing</span>' : ''}${!done ? dueChip(t.due_date, t.status === 'doing' ? 'todo' : t.status, today) : ''}
         ${t.category ? `<span class="tag">${catIc(t.category)} ${esc(t.category)}</span>` : ''}${clProg(t)}
         ${t.link ? '<span class="tag">🔗 link</span>' : ''}${t.files ? `<span class="tag">📎 ${t.files}</span>` : ''}${t.details ? '<span class="tag">📝</span>' : ''}
-        ${sharedTag(t)}${t.comments ? `<span class="tag">💬 ${t.comments}</span>` : ''}${t.source === 'admin' ? '<span class="pill p-y">From admin</span>' : ''}</div>
+        ${sharedTag(t)}${t.comments ? `<span class="tag">💬 ${t.comments}</span>` : ''}${t.source === 'admin' ? '<span class="pill p-y">From admin</span>' : ''}${giverTag(t)}</div>
     </div>
     <span class="pdot" title="${t.priority} priority"></span></div>`;
 }
@@ -1322,20 +1324,20 @@ function vSheet(el, rv) {
   const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
   const rows = sheetRows();
   const prSel = (t, dis) => `<select class="cell-sel pr-${t.priority}" data-cell="priority" data-id="${t.id}" ${dis}>${[['high', '🔴 High'], ['normal', '🟠 Normal'], ['low', '🟢 Low']].map(([v, l]) => `<option value="${v}" ${t.priority === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
-  const stSel = t => `<select class="cell-sel st-${t.status}" data-cell="status" data-id="${t.id}">${[['todo', '📝 To do'], ['doing', '🔄 Doing'], ['done', '✅ Done'], ['not_done', '❌ Not done']].map(([v, l]) => `<option value="${v}" ${t.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+  const stSel = t => `<select class="cell-sel st-${t.status}" data-cell="status" data-id="${t.id}" ${t.given_by_me ? 'disabled title="The person doing it changes the status"' : ''}>${[['todo', '📝 To do'], ['doing', '🔄 Doing'], ['done', '✅ Done'], ['not_done', '❌ Not done']].map(([v, l]) => `<option value="${v}" ${t.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
   const catSel = (t, dis) => `<select class="cell-sel" data-cell="category" data-id="${t.id}" ${dis}><option value="">—</option>${CATS.map(([c, i]) => `<option value="${c}" ${t.category === c ? 'selected' : ''}>${i} ${c}</option>`).join('')}</select>`;
   const dueCell = (t, dis) => { const d = t.due_date ? String(t.due_date).slice(0, 10) : ''; const lateC = d && d < today && (t.status === 'todo' || t.status === 'doing');
     return `<input type="date" class="cell-in ${lateC ? 'late' : ''}" data-cell="due_date" data-id="${t.id}" value="${d}" ${dis}>`; };
   const row = t => { const mine = isOwner(t), dis = mine ? '' : 'disabled';
     return `<tr class="${t.status === 'done' ? 'is-done' : ''}">
-      <td class="c-chk"><input type="checkbox" data-act="taskCheck" data-arg="${t.id}" ${t.status === 'done' ? 'checked' : ''} aria-label="Done"></td>
+      <td class="c-chk"><input type="checkbox" data-act="taskCheck" data-arg="${t.id}" ${t.status === 'done' ? 'checked' : ''} ${t.given_by_me ? 'disabled' : ''} aria-label="Done"></td>
       <td class="c-title">${mine ? `<input class="cell-in title" data-cell="title" data-id="${t.id}" value="${esc(t.title)}" maxlength="200">` : `<b>${esc(t.title)}</b>`}
         ${t.details || clOf(t).length ? `<div class="mu cell-note">${clProg(t)} ${esc(t.details || '').slice(0, 100)}</div>` : ''}</td>
       <td>${catSel(t, dis)}</td><td>${prSel(t, dis)}</td><td>${stSel(t)}</td><td>${dueCell(t, dis)}</td>
       <td class="c-link">${t.link ? `<a href="${esc(t.link)}" target="_blank" rel="noopener" title="${esc(t.link)}">🔗 Open</a>` : '<span class="mu">—</span>'}${t.files ? ` <span class="pill p-m">📎 ${t.files}</span>` : ''}</td>
-      <td>${t.source === 'admin' ? '<span class="pill p-y">Admin</span>' : t.owner === false ? `<span class="pill p-m">🤝 ${esc(t.owner_name || '')}</span>` : '<span class="pill p-b">Me</span>'}${(t.collab_names || []).length && t.owner !== false ? ' <span class="pill p-m">🤝 ' + t.collab_names.length + '</span>' : ''}</td>
+      <td>${t.source === 'admin' ? '<span class="pill p-y">Admin</span>' : t.given_by_me ? `<span class="pill p-m">📤 ${esc(t.owner_name || '')}</span>` : t.source === 'peer' ? `<span class="pill p-b">📌 ${esc(t.assigned_by_name || '')}</span>` : t.owner === false ? `<span class="pill p-m">🤝 ${esc(t.owner_name || '')}</span>` : '<span class="pill p-b">Me</span>'}${(t.collab_names || []).length && t.owner !== false ? ' <span class="pill p-m">🤝 ' + t.collab_names.length + '</span>' : ''}</td>
       <td class="c-act"><button class="btn btn-o btn-sm" data-act="taskOpen" data-arg="${t.id}" title="Open">⋯</button></td></tr>`; };
-  const card = t => { const mine = t.source !== 'admin', i = STCOL.findIndex(c => c[0] === t.status);
+  const card = t => { const mine = t.source !== 'admin', i = t.given_by_me ? -1 : STCOL.findIndex(c => c[0] === t.status);
     return `<div class="card bcard pr-${t.priority}" data-act="taskOpen" data-arg="${t.id}">
       <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><b style="flex:1;min-width:0">${esc(t.title)}</b>${mine ? '' : '<span class="pill p-y">Admin</span>'}</div>
       <div class="row" style="margin-top:8px">${t.category ? `<span class="tag">${catIc(t.category)} ${esc(t.category)}</span>` : ''}${dueChip(t.due_date, t.status === 'doing' ? 'todo' : t.status, today)}${clProg(t)}${t.link ? '<span class="tag">🔗</span>' : ''}${sharedTag(t)}${t.comments ? `<span class="tag">💬 ${t.comments}</span>` : ''}</div>
@@ -1383,7 +1385,7 @@ function vSheet(el, rv) {
         <button class="btn btn-o btn-sm" data-act="csvSheet" title="Download — opens in Google Sheets / Excel">⬇ CSV</button>
         <button class="btn btn-g btn-sm" data-act="taskOpen" data-arg="">＋ New task</button>
       </div>
-      <div class="chips">${[['open', 'Open'], ['doing', 'Doing'], ['done', 'Done'], ['not_done', 'Not done'], ['admin', 'From admin'], ['shared', '🤝 Shared'], ['all', 'All']].map(([k, l]) =>
+      <div class="chips">${[['open', 'Open'], ['doing', 'Doing'], ['done', 'Done'], ['not_done', 'Not done'], ['admin', 'From admin'], ['given', '📌 Given to me'], ['gave', `📤 I gave${GIVEN.length ? ' · ' + GIVEN.length : ''}`], ['shared', '🤝 Shared'], ['all', 'All']].map(([k, l]) =>
         `<button class="chip ${WS.sf === k ? 'on' : ''}" data-act="sf" data-arg="${k}">${l}</button>`).join('')}
         <span style="width:1px;background:var(--line);margin:0 2px"></span>
         ${[['all', 'All types']].concat(CATS.map(([c, i]) => [c, i + ' ' + c])).map(([k, l]) => `<button class="chip ${WS.scat === k ? 'on' : ''}" data-act="scat" data-arg="${k}">${l}</button>`).join('')}</div>
@@ -1414,7 +1416,7 @@ async function sheetAdd() {
   render(false); const n = $('newRow'); if (n) n.focus(); toast('Added ✓');
 }
 async function cellSave(id, cell, val) {
-  const t = TASKS.find(x => x.id === id); if (!t) return;
+  const t = findTask(id); if (!t) return;
   if (cell === 'status') return taskMove(id, val);
   if (!isOwner(t)) return;
   const nt = { ...t, [cell]: val || null };
@@ -1428,7 +1430,7 @@ async function taskMove(id, st) {
   const t = TASKS.find(x => x.id === id); if (!t || t.status === st) return;
   let note = null;
   if (st === 'not_done') {
-    const v = await modal({ title: 'Why couldn\'t you do it?', sub: t.source === 'admin' ? 'The admin will see this reason.' : 'A short note for yourself.', ok: 'Save', danger: true,
+    const v = await modal({ title: 'Why couldn\'t you do it?', sub: t.source === 'admin' ? 'The admin will see this reason.' : t.source === 'peer' ? (t.assigned_by_name || 'Your teammate') + ' will see this reason.' : 'A short note for yourself.', ok: 'Save', danger: true,
       fields: [{ id: 'note', label: 'Reason', type: 'textarea', ph: 'e.g. waiting for the logo file' }] });
     if (!v || !v.note) { render(false); return; } note = v.note;
   }
@@ -1441,22 +1443,28 @@ async function taskMove(id, st) {
 }
 /* task detail / new task (drawer) */
 async function taskDrawer(id) {
-  const t = id ? TASKS.find(x => x.id === id) : null, mine = isOwner(t);
+  const t = id ? findTask(id) : null, mine = isOwner(t), gave = !!(t && t.given_by_me);
   if (!WS.files) await wsLoad('files');
+  const mates = !t && isIntern() ? (await peopleLoad()).filter(p => p.kind === 'intern' && p.id !== ME.id) : [];
   const files = t ? (WS.files || []).filter(f => f.task_id === t.id) : [];
   $('drawer').dataset.kind = 'task';
-  $('drTitle').textContent = t ? (mine ? 'Edit task' : t.source === 'admin' ? 'Task from the admin' : '🤝 Shared by ' + (t.owner_name || 'a teammate')) : 'New task';
+  $('drTitle').textContent = t ? (gave ? '📤 You gave this to ' + (t.owner_name || 'a teammate') : mine ? 'Edit task' : t.source === 'admin' ? 'Task from the admin'
+    : t.source === 'peer' && t.owner !== false ? '📌 From ' + (t.assigned_by_name || 'a teammate') : '🤝 Shared by ' + (t.owner_name || 'a teammate')) : 'New task';
   $('drBody').innerHTML = `
     ${!mine ? `<div class="card" style="margin-bottom:12px;background:#FFF9DD"><b>${esc(t.title)}</b>${t.details ? `<p class="mu" style="margin-top:6px;white-space:pre-wrap">${esc(t.details)}</p>` : ''}
       <div class="row" style="margin-top:10px">${dueChip(t.due_date, t.status === 'doing' ? 'todo' : t.status, istDay())}<span class="pill ${TST[t.status][1]}">${tstL(t.status)}</span></div>
       ${t.link ? `<a class="btn btn-o btn-sm" style="margin-top:10px" href="${esc(t.link)}" target="_blank" rel="noopener">🔗 Open link</a>` : ''}</div>` : `
+    ${mates.length ? `<label class="lbl">Who does it?</label><div class="chips" id="tdWho" style="margin-bottom:10px"><button type="button" class="chip on" data-who="me">👤 Me</button>${mates.map(p =>
+      `<button type="button" class="chip" data-who="${p.id}">${av(p.name, 20)} ${esc(p.name)}</button>`).join('')}</div>` : ''}
+    ${gave ? `<div class="card" style="margin-bottom:12px;background:#EEF6FF"><b>📤 ${esc(t.owner_name || '')} is doing this</b> <span class="pill ${TST[t.status][1]}">${tstL(t.status)}</span>
+      <div class="mu" style="margin-top:4px">You can change the task below. ${esc((t.owner_name || 'They').split(' ')[0])} marks it done — you get a notification.</div></div>` : ''}
     <label class="lbl">Task</label><input class="fld" id="tdTitle" value="${esc(t ? t.title : '')}" maxlength="200" placeholder="e.g. Make 3 Instagram reels for Diwali">
     <label class="lbl" style="margin-top:10px">Notes</label><textarea class="fld" id="tdDet" rows="4" placeholder="Steps, ideas, anything useful">${esc(t ? t.details || '' : '')}</textarea>
     <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:10px;gap:10px">
       <div><label class="lbl">Type</label><select class="fld" id="tdCat"><option value="">—</option>${CATS.map(([c, i]) => `<option value="${c}" ${t && t.category === c ? 'selected' : ''}>${i} ${c}</option>`).join('')}</select></div>
       <div><label class="lbl">Priority</label><select class="fld" id="tdPri">${[['high', '🔴 High'], ['normal', '🟠 Normal'], ['low', '🟢 Low']].map(([v, l]) => `<option value="${v}" ${(t ? t.priority : 'normal') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
       <div><label class="lbl">Due date</label><input class="fld" type="date" id="tdDue" value="${t && t.due_date ? String(t.due_date).slice(0, 10) : ''}"></div>
-      <div><label class="lbl">Status</label><select class="fld" id="tdSt">${[['todo', '📝 To do'], ['doing', '🔄 Doing'], ['done', '✅ Done'], ['not_done', '❌ Not done']].map(([v, l]) => `<option value="${v}" ${(t ? t.status : 'todo') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+      <div ${gave ? 'hidden' : 'id="tdStWrap"'}><label class="lbl">Status</label><select class="fld" id="tdSt">${[['todo', '📝 To do'], ['doing', '🔄 Doing'], ['done', '✅ Done'], ['not_done', '❌ Not done']].map(([v, l]) => `<option value="${v}" ${(t ? t.status : 'todo') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
     </div>
     <label class="lbl" style="margin-top:10px">Link (Figma, GitHub, Google Doc, Canva…)</label><input class="fld" type="url" id="tdLink" value="${esc(t ? t.link || '' : '')}" placeholder="https://">
     <div class="row" style="margin-top:14px"><button class="btn btn-g" id="tdSave">${t ? 'Save changes' : '＋ Add task'}</button>
@@ -1466,13 +1474,28 @@ async function taskDrawer(id) {
     ${t ? `<div id="clWrap">${clHtml(t)}</div>${peopleHtml(t)}` : '<p class="mu" style="margin-top:14px">☑️ After you add the task you can break it into steps, add teammates, attach files and comment.</p>'}
     ${t ? `<div class="sec" style="margin-top:22px"><h2>📎 Files for this task</h2><span class="act row"><button class="btn btn-o btn-sm" data-act="addLink" data-arg="${t.id}">🔗 Link</button><button class="btn btn-g btn-sm" data-act="upload" data-arg="${t.id}">⬆ Upload</button></span></div>
       ${files.map(fileRow).join('') || '<div class="mu">Nothing attached yet.</div>'}
-      ${t.staff_note ? `<div class="card" style="margin-top:12px"><b>Your note</b><p class="mu" style="margin-top:4px">${esc(t.staff_note)}</p></div>` : ''}
+      ${t.staff_note ? `<div class="card" style="margin-top:12px"><b>${gave ? 'Note from ' + esc(t.owner_name || 'them') : 'Your note'}</b><p class="mu" style="margin-top:4px">${esc(t.staff_note)}</p></div>` : ''}
       ${commentsHtml(t)}
       <p class="mu" style="margin-top:14px">Added ${when(t.created_at)}${t.completed_at ? ' · done ' + when(t.completed_at) : ''}</p>` : ''}`;
   openDrawer(); if (t) commentsPaint(t.id);
+  const who = $('tdWho'), picked = () => who ? [...who.querySelectorAll('.chip.on')].map(b => b.dataset.who).filter(x => x !== 'me') : [];
+  if (who) who.onclick = e => { const b = e.target.closest('.chip'); if (!b) return;
+    if (b.dataset.who === 'me') { who.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === b)); }
+    else { b.classList.toggle('on'); who.querySelector('[data-who="me"]').classList.toggle('on', !picked().length); }
+    const give = picked().length, sw = $('tdStWrap'); if (sw) sw.hidden = !!give;
+    $('tdSave').textContent = give ? `📤 Give task${give > 1 ? ' to ' + give : ''}` : '＋ Add task'; };
   const sv = $('tdSave'); if (sv) sv.onclick = async () => {
     const title = $('tdTitle').value.trim(); if (!title) return toast('Write the task');
     sv.disabled = true;
+    const to = !t ? picked() : [];
+    if (to.length) {
+      const r = await rpc('staff_task_assign', { p_to: to, p_title: title, p_details: $('tdDet').value || null, p_priority: $('tdPri').value,
+        p_due: $('tdDue').value || null, p_category: $('tdCat').value || null, p_link: $('tdLink').value.trim() || null });
+      sv.disabled = false;
+      if (!r.ok) return toast('⚠️ ' + (r.error || 'Not given'));
+      GIVEN = (r.data || []).concat(GIVEN); closeAll(); render(false);
+      return toast('📤 Given to ' + (r.data || []).map(x => (x.owner_name || '').split(' ')[0]).join(', ') + ' — they got a notification');
+    }
     const r = await rpc('staff_task_save', { p_id: t ? t.id : null, p_title: title, p_details: $('tdDet').value, p_priority: $('tdPri').value,
       p_due: $('tdDue').value || null, p_category: $('tdCat').value || null, p_link: $('tdLink').value.trim() || null, p_status: $('tdSt').value });
     sv.disabled = false;
@@ -1513,12 +1536,12 @@ async function taskDelete(id) {
   const v = await modal({ title: 'Delete this task?', sub: 'This can\'t be undone.', ok: 'Delete', danger: true, fields: [] }); if (!v) return;
   const r = await rpc('staff_task_delete', { p_id: id });
   if (!r.ok) return toast('⚠️ ' + (r.error || 'Not deleted'));
-  TASKS = TASKS.filter(t => t.id !== id); closeAll(); render(false); toast('Deleted');
+  TASKS = TASKS.filter(t => t.id !== id); GIVEN = GIVEN.filter(t => t.id !== id); closeAll(); render(false); toast('Deleted');
 }
 function csvSheet() {
   download(`rozbazaar-my-tasks-${istDay()}.csv`, [['Task', 'Notes', 'Type', 'Priority', 'Status', 'Due', 'Link', 'From', 'Added', 'Done on']]
     .concat(TASKS.map(t => [t.title, t.details || '', t.category || '', t.priority, t.status, t.due_date ? String(t.due_date).slice(0, 10) : '', t.link || '',
-      t.source === 'self' ? 'Me' : 'Admin', String(t.created_at).slice(0, 10), t.completed_at ? String(t.completed_at).slice(0, 10) : ''])));
+      t.source === 'self' ? 'Me' : t.source === 'peer' ? (t.assigned_by_name || 'Teammate') : 'Admin', String(t.created_at).slice(0, 10), t.completed_at ? String(t.completed_at).slice(0, 10) : ''])));
 }
 
 /* ---------- files & links ---------- */
@@ -1565,7 +1588,7 @@ async function uploadFiles(files, taskId) {
       p_mime: file.type || null, p_task: taskId, p_note: null });
     if (!r.ok) { toast('⚠️ ' + (r.error || 'Not saved')); await sb.storage.from('staff-files').remove([path]); continue; }
     (WS.files = WS.files || []).unshift(r.data);
-    if (taskId) { const t = TASKS.find(x => x.id === taskId); if (t) t.files = (t.files || 0) + 1; }
+    if (taskId) { const t = findTask(taskId); if (t) t.files = (t.files || 0) + 1; }
   }
   toast('✓ Shared with the admin');
   if ($('drawer').dataset.kind === 'task' && taskId) taskDrawer(taskId); else render(false);
@@ -1578,7 +1601,7 @@ async function addLink(taskId) {
     p_url: v.url, p_size: null, p_mime: null, p_task: taskId, p_note: v.note || null });
   if (!r.ok) return toast('⚠️ ' + (r.error || 'Not saved'));
   (WS.files = WS.files || []).unshift(r.data);
-  if (taskId) { const t = TASKS.find(x => x.id === taskId); if (t) t.files = (t.files || 0) + 1; taskDrawer(taskId); } else render(false);
+  if (taskId) { const t = findTask(taskId); if (t) t.files = (t.files || 0) + 1; taskDrawer(taskId); } else render(false);
   toast('🔗 Link shared ✓');
 }
 async function fileOpen(id) {
@@ -1993,8 +2016,12 @@ const avColor = n => AVC[[...String(n || '')].reduce((a, c) => a + c.charCodeAt(
 const av = (n, sz) => `<span class="av" style="background:${avColor(n)};${sz ? `width:${sz}px;height:${sz}px;font-size:${Math.round(sz * .4)}px` : ''}" title="${esc(n)}">${esc(initials(n))}</span>`;
 const linkify = t => esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>')
   .replace(/(^|\s)@([A-Za-zऀ-ॿ]+)/g, '$1<b class="ment">@$2</b>');
-const isOwner = t => !t || (t.source === 'self' && t.owner !== false);
-const sharedTag = t => t.owner === false ? `<span class="tag tg-sh">🤝 from ${esc(t.owner_name || 'teammate')}</span>`
+const isOwner = t => !t || (t.source === 'self' && t.owner !== false) || (t.source === 'peer' && !!t.given_by_me);
+const canShare = t => t.owner !== false && t.source !== 'admin';
+const findTask = id => TASKS.find(x => x.id === id) || GIVEN.find(x => x.id === id);
+const giverTag = t => t.source === 'peer' && !t.given_by_me ? `<span class="pill p-b">📌 from ${esc(t.assigned_by_name || 'teammate')}</span>` : '';
+const sharedTag = t => t.given_by_me ? `<span class="tag tg-sh">📤 to ${esc(t.owner_name || 'teammate')}</span>`
+  : t.owner === false ? `<span class="tag tg-sh">🤝 from ${esc(t.owner_name || 'teammate')}</span>`
   : (t.collab_names || []).length ? `<span class="tag tg-sh">🤝 with ${(t.collab_names || []).map(esc).join(', ')}</span>` : '';
 async function peopleLoad() { if (!WS.people) { const p = await rpc('team_people'); WS.people = p.ok ? p.data || [] : []; } return WS.people; }
 
@@ -2018,6 +2045,10 @@ function vHome(el, rv) {
   const repDone = (WS.reports || []).some(x => String(x.day).slice(0, 10) === today && x.staff_id === ME.id);
   const chat = (WS.chat || []).slice(-3), unread = chatUnread();
   const shared = TASKS.filter(t => TF.open(t) && (t.owner === false || (t.collab_names || []).length));
+  const givenMe = TASKS.filter(t => TF.open(t) && t.owner !== false && (t.source === 'admin' || t.source === 'peer'))
+    .sort((a, b) => String(a.due_date || '9999').localeCompare(String(b.due_date || '9999')));
+  const wk = istDay(-7), gaveL = GIVEN.filter(t => TF.open(t) || (t.completed_at && istOf(t.completed_at) >= wk) || t.status === 'not_done')
+    .sort((a, b) => (TF.open(b) ? 1 : 0) - (TF.open(a) ? 1 : 0) || String(a.due_date || '9999').localeCompare(String(b.due_date || '9999')));
   const myBugs = (WS.issues || []).filter(i => i.assignee === ME.id && (i.status === 'open' || i.status === 'in_progress'));
   const hr = +new Date().toLocaleString('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', hour12: false });
   const greet = hr < 5 ? 'Working late' : hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
@@ -2030,6 +2061,7 @@ function vHome(el, rv) {
         <div class="row" style="margin-top:14px">
           <button class="btn hb1" data-act="clock" data-arg="${tOpen ? 'out' : 'in'}">${tOpen ? '⏹ Stop timer · <span id="hmClock">' + clockTxt(tOpen.started_at) + '</span>' : '▶ Start work'}</button>
           <button class="btn hb2" data-act="homeAdd">＋ Task</button>
+          <button class="btn hb2" data-act="giveTask">📤 Give a task</button>
           <button class="btn hb2" data-act="go" data-arg="chat">💬 Chat${unread ? ` <i class="hbdg">${unread}</i>` : ''}</button></div></div>
       <div class="ring big hring" style="--p:${pct}"><i>${pct}%<small>today</small></i></div>
     </div>
@@ -2050,6 +2082,17 @@ function vHome(el, rv) {
         <div class="hc-h"><b>⏱️ Hours today</b><button class="lnk" data-act="go" data-arg="timer">Timesheet →</button></div>
         <div class="hbig" id="hmToday">${hm(mins)}</div><div class="mu">${tOpen ? '● timer running since ' + tm(tOpen.started_at) : 'timer is off'}</div>
         <div class="row" style="margin-top:10px"><button class="btn ${tOpen ? 'btn-r' : 'btn-g'} btn-sm" data-act="clock" data-arg="${tOpen ? 'out' : 'in'}">${tOpen ? '⏹ Stop' : '▶ Start'}</button></div>
+      </div>
+      <div class="card hcard span2">
+        <div class="hc-h"><b>📌 Given to you</b>${givenMe.length ? `<span class="pill p-b">${givenMe.length}</span>` : ''}<button class="lnk" data-act="sfGo" data-arg="given">All →</button></div>
+        ${givenMe.slice(0, 5).map(t => listItem(t, today)).join('') || '<div class="hempty">No tasks from the admin or teammates right now 🎉</div>'}
+        ${givenMe.length > 5 ? `<button class="lnk" data-act="sfGo" data-arg="given">+ ${givenMe.length - 5} more</button>` : ''}
+      </div>
+      <div class="card hcard span2">
+        <div class="hc-h"><b>📤 You gave</b><button class="lnk" data-act="giveTask">＋ Give</button><button class="lnk" data-act="sfGo" data-arg="gave">All →</button></div>
+        ${gaveL.slice(0, 5).map(t => `<div class="hsh" data-act="taskOpen" data-arg="${t.id}"><b>${esc(t.title)}</b>
+          <div class="row" style="gap:6px;margin-top:4px">${av(t.owner_name, 20)}<span>${esc(t.owner_name || '')}</span><span class="pill ${TST[t.status][1]}">${tstL(t.status)}</span>${TF.open(t) ? dueChip(t.due_date, t.status === 'doing' ? 'todo' : t.status, today) : ''}${t.comments ? `<span class="tag">💬 ${t.comments}</span>` : ''}</div></div>`).join('')
+          || `<div class="hempty">Give a teammate a task — they get a notification and it shows on their Home.<br><button class="btn btn-o btn-sm" style="margin-top:8px" data-act="giveTask">📤 Give a task</button></div>`}
       </div>
       <div class="card hcard ${repDone ? '' : 'hwarn'}">
         <div class="hc-h"><b>🗒️ Daily report</b></div>
@@ -2135,9 +2178,10 @@ setInterval(() => { if (VIEW === 'chat' && !document.hidden && ME) wsLoad('chat'
 /* ---------- shared tasks + comments (task drawer parts) ---------- */
 function peopleHtml(t) {
   const names = [t.owner_name || (ME && ME.name)].concat(t.collab_names || []);
-  return `<div class="sec" style="margin-top:22px"><h2>👥 People</h2>${isOwner(t) ? `<span class="act"><button class="btn btn-o btn-sm" data-act="taskShare" data-arg="${t.id}">＋ Add teammate</button></span>` : ''}</div>
+  return `<div class="sec" style="margin-top:22px"><h2>👥 People</h2>${canShare(t) ? `<span class="act"><button class="btn btn-o btn-sm" data-act="taskShare" data-arg="${t.id}">＋ Add teammate</button></span>` : ''}</div>
     <div class="row">${names.map((n, i) => `<span class="person">${av(n, 26)}${esc(n)}${i === 0 ? ' <span class="mu">owner</span>' : ''}</span>`).join('')}</div>
-    ${t.source === 'admin' ? '<div class="mu" style="margin-top:6px">Given by the admin — the admin sees comments too.</div>' : ''}`;
+    ${t.source === 'admin' ? '<div class="mu" style="margin-top:6px">Given by the admin — the admin sees comments too.</div>' : ''}
+    ${t.source === 'peer' ? `<div class="mu" style="margin-top:6px">📌 Given by ${t.given_by_me ? 'you' : esc(t.assigned_by_name || 'a teammate')} — ${t.given_by_me ? 'you see' : 'they see'} comments and get a notification when it's done.</div>` : ''}`;
 }
 async function taskShare(id) {
   const t = TASKS.find(x => x.id === id); if (!t) return;
@@ -2531,6 +2575,8 @@ document.addEventListener('click', e => {
     case 'leaveNew': leaveNew(); break;
     case 'leaveCancel': leaveCancel(a); break;
     case 'homeAdd': homeAdd(); break;
+    case 'giveTask': taskDrawer(null).then(() => { const w = $('tdWho'); if (w) { w.scrollIntoView({ block: 'nearest' }); toast('Pick who does it ↑'); } else toast('No other interns yet'); }); break;
+    case 'sfGo': WS.sf = a; if (WS.view === 'board') WS.view = 'list'; closeAll(); go('tasks'); break;
     case 'copyLink': copyText(a); break;
     case 'mention': { const ta = $('chatIn'); if (ta) { ta.value = (ta.value && !/\s$/.test(ta.value) ? ta.value + ' ' : ta.value) + '@' + a + ' '; WS.chatDraft = ta.value; ta.focus(); } break; }
     case 'chatSend': chatSend(); break;

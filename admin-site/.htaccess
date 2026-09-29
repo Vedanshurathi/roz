@@ -14,6 +14,6 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
   Header always set Referrer-Policy "no-referrer"
   Header always set Permissions-Policy "geolocation=(self), camera=(), microphone=(), payment=()"
   Header always set Strict-Transport-Security "max-age=31536000"
-  Header always set Content-Security-Policy "default-src 'none'; script-src 'sha256-izUUl1JGtfOyHuiG3XBxe4IgcTMgJnfCzWoCHRc+URY=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'; frame-ancestors 'none'"
+  Header always set Content-Security-Policy "default-src 'none'; script-src 'sha256-NwI4ypt4yLprKEhxFKKBj9+/OC+rCypy38eW6KJmTxk=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'; frame-ancestors 'none'"
   Header always set Cache-Control "no-cache, must-revalidate"
 </IfModule>
