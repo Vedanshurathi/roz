@@ -40,14 +40,14 @@ run `npm run dev:api`.
 
 ## Checks
 
-| command | what it does |
-|---|---|
-| `npm run lint` | ESLint (TypeScript, React hooks, no raw HTML injection, no stray `console.log`) |
-| `npm run typecheck` | strict TypeScript in every package |
-| `npm test` | API tests (security + full order lifecycle against the fake), app unit tests |
-| `npm run e2e` | browser journeys — see `e2e/README.md` (start the stack first) |
-| `npm run build` | production builds; each app's `dist/` includes its `.htaccess` |
-| `npm run format` | Prettier |
+| command             | what it does                                                                    |
+| ------------------- | ------------------------------------------------------------------------------- |
+| `npm run lint`      | ESLint (TypeScript, React hooks, no raw HTML injection, no stray `console.log`) |
+| `npm run typecheck` | strict TypeScript in every package                                              |
+| `npm test`          | API tests (security + full order lifecycle against the fake), app unit tests    |
+| `npm run e2e`       | browser journeys — see `e2e/README.md` (start the stack first)                  |
+| `npm run build`     | production builds; each app's `dist/` includes its `.htaccess`                  |
+| `npm run format`    | Prettier                                                                        |
 
 **Before pushing, all of these must pass:** lint, typecheck, test, build. Run e2e too when you
 change a screen.
