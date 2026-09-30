@@ -7,7 +7,7 @@
    │
    │  fetch(credentials: 'include') + X-Requested-With: rozbazaar
    ▼
- api.rozbazaar.shop  — Express API (Render)          ← the only thing browsers talk to
+ api.rozbazaar.shop  — Express API (Hostinger Node.js app)          ← the only thing browsers talk to
    │  encrypted HttpOnly session cookie → user's Supabase access token (refreshed server-side)
    │  POST /rest/v1/rpc/<fn> with that token (or anon / service key where stated)
    ▼
@@ -50,7 +50,7 @@ cannot widen access.
 3. `requireSession('vendor')` opens the `rb_v` cookie. It refreshes the access token if needed,
    and clears the cookie if the session is dead.
 4. The route validates with `finalizeBillBody` and maps it to `vendor_finalize_bill(p_booking,
-   p_items)`.
+p_items)`.
 5. `rpc.call()` maps the result:
    - `{ok:false,msg}` → 422 with `details.code`
    - `P0001` → 422
@@ -62,13 +62,13 @@ cannot widen access.
 
 ## Endpoints
 
-| area | routes (all under `/v1`) |
-|---|---|
-| public | `GET public/areas`, `GET public/areas/locate`, `POST public/visits`, `POST public/contact`, `POST public/waitlist`, `POST public/notifications/:id/track` (push receipts), `GET img/:hash` |
-| customer auth | `GET customer/session`, `POST customer/auth/phone`, `PUT customer/profile`, `GET customer/auth/google` → `GET customer/auth/callback`, `POST customer/auth/logout` |
-| customer | `GET home`, `GET slots`, `GET vendors`, `GET vendors/available`, `GET product-vendors`, `PUT language`, `POST favourites/:id/toggle`, addresses (`GET`, `POST`, `POST :id/default`, `DELETE :id`), bookings (`GET`, `POST`, `GET :id/bill`, `POST :id/approve`, `/dispute`, `/cancel`, `/rating`), `GET last-order`, notifications (`GET`, `POST :id/read`), `POST push-subscriptions`, `POST push/test`, `GET push/test/:id` |
-| vendor auth | `GET vendor/session`, `POST vendor/auth/login`, Google (`auth/google`, `auth/callback`), `POST auth/logout`, `POST apply`, `GET password/status`, `POST password/first`, `POST password/request`, `PUT language` |
-| vendor | `GET me`, `PATCH profile`, `POST active`, orders (`GET ?date=`, `POST :id/status`, `/bill`, `/payment`, `/verify`), products (`GET`, `POST`, `DELETE :id`, `POST :id/stock`, `POST prices`), `GET catalog`, `POST catalog/activate`, slots (`GET`, `POST capacity`, `GET`/`PUT areas`), `GET stats`, `GET dashboard?from&to`, `GET reviews`, `POST push-subscriptions` |
+| area          | routes (all under `/v1`)                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| public        | `GET public/areas`, `GET public/areas/locate`, `POST public/visits`, `POST public/contact`, `POST public/waitlist`, `POST public/notifications/:id/track` (push receipts), `GET img/:hash`                                                                                                                                                                                                                                    |
+| customer auth | `GET customer/session`, `POST customer/auth/phone`, `PUT customer/profile`, `GET customer/auth/google` → `GET customer/auth/callback`, `POST customer/auth/logout`                                                                                                                                                                                                                                                            |
+| customer      | `GET home`, `GET slots`, `GET vendors`, `GET vendors/available`, `GET product-vendors`, `PUT language`, `POST favourites/:id/toggle`, addresses (`GET`, `POST`, `POST :id/default`, `DELETE :id`), bookings (`GET`, `POST`, `GET :id/bill`, `POST :id/approve`, `/dispute`, `/cancel`, `/rating`), `GET last-order`, notifications (`GET`, `POST :id/read`), `POST push-subscriptions`, `POST push/test`, `GET push/test/:id` |
+| vendor auth   | `GET vendor/session`, `POST vendor/auth/login`, Google (`auth/google`, `auth/callback`), `POST auth/logout`, `POST apply`, `GET password/status`, `POST password/first`, `POST password/request`, `PUT language`                                                                                                                                                                                                              |
+| vendor        | `GET me`, `PATCH profile`, `POST active`, orders (`GET ?date=`, `POST :id/status`, `/bill`, `/payment`, `/verify`), products (`GET`, `POST`, `DELETE :id`, `POST :id/stock`, `POST prices`), `GET catalog`, `POST catalog/activate`, slots (`GET`, `POST capacity`, `GET`/`PUT areas`), `GET stats`, `GET dashboard?from&to`, `GET reviews`, `POST push-subscriptions`                                                        |
 
 ## Frontends
 

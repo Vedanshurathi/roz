@@ -6,8 +6,9 @@ changes, update it in the same commit.
 ## Controls in place
 
 ### Sessions (apps/api/src/security/session.ts)
+
 - **The browser never holds a Supabase token.** After login the API seals `{access, refresh,
-  user, expiry}` into a cookie:
+user, expiry}` into a cookie:
   - AES-256-GCM with an HKDF-derived key; the purpose ("session:customer", "session:vendor",
     "oauth") is bound as associated data, so one cookie can't be replayed as another.
   - `HttpOnly`, `SameSite=Lax`, `Path=/`.
@@ -27,6 +28,7 @@ changes, update it in the same commit.
   number.
 
 ### Requests (apps/api/src/app.ts, security/*)
+
 - **CORS:** only the configured app origins, with credentials. Production refuses `*` and
   non-https origins at boot.
 - **CSRF:**
@@ -36,16 +38,17 @@ changes, update it in the same commit.
   - This sits on top of SameSite=Lax cookies.
 - **Rate limits** (per IP unless noted):
 
-  | what | limit |
-  |---|---|
-  | everything | 300 requests/min |
-  | customer login | 20 per 15 min per IP, and 8 per hour per phone |
-  | vendor wrong passwords | 10 per 15 min per IP, and 5 per 15 min per phone (successes don't count) |
-  | delivery-code guesses | 8 per 15 min per order+IP (the DB also counts attempts) |
-  | bookings | 20 per hour |
-  | contact, waitlist, visits | 10 per hour |
-  | password changes | 5 per hour |
-  | push receipts | 240 per hour |
+  | what                      | limit                                                                    |
+  | ------------------------- | ------------------------------------------------------------------------ |
+  | everything                | 300 requests/min                                                         |
+  | customer login            | 20 per 15 min per IP, and 8 per hour per phone                           |
+  | vendor wrong passwords    | 10 per 15 min per IP, and 5 per 15 min per phone (successes don't count) |
+  | delivery-code guesses     | 8 per 15 min per order+IP (the DB also counts attempts)                  |
+  | bookings                  | 20 per hour                                                              |
+  | contact, waitlist, visits | 10 per hour                                                              |
+  | password changes          | 5 per hour                                                               |
+  | push receipts             | 240 per hour                                                             |
+
 - **Validation:** zod on every body, query and param. Unknown keys are dropped. JSON bodies are
   capped at 32 KB (600 KB for photo uploads only).
 - **Uploads:** photos must be real JPEG/PNG/WebP. Magic bytes are checked, not the declared type.
@@ -61,6 +64,7 @@ changes, update it in the same commit.
   a ≥32-character session secret and the service key.
 
 ### Database (database/migrations/20260930a_security_hardening.sql — applied 30 Sep 2026)
+
 - Anonymous callers can no longer run:
   - the booking function;
   - admin catalogue/product/message functions;
@@ -75,6 +79,7 @@ changes, update it in the same commit.
   (`my_customer_id()`, `my_vendor_id()`, `is_admin()`).
 
 ### Web apps
+
 - **Strict CSP**, written into `.htaccess` by the build:
   - `script-src 'self'`, `style-src 'self'` (no inline code at all).
   - `connect-src` = own site + API.
@@ -90,6 +95,7 @@ changes, update it in the same commit.
 - **Dependencies:** `npm audit` reports 0 known vulnerabilities (30 Sep 2026).
 
 ### Tests that guard this (apps/api/test/security.test.ts)
+
 - headers
 - CORS
 - CSRF (header and foreign origin)
@@ -111,13 +117,13 @@ Mutation-checked: switching the CSRF guard off makes tests fail.
 
 ## Still open — decide / do these
 
-| # | risk | why it's open | what to do |
-|---|---|---|---|
-| 1 | **Customer phone login has no OTP.** Whoever types a number gets that account (orders, saved addresses). | Founder's decision (face-to-face village delivery). Rate limits slow abuse but can't stop someone who knows a number. | Add SMS/WhatsApp OTP (e.g. MSG91) when ready. The API's `POST /v1/customer/auth/phone` is the single place to add it. |
-| 2 | Anonymous Supabase sign-ups are enabled (phone login uses them). A script could create many empty users. | Needed for phone login. | Turn on Supabase Auth CAPTCHA (Turnstile/hCaptcha), or move phone login to the API with OTP (#1). |
-| 3 | `vendor_login_lookup` is still callable anonymously and returns the login email. | The old vendor site (`vendor-site/`) still calls it from the browser. | After the new vendor app is live: `revoke execute on function public.vendor_login_lookup(text) from anon, public;` (the API uses the service key). |
-| 4 | Edge function `send-push` has `verify_jwt=false`, so anyone can call it. | Pre-existing. | Require a secret header, checked against `app_settings`, in the function. |
-| 5 | Rate limits are in memory, per API instance. | Fine for one Render instance. | Use a Redis store if the API ever runs on 2+ instances. |
-| 6 | The **old** apps (single HTML files) are still live and keep their weaknesses (tokens in `localStorage`, direct RPC calls). | The React apps are ready but not yet deployed. | Cut over (DEPLOY.md), then retire `customer/index.html` and `vendor-site/`. |
-| 7 | Staff and admin sites still talk to Supabase directly (supabase-js, tokens in the browser). | Not part of this rebuild. | Same pattern: add `/v1/staff` and `/v1/admin` modules to the API and React apps for them. |
-| 8 | Supabase's raw Auth API lets a logged-in user change their own password (bypassing admin approval). | Supabase behaviour. | With the new apps users never hold a token, so they can't. Stays open for the staff/admin sites until #7. |
+| #   | risk                                                                                                                        | why it's open                                                                                                         | what to do                                                                                                                                         |
+| --- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Customer phone login has no OTP.** Whoever types a number gets that account (orders, saved addresses).                    | Founder's decision (face-to-face village delivery). Rate limits slow abuse but can't stop someone who knows a number. | Add SMS/WhatsApp OTP (e.g. MSG91) when ready. The API's `POST /v1/customer/auth/phone` is the single place to add it.                              |
+| 2   | Anonymous Supabase sign-ups are enabled (phone login uses them). A script could create many empty users.                    | Needed for phone login.                                                                                               | Turn on Supabase Auth CAPTCHA (Turnstile/hCaptcha), or move phone login to the API with OTP (#1).                                                  |
+| 3   | `vendor_login_lookup` is still callable anonymously and returns the login email.                                            | The old vendor site (`vendor-site/`) still calls it from the browser.                                                 | After the new vendor app is live: `revoke execute on function public.vendor_login_lookup(text) from anon, public;` (the API uses the service key). |
+| 4   | Edge function `send-push` has `verify_jwt=false`, so anyone can call it.                                                    | Pre-existing.                                                                                                         | Require a secret header, checked against `app_settings`, in the function.                                                                          |
+| 5   | Rate limits are in memory, per API instance.                                                                                | Fine for one API instance.                                                                                            | Use a Redis store if the API ever runs on 2+ instances.                                                                                            |
+| 6   | The **old** apps (single HTML files) are still live and keep their weaknesses (tokens in `localStorage`, direct RPC calls). | The React apps are ready but not yet deployed.                                                                        | Cut over (DEPLOY.md), then retire `customer/index.html` and `vendor-site/`.                                                                        |
+| 7   | Staff and admin sites still talk to Supabase directly (supabase-js, tokens in the browser).                                 | Not part of this rebuild.                                                                                             | Same pattern: add `/v1/staff` and `/v1/admin` modules to the API and React apps for them.                                                          |
+| 8   | Supabase's raw Auth API lets a logged-in user change their own password (bypassing admin approval).                         | Supabase behaviour.                                                                                                   | With the new apps users never hold a token, so they can't. Stays open for the staff/admin sites until #7.                                          |

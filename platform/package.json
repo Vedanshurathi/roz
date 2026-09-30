@@ -22,7 +22,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "e2e": "node e2e/run.mjs"
+    "e2e": "node e2e/run.mjs",
+    "build:api": "npm run build -w @rozbazaar/shared && npm run build -w @rozbazaar/api",
+    "start": "npm run start -w @rozbazaar/api"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

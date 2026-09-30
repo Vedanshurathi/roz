@@ -436,7 +436,7 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   including static pages like `privacy.html` (its CSS/JS are separate files).
 - Vendor app keeps the **original Home layout** (hero + day pills + slot groups + quick actions) and is
   Hindi by default.
-- Docs: `platform/docs/DEPLOY.md` (Render + Hostinger steps, beta sub-domains first, rollback),
+- Docs: `platform/docs/DEPLOY.md` (all on Hostinger: API as a Node.js app or VPS, apps as static sites, beta sub-domains first, rollback),
   `SECURITY.md` (controls + what's still open), `PARITY.md` (what is not ported yet: Leaflet map pin, customer
   self-check screen, favourites UI, recurring orders…), `ARCHITECTURE.md`.
 - DB migration `database/migrations/20260930a_security_hardening.sql` (applied):
