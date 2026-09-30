@@ -67,6 +67,9 @@ database/
   SCHEMA.md          every table, enum, cron job and all 124 RPC signatures
   DUMP_FULL_SCHEMA.md  how to pull the real .sql with function bodies
 docs/              business context
+platform/          NEW (30 Sep 2026): TypeScript/Express API + React customer & vendor apps
+                   (npm workspaces). Replaces customer/index.html + vendor-site/ once deployed.
+                   Read platform/README.md and platform/docs/* before touching it.
 ```
 
 In production, `index.html`, `vendor.html`, `sw.js`, `og.jpg`, `og-vendor.jpg`
@@ -401,6 +404,48 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   reset password, turn off), Traffic, Launch check. Customer + vendor drawers show full order history.
 - Modals replace `prompt()`/`confirm()`; one delegated click listener on `data-act`.
 
+### Platform (`platform/`) — TypeScript API + React apps (built 30 Sep 2026, not yet deployed)
+- Vedanshu asked for a real backend (TypeScript + Express), React frontends split into files, and proper
+  security. Layout:
+  - `packages/shared` — zod schemas, enums, API types; the API and both apps use them.
+  - `packages/web` — React kit: API client, i18n `t(en, hi)`, components, design tokens, push helper, and
+    the `.htaccess`/CSP build plugin.
+  - `apps/api` — Express.
+  - `apps/customer`, `apps/vendor` — Vite + React 19 + React Router + TanStack Query.
+  - `e2e/` — Playwright journeys.
+- **Browsers only talk to the API** (`api.rozbazaar.shop`, must be a rozbazaar.shop sub-domain because
+  cookies are SameSite=Lax). The API holds the Supabase tokens in encrypted HttpOnly cookies (`rb_c`
+  customer, `rb_v` vendor) and calls the same RPCs as the logged-in user. Business rules stay in Postgres.
+- The API adds:
+  - CORS allow-list and CSRF (`X-Requested-With: rozbazaar` + Origin check);
+  - rate limits (login, wrong passwords, OTP guesses, bookings);
+  - zod validation;
+  - helmet headers;
+  - pino logs with redaction;
+  - row → camelCase mappers (the vendor never gets `deliveryOtp`);
+  - an image cache (`/v1/img/:hash`) instead of base64 photos inside JSON.
+- The vendor login email is looked up server-side (service key); the browser never sees it.
+- Local dev with no production data: `npm run dev:mock` runs the API against
+  `apps/api/src/dev/fake-supabase.ts`, an in-memory fake of every RPC used (demo vendor 8198941588 / sabzi1234).
+  **When you add an RPC call to the API, implement it in the fake too** (same rules as the real one).
+- Checks:
+  - `npm run lint`, `typecheck`, `test` (36 API tests incl. security + full order lifecycle, app unit tests),
+    `build`;
+  - `npm run e2e` (3 browser journeys; run them against `vite preview`, which sends the real CSP).
+- Web apps: strict CSP (`script-src 'self'`, `style-src 'self'`) — **no inline `<script>`/`<style>` anywhere**,
+  including static pages like `privacy.html` (its CSS/JS are separate files).
+- Vendor app keeps the **original Home layout** (hero + day pills + slot groups + quick actions) and is
+  Hindi by default.
+- Docs: `platform/docs/DEPLOY.md` (Render + Hostinger steps, beta sub-domains first, rollback),
+  `SECURITY.md` (controls + what's still open), `PARITY.md` (what is not ported yet: Leaflet map pin, customer
+  self-check screen, favourites UI, recurring orders…), `ARCHITECTURE.md`.
+- DB migration `database/migrations/20260930a_security_hardening.sql` (applied):
+  - anon lost execute on login-only/admin functions (booking, admin catalogue/products/messages, vendor
+    product/slot/earnings, `vendor_login_email`, `can_read_staff_file`);
+  - `admin_areas()` got `admin_guard()`;
+  - new `customer_me()` and `product_image(id)`.
+  - `vendor_login_lookup` stays anon only until the old vendor site is retired.
+
 ### Admin (`admin/`) — older Render version
 - Express serves `public/`; SPA calls `/api/*`; `/api/snapshot` returns
   everything the dashboard needs in one call (`store.snapshot()` fans out to ~11 RPCs).
@@ -513,6 +558,9 @@ finance dashboard. Everything above verified end-to-end in the browser.
 (₹5,715 GMV), 17 ratings — mostly from development dry runs.
 
 **Recent changes, newest first**
+- 30 Sep 2026: `platform/` — TypeScript/Express API + React customer and vendor apps with server-side sessions,
+  CSRF/CORS/rate limits/validation/CSP, and a fake Supabase for local dev and tests; DB security-hardening
+  migration applied. Old apps still live until cut-over (platform/docs/DEPLOY.md).
 - Admin Bookings tab: stat cards, search, status filters (incl. "Needs attention")
 - Admin: real RozBazaar wordmark logo on login + sidebar (was a placeholder leaf)
 - Admin: relative asset paths

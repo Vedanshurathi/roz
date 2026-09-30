@@ -1,0 +1,178 @@
+/**
+ * Vendor login: phone + password. The phone → login-email lookup happens here on the server
+ * (the old app returned the email to any browser that asked). Wrong passwords are rate limited
+ * per IP and per phone number. First-time vendors register through Google, then set a password.
+ */
+import { Router } from 'express';
+import {
+  langBody,
+  vendorApplyBody,
+  vendorLoginBody,
+  vendorPasswordBody,
+  type SessionInfo,
+  type VendorLoginResult,
+  type VendorProfile,
+} from '@rozbazaar/shared';
+import type { Deps } from '../../deps.js';
+import { parse } from '../../middleware/validate.js';
+import { requireSession } from '../../middleware/auth.js';
+import { ok, safeReturnPath } from '../../lib/respond.js';
+import { pkceChallenge, randomToken } from '../../lib/crypto.js';
+import { AppError } from '../../lib/errors.js';
+import { noStore } from '../../security/headers.js';
+import { mapPasswordStatus, mapVendor } from '../mappers.js';
+
+type Row = Record<string, unknown>;
+
+export function vendorAuthRoutes(d: Deps): Router {
+  const r = Router();
+  const AUD = 'vendor' as const;
+  const lookupCaller = d.env.SUPABASE_SERVICE_ROLE_KEY
+    ? ({ kind: 'service' } as const)
+    : ({ kind: 'anon' } as const);
+
+  async function me(token: string): Promise<VendorProfile | null> {
+    try {
+      const out = await d.rpc.call<Row>('vendor_me', {}, { kind: 'user', token });
+      return mapVendor(d.map, out.data);
+    } catch (err) {
+      if (err instanceof AppError && err.code === 'BUSINESS_RULE') return null; // logged in, but not a vendor yet
+      throw err;
+    }
+  }
+
+  r.get('/session', noStore, async (req, res) => {
+    const s = await d.sessions.resolve(req, res, AUD);
+    const user = s ? await me(s.accessToken) : null;
+    const body: SessionInfo<VendorProfile> & { needsRegistration: boolean } = {
+      authenticated: Boolean(s),
+      user,
+      needsRegistration: Boolean(s && !user),
+    };
+    ok(res, body);
+  });
+
+  r.post('/auth/login', d.limiters.vendorLoginIp, d.limiters.vendorLoginPhone, async (req, res) => {
+    const b = parse(vendorLoginBody, req.body);
+    const look = await d.rpc.call<Row>('vendor_login_lookup', { p_phone: b.phone }, lookupCaller);
+    const info = look.data ?? {};
+    if (info.registered !== true) {
+      throw new AppError(422, 'BUSINESS_RULE', 'This number is not registered as a RozBazaar vendor yet.', {
+        code: 'NOT_REGISTERED',
+      });
+    }
+    if (info.has_password !== true || typeof info.email !== 'string') {
+      throw new AppError(
+        422,
+        'BUSINESS_RULE',
+        'No password set yet. Log in with Google once to create your password.',
+        {
+          code: 'NO_PASSWORD',
+        },
+      );
+    }
+    const session = await d.auth.signInWithPassword(info.email, b.password);
+    const vendor = await me(session.accessToken);
+    d.sessions.write(res, AUD, session);
+    d.logger.info({ uid: session.userId }, 'vendor password login');
+    const body: VendorLoginResult = { vendor, needsRegistration: !vendor };
+    ok(res, body);
+  });
+
+  r.get('/auth/google', (req, res) => {
+    const verifier = randomToken(48);
+    d.sessions.writeOAuthState(res, { aud: AUD, verifier, returnTo: safeReturnPath(req.query.returnTo) });
+    res.redirect(
+      302,
+      d.auth.authorizeUrl(
+        'google',
+        `${d.env.PUBLIC_API_URL}/v1/vendor/auth/callback`,
+        pkceChallenge(verifier),
+      ),
+    );
+  });
+
+  r.get('/auth/callback', async (req, res) => {
+    const app = d.env.VENDOR_APP_URL;
+    const state = d.sessions.takeOAuthState(req, res);
+    const code = typeof req.query.code === 'string' && req.query.code.length < 512 ? req.query.code : null;
+    if (!state || state.aud !== AUD || !code) {
+      res.redirect(302, `${app}/login?error=google`);
+      return;
+    }
+    try {
+      const s = await d.auth.exchangePkce(code, state.verifier);
+      d.sessions.write(res, AUD, s);
+      res.redirect(302, `${app}${state.returnTo}`);
+    } catch (err) {
+      d.logger.warn({ err: (err as Error).message }, 'vendor google callback failed');
+      res.redirect(302, `${app}/login?error=google`);
+    }
+  });
+
+  r.post('/auth/logout', async (req, res) => {
+    const token = d.sessions.peekAccessToken(req, AUD);
+    if (token) await d.auth.logout(token);
+    d.sessions.clear(res, AUD);
+    res.status(204).end();
+  });
+
+  /* ---------- registration + password (logged in) ---------- */
+  const auth = requireSession(d.sessions, AUD);
+
+  r.post('/apply', auth, noStore, async (req, res) => {
+    const b = parse(vendorApplyBody, req.body);
+    const out = await d.rpc.call(
+      'vendor_apply',
+      {
+        p_name: b.name,
+        p_phone: b.phone,
+        p_type: b.type,
+        p_areas: b.areas,
+        p_shop: b.shop ?? null,
+        p_vehicle: b.vehicle ?? null,
+        p_capacity: b.capacity ?? 15,
+        p_lang: b.lang ?? 'hi',
+      },
+      { kind: 'user', token: req.auth!.accessToken },
+    );
+    ok(res, { applied: true }, out.message, 201);
+  });
+
+  r.get('/password/status', auth, noStore, async (req, res) => {
+    const out = await d.rpc.call<Row>(
+      'vendor_password_status',
+      {},
+      { kind: 'user', token: req.auth!.accessToken },
+    );
+    ok(res, mapPasswordStatus(out.data ?? {}));
+  });
+
+  r.post('/password/first', auth, noStore, d.limiters.passwordChange, async (req, res) => {
+    const b = parse(vendorPasswordBody, req.body);
+    const out = await d.rpc.call(
+      'vendor_set_first_password',
+      { p_password: b.password },
+      { kind: 'user', token: req.auth!.accessToken },
+    );
+    ok(res, { saved: true }, out.message);
+  });
+
+  r.post('/password/request', auth, noStore, d.limiters.passwordChange, async (req, res) => {
+    const b = parse(vendorPasswordBody, req.body);
+    const out = await d.rpc.call(
+      'vendor_request_password',
+      { p_password: b.password },
+      { kind: 'user', token: req.auth!.accessToken },
+    );
+    ok(res, { requested: true }, out.message);
+  });
+
+  r.put('/language', auth, noStore, async (req, res) => {
+    const b = parse(langBody, req.body);
+    await d.rpc.call('set_language', { p_lang: b.lang }, { kind: 'user', token: req.auth!.accessToken });
+    res.status(204).end();
+  });
+
+  return r;
+}

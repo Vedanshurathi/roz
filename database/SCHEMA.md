@@ -395,3 +395,19 @@ tg_booking_defaults() · tg_guard_delivered() · tg_slot_count() · tg_status_no
 tg_touch_price() · tg_vendor_orders() · tg_vendor_rating()
 job_expire_missed() · job_price_reminders() · job_spawn_recurring()
 ```
+
+### Security hardening for the platform API (added 30 Sep 2026 — `20260930a_security_hardening.sql`)
+```
+customer_me() [definer, logged in only] → {id, name, phone, email, lang, is_blocked}   used by the API's /v1/customer/session
+product_image(p_id uuid) [definer, anon ok] → {image_url}   one product photo, for the API image cache after a restart
+```
+- `admin_areas()` now starts with `perform admin_guard();`.
+- Execute revoked from `anon`/`public` (kept for `authenticated`/`service_role`):
+  - `customer_create_booking`;
+  - `admin_add_catalog_item`, `admin_cancel_booking`, `admin_catalog_list`, `admin_mark_message_read`,
+    `admin_messages`, `admin_products`, `admin_remove_catalog_item`, `admin_update_product`;
+  - `vendor_activate_catalog_item`, `vendor_upsert_product`, `vendor_set_slot_areas`,
+    `vendor_get_slot_areas`, `vendor_earnings_range`, `vendor_earnings_week`;
+  - `can_read_staff_file`, `vendor_login_email`.
+- `rls_auto_enable` is not executable by anyone.
+- `vendor_login_lookup` stays anon-callable until the old vendor site is retired (platform/docs/SECURITY.md #3).
