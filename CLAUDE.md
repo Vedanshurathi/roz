@@ -607,7 +607,9 @@ finance dashboard. Everything above verified end-to-end in the browser.
    home instead of the order screen." Every automated path (phone login) lands on
    success correctly. Suspect: Google OAuth full-page redirect path. Needs a real device test.
 6. Consider a real repo for customer/vendor too, instead of manual Hostinger uploads.
-7. Commit `database/schema.sql` (see DUMP_FULL_SCHEMA.md) and move to migration files.
+7. `database/schema.sql` is from 26 Sep (outdated). A full current backup (structure + data) comes from
+   `public.rb_backup_sql()` via the `rb-backup` Edge Function link (see database/DUMP_FULL_SCHEMA.md). Never commit a
+   data backup — the repo is public.
 
 ---
 
