@@ -413,7 +413,14 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   - `apps/api` — Express.
   - `apps/customer`, `apps/vendor` — Vite + React 19 + React Router + TanStack Query.
   - `e2e/` — Playwright journeys.
-- **Browsers only talk to the API** (`api.rozbazaar.shop`, must be a rozbazaar.shop sub-domain because
+- **The API runs on Supabase Edge Functions** (1 Oct 2026, free): `https://srvpfyjmwaruebbkqkdj.supabase.co/functions/v1/api`,
+  function `api` = `import` of `supabase/functions/api/bundle.js` pinned to a commit via jsDelivr (repo is public), JWT
+  verification off. `npm run build:edge` regenerates that folder from `apps/api` + `packages/shared`. On Edge the session
+  travels in the `X-RB-Session` header (`SESSION_TRANSPORT=header`; supabase.co is another site, cookies would be blocked),
+  Google login returns it as `#rbs=` in the URL, client IP = `cf-connecting-ip`, session secret =
+  `app_settings.api_session_secret`. Supabase Auth redirect URLs must include the two `/functions/v1/api/v1/*/auth/callback`
+  URLs. Rate limits are per Edge instance (looser). The old temporary function `rb-ipcheck` is a 410 stub — can be deleted.
+- **Browsers only talk to the API** (on Hostinger it would be `api.rozbazaar.shop`, a rozbazaar.shop sub-domain because
   cookies are SameSite=Lax). The API holds the Supabase tokens in encrypted HttpOnly cookies (`rb_c`
   customer, `rb_v` vendor) and calls the same RPCs as the logged-in user. Business rules stay in Postgres.
 - The API adds:

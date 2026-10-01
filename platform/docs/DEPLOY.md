@@ -1,24 +1,61 @@
-# Deploy — step by step (everything on Hostinger)
+# Deploy — step by step
 
-Three pieces, all on Hostinger:
+Three pieces:
 
-1. The API: a Node.js app.
-2. The customer app: a static website.
-3. The vendor app: a static website.
+1. **The API** — now running for free on **Supabase Edge Functions** (already deployed, §0).
+   Hostinger Node.js (§1) stays possible if you ever want it on `api.rozbazaar.shop`.
+2. The customer app: a static website on Hostinger.
+3. The vendor app: a static website on Hostinger.
 
 The old apps keep working the whole time. Test the new ones on test sub-domains, then switch.
 
-> **The API must live on a sub-domain of rozbazaar.shop** (e.g. `api.rozbazaar.shop`). Login
-> cookies are `SameSite=Lax`, and browsers only send them to the same site.
-> `api.rozbazaar.shop` + `rozbazaar.shop` = same site ✅. Any other domain ❌ (login would
-> silently fail).
+## 0. API on Supabase Edge Functions (free — in use since 1 Oct 2026)
 
-> **Your Hostinger plan must run Node.js.**
+- Address: `https://srvpfyjmwaruebbkqkdj.supabase.co/functions/v1/api`
+  (health check: `…/functions/v1/api/healthz` → `{"status":"ok"}`).
+- Free plan: about 500,000 calls a month (check Supabase's pricing page). No server to run, never
+  sleeps.
+- It is the same Express API, running on Deno. `npm run build:edge` writes
+  `../supabase/functions/api/` (the sources + `deno.json`) and `bundle.js` (the same code as one
+  file).
+- Settings are built in (`supabase/functions/api/index.ts`): production mode, header sessions,
+  the app URLs and allowed origins (rozbazaar.shop, www, vendor, beta, vendor-beta). Any of them can
+  be overridden with a function secret (Supabase → Edge Functions → Secrets).
+- The session secret is `app_settings.api_session_secret` (made in the database, readable only with
+  the service key). A `SESSION_SECRET` function secret would take priority.
+- **Sessions travel in the `X-RB-Session` header, not cookies**, because supabase.co is a different
+  site from rozbazaar.shop (see SECURITY.md).
+
+**Update the deployed API after a code change**
+
+1. `cd platform && npm run build:edge`, run the checks, commit and push (the repo is public).
+2. Redeploy the `api` function with `index.ts` =
+   `import "https://cdn.jsdelivr.net/gh/Vedanshurathi/roz@<commit>/supabase/functions/api/bundle.js";`
+   plus `supabase/functions/api/deno.json`, JWT verification **off** (the API checks sessions
+   itself). Claude does this with the Supabase connector; or with the Supabase CLI:
+   `supabase functions deploy api --project-ref srvpfyjmwaruebbkqkdj --no-verify-jwt`
+   (from the repo root — this uploads the sources directly).
+3. Check `…/functions/v1/api/healthz`.
+
+**Google login** — Supabase → Authentication → URL Configuration → Redirect URLs → add:
+
+```
+https://srvpfyjmwaruebbkqkdj.supabase.co/functions/v1/api/v1/customer/auth/callback
+https://srvpfyjmwaruebbkqkdj.supabase.co/functions/v1/api/v1/vendor/auth/callback
+```
+
+**Build the apps for it:**
+`VITE_API_URL=https://srvpfyjmwaruebbkqkdj.supabase.co/functions/v1/api npm run build`, then
+upload as in §4–5. Skip §1 entirely.
+
+---
+
+> The sections below are for running the API on **Hostinger** instead (Node.js).
 >
-> - Business and Cloud web hosting plans have "Node.js apps" in hPanel. Any Hostinger VPS works
->   too.
-> - Plain shared (Single/Premium) hosting can only serve static files. On those plans the two
->   apps work, but the API needs an upgrade or a VPS.
+> **The API must then live on a sub-domain of rozbazaar.shop** (e.g. `api.rozbazaar.shop`). Login
+> cookies are `SameSite=Lax`, and browsers only send them to the same site.
+>
+> **Your Hostinger plan must run Node.js** (Business / Cloud plans, or a VPS).
 
 ## 1. API on Hostinger
 

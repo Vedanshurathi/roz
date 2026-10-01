@@ -14,6 +14,7 @@ platform/
   packages/web       React kit: API client, i18n (English / Devanagari), UI components, tokens,
                      web-push helper, build plugin that writes .htaccess security headers
   apps/api           Express API — sessions, security, validation, talks to Supabase
+                     (runs on Supabase Edge Functions or Node.js — see docs/DEPLOY.md)
   apps/customer      React customer app  → rozbazaar.shop
   apps/vendor        React vendor app    → vendor.rozbazaar.shop (Hindi by default)
   e2e/               Playwright browser journeys (real apps → real API → fake Supabase)
@@ -40,14 +41,15 @@ run `npm run dev:api`.
 
 ## Checks
 
-| command             | what it does                                                                    |
-| ------------------- | ------------------------------------------------------------------------------- |
-| `npm run lint`      | ESLint (TypeScript, React hooks, no raw HTML injection, no stray `console.log`) |
-| `npm run typecheck` | strict TypeScript in every package                                              |
-| `npm test`          | API tests (security + full order lifecycle against the fake), app unit tests    |
-| `npm run e2e`       | browser journeys — see `e2e/README.md` (start the stack first)                  |
-| `npm run build`     | production builds; each app's `dist/` includes its `.htaccess`                  |
-| `npm run format`    | Prettier                                                                        |
+| command              | what it does                                                                      |
+| -------------------- | --------------------------------------------------------------------------------- |
+| `npm run lint`       | ESLint (TypeScript, React hooks, no raw HTML injection, no stray `console.log`)   |
+| `npm run typecheck`  | strict TypeScript in every package                                                |
+| `npm test`           | API tests (security + full order lifecycle against the fake), app unit tests      |
+| `npm run e2e`        | browser journeys — see `e2e/README.md` (start the stack first)                    |
+| `npm run build`      | production builds; each app's `dist/` includes its `.htaccess`                    |
+| `npm run build:edge` | the API as a Supabase Edge Function → `../supabase/functions/api/` (DEPLOY.md §0) |
+| `npm run format`     | Prettier                                                                          |
 
 **Before pushing, all of these must pass:** lint, typecheck, test, build. Run e2e too when you
 change a screen.

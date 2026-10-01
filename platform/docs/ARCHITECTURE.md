@@ -5,10 +5,12 @@
    │  rozbazaar.shop  (customer, static React build on Hostinger)
    │  vendor.rozbazaar.shop  (vendor, static React build on Hostinger)
    │
-   │  fetch(credentials: 'include') + X-Requested-With: rozbazaar
+   │  fetch + X-Requested-With: rozbazaar + X-RB-Session (sealed session)
    ▼
- api.rozbazaar.shop  — Express API (Hostinger Node.js app)          ← the only thing browsers talk to
-   │  encrypted HttpOnly session cookie → user's Supabase access token (refreshed server-side)
+ Express API — the only thing browsers talk to. Runs in either place:
+   • Supabase Edge Functions (Deno, free): …supabase.co/functions/v1/api   ← in use, header sessions
+   • Hostinger Node.js: api.rozbazaar.shop                                   ← HttpOnly cookie sessions
+   │  sealed session → user's Supabase access token (refreshed server-side)
    │  POST /rest/v1/rpc/<fn> with that token (or anon / service key where stated)
    ▼
  Supabase (Postgres 17, Mumbai) — SECURITY DEFINER RPCs, RLS on every table, edge functions

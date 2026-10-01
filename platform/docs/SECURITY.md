@@ -27,6 +27,24 @@ user, expiry}` into a cookie:
   service key and never sent to the browser. The old app returned it to anyone who typed a phone
   number.
 
+### Header sessions (API on Supabase Edge Functions — in use)
+
+- supabase.co is a different site from rozbazaar.shop, so cookies would be third-party (Safari
+  blocks them always, Chrome may). With `SESSION_TRANSPORT=header` the **same sealed token** travels
+  in the `X-RB-Session` header instead:
+  - the API returns a new value in that response header on login/refresh and `cleared` on logout;
+  - the app keeps it in `localStorage` (`rbx.session` / `rbx.vsession`) and sends it back;
+  - after Google login it arrives in the URL fragment (`#rbs=…`, never sent to any server) and is
+    removed from the address bar at once.
+- Trade-off vs. cookies: page JavaScript can read the token. Mitigation: the strict CSP
+  (`script-src 'self'`, no inline code, no third-party scripts) makes script injection very hard,
+  and the token is still the API's encrypted blob (the Supabase tokens inside can't be read or used
+  directly). CSRF is not possible with header sessions; the CSRF guard stays on anyway.
+- The Google-login state (PKCE verifier) is still a short-lived `__Host-` cookie on the API's own
+  site — it is set and read in top-level navigations, which browsers allow.
+- Real visitor IP = `cf-connecting-ip` (checked live on 1 Oct 2026: Cloudflare sets it and refuses
+  forged ones; `X-Forwarded-For` only shows Supabase's proxies), so rate limits are per visitor.
+
 ### Requests (apps/api/src/app.ts, security/*)
 
 - **CORS:** only the configured app origins, with credentials. Production refuses `*` and
@@ -91,7 +109,8 @@ user, expiry}` into a cookie:
   - Only accept an https (or localhost) API origin.
   - Only track notification IDs that are UUIDs.
   - The customer worker only opens same-site paths from a push.
-- **`localStorage`** holds only language, village and basket — nothing secret.
+- **`localStorage`** holds language, village and basket — and, with header sessions (API on
+  Supabase Edge), the sealed session token (see above).
 - **Dependencies:** `npm audit` reports 0 known vulnerabilities (30 Sep 2026).
 
 ### Tests that guard this (apps/api/test/security.test.ts)
@@ -117,13 +136,13 @@ Mutation-checked: switching the CSRF guard off makes tests fail.
 
 ## Still open — decide / do these
 
-| #   | risk                                                                                                                        | why it's open                                                                                                         | what to do                                                                                                                                         |
-| --- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Customer phone login has no OTP.** Whoever types a number gets that account (orders, saved addresses).                    | Founder's decision (face-to-face village delivery). Rate limits slow abuse but can't stop someone who knows a number. | Add SMS/WhatsApp OTP (e.g. MSG91) when ready. The API's `POST /v1/customer/auth/phone` is the single place to add it.                              |
-| 2   | Anonymous Supabase sign-ups are enabled (phone login uses them). A script could create many empty users.                    | Needed for phone login.                                                                                               | Turn on Supabase Auth CAPTCHA (Turnstile/hCaptcha), or move phone login to the API with OTP (#1).                                                  |
-| 3   | `vendor_login_lookup` is still callable anonymously and returns the login email.                                            | The old vendor site (`vendor-site/`) still calls it from the browser.                                                 | After the new vendor app is live: `revoke execute on function public.vendor_login_lookup(text) from anon, public;` (the API uses the service key). |
-| 4   | Edge function `send-push` has `verify_jwt=false`, so anyone can call it.                                                    | Pre-existing.                                                                                                         | Require a secret header, checked against `app_settings`, in the function.                                                                          |
-| 5   | Rate limits are in memory, per API instance.                                                                                | Fine for one API instance.                                                                                            | Use a Redis store if the API ever runs on 2+ instances.                                                                                            |
-| 6   | The **old** apps (single HTML files) are still live and keep their weaknesses (tokens in `localStorage`, direct RPC calls). | The React apps are ready but not yet deployed.                                                                        | Cut over (DEPLOY.md), then retire `customer/index.html` and `vendor-site/`.                                                                        |
-| 7   | Staff and admin sites still talk to Supabase directly (supabase-js, tokens in the browser).                                 | Not part of this rebuild.                                                                                             | Same pattern: add `/v1/staff` and `/v1/admin` modules to the API and React apps for them.                                                          |
-| 8   | Supabase's raw Auth API lets a logged-in user change their own password (bypassing admin approval).                         | Supabase behaviour.                                                                                                   | With the new apps users never hold a token, so they can't. Stays open for the staff/admin sites until #7.                                          |
+| #   | risk                                                                                                                                                                                          | why it's open                                                                                                         | what to do                                                                                                                                         |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Customer phone login has no OTP.** Whoever types a number gets that account (orders, saved addresses).                                                                                      | Founder's decision (face-to-face village delivery). Rate limits slow abuse but can't stop someone who knows a number. | Add SMS/WhatsApp OTP (e.g. MSG91) when ready. The API's `POST /v1/customer/auth/phone` is the single place to add it.                              |
+| 2   | Anonymous Supabase sign-ups are enabled (phone login uses them). A script could create many empty users.                                                                                      | Needed for phone login.                                                                                               | Turn on Supabase Auth CAPTCHA (Turnstile/hCaptcha), or move phone login to the API with OTP (#1).                                                  |
+| 3   | `vendor_login_lookup` is still callable anonymously and returns the login email.                                                                                                              | The old vendor site (`vendor-site/`) still calls it from the browser.                                                 | After the new vendor app is live: `revoke execute on function public.vendor_login_lookup(text) from anon, public;` (the API uses the service key). |
+| 4   | Edge function `send-push` has `verify_jwt=false`, so anyone can call it.                                                                                                                      | Pre-existing.                                                                                                         | Require a secret header, checked against `app_settings`, in the function.                                                                          |
+| 5   | Rate limits are in memory, per API instance. **On Supabase Edge there are several short-lived instances**, so the limits are looser than the numbers above (each instance counts on its own). | Fine for one API instance; on Edge it still slows abuse but is not exact.                                             | Move the counters into Postgres (a small `rate_limits` table + RPC) or Upstash Redis.                                                              |
+| 6   | The **old** apps (single HTML files) are still live and keep their weaknesses (tokens in `localStorage`, direct RPC calls).                                                                   | The React apps are ready but not yet deployed.                                                                        | Cut over (DEPLOY.md), then retire `customer/index.html` and `vendor-site/`.                                                                        |
+| 7   | Staff and admin sites still talk to Supabase directly (supabase-js, tokens in the browser).                                                                                                   | Not part of this rebuild.                                                                                             | Same pattern: add `/v1/staff` and `/v1/admin` modules to the API and React apps for them.                                                          |
+| 8   | Supabase's raw Auth API lets a logged-in user change their own password (bypassing admin approval).                                                                                           | Supabase behaviour.                                                                                                   | With the new apps users never hold a token, so they can't. Stays open for the staff/admin sites until #7.                                          |
