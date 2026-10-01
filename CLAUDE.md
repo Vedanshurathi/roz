@@ -550,7 +550,10 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
     clean → it's the browser's **Reader Mode**, not the code. (Happened twice.)
 12. `sw.js` must be at `public_html` root or push silently fails (the UI now
     reports this honestly instead of claiming success).
-13. WhatsApp/Facebook cache link previews — after changing `og.jpg`, re-scrape
+13. Rolling back from the new React build to the old customer site: the new build's `.htaccess`
+    CSP (`connect-src` = only the API, `script-src 'self'`) blocks supabase-js and Supabase, so the
+    old app shows no products/vendors/villages. Always upload `customer/.htaccess` with the old files.
+14. WhatsApp/Facebook cache link previews — after changing `og.jpg`, re-scrape
     with Facebook's Sharing Debugger.
 
 ---

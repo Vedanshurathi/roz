@@ -144,5 +144,11 @@ index.html" for the app's links.
 
 ## Rolling back
 
-Upload the old `customer/index.html` (+ `sw.js`) or `vendor-site/*` again. The database is
-unchanged by the switch, so both versions work against it.
+Upload the old `customer/` files or `vendor-site/*` again. The database is unchanged by the switch,
+so both versions work against it.
+
+> **Always upload the old `.htaccess` too** (`customer/.htaccess`). The new build's `.htaccess`
+> has a Content-Security-Policy that only allows `api.rozbazaar.shop`; if it stays in
+> `public_html`, the old app cannot load supabase-js or reach Supabase and shows **no products,
+> vendors or villages** (this happened on 1 Oct 2026). Also delete the new app's leftovers:
+> the `assets/` and `brand/` folders, `privacy.css`, `privacy.js`.
