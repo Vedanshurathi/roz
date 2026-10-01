@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
-import { ApiError, createApiClient } from '@rozbazaar/web';
-import { API_URL } from '../config';
+import { ApiError, adoptSessionFromUrl, createApiClient } from '@rozbazaar/web';
+import { API_URL, STORAGE } from '../config';
 import { keys } from './keys';
 
 export const queryClient = new QueryClient({
@@ -14,7 +14,11 @@ export const queryClient = new QueryClient({
   },
 });
 
+// Back from a Google login with the session in the fragment (header sessions): keep it.
+adoptSessionFromUrl(STORAGE.session);
+
 export const api = createApiClient(API_URL, {
+  sessionKey: STORAGE.session,
   // The session expired or was revoked: re-read it, and the route guard sends the vendor to login.
   onUnauthenticated: () => void queryClient.invalidateQueries({ queryKey: keys.session }),
 });

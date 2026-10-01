@@ -58,7 +58,8 @@ export async function subscribePush(
  * subscription at `path`. Throws Error('denied' | 'unsupported') so the app can explain what to do.
  */
 export async function enablePush(client: ApiClient, path: string, vapidPublicKey: string): Promise<void> {
-  const swUrl = `/sw.js?api=${encodeURIComponent(new URL(client.baseUrl).origin)}`;
+  // The full API address (on Supabase Edge it has a path: /functions/v1/api).
+  const swUrl = `/sw.js?api=${encodeURIComponent(client.baseUrl)}`;
   const sub = await subscribePush(vapidPublicKey, swUrl);
   if (!sub) throw new Error(pushState() === 'denied' ? 'denied' : 'unsupported');
   await client.post(path, sub);

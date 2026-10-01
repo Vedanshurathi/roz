@@ -6,6 +6,7 @@
  * "purpose" string is bound as additional authenticated data: a customer cookie cannot be
  * replayed as a vendor cookie, and an OAuth-state cookie cannot be replayed as a session.
  */
+import { Buffer } from 'node:buffer';
 import {
   createCipheriv,
   createDecipheriv,

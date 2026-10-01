@@ -7,9 +7,13 @@ export const VAPID_PUBLIC_KEY =
   (import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined) ||
   'BFlTM-YF_0e6X_gZBy4ptZzxxM25c_l-C9kIOKZOiKbYybWBQom8L0CEoU9xLRK5vyiJml4sSq0Q7OUmynyaOhQ';
 
-/** Harmless per-device preferences only — the session itself is an HttpOnly cookie. */
+/**
+ * Per-device preferences, plus the sealed session token when the API runs on Supabase Edge
+ * (header sessions). With the API on api.rozbazaar.shop the session is an HttpOnly cookie instead.
+ */
 export const STORAGE = {
   lang: 'rbx.vlang',
+  session: 'rbx.vsession',
   pushDismissed: 'rbx.vpush',
   seenOrders: 'rbx.vseen',
   passwordLater: 'rbx.vpwlater',

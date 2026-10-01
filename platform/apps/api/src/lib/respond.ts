@@ -12,3 +12,17 @@ export function safeReturnPath(v: unknown, fallback = '/'): string {
   if (!v.startsWith('/') || v.startsWith('//') || v.startsWith('/\\') || /[\r\n]/.test(v)) return fallback;
   return v;
 }
+
+/**
+ * The app that started a login (from the Referer), when it is one of ours — so a login started on
+ * beta.rozbazaar.shop comes back there. Anything else falls back to the configured app URL.
+ */
+export function startingApp(referer: unknown, allowed: readonly string[], fallback: string): string {
+  if (typeof referer !== 'string') return fallback;
+  try {
+    const origin = new URL(referer).origin;
+    return allowed.includes(origin) ? origin : fallback;
+  } catch {
+    return fallback;
+  }
+}

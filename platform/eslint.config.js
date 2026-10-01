@@ -20,6 +20,12 @@ export default tseslint.config(
     languageOptions: { globals: globals.node },
   },
   {
+    // Build scripts (Node).
+    files: ['scripts/**/*.mjs'],
+    languageOptions: { globals: globals.node },
+    rules: { 'no-console': 'off' },
+  },
+  {
     // Playwright journeys run in Node and drive a browser.
     files: ['e2e/**/*.mjs'],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },

@@ -1,5 +1,13 @@
 /**
- * Server-side sessions in encrypted, HttpOnly cookies.
+ * Server-side sessions: an encrypted token that only this API can open.
+ *
+ * Two ways to carry it (SESSION_TRANSPORT):
+ * - `cookie` (API on a rozbazaar.shop sub-domain): HttpOnly cookie, described below.
+ * - `header` (API on Supabase Edge Functions, a different site): browsers block cross-site
+ *   cookies (Safari always), so the same sealed token travels in the `X-RB-Session` header.
+ *   The API sends a new value in that response header whenever it changes (login, refresh) and
+ *   `cleared` on logout; the app stores it and sends it back. Still opaque and encrypted — the
+ *   Supabase tokens inside are never readable by the browser.
  *
  * - One cookie per app ("audience"): a customer session can never act on vendor routes.
  * - `__Host-` prefix in production: Secure, host-only, Path=/ — cannot be set by a subdomain.
@@ -36,10 +44,21 @@ export interface OAuthState {
   aud: Audience;
   verifier: string;
   returnTo: string;
+  /** Which app (origin) started the login, so beta sites come back to themselves. */
+  app?: string;
   iat: number;
 }
 
+export type SessionTransport = 'cookie' | 'header';
+export const SESSION_HEADER = 'X-RB-Session';
+export const SESSION_CLEARED = 'cleared';
+
 const REFRESH_BEFORE_S = 120;
+
+/** Node timers can be unref'd; Deno's (Supabase Edge) are plain numbers. */
+function unref(t: unknown): void {
+  (t as { unref?: () => void })?.unref?.();
+}
 const OAUTH_TTL_S = 600;
 
 export class SessionManager {
@@ -53,6 +72,7 @@ export class SessionManager {
       /** Cookie lifetime; also the absolute limit before a fresh login is required. */
       maxAgeDays: Record<Audience, number>;
       logger: Logger;
+      transport?: SessionTransport;
     },
   ) {}
 
@@ -64,11 +84,38 @@ export class SessionManager {
     return `${this.opts.secure ? '__Host-' : ''}rb_oauth`;
   }
 
+  get transport(): SessionTransport {
+    return this.opts.transport ?? 'cookie';
+  }
+
+  private readRaw(req: Request, aud: Audience): string | undefined {
+    if (this.transport === 'header') {
+      const h = req.get(SESSION_HEADER);
+      return h && h !== SESSION_CLEARED ? h : undefined;
+    }
+    return req.cookies?.[this.cookieName(aud)] as string | undefined;
+  }
+
+  private send(res: Response, aud: Audience, token: string, maxAgeMs: number): void {
+    if (this.transport === 'header') res.setHeader(SESSION_HEADER, token);
+    else res.cookie(this.cookieName(aud), token, this.cookieOptions(maxAgeMs));
+  }
+
+  /**
+   * Where to send the browser after a Google login. In header mode the new session rides along in
+   * the URL fragment (`#rbs=`), which browsers never send to any server; the app stores it and
+   * removes it from the address bar straight away.
+   */
+  afterLogin(url: string, token: string): string {
+    return this.transport === 'header' ? `${url}#rbs=${token}` : url;
+  }
+
   private cookieOptions(maxAgeMs: number): CookieOptions {
     return { httpOnly: true, secure: this.opts.secure, sameSite: 'lax', path: '/', maxAge: maxAgeMs };
   }
 
-  write(res: Response, aud: Audience, s: AuthSession, loginAt = Math.floor(Date.now() / 1000)): void {
+  /** Stores the session and returns the sealed token. */
+  write(res: Response, aud: Audience, s: AuthSession, loginAt = Math.floor(Date.now() / 1000)): string {
     const payload: SessionPayload = {
       v: 1,
       aud,
@@ -79,14 +126,16 @@ export class SessionManager {
       iat: loginAt,
     };
     const remainingMs = Math.max(60_000, loginAt * 1000 + this.opts.maxAgeDays[aud] * 864e5 - Date.now());
-    res.cookie(
-      this.cookieName(aud),
-      this.sealer.seal(`session:${aud}`, payload),
-      this.cookieOptions(remainingMs),
-    );
+    const token = this.sealer.seal(`session:${aud}`, payload);
+    this.send(res, aud, token, remainingMs);
+    return token;
   }
 
   clear(res: Response, aud: Audience): void {
+    if (this.transport === 'header') {
+      res.setHeader(SESSION_HEADER, SESSION_CLEARED);
+      return;
+    }
     res.clearCookie(this.cookieName(aud), {
       httpOnly: true,
       secure: this.opts.secure,
@@ -97,7 +146,7 @@ export class SessionManager {
 
   /** The raw access token for logout, without refreshing. */
   peekAccessToken(req: Request, aud: Audience): string | null {
-    const opened = this.sealer.open<SessionPayload>(`session:${aud}`, req.cookies?.[this.cookieName(aud)]);
+    const opened = this.sealer.open<SessionPayload>(`session:${aud}`, this.readRaw(req, aud));
     return opened?.value.at ?? null;
   }
 
@@ -106,7 +155,7 @@ export class SessionManager {
    * A dead cookie is cleared so the browser stops sending it.
    */
   async resolve(req: Request, res: Response, aud: Audience): Promise<ActiveSession | null> {
-    const raw = req.cookies?.[this.cookieName(aud)] as string | undefined;
+    const raw = this.readRaw(req, aud);
     if (!raw) return null;
     const opened = this.sealer.open<SessionPayload>(`session:${aud}`, raw);
     const p = opened?.value;
@@ -136,7 +185,7 @@ export class SessionManager {
     let p = this.inflight.get(refreshToken);
     if (!p) {
       p = this.auth.refresh(refreshToken).finally(() => {
-        setTimeout(() => this.inflight.delete(refreshToken), 5_000).unref();
+        unref(setTimeout(() => this.inflight.delete(refreshToken), 5_000));
       });
       this.inflight.set(refreshToken, p);
     }
@@ -145,7 +194,7 @@ export class SessionManager {
 
   private rewrite(res: Response, aud: Audience, p: SessionPayload): void {
     const remainingMs = Math.max(60_000, p.iat * 1000 + this.opts.maxAgeDays[aud] * 864e5 - Date.now());
-    res.cookie(this.cookieName(aud), this.sealer.seal(`session:${aud}`, p), this.cookieOptions(remainingMs));
+    this.send(res, aud, this.sealer.seal(`session:${aud}`, p), remainingMs);
   }
 
   /* ---------- OAuth (PKCE) state, bound to this browser ---------- */

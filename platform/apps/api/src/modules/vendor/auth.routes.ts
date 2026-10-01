@@ -16,7 +16,7 @@ import {
 import type { Deps } from '../../deps.js';
 import { parse } from '../../middleware/validate.js';
 import { requireSession } from '../../middleware/auth.js';
-import { ok, safeReturnPath } from '../../lib/respond.js';
+import { ok, safeReturnPath, startingApp } from '../../lib/respond.js';
 import { pkceChallenge, randomToken } from '../../lib/crypto.js';
 import { AppError } from '../../lib/errors.js';
 import { noStore } from '../../security/headers.js';
@@ -81,7 +81,12 @@ export function vendorAuthRoutes(d: Deps): Router {
 
   r.get('/auth/google', (req, res) => {
     const verifier = randomToken(48);
-    d.sessions.writeOAuthState(res, { aud: AUD, verifier, returnTo: safeReturnPath(req.query.returnTo) });
+    d.sessions.writeOAuthState(res, {
+      aud: AUD,
+      verifier,
+      returnTo: safeReturnPath(req.query.returnTo),
+      app: startingApp(req.get('referer'), d.env.CORS_ORIGINS, d.env.VENDOR_APP_URL),
+    });
     res.redirect(
       302,
       d.auth.authorizeUrl(
@@ -93,8 +98,8 @@ export function vendorAuthRoutes(d: Deps): Router {
   });
 
   r.get('/auth/callback', async (req, res) => {
-    const app = d.env.VENDOR_APP_URL;
     const state = d.sessions.takeOAuthState(req, res);
+    const app = state?.app ?? d.env.VENDOR_APP_URL;
     const code = typeof req.query.code === 'string' && req.query.code.length < 512 ? req.query.code : null;
     if (!state || state.aud !== AUD || !code) {
       res.redirect(302, `${app}/login?error=google`);
@@ -102,8 +107,8 @@ export function vendorAuthRoutes(d: Deps): Router {
     }
     try {
       const s = await d.auth.exchangePkce(code, state.verifier);
-      d.sessions.write(res, AUD, s);
-      res.redirect(302, `${app}${state.returnTo}`);
+      const token = d.sessions.write(res, AUD, s);
+      res.redirect(302, d.sessions.afterLogin(`${app}${state.returnTo}`, token));
     } catch (err) {
       d.logger.warn({ err: (err as Error).message }, 'vendor google callback failed');
       res.redirect(302, `${app}/login?error=google`);

@@ -49,12 +49,34 @@ export async function phone(name) {
   return { browser, page, errors, shot, step, close: () => browser.close() };
 }
 
-/** An API client that behaves like one of our apps (allowed Origin + the CSRF header). */
-export const apiAs = (origin) =>
-  request.newContext({
-    baseURL: URLS.api,
+/**
+ * An API client that behaves like one of our apps (allowed Origin + the CSRF header). Works with
+ * both session styles: cookies (API on api.rozbazaar.shop) and the X-RB-Session header (API on
+ * Supabase Edge). Paths are relative to the API address, which may have a path (/functions/v1/api).
+ */
+export async function apiAs(origin) {
+  const ctx = await request.newContext({
     extraHTTPHeaders: { Origin: origin, 'X-Requested-With': 'rozbazaar' },
   });
+  let token = null;
+  const call = async (method, path, opts = {}) => {
+    const res = await ctx.fetch(URLS.api.replace(/\/+$/, '') + path, {
+      method,
+      ...opts,
+      headers: { ...(opts.headers ?? {}), ...(token ? { 'X-RB-Session': token } : {}) },
+    });
+    const next = res.headers()['x-rb-session'];
+    if (next) token = next === 'cleared' ? null : next;
+    return res;
+  };
+  return {
+    get: (path, opts) => call('GET', path, opts),
+    post: (path, opts) => call('POST', path, opts),
+    put: (path, opts) => call('PUT', path, opts),
+    delete: (path, opts) => call('DELETE', path, opts),
+    dispose: () => ctx.dispose(),
+  };
+}
 
 export async function ok(res, what) {
   if (!res.ok()) throw new Error(`${what}: ${res.status()} ${await res.text()}`);

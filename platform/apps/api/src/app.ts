@@ -46,6 +46,7 @@ export function buildDeps(env: Env, overrides: Partial<Deps> = {}): Deps {
       secure: env.isProd,
       maxAgeDays: { customer: 60, vendor: 30 },
       logger,
+      transport: env.SESSION_TRANSPORT,
     });
   const images = overrides.images ?? new ImageStore();
   return {
@@ -96,7 +97,17 @@ export function createApp(d: Deps): Express {
       },
     }),
   );
-  app.use(securityHeaders({ hsts: env.isProd }));
+  if (env.CLIENT_IP_HEADER) {
+    // e.g. Supabase Edge sits behind Cloudflare, which sets cf-connecting-ip (clients can't forge it).
+    const header = env.CLIENT_IP_HEADER.toLowerCase();
+    app.use((req, _res, next) => {
+      const v = req.headers[header];
+      const ip = (Array.isArray(v) ? v[0] : v)?.split(',')[0]?.trim();
+      if (ip) Object.defineProperty(req, 'ip', { value: ip, configurable: true });
+      next();
+    });
+  }
+  app.use(securityHeaders({ hsts: env.isProd, crossSite: env.SESSION_TRANSPORT === 'header' }));
   app.use(corsPolicy(env.CORS_ORIGINS));
   app.use(d.limiters.global);
   app.use(jsonBody());

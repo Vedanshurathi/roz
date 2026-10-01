@@ -1,11 +1,11 @@
 /* RozBazaar (customer) — service worker. Lets order updates reach the phone even when the app is
    closed (order confirmed, vendor on the way, bill ready, delivered, slot reminders), and opens the
-   app on tap. Delivery receipts go through the RozBazaar API (registered as /sw.js?api=<api origin>). */
+   app on tap. Delivery receipts go through the RozBazaar API (registered as /sw.js?api=<api address>). */
 const API = (() => {
   try {
     const u = new URL(new URL(self.location.href).searchParams.get('api') || '');
     return u.protocol === 'https:' || u.hostname === 'localhost' || u.hostname === '127.0.0.1'
-      ? u.origin
+      ? u.origin + u.pathname.replace(/\/+$/, '')
       : null;
   } catch (e) {
     return null;

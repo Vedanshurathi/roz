@@ -32,6 +32,18 @@ const schema = z
     VENDOR_APP_URL: z.string().url(),
     CORS_ORIGINS: csv,
     TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(1),
+    /** `cookie` = API on a rozbazaar.shop sub-domain; `header` = API on Supabase Edge (other site). */
+    SESSION_TRANSPORT: z.enum(['cookie', 'header']).default('cookie'),
+    /** Header that carries the visitor's real IP when TRUST_PROXY can't express the proxy chain. */
+    CLIENT_IP_HEADER: z
+      .string()
+      .regex(/^[a-z0-9-]+$/i)
+      .optional(),
+    /** Log through console.log (Supabase Edge collects console output). */
+    LOG_TO_CONSOLE: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((v) => v === 'true'),
     /** Upstream (Supabase) request timeout. */
     UPSTREAM_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60_000).default(12_000),
   })
@@ -69,7 +81,7 @@ const schema = z
 
 export type Env = z.infer<typeof schema>;
 
-export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
+export function loadEnv(source: Record<string, string | undefined> = process.env): Env {
   const parsed = schema.safeParse(source);
   if (!parsed.success) {
     const lines = parsed.error.issues.map((i) => `  - ${i.path.join('.') || '(root)'}: ${i.message}`);

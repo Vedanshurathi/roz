@@ -3,6 +3,8 @@ export const API_URL =
   (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, '') || 'http://localhost:8080';
 export const STORAGE = {
   lang: 'rbx.lang',
+  /** sealed session token when the API runs on Supabase Edge (header sessions) */
+  session: 'rbx.session',
   area: 'rbx.area',
   cart: 'rbx.cart',
   checkout: 'rbx.checkout',

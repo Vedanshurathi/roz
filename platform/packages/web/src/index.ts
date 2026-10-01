@@ -1,4 +1,11 @@
-export { createApiClient, ApiError, type ApiClient } from './api.js';
+export {
+  createApiClient,
+  ApiError,
+  adoptSessionFromUrl,
+  sessionStore,
+  SESSION_HEADER,
+  type ApiClient,
+} from './api.js';
 export { I18nProvider, useI18n } from './i18n.js';
 export { storage } from './storage.js';
 export { rupees, istDate, slotLabel, slotIcon, dayLabel, timeAgo, qty } from './format.js';

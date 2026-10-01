@@ -34,12 +34,52 @@ export interface ApiClient {
   url(path: string, query?: Record<string, string>): string;
 }
 
+/** Header that carries the sealed session when the API runs on another site (Supabase Edge). */
+export const SESSION_HEADER = 'X-RB-Session';
+
+/**
+ * The session token, when the API uses header sessions. It is the API's own sealed blob (the
+ * Supabase tokens inside are encrypted), stored only on this phone.
+ */
+export const sessionStore = (key: string) => ({
+  get(): string | null {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  set(v: string | null): void {
+    try {
+      if (v) localStorage.setItem(key, v);
+      else localStorage.removeItem(key);
+    } catch {
+      /* storage blocked (private mode) — the session lasts until the tab closes */
+    }
+  },
+});
+
+/**
+ * After a Google login the API sends the browser back with `#rbs=<token>` (header sessions).
+ * Store it and remove it from the address bar before anything else runs.
+ */
+export function adoptSessionFromUrl(key: string): void {
+  const m = /[#&]rbs=([A-Za-z0-9._-]+)/.exec(window.location.hash);
+  if (!m) return;
+  sessionStore(key).set(m[1]!);
+  window.history.replaceState(null, '', window.location.pathname + window.location.search);
+}
+
 export function createApiClient(
   baseUrl: string,
-  opts: { timeoutMs?: number; onUnauthenticated?: () => void } = {},
+  opts: { timeoutMs?: number; onUnauthenticated?: () => void; sessionKey?: string } = {},
 ): ApiClient {
   const base = baseUrl.replace(/\/+$/, '');
   const timeoutMs = opts.timeoutMs ?? 20_000;
+  const session = opts.sessionKey ? sessionStore(opts.sessionKey) : null;
+  // Read on every request (another tab may have logged in or out); `memo` covers blocked storage.
+  let memo: string | null = null;
+  const currentToken = () => session?.get() ?? memo;
 
   const url = (path: string, query?: Record<string, string | number | boolean | undefined>) => {
     const u = new URL(base + path);
@@ -58,6 +98,9 @@ export function createApiClient(
     // The custom header is our CSRF proof; only needed (and only sent) for writes so reads stay preflight-free.
     if (method !== 'GET') headers['X-Requested-With'] = 'rozbazaar';
     if (body !== undefined) headers['Content-Type'] = 'application/json';
+    // Header sessions (API on Supabase Edge). With cookie sessions the API never sends one.
+    const token = currentToken();
+    if (token) headers[SESSION_HEADER] = token;
     let res: Response;
     try {
       res = await fetch(url(path, query), {
@@ -75,6 +118,11 @@ export function createApiClient(
         timedOut ? 'TIMEOUT' : 'NETWORK',
         timedOut ? 'The network is slow. Please try again.' : 'No internet connection',
       );
+    }
+    const next = session ? res.headers.get(SESSION_HEADER) : null;
+    if (session && next) {
+      memo = next === 'cleared' ? null : next;
+      session.set(memo);
     }
     if (res.status === 204) return undefined as T;
     let json: unknown = null;

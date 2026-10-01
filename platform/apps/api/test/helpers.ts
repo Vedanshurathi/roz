@@ -16,7 +16,9 @@ export interface Harness {
 }
 
 /** Real API + fake Supabase. `limitScale` > 1 loosens rate limits for flow tests. */
-export async function harness(opts: { limitScale?: number; prod?: boolean } = {}): Promise<Harness> {
+export async function harness(
+  opts: { limitScale?: number; prod?: boolean; env?: Record<string, string> } = {},
+): Promise<Harness> {
   const fake = await startFakeSupabase();
   const env = loadEnv({
     NODE_ENV: 'test',
@@ -29,6 +31,7 @@ export async function harness(opts: { limitScale?: number; prod?: boolean } = {}
     VENDOR_APP_URL: VENDOR_ORIGIN,
     CORS_ORIGINS: `${ORIGIN},${VENDOR_ORIGIN}`,
     TRUST_PROXY: '0',
+    ...opts.env,
   });
   const deps = buildDeps(env, { limiters: createLimiters(opts.limitScale ?? 1) });
   return { app: createApp(deps), fake, close: () => fake.close() };

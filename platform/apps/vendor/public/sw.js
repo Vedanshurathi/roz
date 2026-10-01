@@ -1,12 +1,12 @@
 /* RozBazaar Vendor — service worker. Lets an alert reach the phone even when the app is closed:
    the browser wakes this file when a push arrives (new order, slot starting, bill approved, cancel,
    rating, item review, daily summary), shows it, and opens the app when it is tapped.
-   Delivery receipts go through the RozBazaar API (registered as /sw.js?api=<api origin>). */
+   Delivery receipts go through the RozBazaar API (registered as /sw.js?api=<api address>). */
 const API = (() => {
   try {
     const u = new URL(new URL(self.location.href).searchParams.get('api') || '');
     return u.protocol === 'https:' || u.hostname === 'localhost' || u.hostname === '127.0.0.1'
-      ? u.origin
+      ? u.origin + u.pathname.replace(/\/+$/, '')
       : null;
   } catch (e) {
     return null;

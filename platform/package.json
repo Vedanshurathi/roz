@@ -11,6 +11,7 @@
     "node": ">=20.11"
   },
   "scripts": {
+    "build:edge": "node scripts/build-edge.mjs",
     "build": "npm run build -w @rozbazaar/shared && npm run build -w @rozbazaar/api -w @rozbazaar/customer -w @rozbazaar/vendor",
     "build:shared": "npm run build -w @rozbazaar/shared",
     "dev:api": "npm run dev -w @rozbazaar/api",

@@ -2,9 +2,10 @@ import helmet from 'helmet';
 import cors from 'cors';
 import type { RequestHandler } from 'express';
 import { CSRF_HEADER } from './csrf.js';
+import { SESSION_HEADER } from './session.js';
 
 /** The API only ever returns JSON or images, so its CSP is "nothing may load". */
-export function securityHeaders(opts: { hsts: boolean }): RequestHandler {
+export function securityHeaders(opts: { hsts: boolean; crossSite?: boolean }): RequestHandler {
   return helmet({
     contentSecurityPolicy: {
       useDefaults: false,
@@ -15,8 +16,9 @@ export function securityHeaders(opts: { hsts: boolean }): RequestHandler {
         formAction: ["'none'"],
       },
     },
-    // Product photos are loaded by the web apps on sibling subdomains (same-site).
-    crossOriginResourcePolicy: { policy: 'same-site' },
+    // Product photos are loaded by the web apps: same-site when the API is api.rozbazaar.shop,
+    // cross-site when it runs on Supabase Edge (supabase.co).
+    crossOriginResourcePolicy: { policy: opts.crossSite ? 'cross-origin' : 'same-site' },
     crossOriginOpenerPolicy: { policy: 'same-origin' },
     referrerPolicy: { policy: 'no-referrer' },
     strictTransportSecurity: opts.hsts
@@ -36,8 +38,8 @@ export function corsPolicy(allowedOrigins: readonly string[]): RequestHandler {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', CSRF_HEADER],
-    exposedHeaders: ['X-Request-Id', 'RateLimit', 'RateLimit-Policy'],
+    allowedHeaders: ['Content-Type', CSRF_HEADER, SESSION_HEADER],
+    exposedHeaders: ['X-Request-Id', 'RateLimit', 'RateLimit-Policy', SESSION_HEADER],
     maxAge: 600,
   });
 }

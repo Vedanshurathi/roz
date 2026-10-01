@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
-import { ApiError, createApiClient } from '@rozbazaar/web';
-import { API_URL } from '../config';
+import { ApiError, adoptSessionFromUrl, createApiClient } from '@rozbazaar/web';
+import { API_URL, STORAGE } from '../config';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -13,6 +13,10 @@ export const queryClient = new QueryClient({
   },
 });
 
+// Back from a Google login with the session in the fragment (header sessions): keep it.
+adoptSessionFromUrl(STORAGE.session);
+
 export const api = createApiClient(API_URL, {
+  sessionKey: STORAGE.session,
   onUnauthenticated: () => void queryClient.invalidateQueries({ queryKey: ['session'] }),
 });

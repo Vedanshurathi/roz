@@ -4,6 +4,7 @@
  * in-memory cache keyed by the hash of its content, and returns a URL. Browsers cache that URL
  * forever (the content hash changes whenever the photo changes).
  */
+import { Buffer } from 'node:buffer';
 import { sha256Hex } from '../../lib/crypto.js';
 
 export interface StoredImage {
