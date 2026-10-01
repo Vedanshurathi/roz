@@ -1,0 +1,19 @@
+import type { z } from 'zod';
+import { AppError } from '../lib/errors.js';
+
+/**
+ * Parses untrusted input with a zod schema. Unknown keys are dropped (zod objects strip by
+ * default), types are coerced where the schema says so, and a 400 lists every problem.
+ */
+export function parse<S extends z.ZodTypeAny>(schema: S, input: unknown): z.output<S> {
+  const r = schema.safeParse(input ?? {});
+  if (r.success) return r.data;
+  const issues = r.error.issues.map((i) => ({ path: i.path.join('.'), message: i.message }));
+  const first = issues[0];
+  throw new AppError(
+    400,
+    'VALIDATION',
+    first ? (first.path ? `${first.path}: ${first.message}` : first.message) : 'Invalid input',
+    issues,
+  );
+}
