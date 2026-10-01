@@ -3,3 +3,4 @@ node_modules/
 *.log
 database/data.sql
 .DS_Store
+uploads/
