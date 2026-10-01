@@ -49,6 +49,13 @@ export default tseslint.config(
       'no-restricted-syntax': [
         'error',
         { selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']", message: 'Do not inject raw HTML.' },
+        {
+          // React calls whatever an effect returns as its cleanup. A value from a browser API
+          // (which in-app browsers sometimes patch) crashed the live app: "l is not a function".
+          selector:
+            "CallExpression[callee.name=/^use(Layout|Insertion)?Effect$/] > ArrowFunctionExpression[expression=true][body.type!='ArrowFunctionExpression']",
+          message: 'Give effects a block body: useEffect(() => { … }). Only return a cleanup function.',
+        },
       ],
     },
   },

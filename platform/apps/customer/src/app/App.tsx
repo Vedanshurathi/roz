@@ -1,7 +1,7 @@
 import { lazy, Suspense, useCallback } from 'react';
 import { createBrowserRouter, Navigate, Outlet, RouterProvider, useLocation } from 'react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { I18nProvider, Spinner, ToastProvider } from '@rozbazaar/web';
+import { CrashScreen, I18nProvider, Spinner, ToastProvider } from '@rozbazaar/web';
 import type { Lang } from '@rozbazaar/shared';
 import { api, queryClient } from '../api/client';
 import { useSession } from '../api/queries';
@@ -34,24 +34,30 @@ const page = (el: React.ReactNode) => <Suspense fallback={<Spinner />}>{el}</Sus
 
 const router = createBrowserRouter([
   {
-    element: <AppShell />,
+    // A crash in any screen shows a friendly reload screen instead of a stack trace.
+    errorElement: <CrashScreen />,
     children: [
-      { path: '/', element: page(<HomePage />) },
-      { path: '/basket', element: page(<BasketPage />) },
-      { path: '/slot', element: page(<SlotPage />) },
-      { path: '/login', element: page(<LoginPage />) },
-      { path: '/account', element: page(<AccountPage />) },
       {
-        element: <RequireLogin />,
+        element: <AppShell />,
         children: [
-          { path: '/checkout', element: page(<CheckoutPage />) },
-          { path: '/success', element: page(<SuccessPage />) },
-          { path: '/orders', element: page(<OrdersPage />) },
-          { path: '/address/new', element: page(<AddressPage />) },
-          { path: '/address/:id', element: page(<AddressPage />) },
+          { path: '/', element: page(<HomePage />) },
+          { path: '/basket', element: page(<BasketPage />) },
+          { path: '/slot', element: page(<SlotPage />) },
+          { path: '/login', element: page(<LoginPage />) },
+          { path: '/account', element: page(<AccountPage />) },
+          {
+            element: <RequireLogin />,
+            children: [
+              { path: '/checkout', element: page(<CheckoutPage />) },
+              { path: '/success', element: page(<SuccessPage />) },
+              { path: '/orders', element: page(<OrdersPage />) },
+              { path: '/address/new', element: page(<AddressPage />) },
+              { path: '/address/:id', element: page(<AddressPage />) },
+            ],
+          },
+          { path: '*', element: <Navigate to="/" replace /> },
         ],
       },
-      { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
 ]);

@@ -24,3 +24,4 @@ export {
   type PushSubscriptionPayload,
 } from './push.js';
 export { safeNext } from './nav.js';
+export { CrashScreen } from './components/CrashScreen.js';

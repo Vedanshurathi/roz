@@ -13,7 +13,9 @@ export function AppShell() {
   const showNav = NAV_ROUTES.includes(pathname);
 
   useSyncPush(Boolean(useSession().data?.authenticated));
-  useEffect(() => window.scrollTo(0, 0), [pathname]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
   useEffect(() => {
     // One anonymous visit ping per browser session (traffic stats in the admin console).
     try {

@@ -52,8 +52,12 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   }>(() => storage.get(STORAGE.checkout) ?? { slot: null, note: '', addressId: null });
   const [bump, setBump] = useState(0);
 
-  useEffect(() => storage.set(STORAGE.cart, basket), [basket]);
-  useEffect(() => storage.set(STORAGE.checkout, checkout), [checkout]);
+  useEffect(() => {
+    storage.set(STORAGE.cart, basket);
+  }, [basket]);
+  useEffect(() => {
+    storage.set(STORAGE.checkout, checkout);
+  }, [checkout]);
 
   const setArea = useCallback((a: string) => {
     setAreaState((prev) => {

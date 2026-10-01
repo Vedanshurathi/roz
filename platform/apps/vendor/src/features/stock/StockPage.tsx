@@ -98,7 +98,9 @@ function StockCard({ p, lang }: { p: VendorProduct; lang: 'en' | 'hi' }) {
   const [saved, setSaved] = useState(false);
   const timer = useRef<number | undefined>(undefined);
 
-  useEffect(() => setPrice(String(p.price)), [p.price]);
+  useEffect(() => {
+    setPrice(String(p.price));
+  }, [p.price]);
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const stock = useMutation({

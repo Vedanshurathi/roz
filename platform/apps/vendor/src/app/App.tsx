@@ -1,7 +1,7 @@
 import { lazy, Suspense, useCallback } from 'react';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { I18nProvider, Spinner, ToastProvider } from '@rozbazaar/web';
+import { CrashScreen, I18nProvider, Spinner, ToastProvider } from '@rozbazaar/web';
 import type { Lang } from '@rozbazaar/shared';
 import { api, queryClient } from '../api/client';
 import { keys } from '../api/keys';
@@ -30,38 +30,44 @@ const ProfilePage = lazy(() => import('../features/profile/ProfilePage'));
 const page = (el: React.ReactNode) => <Suspense fallback={<Spinner />}>{el}</Suspense>;
 
 const router = createBrowserRouter([
-  { path: '/login', element: page(<LoginPage />) },
   {
-    element: <RequireAccount />,
+    // A crash in any screen shows a friendly reload screen instead of a stack trace.
+    errorElement: <CrashScreen />,
     children: [
-      { path: '/welcome', element: page(<WelcomePage />) },
-      { path: '/register', element: page(<RegisterPage />) },
-    ],
-  },
-  {
-    element: <RequireVendor />,
-    children: [
+      { path: '/login', element: page(<LoginPage />) },
       {
-        element: <TabsLayout />,
+        element: <RequireAccount />,
         children: [
-          { path: '/', element: page(<HomePage />) },
-          { path: '/stock', element: page(<StockPage />) },
-          { path: '/slots', element: page(<SlotsPage />) },
-          { path: '/dashboard', element: page(<DashboardPage />) },
-          { path: '/profile', element: page(<ProfilePage />) },
+          { path: '/welcome', element: page(<WelcomePage />) },
+          { path: '/register', element: page(<RegisterPage />) },
         ],
       },
-      { path: '/set-password', element: page(<SetPasswordPage />) },
-      { path: '/order/:date/:id', element: page(<OrderPage />) },
-      { path: '/order/:date/:id/bill', element: page(<BillPage />) },
-      { path: '/order/:date/:id/pay', element: page(<PayPage />) },
-      { path: '/order/:date/:id/code', element: page(<CodePage />) },
-      { path: '/stock/new', element: page(<ProductEditPage />) },
-      { path: '/stock/catalog', element: page(<CatalogPage />) },
-      { path: '/stock/:id', element: page(<ProductEditPage />) },
+      {
+        element: <RequireVendor />,
+        children: [
+          {
+            element: <TabsLayout />,
+            children: [
+              { path: '/', element: page(<HomePage />) },
+              { path: '/stock', element: page(<StockPage />) },
+              { path: '/slots', element: page(<SlotsPage />) },
+              { path: '/dashboard', element: page(<DashboardPage />) },
+              { path: '/profile', element: page(<ProfilePage />) },
+            ],
+          },
+          { path: '/set-password', element: page(<SetPasswordPage />) },
+          { path: '/order/:date/:id', element: page(<OrderPage />) },
+          { path: '/order/:date/:id/bill', element: page(<BillPage />) },
+          { path: '/order/:date/:id/pay', element: page(<PayPage />) },
+          { path: '/order/:date/:id/code', element: page(<CodePage />) },
+          { path: '/stock/new', element: page(<ProductEditPage />) },
+          { path: '/stock/catalog', element: page(<CatalogPage />) },
+          { path: '/stock/:id', element: page(<ProductEditPage />) },
+        ],
+      },
+      { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
-  { path: '*', element: <Navigate to="/" replace /> },
 ]);
 
 export function App() {
