@@ -96,79 +96,83 @@ export default function HomePage() {
       </section>
 
       <div className="wrap wrap--home">
-        {vendor.status !== 'approved' ? <ApprovalNote status={vendor.status} /> : null}
-        <PushCard />
+        <div className="home__main">
+          {vendor.status !== 'approved' ? <ApprovalNote status={vendor.status} /> : null}
+          <PushCard />
 
-        <div className="daypills" role="tablist" aria-label={t('Day', 'दिन')}>
-          {Array.from({ length: DAYS }, (_, i) => (
-            <DayPill key={i} offset={i} selected={day === i} onClick={() => setDay(i)} />
-          ))}
-        </div>
-
-        <div className="sechd">
-          <h2>
-            {day === 0
-              ? t('Orders to deliver', 'डिलीवर करने वाले ऑर्डर')
-              : t('Orders booked', 'बुक हुए ऑर्डर')}
-          </h2>
-          <span>
-            {runs.length} {day === 0 ? t('left', 'बाकी') : t('booked', 'बुक')}
-          </span>
-        </div>
-
-        {orders.isPending ? (
-          <div className="stack">
-            <Skeleton h={96} r={18} />
-            <Skeleton h={96} r={18} />
+          <div className="daypills" role="tablist" aria-label={t('Day', 'दिन')}>
+            {Array.from({ length: DAYS }, (_, i) => (
+              <DayPill key={i} offset={i} selected={day === i} onClick={() => setDay(i)} />
+            ))}
           </div>
-        ) : orders.isError ? (
-          <ErrorState
-            message={orders.error.message}
-            onRetry={() => orders.refetch()}
-            retryLabel={t('Retry', 'फिर से')}
-          />
-        ) : !runs.length ? (
-          day === 0 && doneToday.length ? (
-            <EmptyState
-              icon="✅"
-              title={t('All done for today', 'आज का काम पूरा')}
-              text={t('Nice work. Rest up.', 'बढ़िया काम। अब आराम करें।')}
-            />
-          ) : (
-            <EmptyState
-              icon="🌤️"
-              title={
-                day === 0
-                  ? t('Nothing booked yet today', 'आज अभी कोई बुकिंग नहीं')
-                  : t('Nothing booked yet', 'अभी कोई बुकिंग नहीं')
-              }
-              text={day === 0 ? undefined : t('Check back closer to the day', 'दिन के करीब फिर देखें')}
-            />
-          )
-        ) : (
-          TIME_SLOTS.map((slot) => {
-            const list = runs.filter((b) => b.slot === slot);
-            if (!list.length) return null;
-            return (
-              <section key={slot} className="slotgrp" aria-label={slotLabel(slot, lang)}>
-                <div className="slothd">
-                  <span className="slothd__ic" aria-hidden>
-                    {slotIcon(slot)}
-                  </span>
-                  <b>{slotLabel(slot, lang)}</b>
-                  <span>
-                    {list.length} {day === 0 ? t('left', 'बाकी') : t('booked', 'बुक')}
-                  </span>
-                </div>
-                {list.map((b, i) => (
-                  <RunCard key={b.id} b={b} n={i + 1} date={date} isNext={next?.id === b.id} />
-                ))}
-              </section>
-            );
-          })
-        )}
 
-        <QuickActions />
+          <div className="sechd">
+            <h2>
+              {day === 0
+                ? t('Orders to deliver', 'डिलीवर करने वाले ऑर्डर')
+                : t('Orders booked', 'बुक हुए ऑर्डर')}
+            </h2>
+            <span>
+              {runs.length} {day === 0 ? t('left', 'बाकी') : t('booked', 'बुक')}
+            </span>
+          </div>
+
+          {orders.isPending ? (
+            <div className="stack">
+              <Skeleton h={96} r={18} />
+              <Skeleton h={96} r={18} />
+            </div>
+          ) : orders.isError ? (
+            <ErrorState
+              message={orders.error.message}
+              onRetry={() => orders.refetch()}
+              retryLabel={t('Retry', 'फिर से')}
+            />
+          ) : !runs.length ? (
+            day === 0 && doneToday.length ? (
+              <EmptyState
+                icon="✅"
+                title={t('All done for today', 'आज का काम पूरा')}
+                text={t('Nice work. Rest up.', 'बढ़िया काम। अब आराम करें।')}
+              />
+            ) : (
+              <EmptyState
+                icon="🌤️"
+                title={
+                  day === 0
+                    ? t('Nothing booked yet today', 'आज अभी कोई बुकिंग नहीं')
+                    : t('Nothing booked yet', 'अभी कोई बुकिंग नहीं')
+                }
+                text={day === 0 ? undefined : t('Check back closer to the day', 'दिन के करीब फिर देखें')}
+              />
+            )
+          ) : (
+            TIME_SLOTS.map((slot) => {
+              const list = runs.filter((b) => b.slot === slot);
+              if (!list.length) return null;
+              return (
+                <section key={slot} className="slotgrp" aria-label={slotLabel(slot, lang)}>
+                  <div className="slothd">
+                    <span className="slothd__ic" aria-hidden>
+                      {slotIcon(slot)}
+                    </span>
+                    <b>{slotLabel(slot, lang)}</b>
+                    <span>
+                      {list.length} {day === 0 ? t('left', 'बाकी') : t('booked', 'बुक')}
+                    </span>
+                  </div>
+                  {list.map((b, i) => (
+                    <RunCard key={b.id} b={b} n={i + 1} date={date} isNext={next?.id === b.id} />
+                  ))}
+                </section>
+              );
+            })
+          )}
+        </div>
+        {/* Bottom of Home on a phone; a side column on a laptop. */}
+        <aside className="home__side">
+          <QuickActions />
+        </aside>
       </div>
     </div>
   );

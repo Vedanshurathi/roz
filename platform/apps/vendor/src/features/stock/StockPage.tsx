@@ -79,7 +79,7 @@ export default function StockPage() {
             text={t('Add from the catalogue — it takes a minute.', 'कैटलॉग से जोड़ें — एक मिनट लगेगा।')}
           />
         ) : (
-          <div className="stack">
+          <div className="stack scards">
             {list.map((p) => (
               <StockCard key={p.id} p={p} lang={lang} />
             ))}

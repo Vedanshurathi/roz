@@ -1752,3 +1752,206 @@ body {
     animation: none;
   }
 }
+
+/* =====================================================================
+   Tablet (≥ 700px) and laptop (≥ 1024px). The phone layout above is the
+   original one Vedanshu approved; these rules only use the extra room.
+   ===================================================================== */
+@media (min-width: 700px) {
+  :root {
+    --gutter: max(16px, calc((100% - 1180px) / 2));
+    --col: max(16px, calc((100% - var(--page)) / 2));
+  }
+  body {
+    background: var(--cream);
+  }
+  .duty {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+    border-radius: 0 0 32px 32px;
+  }
+  .wrap {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+  /* Order steps and forms: one readable centred column */
+  .topbar,
+  .page--bar .wrap {
+    padding-left: var(--col);
+    padding-right: var(--col);
+  }
+  /* Tab screens (Stock, Slots, Dashboard, Profile) use the wider grid */
+  .shell .topbar {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+  .stickybar {
+    max-width: var(--page);
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    border-radius: 18px 18px 0 0;
+  }
+  .bnav {
+    max-width: none;
+    justify-content: center;
+    gap: 32px;
+  }
+  .bnav__i {
+    flex: 0 0 104px;
+  }
+  .scards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .catgrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .tiles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .addrow {
+    grid-template-columns: 1fr 1fr;
+  }
+  .auth__hero {
+    padding: 28px max(18px, calc((100% - 460px) / 2)) 72px;
+  }
+  .auth__card {
+    max-width: 460px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .daypills {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+  }
+}
+
+/* Laptop: side menu, two-column Home, wider grids */
+@media (min-width: 1024px) {
+  :root {
+    --rail: 104px;
+    --gutter: max(28px, calc((100% - var(--rail) - 1240px) / 2));
+    --col: max(28px, calc((100% - var(--rail) - var(--page)) / 2));
+  }
+  .shell__main {
+    padding-left: var(--rail);
+    padding-bottom: 32px;
+  }
+  .bnav {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    transform: none;
+    width: var(--rail);
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 18px 0;
+    border-top: 0;
+    border-right: 1px solid var(--line);
+    background: var(--navy);
+  }
+  .bnav::before {
+    content: '';
+    display: block;
+    width: 52px;
+    height: 46px;
+    margin: 0 auto 18px;
+    background: #fff url('/brand/mark.png') center / 40px no-repeat;
+    border-radius: 14px;
+  }
+  .bnav__i {
+    flex: 0 0 auto;
+    padding: 12px 0;
+    margin: 0 10px;
+    border-radius: 14px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .bnav__i.is-on {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .bnav__i.is-on::before {
+    display: none;
+  }
+  .bnav__i:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .bnav__i span {
+    filter: none;
+    opacity: 0.85;
+  }
+  /* Hero: earnings on the left, today's numbers + online switch on the right */
+  .duty {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 40px;
+    align-items: start;
+    padding-top: 20px;
+    padding-bottom: 24px;
+  }
+  .duty__top {
+    grid-column: 1 / -1;
+  }
+  .duty__name {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .duty__earn {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  .duty__keep {
+    grid-column: 1;
+    grid-row: 4;
+  }
+  .duty__stats {
+    grid-column: 2;
+    grid-row: 2 / 4;
+    margin-top: 14px;
+  }
+  .online {
+    grid-column: 2;
+    grid-row: 4 / 6;
+  }
+  .duty__sale {
+    font-size: 54px;
+  }
+  .wrap--home {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 28px;
+    align-items: start;
+  }
+  .home__side {
+    position: sticky;
+    top: 20px;
+  }
+  .home__side .quick {
+    margin-top: 0;
+  }
+  .shell .stickybar {
+    left: calc(50% + var(--rail) / 2);
+  }
+  .scards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .slotcards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .slotcards .card {
+    margin-bottom: 0;
+  }
+  .catgrid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .run__main:hover,
+  .catitem:hover:not(:disabled),
+  .addlist__i:hover {
+    background: #fbfaf7;
+  }
+}

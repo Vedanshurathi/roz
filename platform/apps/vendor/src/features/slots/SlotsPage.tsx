@@ -85,7 +85,7 @@ export default function SlotsPage() {
             retryLabel={t('Retry', 'फिर से')}
           />
         ) : (
-          <div className="stack">
+          <div className="stack slotcards">
             {TIME_SLOTS.map((s) => (
               <SlotCard key={`${date}-${s}`} day={find(s)} from={from} />
             ))}
@@ -212,7 +212,7 @@ function SlotVillages({ areas }: { areas: string[] }) {
   if (q.isError) return <ErrorState message={q.error.message} onRetry={() => q.refetch()} />;
 
   return (
-    <div className="stack">
+    <div className="stack slotcards">
       {TIME_SLOTS.map((slot) => {
         const cur = draft[slot];
         const all = cur === null;

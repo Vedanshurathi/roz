@@ -43,6 +43,7 @@ html {
 }
 body {
   margin: 0 auto;
+  /* Phone-first. Tablets and laptops use the full width (see the breakpoints at the end). */
   max-width: 480px;
   min-height: 100vh;
   position: relative;
@@ -502,6 +503,43 @@ img {
   from {
     opacity: 0;
     transform: translateY(12px);
+  }
+}
+
+/* ---------- bigger screens ----------
+   Breakpoints used by every app: tablet ≥ 700px, laptop ≥ 1024px, wide ≥ 1440px.
+   --page = width of a reading column; --gutter = side padding that centres it. */
+:root {
+  --page: 760px;
+  --rail: 0px; /* width of the laptop side menu, set by the apps */
+}
+@media (min-width: 700px) {
+  body {
+    max-width: none;
+    font-size: 15.5px;
+  }
+  /* Sheets become centred dialogs */
+  .rb-sheet-wrap {
+    align-items: center;
+    padding: 24px;
+  }
+  .rb-sheet {
+    max-width: 540px;
+    border-radius: 22px;
+    max-height: 86vh;
+    animation: rb-pop 0.24s var(--sp);
+  }
+  .rb-sheet__grab {
+    display: none;
+  }
+  .rb-toast-zone {
+    left: var(--rail);
+  }
+}
+@keyframes rb-pop {
+  from {
+    transform: scale(0.94);
+    opacity: 0;
   }
 }
 

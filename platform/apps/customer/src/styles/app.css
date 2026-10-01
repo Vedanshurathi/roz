@@ -1145,3 +1145,153 @@
   min-height: 42px;
   padding: 0 16px;
 }
+
+/* =====================================================================
+   Tablet (≥ 700px) and laptop (≥ 1024px)
+   Phone layout above stays as it is; these rules only widen it.
+   ===================================================================== */
+@media (min-width: 600px) {
+  .pgrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (min-width: 700px) {
+  :root {
+    --gutter: max(16px, calc((100% - 1180px) / 2));
+    --col: max(16px, calc((100% - var(--page)) / 2));
+  }
+  body {
+    background: var(--white);
+  }
+  /* Home: full-width bands, content centred */
+  .hhead,
+  .tabs,
+  .grid-wrap,
+  .minifoot {
+    padding-left: var(--gutter);
+    padding-right: var(--gutter);
+  }
+  .hhead {
+    padding-top: 22px;
+    padding-bottom: 26px;
+  }
+  .hhead__promise {
+    font-size: 30px;
+    max-width: 640px;
+  }
+  .search {
+    max-width: 640px;
+  }
+  .again {
+    margin-left: var(--gutter);
+    margin-right: var(--gutter);
+  }
+  .pgrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  /* Bottom bar spans the screen; its items stay together in the middle */
+  .bnav {
+    max-width: none;
+    justify-content: center;
+    gap: 40px;
+  }
+  .bnav__i {
+    flex: 0 0 96px;
+  }
+  /* Inner pages: one readable centred column */
+  .phead,
+  .page__body {
+    padding-left: var(--col);
+    padding-right: var(--col);
+  }
+  .stickybar {
+    max-width: var(--page);
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    border-radius: 18px 18px 0 0;
+  }
+  .olist {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 12px;
+  }
+  .success {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+}
+
+/* Laptop: side menu instead of the bottom bar */
+@media (min-width: 1024px) {
+  :root {
+    --rail: 104px;
+    --gutter: max(24px, calc((100% - var(--rail) - 1240px) / 2));
+    --col: max(24px, calc((100% - var(--rail) - var(--page)) / 2));
+  }
+  .app--nav main {
+    padding-left: var(--rail);
+    padding-bottom: 32px;
+  }
+  .bnav {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    transform: none;
+    width: var(--rail);
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 18px 0;
+    border-top: 0;
+    border-right: 1px solid var(--line);
+  }
+  .bnav::before {
+    content: '';
+    display: block;
+    width: 52px;
+    height: 46px;
+    margin: 0 auto 18px;
+    background: url('/brand/mark.png') center / contain no-repeat;
+  }
+  .bnav__i {
+    flex: 0 0 auto;
+    padding: 12px 0;
+    margin: 0 10px;
+    border-radius: 14px;
+  }
+  .bnav__i.active {
+    background: var(--lime-s);
+  }
+  .bnav__i:hover {
+    background: var(--grey);
+  }
+  .pgrid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .cartbar {
+    left: calc(50% + var(--rail) / 2);
+    bottom: 24px;
+    max-width: 520px;
+  }
+  .app--nav .stickybar {
+    left: calc(50% + var(--rail) / 2);
+  }
+  .pcard {
+    transition:
+      transform 0.15s var(--sp),
+      box-shadow 0.15s;
+  }
+  .pcard:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shl);
+  }
+}
+
+@media (min-width: 1440px) {
+  .pgrid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
