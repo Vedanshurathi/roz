@@ -30,7 +30,7 @@ function track(nid, event) {
 function safePath(url) {
   return typeof url === 'string' && url.startsWith('/') && !url.startsWith('//') && !url.includes('\\')
     ? url
-    : '/orders';
+    : '/bookings';
 }
 
 self.addEventListener('push', (event) => {
@@ -61,7 +61,7 @@ self.addEventListener('notificationclick', (event) => {
     Promise.all([
       track(data.nid, 'opened'),
       self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
-        const url = data.url || '/orders';
+        const url = data.url || '/bookings';
         for (const c of list) {
           if ('focus' in c) {
             // Bring the open app forward, then show the right screen (navigate() can refuse; focus is enough).

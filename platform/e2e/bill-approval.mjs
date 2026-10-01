@@ -1,5 +1,5 @@
 /** Customer books; the vendor bills at the door (API); the customer checks + approves; pays; rates. */
-import { apiAs, DEMO_VENDOR, istDate, ok, phone, randomPhone, URLS } from './lib.mjs';
+import { apiAs, customerBooks, DEMO_VENDOR, istDate, ok, phone, URLS } from './lib.mjs';
 
 export default async function billApproval() {
   const { page: p, errors, shot, step, close } = await phone('bill');
@@ -7,31 +7,7 @@ export default async function billApproval() {
   try {
     let otp = '';
     await step('book', async () => {
-      await p.goto(URLS.customer + '/');
-      await p.getByRole('button', { name: /Khandewla/ }).click();
-      await p.locator('.pcard', { hasText: 'Tomato' }).getByRole('button', { name: /Add/ }).click();
-      await p.locator('.vpick__i', { hasText: 'Sanjiv' }).click();
-      await p.waitForTimeout(900);
-      await p.locator('.pcard', { hasText: 'Potato' }).getByRole('button', { name: /Add/ }).click();
-      await p.waitForTimeout(900);
-      await p.locator('.cartbar').click();
-      await p.getByRole('button', { name: /Choose delivery slot/ }).click();
-      await p.locator('.daypill').nth(1).click();
-      await p.locator('.slottile', { hasText: 'Morning' }).click();
-      await p.locator('.stickybar button').click();
-      await p.waitForURL(/login/);
-      await p.getByLabel('Your name').fill('Kamla Devi');
-      await p.getByLabel('Mobile number').fill(randomPhone('97'));
-      await p.getByRole('button', { name: 'Continue', exact: true }).click();
-      await p.waitForURL(/checkout/);
-      await p.getByRole('link', { name: /Add address/ }).click();
-      await p.locator('select').selectOption('Khandewla');
-      await p.getByLabel('House / building number').fill('7');
-      await p.getByRole('button', { name: 'Save address' }).click();
-      await p.waitForURL(/checkout/);
-      await p.locator('.stickybar button').click();
-      await p.waitForURL(/success/);
-      otp = (await p.locator('.otpbox b').textContent()).trim();
+      otp = await customerBooks(p, { name: 'Kamla Devi', phonePrefix: '97', house: '7' });
     });
     let order;
     await step('vendor bills at the door', async () => {
@@ -57,12 +33,13 @@ export default async function billApproval() {
       );
     });
     await step('customer checks + approves the bill', async () => {
-      await p.goto(URLS.customer + '/orders');
-      await p.getByRole('button', { name: 'Check the bill' }).click();
+      await p.goto(URLS.customer + '/bookings');
+      await p.getByRole('button', { name: 'See final bill' }).click();
       await p.waitForSelector('.billtot');
-      await shot('01-bill-sheet');
-      await p.getByRole('button', { name: /Bill is correct/ }).click();
-      await p.waitForSelector('.rb-pill:has-text("Bill approved")');
+      if (!(await p.locator('.diff').count())) throw new Error('changed lines not shown');
+      await shot('01-bill');
+      await p.getByRole('button', { name: /Bill is right/ }).click();
+      await p.waitForURL(/bookings$/);
     });
     await step('vendor is paid + confirms the code', async () => {
       const list = await ok(await vendor.get(`/v1/vendor/orders?date=${istDate(1)}`), 'orders');
@@ -75,23 +52,26 @@ export default async function billApproval() {
       );
       await ok(await vendor.post(`/v1/vendor/orders/${order.id}/verify`, { data: { otp } }), 'verify');
     });
-    await step('customer rates', async () => {
+    await step('customer rates (order-complete pop-up)', async () => {
       await p.reload();
-      await p.getByRole('button', { name: /Rate/ }).click();
-      await p.locator('.rate button').nth(3).click();
-      await p.fill('.rb-sheet textarea', 'Fresh tomatoes, polite vendor');
-      await p.getByRole('button', { name: 'Submit' }).click();
-      await p.waitForSelector('.ocard .rb-stars');
-      await shot('02-rated');
+      await p.waitForSelector('.loc-ask.on .stars');
+      await shot('02-done-popup');
+      await p.locator('.loc-ask.on .star').nth(3).click();
+      await p.fill('.loc-ask.on textarea', 'Fresh tomatoes, polite vendor');
+      await p.getByRole('button', { name: 'Submit rating' }).click();
+      await p.waitForSelector('.toast.show:has-text("Thank you")');
+      await p.waitForSelector('.loc-ask.on', { state: 'detached', timeout: 3000 }).catch(() => undefined);
+      if (await p.getByRole('button', { name: 'Rate the vendor' }).count())
+        throw new Error('still asks for a rating');
     });
     await step('hindi mode', async () => {
       await p.goto(URLS.customer + '/account');
-      await p.getByRole('radio', { name: 'हिंदी' }).click();
-      await p.goto(URLS.customer + '/orders');
+      await p.locator('.arow .lang button', { hasText: 'HI' }).click();
+      await p.goto(URLS.customer + '/bookings');
       await p.waitForSelector('.ocard');
-      if (!(await p.locator('h1').textContent()).includes('मेरे ऑर्डर'))
-        throw new Error('orders title not in Hindi');
-      await shot('03-orders-hi');
+      if (!(await p.locator('h1').textContent()).includes('मेरी बुकिंग'))
+        throw new Error('bookings title not in Hindi');
+      await shot('03-bookings-hi');
     });
     if (errors.length) throw new Error(`bill: browser errors ${JSON.stringify(errors)}`);
   } finally {

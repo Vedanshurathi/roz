@@ -434,6 +434,13 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   - `npm run e2e` (3 browser journeys; run them against `vite preview`, which sends the real CSP).
 - Web apps: strict CSP (`script-src 'self'`, `style-src 'self'`) — **no inline `<script>`/`<style>` anywhere**,
   including static pages like `privacy.html` (its CSS/JS are separate files).
+- **Customer app = exact port of `customer/index.html`** (1 Oct 2026, Vedanshu: "exact look it was in past"):
+  original CSS verbatim in `apps/customer/src/styles/legacy.css` (+ small `app.css`), original markup/class names
+  (`.scr on`, `#nav`, `.cart`, `.bn`, `#foot`, `.loc-ask`, `.sheet-wrap` …), the 106 SVG drawings in `src/art/drawings.ts`
+  (generated from the old file; rendered by `Art`), Leaflet bundled from npm (tiles/Nominatim allowed in the CSP via
+  `extraImgHosts`/`extraConnectHosts`), Fraunces self-hosted. Screens in `src/screens/`, pop-ups in `src/overlays/`,
+  basket/checkout rules in `src/state/` (`useCart` = fly-to-cart + vendor picker, `useCheckout` = stock → ₹50 → slot →
+  login → address → book). Keep it looking like the old app; don't swap in the web kit's components.
 - Vendor app keeps the **original Home layout** (hero + day pills + slot groups + quick actions) and is
   Hindi by default.
 - Docs: `platform/docs/DEPLOY.md` (all on Hostinger: API as a Node.js app or VPS, apps as static sites, beta sub-domains first, rollback),

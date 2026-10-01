@@ -9,34 +9,45 @@ What the React apps already do, and what is still only in `customer/index.html` 
 
 ## Customer (`apps/customer`)
 
-| feature                                                                                  | status  | notes                                                                                                                                        |
-| ---------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Browse without login, village picker, "use my location" (refuses fixes worse than ±3 km) | ✅      |                                                                                                                                              |
-| Category tabs, search                                                                    | ✅      |                                                                                                                                              |
-| Item photos: vendor photo → catalogue photo → fallback                                   | ☑️      | Fallback is an emoji. The old app drew SVG illustrations.                                                                                    |
-| Item sold by 2+ vendors → vendor picker with prices; one vendor per booking              | ✅      |                                                                                                                                              |
-| Basket: out-of-stock marking, note for the vendor                                        | ✅      |                                                                                                                                              |
-| Slot picker (5 days × 3 slots, full / not served shown)                                  | ✅      |                                                                                                                                              |
-| Phone login (no OTP — founder's decision)                                                | ✅      | Rate limited per IP and per phone                                                                                                            |
-| Google login                                                                             | ☑️      | Server-side PKCE. Needs the Supabase redirect URLs (DEPLOY.md §2) before it works live.                                                      |
-| Address: GPS + village + house / street / landmark                                       | ✅      |                                                                                                                                              |
-| Leaflet map with a draggable 📍 pin, satellite view                                      | ❌      | GPS fix + village only for now                                                                                                               |
-| Several addresses, default ⭐, delete, choose at checkout                                | ✅      |                                                                                                                                              |
-| Booking → success with delivery code                                                     | ✅      |                                                                                                                                              |
-| My orders: tracker, delivery code, call vendor, cancel                                   | ✅      |                                                                                                                                              |
-| Bill check: every changed line, approve / "something is wrong"                           | ✅      |                                                                                                                                              |
-| Rating                                                                                   | ✅      |                                                                                                                                              |
-| Order again                                                                              | ☑️      |                                                                                                                                              |
-| 🔔 in-app notifications                                                                  | ☑️      |                                                                                                                                              |
-| Web push (order confirmed, on the way, bill ready…)                                      | ☑️      | The service worker registers, and the subscription is saved via the API. Real delivery to a phone is not yet verified (needs a real device). |
-| "🩺 Check notifications & location" self-test screen, test push                          | ❌      | API ready: `POST /v1/customer/push/test`, `GET /v1/customer/push/test/:id`                                                                   |
-| Favourites                                                                               | ❌      | API ready: `POST /v1/customer/favourites/:id/toggle`                                                                                         |
-| Recurring (repeat) orders                                                                | ❌      |                                                                                                                                              |
-| "How it works" page, chat bubble                                                         | ❌      |                                                                                                                                              |
-| Waitlist for unserved villages, contact form, "Become a vendor" link, privacy page       | ✅ / ☑️ |                                                                                                                                              |
-| English ↔ Hindi (Devanagari), synced to the account                                      | ✅      |                                                                                                                                              |
-| Play Store app (TWA): `assetlinks.json`, start URL `/?source=pwa`                        | ☑️      | Carried in the build. Re-check Play app login after cut-over.                                                                                |
-| Offline DEMO mode                                                                        | —       | Replaced by `npm run dev:mock` (fake Supabase)                                                                                               |
+Since 1 Oct 2026 the customer app is a **screen-by-screen port of `customer/index.html`**: the
+original CSS is used as-is (`src/styles/legacy.css`), the original markup and class names are kept,
+and the 106 hand-drawn SVG item pictures are carried over (`src/art/drawings.ts`). It should look
+and behave exactly like the old app, on phone, tablet and laptop (the old app's own desktop layout:
+top bar, hero, category cards, footer).
+
+| feature                                                                                        | status  | notes                                                                                                     |
+| ---------------------------------------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------- |
+| Splash, "Which village are you in?" ask, village sheet, "use my location" (±3 km rule)         | ☑️      |                                                                                                           |
+| Home: hero with slot line, rotating search hints, tabs, offer tiles, Most bought, best rate    | ✅      | Laptop: hero with real price tiles, category cards, footer                                                |
+| Item pictures: vendor photo → catalogue photo → hand-drawn SVG (also when a photo fails)       | ✅      |                                                                                                           |
+| Category screen: side rail, filters (price / freshest / rate dropped), vendor banner + chip    | ☑️      |                                                                                                           |
+| Search with typo-tolerant matching, popular searches                                           | ☑️      |                                                                                                           |
+| Item sold by 2+ vendors → vendor picker with prices; different-vendor warning                  | ✅      |                                                                                                           |
+| Favourites ♡, price-change toasts for basket/favourite items, basket reminder                  | ☑️      |                                                                                                           |
+| Fly-to-cart, cart bar with ₹50 minimum progress                                                | ✅      |                                                                                                           |
+| Slot picker: type (auto when only one), vendor list / compact confirmation, 5 days, N/A slots  | ✅      |                                                                                                           |
+| Basket: out-of-stock marking, note for the vendor, address card with Change                    | ✅      |                                                                                                           |
+| Phone login (no OTP — founder's decision) / Google (name + number kept across the redirect)    | ✅ / ☑️ | Google needs the Supabase redirect URLs (DEPLOY.md §2)                                                    |
+| Address: precise GPS (best fix in 20 s), Leaflet map with draggable 📍, satellite / map        | ☑️      | Checked in the browser with a fake GPS fix. Map tiles come from Esri / OpenStreetMap (allowed in the CSP) |
+| Address auto-fill from OpenStreetMap (small parts + our village), village from our boundaries  | ☑️      |                                                                                                           |
+| Several addresses: Home / Shop / Parents' home / named, default ⭐, delete, choose at checkout | ✅      |                                                                                                           |
+| Success with burst + delivery code + "alert me" card                                           | ✅      |                                                                                                           |
+| Bookings: tracker, delivery code, see bill, rate, order again, call vendor, cancel             | ✅      |                                                                                                           |
+| Bill check: every changed line, unchanged folded, approve / "something's wrong" (with reason)  | ✅      |                                                                                                           |
+| Order-complete pop-up with stars (delivered or completed, once per order); rating screen       | ✅      |                                                                                                           |
+| 🔔 notifications sheet + unread dot + toast; "keep asking" permission bar                      | ☑️      |                                                                                                           |
+| "🩺 Check notifications & location" with GPS test and test push                                | ☑️      | Real push delivery needs a real phone                                                                     |
+| My account, How it works (animated), Contact form, chat bubble, Become a vendor, privacy       | ☑️      |                                                                                                           |
+| Waitlist for unserved villages (asks for a number when logged out)                             | ☑️      |                                                                                                           |
+| English ↔ Hindi (Devanagari), synced to the account                                            | ✅      |                                                                                                           |
+| Play Store app (TWA): `assetlinks.json`, start URL `/?source=pwa`                              | ☑️      | Re-check Play app login after cut-over                                                                    |
+| Recurring (repeat) orders                                                                      | ❌      | The old app had no screen for them either                                                                 |
+| Voice search                                                                                   | —       | "coming soon" toast, as before                                                                            |
+| Offline DEMO mode                                                                              | —       | Replaced by `npm run dev:mock` (fake Supabase)                                                            |
+
+Small, deliberate differences: no Roman Hindi anywhere (the splash line and a few labels were Roman
+Hindi); the vendor-picker sort chips sit in one row (the old `.row` class was never defined); the
+"order complete" pop-up also appears for paid (`completed`) orders, not only `delivered`.
 
 ## Vendor (`apps/vendor`)
 

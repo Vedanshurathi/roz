@@ -9,11 +9,14 @@ import type {
   CustomerProfile,
   HomeData,
   LastOrderItem,
+  ProductVendorOption,
   SessionInfo,
   SlotStatus,
   VendorCard,
   VendorType,
 } from '@rozbazaar/shared';
+import { useMemo } from 'react';
+import { toP, type P } from '../lib/model';
 import { api } from './client';
 
 export const keys = {
@@ -27,6 +30,7 @@ export const keys = {
   bill: (id: string) => ['bill', id] as const,
   notifications: ['notifications'] as const,
   lastOrder: ['last-order'] as const,
+  productVendors: (area: string, name: string) => ['product-vendors', area, name] as const,
 };
 
 export function useSession() {
@@ -52,6 +56,23 @@ export function useHome(area: string | null, loggedIn: boolean) {
     enabled: Boolean(area),
     // Prices and stock change during the day; keep the catalogue fresh.
     refetchInterval: 3 * 60_000,
+  });
+}
+
+/** The village's catalogue in the shape the screens draw, plus favourites and who serves it. */
+export function useCatalog(area: string, loggedIn: boolean) {
+  const q = useHome(area, loggedIn);
+  const products = useMemo<P[]>(() => (q.data?.products ?? []).map(toP), [q.data]);
+  const favs = useMemo(() => new Set(q.data?.favourites ?? []), [q.data]);
+  return { q, products, favs, served: q.data?.served ?? true, types: q.data?.types ?? [] };
+}
+
+export function useProductVendors(area: string, name: string | null) {
+  return useQuery({
+    queryKey: keys.productVendors(area, name ?? ''),
+    queryFn: () => api.get<ProductVendorOption[]>('/v1/customer/product-vendors', { area, name: name! }),
+    enabled: Boolean(name),
+    staleTime: 15_000,
   });
 }
 
@@ -87,10 +108,8 @@ export function useBookings(enabled: boolean) {
     queryFn: () => api.get<Booking[]>('/v1/customer/bookings', { limit: 30 }),
     enabled,
     // Live while an order is in progress, so the vendor's steps show up on their own.
-    refetchInterval: (q) =>
-      (q.state.data ?? []).some((b) => !['completed', 'delivered', 'cancelled', 'missed'].includes(b.status))
-        ? 20_000
-        : false,
+    // Polled while logged in, so "vendor on the way" and the order-complete pop-up appear on their own.
+    refetchInterval: 25_000,
   });
 }
 

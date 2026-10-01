@@ -34,7 +34,8 @@ export async function phone(name) {
   page.on('pageerror', (e) => errors.push(`pageerror ${e.message}`));
   page.on('console', (m) => {
     // 4xx responses are expected in the negative steps (wrong password, wrong code).
-    if (m.type() === 'error' && !/status of 4\d\d/.test(m.text())) errors.push(`console ${m.text()}`);
+    if (m.type() === 'error' && !/status of 4\d\d|Push API in incognito/.test(m.text()))
+      errors.push(`console ${m.text()}`);
   });
   const shot = (n) => page.screenshot({ path: `${SHOTS}${name}-${n}.png` });
   const step = async (label, fn) => {
@@ -58,4 +59,60 @@ export const apiAs = (origin) =>
 export async function ok(res, what) {
   if (!res.ok()) throw new Error(`${what}: ${res.status()} ${await res.text()}`);
   return (await res.json().catch(() => ({}))).data;
+}
+
+/**
+ * Customer: from Home, puts Sanjiv's tomato + potato in the basket, books tomorrow morning with a
+ * phone login and a new address. Returns the delivery code shown on the success screen.
+ */
+export async function customerBooks(p, { name, phonePrefix, house, shot = async () => undefined }) {
+  await p.context().grantPermissions(['notifications', 'geolocation'], { origin: URLS.customer });
+  await p.addInitScript(() => {
+    try {
+      sessionStorage.setItem('rbx.locAsked', '1');
+    } catch {
+      /* ignore */
+    }
+  });
+  await p.goto(URLS.customer + '/');
+  await p.waitForSelector('#homeGrid .pcard');
+  await shot('01-home');
+  // Tomato is sold by two vendors → the picker opens.
+  await p.locator('#homeGrid .pcard', { hasText: 'Tomato' }).first().locator('.add').click();
+  await p.waitForSelector('.loc-ask.on .vcard');
+  await shot('02-vendor-picker');
+  await p.locator('.loc-ask.on .vcard', { hasText: 'Sanjiv' }).click();
+  await p.waitForTimeout(900);
+  await p.locator('#homeGrid .pcard', { hasText: 'Potato' }).locator('.add').click();
+  await p.waitForTimeout(900);
+  // Geeta's apple: added with a "different vendor" warning (as in the original app), then removed.
+  await p.locator('#homeGrid .pcard', { hasText: 'Apple' }).locator('.add').click();
+  await p.waitForSelector('.toast.show:has-text("different vendor")');
+  await p.waitForTimeout(900);
+  await p.locator('#cartIn').click();
+  await p.waitForURL(/basket/);
+  await p.locator('.brow', { hasText: 'Apple' }).locator('.qty button').first().click();
+  await p.fill('#vnote', 'Green gate, ring twice');
+  await shot('03-basket');
+  await p.getByRole('button', { name: 'Confirm booking' }).click();
+  await p.waitForURL(/slot/);
+  await p.locator('#days .day-pill').nth(1).click();
+  await p.locator('#slotList .slot', { hasText: 'Morning' }).click();
+  await p.locator('#slotGo').click();
+  await p.waitForURL(/basket/);
+  await p.getByRole('button', { name: 'Confirm booking' }).click();
+  await p.waitForURL(/login/);
+  await p.fill('#inName', name);
+  await p.fill('#inPhone', randomPhone(phonePrefix));
+  await p.locator('#phoneLoginBtn').click();
+  await p.waitForURL(/address\/new/);
+  await p.locator('#aArea').selectOption('Khandewla');
+  await p.fill('#aHouse', house);
+  await p.fill('#aLand', 'Near Hanuman temple');
+  await shot('04-address');
+  await p.getByRole('button', { name: /Save address/ }).click();
+  await p.waitForURL(/success/);
+  const otp = (await p.locator('#sucOtp').textContent())?.trim() ?? '';
+  if (!/^\d{4}$/.test(otp)) throw new Error(`no delivery code on success page: ${otp}`);
+  return otp;
 }

@@ -86,9 +86,10 @@ p_items)`.
     without one.
 - **i18n** — `I18nProvider` + `t(en, hi)`. The chosen language is synced to the account
   (`set_language`) so pushes arrive in the same language.
-- **Styling** — tokens and components in `packages/web/src/styles/kit.css` (the rozbazaar-ui
-  design system), with a layout stylesheet per app. No inline `<style>`/`<script>`, because the
-  CSP forbids them.
+- **Styling** — the vendor app uses `packages/web/src/styles/kit.css` (the rozbazaar-ui design
+  system) plus its own layout stylesheet. The customer app uses the original app's CSS unchanged
+  (`apps/customer/src/styles/legacy.css`) plus small additions in `app.css`, so it looks exactly like
+  before. No inline `<style>`/`<script>`, because the CSP forbids them.
 - **Hosting** — `@rozbazaar/web/hosting` writes `.htaccess` into each build: CSP, HSTS, HTTPS
   redirect, SPA fallback and caching. `vite preview` sends the same headers, so a production build
   is tested locally under the real policy.
@@ -102,7 +103,7 @@ p_items)`.
    rows in `mappers.ts`.
 4. Implement the RPC in `apps/api/src/dev/fake-supabase.ts` (same rules as the real one), and add
    a test in `apps/api/test/`.
-5. Build the screen in `apps/<app>/src/features/...`. Use a query/mutation hook, and `t(en, hi)`
+5. Build the screen in `apps/vendor/src/features/...` or `apps/customer/src/screens/...`. Use a query/mutation hook, and `t(en, hi)`
    for every string.
 6. Run `npm run lint && npm run typecheck && npm test && npm run build`, then `npm run e2e` if the
    change touches a journey.

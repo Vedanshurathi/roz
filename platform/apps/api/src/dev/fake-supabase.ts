@@ -933,8 +933,9 @@ export async function startFakeSupabase(
           .slice(0, Number(a.p_limit ?? 30)),
       ),
     customer_mark_read: (a, ctx) => {
-      const n = state.notifications.find((x) => x.id === a.p_id && x.user_id === ctx.uid);
-      if (n) n.is_read = true;
+      // No id = mark all of this person's notifications read (same as the DB function).
+      for (const n of state.notifications)
+        if (n.user_id === ctx.uid && (a.p_id == null || n.id === a.p_id)) n.is_read = true;
       return okd(null);
     },
     save_push_subscription: (a, ctx) => {

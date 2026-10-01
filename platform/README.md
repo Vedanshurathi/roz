@@ -61,5 +61,7 @@ change a screen.
   an order never contains the customer's delivery code.
 - **Every visible string goes through `t(en, hi)`.** English mode is proper English; Hindi mode is
   Devanagari. No Roman Hindi.
-- **One screen = one file** under `src/features/<area>/`. Shared bits live in `packages/web`.
+- **One screen = one file** — vendor: `src/features/<area>/`; customer: `src/screens/` (+ `overlays/`
+  for pop-ups, `state/` for basket/checkout logic, `art/` for the item drawings). Shared bits live in
+  `packages/web`.
 - **No tokens in the browser.** Sessions are encrypted HttpOnly cookies (see `docs/SECURITY.md`).

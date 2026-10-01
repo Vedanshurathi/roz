@@ -11,17 +11,20 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@fontsource/fraunces": "^5.3.0",
+    "@rozbazaar/shared": "1.0.0",
+    "@rozbazaar/web": "1.0.0",
     "@tanstack/react-query": "^5.104.0",
+    "leaflet": "^1.9.4",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-router": "^8.4.0",
-    "zod": "^3.25.76",
-    "@rozbazaar/shared": "1.0.0",
-    "@rozbazaar/web": "1.0.0"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
+    "@types/leaflet": "^1.9.22",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",

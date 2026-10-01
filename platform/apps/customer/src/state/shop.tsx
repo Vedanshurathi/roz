@@ -1,119 +1,159 @@
 /**
- * Client state that isn't server data: chosen village, the basket, and the checkout choices.
- * Persisted per device (not secret). A booking goes to ONE vendor, so the basket remembers
- * whose items it holds and refuses to silently mix vendors.
+ * What the customer is putting together: village, basket, chosen slot/vendor, note for the vendor.
+ * Kept on the phone (localStorage) so a basket survives closing the app and the Google login
+ * redirect — same as the original app.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import type { Product, TimeSlot } from '@rozbazaar/shared';
 import { storage } from '@rozbazaar/web';
-import { STORAGE } from '../config';
+import type { Sel } from '../lib/model';
 
-export interface SlotChoice {
-  date: string;
-  slot: TimeSlot;
-}
+const K = {
+  area: 'rbx.area',
+  cart: 'rbx.cart2',
+  sel: 'rbx.sel',
+  note: 'rbx.note',
+  checkout: 'rbx.pendingCheckout',
+  query: 'rbx.query',
+} as const;
 
-interface Persisted {
-  cart: Record<string, number>;
-  vendorId: string | null;
-}
+export type Cart = Record<string, number>;
+const EMPTY_SEL: Sel = { type: null, day: 0, slot: null, vendorId: null };
 
 interface Shop {
-  area: string | null;
-  setArea(area: string): void;
-  cart: Record<string, number>;
-  cartVendorId: string | null;
-  itemCount: number;
-  /** Bumps on every add, so the cart bar can replay its "pop". */
-  bump: number;
-  add(p: Product): 'added' | 'other-vendor';
-  setQty(productId: string, qty: number): void;
-  replaceWith(p: Product): void;
+  area: string;
+  setArea(a: string): void;
+  cart: Cart;
+  count: number;
+  addOne(id: string, qty?: number): void;
+  setQty(id: string, delta: number): void;
   clearCart(): void;
-  slot: SlotChoice | null;
-  setSlot(s: SlotChoice | null): void;
+  sel: Sel;
+  setSel(patch: Partial<Sel>): void;
   note: string;
   setNote(n: string): void;
-  addressId: string | null;
-  setAddressId(id: string | null): void;
+  /** Address chosen for this order (the "Deliver to which address?" sheet). */
+  addrId: string | null;
+  setAddrId(id: string | null): void;
+  /** Login/address were opened in the middle of placing an order. */
+  pendingCheckout: boolean;
+  setPendingCheckout(v: boolean): void;
+  query: string;
+  setQuery(q: string): void;
 }
 
 const Ctx = createContext<Shop | null>(null);
 
+function session<T>(key: string, fallback: T): T {
+  try {
+    const v = sessionStorage.getItem(key);
+    return v === null ? fallback : (JSON.parse(v) as T);
+  } catch {
+    return fallback;
+  }
+}
+function setSession(key: string, v: unknown) {
+  try {
+    sessionStorage.setItem(key, JSON.stringify(v));
+  } catch {
+    /* storage blocked */
+  }
+}
+
 export function ShopProvider({ children }: { children: ReactNode }) {
-  const [area, setAreaState] = useState<string | null>(() => storage.get<string>(STORAGE.area));
-  const [basket, setBasket] = useState<Persisted>(
-    () => storage.get<Persisted>(STORAGE.cart) ?? { cart: {}, vendorId: null },
-  );
-  const [checkout, setCheckout] = useState<{
-    slot: SlotChoice | null;
-    note: string;
-    addressId: string | null;
-  }>(() => storage.get(STORAGE.checkout) ?? { slot: null, note: '', addressId: null });
-  const [bump, setBump] = useState(0);
+  // The original app opened on Khandewla; the location prompt then moves people to their village.
+  const [area, setAreaState] = useState<string>(() => storage.get<string>(K.area) || 'Khandewla');
+  const [cart, setCart] = useState<Cart>(() => storage.get<Cart>(K.cart) ?? {});
+  const [sel, setSelState] = useState<Sel>(() => ({
+    ...EMPTY_SEL,
+    ...(storage.get<Partial<Sel>>(K.sel) ?? {}),
+    day: 0,
+  }));
+  const [note, setNote] = useState<string>(() => storage.get<string>(K.note) ?? '');
+  const [addrId, setAddrId] = useState<string | null>(null);
+  const [pendingCheckout, setPendingState] = useState<boolean>(() => session(K.checkout, false));
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
-    storage.set(STORAGE.cart, basket);
-  }, [basket]);
+    storage.set(K.cart, cart);
+  }, [cart]);
   useEffect(() => {
-    storage.set(STORAGE.checkout, checkout);
-  }, [checkout]);
+    storage.set(K.sel, sel);
+  }, [sel]);
+  useEffect(() => {
+    storage.set(K.note, note);
+  }, [note]);
 
   const setArea = useCallback((a: string) => {
     setAreaState((prev) => {
-      if (prev !== a) setBasket({ cart: {}, vendorId: null }); // another village = other vendors
+      if (prev !== a) {
+        // A basket priced by one village's vendor cannot follow you to another village.
+        setCart({});
+        setSelState((s) => ({ ...s, type: null, slot: null, vendorId: null }));
+      }
       return a;
     });
-    storage.set(STORAGE.area, a);
+    storage.set(K.area, a);
   }, []);
 
-  const add = useCallback(
-    (p: Product): 'added' | 'other-vendor' => {
-      if (basket.vendorId && basket.vendorId !== p.vendorId && Object.keys(basket.cart).length)
-        return 'other-vendor';
-      setBasket((b) => ({ vendorId: p.vendorId, cart: { ...b.cart, [p.id]: (b.cart[p.id] ?? 0) + 1 } }));
-      setBump((n) => n + 1);
-      return 'added';
-    },
-    [basket],
+  const addOne = useCallback(
+    (id: string, qty = 1) => setCart((c) => ({ ...c, [id]: (c[id] ?? 0) + qty })),
+    [],
   );
-
-  const setQty = useCallback((productId: string, qty: number) => {
-    setBasket((b) => {
-      const cart = { ...b.cart };
-      if (qty <= 0) delete cart[productId];
-      else cart[productId] = qty;
-      return { cart, vendorId: Object.keys(cart).length ? b.vendorId : null };
-    });
+  const setQty = useCallback(
+    (id: string, delta: number) =>
+      setCart((c) => {
+        const n = (c[id] ?? 0) + delta;
+        const next = { ...c };
+        if (n <= 0) delete next[id];
+        else next[id] = n;
+        return next;
+      }),
+    [],
+  );
+  const clearCart = useCallback(() => setCart({}), []);
+  const setSel = useCallback((patch: Partial<Sel>) => setSelState((s) => ({ ...s, ...patch })), []);
+  const setPendingCheckout = useCallback((v: boolean) => {
+    setPendingState(v);
+    setSession(K.checkout, v);
   }, []);
 
-  const replaceWith = useCallback((p: Product) => {
-    setBasket({ vendorId: p.vendorId, cart: { [p.id]: 1 } });
-    setBump((n) => n + 1);
-  }, []);
-
-  const clearCart = useCallback(() => setBasket({ cart: {}, vendorId: null }), []);
-
-  const value = useMemo<Shop>(
+  const count = Object.values(cart).reduce((a, b) => a + b, 0);
+  const value = useMemo(
     () => ({
       area,
       setArea,
-      cart: basket.cart,
-      cartVendorId: basket.vendorId,
-      itemCount: Object.values(basket.cart).reduce((n, q) => n + q, 0),
-      bump,
-      add,
+      cart,
+      count,
+      addOne,
       setQty,
-      replaceWith,
       clearCart,
-      slot: checkout.slot,
-      setSlot: (slot) => setCheckout((c) => ({ ...c, slot })),
-      note: checkout.note,
-      setNote: (note) => setCheckout((c) => ({ ...c, note: note.slice(0, 500) })),
-      addressId: checkout.addressId,
-      setAddressId: (addressId) => setCheckout((c) => ({ ...c, addressId })),
+      sel,
+      setSel,
+      note,
+      setNote,
+      addrId,
+      setAddrId,
+      pendingCheckout,
+      setPendingCheckout,
+      query,
+      setQuery,
     }),
-    [area, setArea, basket, bump, add, setQty, replaceWith, clearCart, checkout],
+    [
+      area,
+      setArea,
+      cart,
+      count,
+      addOne,
+      setQty,
+      clearCart,
+      sel,
+      setSel,
+      note,
+      addrId,
+      pendingCheckout,
+      setPendingCheckout,
+      query,
+    ],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

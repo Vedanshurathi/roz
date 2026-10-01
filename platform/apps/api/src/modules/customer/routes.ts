@@ -258,6 +258,12 @@ export function customerRoutes(d: Deps): Router {
     ok(res, rows(out.data).map(mapNotification));
   });
 
+  // The 🔔 sheet marks everything read when it opens (customer_mark_read with no id = all).
+  r.post('/notifications/read-all', async (req, res) => {
+    await d.rpc.call('customer_mark_read', { p_id: null }, user(req));
+    res.status(204).end();
+  });
+
   r.post('/notifications/:id/read', async (req, res) => {
     const { id } = parse(idParam, req.params);
     await d.rpc.call('customer_mark_read', { p_id: id }, user(req));

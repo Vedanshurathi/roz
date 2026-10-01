@@ -195,6 +195,16 @@ describe('customer → vendor order lifecycle', () => {
     expect(list.body.data[0]).toMatchObject({ status: 'completed', payAmount: 135, payMethod: 'cash' });
   });
 
+  it('customer sees order notifications and can mark them all read', async () => {
+    const before = await c.get('/v1/customer/notifications');
+    expect(before.status).toBe(200);
+    const unread = (before.body.data as Array<{ isRead: boolean }>).filter((n) => !n.isRead);
+    expect(unread.length).toBeGreaterThan(0);
+    expect((await c.post('/v1/customer/notifications/read-all')).status).toBe(204);
+    const after = await c.get('/v1/customer/notifications');
+    expect((after.body.data as Array<{ isRead: boolean }>).every((n) => n.isRead)).toBe(true);
+  });
+
   it('customer rates, vendor sees the sale on the dashboard', async () => {
     expect(
       (await c.post(`/v1/customer/bookings/${bookingId}/rating`, { stars: 5, comment: 'Fresh!' })).status,

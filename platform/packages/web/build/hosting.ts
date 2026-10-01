@@ -29,7 +29,11 @@ export type HostingPlugin =
  * Returns two plugins: one writes .htaccess into the build, the other makes `vite preview` send the
  * same headers, so the production build can be tested locally under the real CSP.
  */
-export function hostingHeaders(opts: { apiUrl: string; extraImgHosts?: string[] }): HostingPlugin[] {
+export function hostingHeaders(opts: {
+  apiUrl: string;
+  extraImgHosts?: string[];
+  extraConnectHosts?: string[];
+}): HostingPlugin[] {
   const api = new URL(opts.apiUrl).origin;
   const img = ["'self'", 'data:', 'blob:', api, 'https://*.supabase.co', ...(opts.extraImgHosts ?? [])].join(
     ' ',
@@ -39,7 +43,7 @@ export function hostingHeaders(opts: { apiUrl: string; extraImgHosts?: string[] 
     "script-src 'self'",
     "style-src 'self'",
     `img-src ${img}`,
-    `connect-src 'self' ${api}`,
+    `connect-src ${["'self'", api, ...(opts.extraConnectHosts ?? [])].join(' ')}`,
     "font-src 'self'",
     "manifest-src 'self'",
     "worker-src 'self'",
