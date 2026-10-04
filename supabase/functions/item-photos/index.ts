@@ -108,6 +108,41 @@ Deno.serve(async (req) => {
     return json({ ok: true, data: out });
   }
 
+  // mode compare: items = [{key, title, q}] → for choosing a better photo by eye: the item's current photo,
+  // the photos used in its Wikipedia article, and Commons search hits — each as a small base64 preview.
+  if (body.mode === "compare") {
+    const size = Math.min(Number(body.size) || 150, 240);
+    const out: any[] = [];
+    for (const it of body.items || []) {
+      const row: any = { key: it.key, current: null, candidates: [] };
+      const { data: ci } = await db.from("catalog_items").select("image_url").eq("key", it.key).maybeSingle();
+      if (ci?.image_url) row.current = await b64(String(ci.image_url).split("?")[0]);
+      let title = it.title || "";
+      if (!title && it.q) {
+        const r = await fetch(`https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srlimit=1&srsearch=${encodeURIComponent(it.q)}`, { headers: { "User-Agent": UA } });
+        title = (await r.json())?.query?.search?.[0]?.title || "";
+      }
+      const files: string[] = [];
+      if (title) {
+        const r = await fetch(`https://en.wikipedia.org/w/api.php?action=query&format=json&redirects=1&prop=images&imlimit=40&titles=${encodeURIComponent(title)}`, { headers: { "User-Agent": UA } });
+        const pages = (await r.json())?.query?.pages || {};
+        for (const k of Object.keys(pages)) for (const im of pages[k]?.images || []) if (/\.(jpe?g|png|webp)$/i.test(im.title)) files.push(im.title);
+      }
+      const seen = new Set<string>();
+      for (const f of files.slice(0, Number(body.wiki) || 7)) {
+        if (seen.has(f)) continue; seen.add(f);
+        const t = await fileThumb(f, size); if (t) row.candidates.push({ file: f, preview: await b64(t), src: "wiki" });
+      }
+      for (const c of await commonsSearch(it.q || title, Number(body.commons) || 4, size)) {
+        if (seen.has((c as any).file)) continue; seen.add((c as any).file);
+        row.candidates.push({ file: (c as any).file, preview: await b64((c as any).thumb), src: "commons" });
+      }
+      row.title = title;
+      out.push(row);
+    }
+    return json({ ok: true, data: out });
+  }
+
   // mode catalog: items = [{key, title}] (Wikipedia article lead image) or [{key, file}] (a Commons file)
   const out: any[] = [];
   for (const it of body.items || []) {

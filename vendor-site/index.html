@@ -784,6 +784,7 @@ body.has-nav .scr{padding-bottom:200px}
 #greetCard .gc-x{border:0;background:rgba(255,255,255,.12);color:#fff;border-radius:12px;width:38px;height:38px;font-size:16px;cursor:pointer}
 @keyframes gcBar{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1.3)}}
 @media (prefers-reduced-motion:reduce){#greetCard,#greetCard .gc-wave i{animation:none!important;transition:none!important}}
+.cav{width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:-5px;margin-right:6px;border:1.5px solid var(--line)}
 </style>
 </head>
 <body>
@@ -1653,7 +1654,7 @@ function mapBooking(b){
   return {id:b.id, code:b.code, otp:null,           /* vendor never receives it */
     slot:b.slot, name:b.customer_name||b.name||'—', phone:b.customer_phone||b.phone||'',
     house:b.house_no||'', street:b.street||'', area:b.area||'', landmark:b.landmark||'',
-    note:b.note||'', status:ST_IN[b.status]||'new', raw:b.status,
+    note:b.note||'', status:ST_IN[b.status]||'new', raw:b.status, photo:b.customer_photo||null,
     lat:b.lat, lng:b.lng, maps:b.maps_url||null, addr:line,
     final:b.final_total!=null?Number(b.final_total):null,
     /* name/price now travel WITH the item itself, not just an id to
@@ -2128,12 +2129,25 @@ function pickPhoto(inp){
   const f=inp.files && inp.files[0];
   if(!f) return;
   if(!f.type.startsWith('image/')) return toast(T('Pick an image','कोई फ़ोटो चुनो'));
-  const rd=new FileReader();
-  rd.onload=e=>{ PHOTO=e.target.result; renderProfile(); paintAvatar();
-                 toast(T('Photo updated','फ़ोटो बदल गई')); };
-  rd.onerror=()=>toast(T('Could not read that photo','फ़ोटो नहीं खुली'));
-  rd.readAsDataURL(f);
   inp.value='';
+  /* saved for real now (vendor_set_photo) — it used to change only on this phone, so customers never saw it */
+  shrinkPhoto(f, 320).then(async url=>{
+    const old=PHOTO; PHOTO=url; renderProfile(); paintAvatar();
+    const r = DEMO ? {ok:true} : await rpc('vendor_set_photo',{p_photo:url});
+    if(r.ok) toast(T('Photo saved — customers see it now','फ़ोटो सेव हो गई — ग्राहकों को दिखेगी'));
+    else { PHOTO=old; renderProfile(); paintAvatar(); toast(r.msg||T('Could not save the photo','फ़ोटो सेव नहीं हुई')); }
+  }).catch(()=>toast(T('Could not read that photo','फ़ोटो नहीं खुली')));
+}
+/* square-cropped JPEG data URL, small enough to send with every order card */
+function shrinkPhoto(file, size){
+  return new Promise((res,rej)=>{
+    const img=new Image(), u=URL.createObjectURL(file);
+    img.onload=()=>{ const c=document.createElement('canvas'); c.width=c.height=size;
+      const m=Math.min(img.width,img.height), x=(img.width-m)/2, y=(img.height-m)/2;
+      c.getContext('2d').drawImage(img,x,y,m,m,0,0,size,size); URL.revokeObjectURL(u); res(c.toDataURL('image/jpeg',0.82)); };
+    img.onerror=()=>{ URL.revokeObjectURL(u); rej(); };
+    img.src=u;
+  });
 }
 function paintAvatar(){
   const a=document.getElementById('dutyAv'); if(!a) return;
@@ -3595,7 +3609,7 @@ async function renderHome(){
         <span class="t">
           <span class="rtop"><span class="rcode">${r.code}</span>
             <span class="rslot">${s.em} ${LANG==='en'?s.en:s.hi}</span></span>
-          <b>${r.name}</b>
+          <b>${r.photo?`<img class="cav" src="${r.photo}" alt="">`:''}${r.name}</b>
           <span class="addr">${r.house}, ${r.street} · 📍 ${r.landmark}</span>
         </span>
         <span class="amt"><b>₹${r.final||runTotal(r)}</b>
@@ -3638,6 +3652,7 @@ function renderRun(){
   const src = r.bill || r.items;
 
   document.getElementById('runBody').innerHTML = `
+    ${r.photo?`<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><img src="${r.photo}" alt="" style="width:58px;height:58px;border-radius:50%;object-fit:cover;border:2px solid var(--line)"><b style="font-size:17px">${r.name}</b></div>`:''}
     <div class="card">
       <div style="display:flex;align-items:flex-start;gap:12px">
         <span style="font-size:22px">📍</span>

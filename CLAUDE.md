@@ -198,6 +198,21 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   vendor (“N ऑर्डर की जगह बाकी”), `closed` = vendor switched the slot off (“बंद”); `paintSlotList()` refreshes every 30 s.
 - Product images are inline SVG illustrations via `pImg()` / `art()`; a vendor's
   uploaded photo overrides the illustration.
+- **No emojis on screen** (4 Oct 2026): an icon engine (`ICO` path set, `EMO_ICON` emoji → icon map, `ic(name)` →
+  `<i class="ic"><svg>`) runs `emojiToIcons()` at load and from a MutationObserver, so every emoji anywhere (markup,
+  toasts, translated text) becomes a vector icon; unmapped emojis/flags are dropped. Emojis in code are fine — they are
+  converted — but add a mapping in `EMO_ICON` for a new one.
+- **ADD → qty stepper**: `addBtn(id)` renders ADD or `− qty +` (`.qstep`) from `cart`; `paintAllAdds()` (end of
+  `syncCart`) keeps every card in sync; cards wrap it in `<span class="addw" data-pid>`.
+- **Today's rates** board on Home (`#ratesSec`, `renderRates`): cheapest price per item, ▲/▼ vs `rb_rates`, first 8 +
+  "All N rates", each row has the stepper.
+- **Chat FAQ**: Contact screen shows `FAQ` (14 questions, `k` keywords, bilingual `q`/`a`) as chips → answer bubble;
+  typing in the message box suggests matches (`faqSuggest`). Sending a message works as before.
+- **Profile name + photo**: Account → Edit (`#profSheet`, `openProfileEdit`, `saveProfileEdit`) →
+  `customer_set_profile(p_name, p_photo, p_remove_photo)`. Photos are square JPEG data URLs made by `shrinkPhoto(file,size)`
+  (customer 240 px, vendor 320 px), checked by `rb_valid_photo()` (≤ 300 KB, data:image only). Customer photo is shown only
+  in the vendor app (`booking_full.customer_photo`), vendor photo only to customers (`booking_full.vendor_photo`, vendor
+  banner, Call button). Migration `20261004e_profile_photos_catalog.sql`.
 
 ### Vendor app (`vendor/vendor.html`)
 - Same single-file pattern. 16 screens incl. home (today's runs), stock, item,
@@ -256,9 +271,12 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
 
 ### Item names + photos (migration `20260926h_item_names_photos.sql`, edge function `item-photos`)
 - `catalog_items.english_name` (real English) + `image_url`; `products.name_en` + `stock_image_url`.
-- 99/104 catalog items have a real photo: hand-picked Wikimedia Commons / Wikipedia images, 480 px
-  thumbnails, stored in the public Storage bucket `item-photos` (`catalog/<key>.jpg`). p13, p31, p54,
-  p64, p89, p90, p91, p92, p96, p97 keep the drawing (no good photo found).
+- **124 catalog items** (p108–p127 added 4 Oct 2026: mango, mosambi, kinnow, sitaphal, plum, peach, fig, kiwi, dragon fruit,
+  amla, mulberry, raw mango, lemon, raw banana, raw papaya, green garlic, lettuce, cherry tomato, baby potato, red onion).
+  121 have a real photo (Wikimedia Commons, 480 px, Storage bucket `item-photos`, `catalog/<key>.jpg`); p123 green garlic,
+  p54 lotus stem, p89 sangri keep the drawing. Photos are picked by eye: `item-photos` mode `compare` ([{key,title,q}] →
+  current photo + Wikipedia-article images + Commons hits as previews), then mode `catalog` with [{key,file:'File:…'}].
+  Call it through `net.http_post` in small batches (4 items) — big batches time out.
 - Trigger `tg_product_fill` (products insert / rename): fills `name_en`, Devanagari `name_hi` and
   `stock_image_url` from the matching catalog item (by key, English, Roman or Hindi name); for an
   unknown item it calls the `item-photos` function (mode `product`), which searches Commons and
@@ -315,6 +333,8 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   (`vendor_day_counts(p_from,p_to)` from that attempt still exists in the DB, unused.)
 - **Language: Hindi by default**, remembered in `localStorage.rb_vlang`, synced with `set_language` (after login and
   on change) so pushes match. Hindi mode is Devanagari (day names, toasts, notification card fixed).
+- **Vendor profile photo** (Profile → photo) is saved with `vendor_set_photo` (it used to change only on the phone);
+  customers' photos show on Home order cards (`.cav`) and the order screen.
 - Item photos/names: `vendor_my_products` also returns `name_en` + `stock_image_url` (migration
   `20260927b_vendor_products_photo_name.sql`); `pImg` = vendor photo → catalog photo → drawing (on load error);
   `pname` shows `name_en` in English. `p.en` stays the vendor's typed name (editing must not rename items).

@@ -1027,6 +1027,41 @@ details summary::-webkit-details-marker{display:none}
 #greetCard .gc-x{border:0;background:rgba(255,255,255,.12);color:#fff;border-radius:12px;width:38px;height:38px;font-size:16px;cursor:pointer}
 @keyframes gcBar{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1.3)}}
 @media (prefers-reduced-motion:reduce){#greetCard,#greetCard .gc-wave i{animation:none!important;transition:none!important}}
+/* ---------- vector icons (replace emojis) ---------- */
+.ic{display:inline-flex;width:1.05em;height:1.05em;vertical-align:-.16em;flex:none;line-height:1}
+.ic svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ic svg .f{fill:currentColor;stroke:none}
+.pv-star .ic,.rstar .ic{color:#F5A623}
+
+/* ADD → quantity stepper (shows how many are in the basket) */
+.qstep{position:absolute;bottom:-1px;right:8px;display:flex;align-items:center;background:var(--g);color:#fff;border-radius:10px;
+  box-shadow:0 4px 12px rgba(30,142,62,.3);overflow:hidden;height:34px}
+.qstep button{border:0;background:transparent;color:#fff;width:32px;height:34px;font-size:19px;font-weight:800;cursor:pointer}
+.qstep b{min-width:22px;text-align:center;font-size:14px;font-weight:800}
+.qstep button:active{background:rgba(0,0,0,.12)}
+/* today's rates board */
+.rates{margin:0 16px 6px;background:#fff;border:1.5px solid var(--line);border-radius:18px;overflow:hidden}
+.rates .rrow{display:flex;align-items:center;gap:10px;padding:9px 14px;border-top:1px solid var(--line)}
+.rates .rrow:first-child{border-top:0}
+.rates .rimg{width:34px;height:34px;border-radius:10px;overflow:hidden;background:var(--grey);flex:none}
+.rates .rimg img,.rates .rimg svg{width:100%;height:100%;object-fit:cover}
+.rates .rn{flex:1;min-width:0;font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rates .rn small{display:block;font-size:11.5px;font-weight:700;color:var(--mut)}
+.rates .rp{font-weight:800;font-size:15px;text-align:right}
+.rates .rp small{display:block;font-size:11px;font-weight:800}
+.rates .rp .up{color:#d93025}.rates .rp .down{color:var(--g)}
+.rates .add,.rates .qstep{position:absolute;right:0;bottom:1px}
+.rates .rmore{display:block;width:100%;border:0;border-top:1px solid var(--line);background:var(--lime-s);color:var(--g-dk);font-weight:800;font-size:13.5px;padding:11px;cursor:pointer}
+/* chat: common questions */
+.faq-chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}
+.faq-chips button{border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:8px 12px;font-weight:700;font-size:13px;color:var(--tx);cursor:pointer;text-align:left}
+.faq-chips button:active{transform:scale(.97)}
+.faq-chat{display:flex;flex-direction:column;gap:8px;margin:6px 0 10px}
+.faq-chat .b{max-width:86%;padding:10px 13px;border-radius:16px;font-size:14px;font-weight:600;line-height:1.5}
+.faq-chat .b.me{align-self:flex-end;background:var(--g);color:#fff;border-bottom-right-radius:4px}
+.faq-chat .b.bot{align-self:flex-start;background:var(--grey);color:var(--tx);border-bottom-left-radius:4px}
+.faq-sug{margin-top:8px}
+.faq-sug button{display:flex;gap:8px;align-items:center;width:100%;border:1.5px dashed var(--g);background:var(--lime-s);color:var(--g-dk);border-radius:12px;padding:9px 12px;font-weight:700;font-size:13px;margin-top:6px;cursor:pointer;text-align:left}
 </style>
 </head>
 <body>
@@ -1181,6 +1216,10 @@ details summary::-webkit-details-marker{display:none}
     <button class="rb" onclick="repeatOrder()" data-en="Repeat" data-hi="दोबारा मँगाएँ">Repeat</button>
   </div>
 
+  <div class="sec" id="ratesSec" style="display:none">
+    <div class="sec-hd"><h2 data-en="Today's rates" data-hi="आज के रेट">Today's rates</h2><p id="ratesDate"></p></div>
+    <div class="rates" id="ratesBoard"></div>
+  </div>
   <div class="sec">
     <div class="sec-hd"><h2 data-en="Everything available today" data-hi="आज सब कुछ उपलब्ध">Everything available today</h2><p id="gridCount"></p></div>
     <div class="grid" id="homeGrid"></div>
@@ -1535,6 +1574,7 @@ details summary::-webkit-details-marker{display:none}
       <div class="av" id="avLetter">V</div>
       <div><b id="profName">Guest</b><span id="profPhone" data-en="Not logged in" data-hi="लॉगिन नहीं किया">Not logged in</span></div>
       <button class="pill" style="margin-left:auto" onclick="go('login')" id="profBtn" data-en="Log in" data-hi="लॉगिन">Log in</button>
+      <button class="pill" style="margin-left:auto;display:none" id="profEdit" onclick="event.stopPropagation();openProfileEdit()" data-en="✏️ Edit" data-hi="✏️ बदलें">✏️ Edit</button>
     </div>
 
     <div class="h2" data-en="My addresses" data-hi="मेरे पते">My addresses</div>
@@ -1621,12 +1661,17 @@ details summary::-webkit-details-marker{display:none}
     <div class="sub" data-en="goes straight to the RozBazaar team" data-hi="सीधे RozBazaar टीम के पास जाता है">goes straight to the RozBazaar team</div></div>
   </div>
   <div class="pg" id="contactForm">
+    <div class="h2" data-en="Common questions — tap one" data-hi="आम सवाल — किसी पर दबाएँ">Common questions — tap one</div>
+    <div class="faq-chat" id="faqChat"></div>
+    <div class="faq-chips" id="faqChips"></div>
+    <div class="muted" style="font-size:12.5px;font-weight:700;margin:14px 0 4px" data-en="Not listed? Write to us below — the team reads every message." data-hi="सवाल यहाँ नहीं है? नीचे लिखें — टीम हर मैसेज पढ़ती है।">Not listed? Write to us below — the team reads every message.</div>
     <div class="h2" data-en="Your name" data-hi="आपका नाम">Your name</div>
     <input class="field" id="cName" placeholder="Sunita Devi">
     <div class="h2" data-en="Phone (optional)" data-hi="फ़ोन (वैकल्पिक)">Phone (optional)</div>
     <input class="field" id="cPhone" inputmode="numeric" maxlength="10" placeholder="98123 45670">
     <div class="h2" data-en="Message" data-hi="मैसेज">Message</div>
-    <textarea class="field" id="cBody" rows="5" data-en-ph="What's on your mind?" data-hi-ph="क्या कहना चाहते हैं?" placeholder="What's on your mind?"></textarea>
+    <textarea class="field" id="cBody" rows="5" oninput="faqSuggest(this.value)" data-en-ph="What's on your mind?" data-hi-ph="क्या कहना चाहते हैं?" placeholder="What's on your mind?"></textarea>
+    <div class="faq-sug" id="faqSug"></div>
     <button class="bigbtn" style="width:100%;margin-top:16px" onclick="sendContactMessage()" id="cSendBtn" data-en="Send message" data-hi="मैसेज भेजें">Send message</button>
   </div>
   <div class="pg" id="contactDone" style="display:none;text-align:center;padding-top:60px">
@@ -1781,6 +1826,30 @@ details summary::-webkit-details-marker{display:none}
       <button class="bk" onclick="closeCheck()" aria-label="Close">✕</button>
     </div>
     <div id="checkList" style="padding:0 16px 26px;max-height:66vh;overflow-y:auto"></div>
+  </div>
+</div>
+<div class="sheet-wrap" id="profSheet" style="z-index:166">
+  <div class="sheet-bg" onclick="closeProfileEdit()"></div>
+  <div class="sheet">
+    <div class="sheet-grab"></div>
+    <div class="sheet-hd">
+      <div><b data-en="Your name &amp; photo" data-hi="आपका नाम और फ़ोटो">Your name &amp; photo</b>
+      <span data-en="only your vendor sees these" data-hi="ये सिर्फ़ आपके वेंडर को दिखते हैं">only your vendor sees these</span></div>
+      <button class="bk" onclick="closeProfileEdit()" aria-label="Close">✕</button>
+    </div>
+    <div style="padding:4px 16px 24px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div id="peAv" style="width:84px;height:84px;border-radius:50%;background:var(--lime-s);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:var(--g-dk);overflow:hidden;flex:none"></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="pill" onclick="document.getElementById('peFile').click()" data-en="📷 Choose photo" data-hi="📷 फ़ोटो चुनें">📷 Choose photo</button>
+          <button class="pill" id="peRemove" onclick="PE.remove=true;PE.photo=null;paintPE()" data-en="🗑 Remove photo" data-hi="🗑 फ़ोटो हटाएँ">🗑 Remove photo</button>
+        </div>
+      </div>
+      <input type="file" id="peFile" accept="image/*" style="display:none" onchange="pickProfilePhoto(this)">
+      <div class="h2" style="margin-top:16px" data-en="Your name" data-hi="आपका नाम">Your name</div>
+      <input class="field" id="peName" maxlength="80">
+      <button class="bigbtn" style="width:100%;margin-top:16px" id="peSave" onclick="saveProfileEdit()" data-en="Save" data-hi="सेव करें">Save</button>
+    </div>
   </div>
 </div>
 <div class="sheet-wrap" id="savedSheet" style="z-index:165">
@@ -2544,7 +2613,7 @@ function art(p){
   if(!p) return '';
   if(p.photo) return `<img src="${esc(p.photo)}" alt="${esc(p.en)}" loading="lazy" data-pid="${esc(p.id)}" onerror="artFail(this)">`;
   const sv = ART[p.id] || (p.art_key && ART[p.art_key]);
-  if(!sv) return `<span class="emfall">${(p.em)||'🥬'}</span>`;
+  if(!sv) return `<span class="emfall">${ic(p.cat==='fruit'?'apple':p.cat==='onion_potato'?'onion':'leaf')}</span>`;
   /* the same vegetable can appear in a rail, a grid and a quad tile at once.
      SVG gradient ids are document-global, so scope them per instance. */
   const u='_'+(_artN++);
@@ -2911,7 +2980,7 @@ function mapBooking(b){
     items:(b.items||[]).map(i=>({id:i.product_id||i.id, q:Number(i.qty||i.final_qty||1)})),
     est:Number(b.est_total||0), final:b.final_total!=null?Number(b.final_total):null,
     addr:line || addrLine() || '', tag:b.addr_label||'Ghar',
-    vendorName:b.vendor_name||'', vendorPhone:b.vendor_phone||'',
+    vendorName:b.vendor_name||'', vendorPhone:b.vendor_phone||'', vendorPhoto:b.vendor_photo||null,
     rated: b.rating_stars!=null, billReady: b.status==='bill_final'
   };
 }
@@ -3093,6 +3162,7 @@ function go(s){
   window.scrollTo(0,0);
   if(s==='login') otpRequired();
   if(s==='acct'){ paintVoiceRow(); paintSavedCount(); }
+  if(s==='contact') renderFaq();
   const gated=needsProfile();
   document.getElementById('bn').classList.toggle('show', NAVS.includes(s) && !gated);
   document.querySelectorAll('#nav, .h-icons, .h-loc').forEach(el=>{
@@ -3134,6 +3204,57 @@ function initContact(){
   document.getElementById('cName').value=(user&&user.name)||'';
   document.getElementById('cPhone').value=(user&&user.phone)||'';
   document.getElementById('cBody').value='';
+}
+
+/* ---------- Chat: common questions answered at once; anything else goes to the team as before ---------- */
+const FAQ=[
+ {k:'how work kaise use order process book booking start',q:['How does RozBazaar work?','RozBazaar कैसे काम करता है?'],
+  a:['Pick vegetables or fruit, tap ADD, choose a time slot and book. A local vendor comes in that slot, weighs everything in front of you and you pay the vendor directly.','सब्ज़ी या फल चुनें, ADD दबाएँ, समय चुनकर बुक करें। उसी समय आपके गाँव का वेंडर आएगा, आपके सामने तौलेगा और आप सीधे वेंडर को पैसे देंगे।']},
+ {k:'time slot timing when kab samay morning evening afternoon subah shaam',q:['What are the delivery times?','डिलीवरी का समय क्या है?'],
+  a:['Three slots every day: morning 7–11, afternoon 12–4 and evening 5–8. You can book for today or the coming days. A slot closes 1 hour before it starts.','रोज़ तीन स्लॉट: सुबह 7–11, दोपहर 12–4 और शाम 5–8। आज या आने वाले दिनों के लिए बुक कर सकते हैं। स्लॉट शुरू होने से 1 घंटा पहले बंद हो जाता है।']},
+ {k:'charge fee delivery cost free extra paisa',q:['Is there a delivery charge?','क्या डिलीवरी चार्ज लगता है?'],
+  a:['No. There is no delivery charge — you pay only for what the vendor weighs, at the price shown in the app.','नहीं। कोई डिलीवरी चार्ज नहीं — आप सिर्फ़ उतने सामान के पैसे देते हैं जितना वेंडर तौलता है, ऐप वाले रेट पर।']},
+ {k:'minimum order kam se kam least',q:['Is there a minimum order?','कम से कम कितने का ऑर्डर?'],
+  a:[`Yes, ₹${MIN_BASKET} — so the vendor's trip to your house is worth it.`,`हाँ, ₹${MIN_BASKET} — ताकि वेंडर का आपके घर आना ठीक रहे।`]},
+ {k:'pay payment upi cash online paise kaise',q:['How do I pay?','पैसे कैसे दें?'],
+  a:['Pay the vendor directly at your door — cash or UPI. The app never takes money from you.','पैसे सीधे वेंडर को दरवाज़े पर दें — नकद या UPI से। ऐप आपसे कभी पैसे नहीं लेता।']},
+ {k:'bill different more price weigh weight final change zyada',q:['Why can the final bill be different?','बिल अलग क्यों हो सकता है?'],
+  a:['The app shows an estimate. The vendor weighs at your door and sends the real bill to your phone — you approve it. If something is wrong, tap “Report a problem” on the bill.','ऐप पहले अंदाज़ा दिखाता है। वेंडर दरवाज़े पर तौलकर असली बिल आपके फ़ोन पर भेजता है — आप उसे मंज़ूर करते हैं। कुछ गलत लगे तो बिल पर “समस्या बताएँ” दबाएँ।']},
+ {k:'code otp delivery 4 digit pin',q:['What is the delivery code?','डिलीवरी कोड क्या है?'],
+  a:['Every order has a 4-digit code (in Bookings). Tell it to the vendor only after you have received your items — that completes the order.','हर ऑर्डर का एक 4 अंकों का कोड होता है (बुकिंग में)। सामान मिलने के बाद ही वेंडर को बताएँ — इससे ऑर्डर पूरा होता है।']},
+ {k:'cancel cancellation band radd',q:['How do I cancel an order?','ऑर्डर कैंसल कैसे करें?'],
+  a:['Open Bookings, tap the order and press Cancel. You can cancel until the vendor reaches your house.','बुकिंग खोलें, ऑर्डर पर दबाएँ और कैंसल करें। वेंडर के घर पहुँचने से पहले तक कैंसल कर सकते हैं।']},
+ {k:'late not came vendor nahi aaya der missed',q:['The vendor has not come — what do I do?','वेंडर नहीं आया — क्या करें?'],
+  a:['Open the order in Bookings and call the vendor. If you still cannot reach them, write to us below and we will sort it out.','बुकिंग में ऑर्डर खोलकर वेंडर को कॉल करें। फिर भी बात न हो तो नीचे हमें लिखें, हम ठीक करेंगे।']},
+ {k:'village area gaon where kahan available serve',q:['Which villages do you serve?','किन गाँवों में सेवा है?'],
+  a:['Villages around Pataudi and Haileymandi. Pick your village at the top of Home. If no vendor is there yet, tap “Notify me” and we will tell you when one starts.','पटौदी और हेलीमंडी के आस-पास के गाँव। होम में ऊपर अपना गाँव चुनें। वहाँ अभी वेंडर नहीं है तो “मुझे बताएँ” दबाएँ, शुरू होते ही बताएँगे।']},
+ {k:'name photo address change edit profile account naam pata',q:['How do I change my name, photo or address?','नाम, फ़ोटो या पता कैसे बदलें?'],
+  a:['Open Account. Tap your name card to change your name and photo (only your vendor sees them), and use Addresses to add or edit an address.','अकाउंट खोलें। नाम वाले कार्ड पर दबाकर नाम और फ़ोटो बदलें (ये सिर्फ़ आपके वेंडर को दिखते हैं), और पते में नया पता जोड़ें या बदलें।']},
+ {k:'notification alert location gps not working permission',q:['Notifications or location not working','सूचनाएँ या लोकेशन काम नहीं कर रही'],
+  a:['Open Account → “Check notifications & location”. It shows what is blocked and how to turn it on.','अकाउंट → “सूचनाएँ और लोकेशन जाँचें” खोलें। वहाँ दिखेगा क्या बंद है और कैसे चालू करें।']},
+ {k:'quality bad rotten kharab return fresh',q:['What if an item is not fresh?','सामान ताज़ा न हो तो?'],
+  a:['Check everything at the door before paying — tell the vendor to take it out of the bill. If there is still a problem, report it on the bill or write to us.','पैसे देने से पहले दरवाज़े पर सब देख लें — खराब सामान वेंडर से बिल से हटवा दें। फिर भी दिक्कत हो तो बिल पर बताएँ या हमें लिखें।']},
+ {k:'vendor become sell join bechna',q:['How can I become a vendor?','वेंडर कैसे बनें?'],
+  a:['Open vendor.rozbazaar.shop on your phone and register with your name and number — the team will call you.','फ़ोन में vendor.rozbazaar.shop खोलें और नाम-नंबर से रजिस्टर करें — टीम आपको कॉल करेगी।']}
+];
+function faqT(x){ return LANG==='en'?x[0]:x[1]; }
+function renderFaq(){
+  const c=document.getElementById('faqChips'); if(!c) return;
+  c.innerHTML=FAQ.map((f,i)=>`<button onclick="faqAsk(${i})">${faqT(f.q)}</button>`).join('');
+}
+function faqAsk(i){
+  const f=FAQ[i], chat=document.getElementById('faqChat');
+  chat.insertAdjacentHTML('beforeend', `<div class="b me">${faqT(f.q)}</div><div class="b bot">${faqT(f.a)}</div>`);
+  chat.lastElementChild.scrollIntoView({block:'nearest', behavior:'smooth'});
+  document.getElementById('faqSug').innerHTML='';
+}
+function faqSuggest(text){
+  const box=document.getElementById('faqSug'); if(!box) return;
+  const words=String(text||'').toLowerCase().split(/[^a-zऀ-ॿ0-9]+/).filter(w=>w.length>2);
+  if(!words.length){ box.innerHTML=''; return; }
+  const scored=FAQ.map((f,i)=>{ const hay=(f.k+' '+f.q.join(' ')).toLowerCase(); return {i, n:words.filter(w=>hay.includes(w)).length}; })
+    .filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,2);
+  box.innerHTML=scored.map(x=>`<button onclick="faqAsk(${x.i})">${T('Maybe this helps:','शायद इसका जवाब यहाँ है:')} ${faqT(FAQ[x.i].q)}</button>`).join('');
 }
 async function sendContactMessage(){
   const name=document.getElementById('cName').value.trim();
@@ -3298,12 +3419,27 @@ function priceLine(p){
     ? `<span class="pp">₹${p.price}</span><span class="mrp fresh-rate">${T('🔥 Freshly priced','🔥 नया रेट')}</span>`
     : `<span class="pp">₹${p.price}</span><span class="mrp">${T("today's mandi rate",'आज का मंडी रेट')}</span>`;
 }
+/* ADD, or − qty + when it is already in the basket */
+function addBtn(id){
+  const q=cart[id]||0;
+  return q>0
+    ? `<div class="qstep" onclick="event.stopPropagation()"><button aria-label="less" onclick="cardQty(event,'${id}',-1)">−</button><b>${q}</b><button aria-label="more" onclick="fly(event,'${id}')">+</button></div>`
+    : `<button class="add" onclick="fly(event,'${id}')">ADD</button>`;
+}
+function paintAdd(id){ document.querySelectorAll('.addw[data-pid="'+id+'"]').forEach(el=>el.innerHTML=addBtn(id)); }
+function paintAllAdds(){ document.querySelectorAll('.addw[data-pid]').forEach(el=>el.innerHTML=addBtn(el.dataset.pid)); }
+function cardQty(e,id,d){
+  e.stopPropagation();
+  cart[id]=(cart[id]||0)+d; if(cart[id]<=0) delete cart[id];
+  syncCart(); paintAdd(id);
+  if(document.getElementById('s-basket').classList.contains('on')) renderBasket();
+}
 function card(p){
   const oos = p.fresh===false;   /* fresh doubles as "in stock" — see mapProduct */
   return `<div class="pcard${oos?' oos':''}">
     <div class="pimg">${art(p)}<button class="fav ${FAVS.has(p.id)?'on':''}" aria-label="Save" onclick="toggleFav(event,'${p.id}')">${FAVS.has(p.id)?'♥':'♡'}</button>
       ${oos ? `<span class="oosbadge">${T('Out of stock','स्टॉक खत्म')}</span>`
-            : `<button class="add" onclick="fly(event,'${p.id}')">ADD</button>`}</div>
+            : `<span class="addw" data-pid="${p.id}">${addBtn(p.id)}</span>`}</div>
     <span class="wt">${p.unit}</span>
     <div class="pn">${pname(p)}</div>
     ${p.vendorName ? `<div class="pvendor" onclick="event.stopPropagation();openVendorPicker(pname(prod('${p.id}')),null,'${p.id}')">
@@ -3369,6 +3505,7 @@ async function renderHome(){
   }
   grid.innerHTML = all.map(card).join('');
   document.getElementById('gridCount').textContent = all.length+' '+T('items','सामान');
+  renderRates(all);
 
   document.getElementById('quadRail').innerHTML = VENDOR_TYPES.map(v=>{
     const items=all.filter(p=>p.cat===v.id);
@@ -3387,6 +3524,26 @@ async function renderHome(){
   if(fa) fa.innerHTML = AREAS.map(a=>{const nm=typeof a==='string'?a:a.name;
     return `<li onclick="setArea('${nm.replace(/'/g,"\\'")}')">${nm}</li>`;}).join('');
   refreshRepeat();
+}
+/* Today's rates: every item in stock, cheapest vendor's price, with ▲/▼ against the last visit (rb_rates) */
+let RATES_ALL=false;
+function renderRates(all){
+  const sec=document.getElementById('ratesSec'), box=document.getElementById('ratesBoard'); if(!sec||!box) return;
+  const m={};
+  (all||PRODUCTS).filter(p=>p.fresh!==false && p.price>0).forEach(p=>{ const k=String(p.roman||p.en).toLowerCase(); if(!m[k]||p.price<m[k].price) m[k]=p; });
+  const order={vegetable:0,onion_potato:1,fruit:2};
+  const list=Object.values(m).sort((a,b)=>(order[a.cat]??3)-(order[b.cat]??3) || pname(a).localeCompare(pname(b)));
+  if(!list.length){ sec.style.display='none'; return; }
+  let prev=null; try{ prev=JSON.parse(localStorage.getItem('rb_rates')||'null'); }catch(e){}
+  const shown=RATES_ALL?list:list.slice(0,8);
+  document.getElementById('ratesDate').textContent=new Date().toLocaleDateString(LANG==='en'?'en-IN':'hi-IN',{day:'numeric',month:'short'});
+  box.innerHTML=shown.map(p=>{
+    const k=String(p.roman||p.en).toLowerCase(), was=prev&&prev[k];
+    const ch = was && was!==p.price ? (p.price>was ? `<small class="up">▲ ₹${p.price-was}</small>` : `<small class="down">▼ ₹${was-p.price}</small>`) : `<small style="color:var(--mut)">${T('per','प्रति')} ${p.unit}</small>`;
+    return `<div class="rrow"><span class="rimg">${art(p)}</span><span class="rn">${pname(p)}</span>
+      <span class="rp">₹${p.price}${ch}</span><span class="addw" data-pid="${p.id}" style="position:relative;width:96px;height:36px">${addBtn(p.id)}</span></div>`;
+  }).join('') + (list.length>8 ? `<button class="rmore" onclick="RATES_ALL=!RATES_ALL;renderRates()">${RATES_ALL?T('Show less','कम दिखाएँ'):T('All '+list.length+' rates','सभी '+list.length+' रेट देखें')}</button>` : '');
+  sec.style.display='';
 }
 function refreshRepeat(){
   const rc=document.getElementById('repeatCard');
@@ -3549,7 +3706,9 @@ function renderVendorBannerContent(){
   const effectiveId = catVendorFilter || (VENDOR_LIST.length===1 ? VENDOR_LIST[0].id : null);
   const v=VENDOR_LIST.find(x=>x.id===effectiveId);
   if(v){
-    document.getElementById('vbanAvatar').textContent=(v.name||'?')[0].toUpperCase();
+    const vba=document.getElementById('vbanAvatar');
+    if(v.photo_url) vba.innerHTML=`<img src="${v.photo_url}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+    else vba.textContent=(v.name||'?')[0].toUpperCase();
     document.getElementById('vbanName').textContent=v.name;
     const bits=[];
     if(v.avg_rating>0) bits.push('⭐ '+Number(v.avg_rating).toFixed(1));
@@ -3712,8 +3871,7 @@ function fly(e,id){
 }
 function flyAnimate(e,id){
   const b=e.currentTarget;
-  b.classList.add('done'); b.textContent='✓';
-  setTimeout(()=>{b.classList.remove('done'); b.textContent='ADD';},1000);
+  if(b.classList.contains('add')){ b.classList.add('done'); b.textContent='✓'; }
 
   const target = window.innerWidth>=768 ? document.getElementById('navCart') : document.getElementById('cart');
   const r=b.getBoundingClientRect(), c=target.getBoundingClientRect();
@@ -3755,14 +3913,16 @@ function addCart(id){
               `जुड़ गया — पर यह ${cartVendorName} से अलग वेंडर का है`));
     }
   }
-  syncCart();
+  syncCart(); paintAdd(id);
+  const q=cart[id], pp=prod(id);
+  if(pp) toast(T(`${pname(pp)} — ${q} in basket`, `${pname(pp)} — टोकरी में ${q}`));
   const i=document.getElementById('cartIn');
   i.classList.remove('pop'); void i.offsetWidth; i.classList.add('pop');
 }
 function setQty(id,d){
   cart[id]=(cart[id]||0)+d;
   if(cart[id]<=0) delete cart[id];
-  syncCart(); renderBasket();
+  syncCart(); renderBasket(); paintAdd(id);
 }
 function syncCart(){
   const n=count(), t=total();
@@ -3786,6 +3946,7 @@ function syncCart(){
   const fab=document.getElementById('fabContact');
   if(fab) fab.style.bottom = (cartShowing && window.innerWidth<900) ? '242px' : '';
   saveCartLocal();
+  paintAllAdds();
 }
 /* Cart survives closing the app entirely — previously it only lived
    in memory, so anyone who added items and simply came back later
@@ -4711,7 +4872,7 @@ async function phoneLogin(){
     document.getElementById('otpBox').style.display='none';
     const d=r.data;
     SESSION=session;
-    user={name:d.name||n, phone:d.phone||p, email:d.email||''};
+    user={name:d.name||n, phone:d.phone||p, email:d.email||'', photo:d.photo_url||null};
     await loadMyAddress();
     renderAcct(); paintHeaderIdentity();
     /* same as the Google path: language, push subscription and the 🔔 list — phone-login
@@ -4859,7 +5020,7 @@ async function adoptSession(session){
     const d=boot.data||{};
     user={name:d.name||(pending&&pending.name)||m.full_name||m.name||'',
           phone:d.phone||(pending&&pending.phone)||'',
-          email:d.email||session.user.email||''};
+          email:d.email||session.user.email||'', photo:d.photo_url||null};
     await loadMyAddress();
     renderAcct();
     paintHeaderIdentity();
@@ -5086,6 +5247,49 @@ async function syncPush(){
 let CK={}, CK_TEST=null;
 function openCheck(){ document.getElementById('checkSheet').classList.add('on'); runCheck(); }
 function closeCheck(){ document.getElementById('checkSheet').classList.remove('on'); }
+/* Name + photo (customer_set_profile). The photo is cropped to a 240 px JPEG; vendors see it on the order card. */
+const PE={photo:null, remove:false, changed:false};
+function openProfileEdit(){
+  if(!user) return go('login');
+  PE.photo=user.photo||null; PE.remove=false; PE.changed=false;
+  document.getElementById('peName').value=user.name||'';
+  paintPE(); document.getElementById('profSheet').classList.add('on');
+}
+function closeProfileEdit(){ document.getElementById('profSheet').classList.remove('on'); }
+function paintPE(){
+  const a=document.getElementById('peAv');
+  a.innerHTML = PE.photo ? `<img src="${PE.photo}" alt="" style="width:100%;height:100%;object-fit:cover">` : ((user&&user.name)||'?')[0].toUpperCase();
+  document.getElementById('peRemove').style.display = PE.photo ? '' : 'none';
+}
+function shrinkPhoto(file, size){
+  return new Promise((res,rej)=>{
+    const img=new Image(), u=URL.createObjectURL(file);
+    img.onload=()=>{ const c=document.createElement('canvas'); c.width=c.height=size;
+      const m=Math.min(img.width,img.height), x=(img.width-m)/2, y=(img.height-m)/2;
+      c.getContext('2d').drawImage(img,x,y,m,m,0,0,size,size); URL.revokeObjectURL(u); res(c.toDataURL('image/jpeg',0.82)); };
+    img.onerror=()=>{ URL.revokeObjectURL(u); rej(); };
+    img.src=u;
+  });
+}
+function pickProfilePhoto(inp){
+  const f=inp.files&&inp.files[0]; inp.value='';
+  if(!f || !f.type.startsWith('image/')) return toast(T('Pick a photo','कोई फ़ोटो चुनें'));
+  shrinkPhoto(f,240).then(u=>{ PE.photo=u; PE.remove=false; PE.changed=true; paintPE(); })
+    .catch(()=>toast(T('Could not open that photo','फ़ोटो नहीं खुली')));
+}
+async function saveProfileEdit(){
+  const name=document.getElementById('peName').value.trim();
+  if(!name) return toast(T('Enter your name','नाम डालें'));
+  const b=document.getElementById('peSave'); b.classList.add('busy');
+  const r = DEMO ? {ok:true, data:{name, photo_url:PE.remove?null:PE.photo}}
+                 : await rpc('customer_set_profile',{p_name:name, p_photo: PE.changed ? PE.photo : null, p_remove_photo: PE.remove});
+  b.classList.remove('busy');
+  if(!r.ok) return toast(r.msg||T('Could not save','सेव नहीं हुआ'));
+  user.name=r.data.name; user.photo=r.data.photo_url||null;
+  try{ localStorage.setItem('rb_vox_name', String(user.name).split(/\s+/)[0]); }catch(e){}
+  renderAcct(); paintHeaderIdentity(); closeProfileEdit();
+  toast(T('Saved','सेव हो गया'));
+}
 /* Saved items = the products the customer tapped ♥ on (customer_toggle_favourite; loaded with customer_home) */
 async function openSaved(){
   if(!DEMO && !user){ toast(T('Log in to see your saved items','सेव किया सामान देखने के लिए लॉगिन करें')); return go('login'); }
@@ -5298,7 +5502,7 @@ async function renderBookings(){
         ${(bk.billReady||(DEMO&&bk.status==='reached'))?`<button class="btn-g" onclick="openBill('${bk.code}')">${T('See final bill','फ़ाइनल बिल देखें')}</button>`:''}
         ${(bk.raw_status==='delivered'||bk.status==='completed')&&!bk.rated?`<button class="btn-g" onclick="openRate('${bk.code}')">${T('Rate the vendor','वेंडर को रेटिंग दें')}</button>`:''}
         ${bk.status==='completed'?`<button class="pill" onclick="reorder('${bk.code}')">${T('Order again','फिर से ऑर्डर')}</button>`:''}
-        <button class="pill" onclick="callVendor('${bk.code}')">📞 ${T('Call vendor','वेंडर को कॉल करें')}</button>
+        <button class="pill" onclick="callVendor('${bk.code}')">${bk.vendorPhoto?`<img src="${bk.vendorPhoto}" alt="" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:-6px;margin-right:4px">`:'📞 '}${bk.vendorName?bk.vendorName+' · ':''}${T('Call','कॉल करें')}</button>
       </div>
     </div>`;
   }).join('');
@@ -5487,7 +5691,12 @@ function renderAcct(){
   document.getElementById('profPhone').textContent = user
     ? (user.email ? user.email + (user.phone?' · +91 '+user.phone:'') : '+91 '+user.phone)
     : T('Not logged in','लॉगिन नहीं किया');
-  document.getElementById('avLetter').textContent = (user?user.name:'G')[0].toUpperCase();
+  const av=document.getElementById('avLetter');
+  if(user && user.photo) av.innerHTML=`<img src="${user.photo}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+  else av.textContent = (user&&user.name?user.name:'G')[0].toUpperCase();
+  av.parentNode.style.cursor = user ? 'pointer' : '';
+  av.parentNode.onclick = user ? openProfileEdit : null;
+  const ed=document.getElementById('profEdit'); if(ed) ed.style.display = user ? '' : 'none';
   document.getElementById('profBtn').style.display = user?'none':'inline-flex';
   const so=document.getElementById('signOutRow');
   if(so){ so.style.display = user?'flex':'none';
@@ -5723,6 +5932,111 @@ function greet(){
 }
 function paintVoiceRow(){ const el=document.getElementById('voiceRowState'); if(el) el.textContent = VOX.on ? T('On','चालू') : T('Off','बंद'); }
 function toggleVoiceSetting(){ setVoice(!VOX.on); paintVoiceRow(); if(VOX.on) playVoice('greet', T('Voice is on.','आवाज़ चालू है।')); }
+
+/* ---------- Vector icons instead of emojis (4 Oct 2026) ----------
+   Outline icons (Lucide style, inline SVG, no download). The page's text still contains emojis in the code;
+   emojiToIcons() turns every emoji that reaches the screen — static markup, rendered lists, toasts, translated
+   text — into the matching icon, and a MutationObserver keeps doing it as the page changes. Unknown emojis are
+   removed. ic(name) gives an icon for new code. */
+const ICO={
+  home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',
+  basket:'<path d="m15 11-1 9"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4"/><path d="M4.5 15.5h15"/><path d="m5 11 4-7"/><path d="m9 11 1 9"/>',
+  cart:'<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
+  list:'<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/>',
+  user:'<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>',
+  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  belloff:'<path d="M8.7 3A6 6 0 0 1 18 8a21.3 21.3 0 0 0 .6 5"/><path d="M17 17H3s3-2 3-9a4.67 4.67 0 0 1 .3-1.7"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path d="m2 2 20 20"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  mic:'<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',
+  pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  star:'<path class="f" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>',
+  heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+  heartf:'<path class="f" d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+  store:'<path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-2-1 2.7 2.7 0 0 1-4 0 2.7 2.7 0 0 1-4 0 2.7 2.7 0 0 1-4 0 2.7 2.7 0 0 1-2 1 2 2 0 0 1-2-2V7"/>',
+  truck:'<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>',
+  phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  mobile:'<rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/>',
+  chat:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+  apple:'<path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/>',
+  carrot:'<path d="M2.27 21.7s9.87-3.5 12.73-6.36a4.5 4.5 0 0 0-6.36-6.37C5.77 11.84 2.27 21.7 2.27 21.7zM8.64 14l-2.05-2.04M15.34 15l-2.46-2.46"/><path d="M22 9s-1.33-2-3.5-2C16.86 7 15 9 15 9s1.33 2 3.5 2S22 9 22 9z"/><path d="M15 2s-2 1.33-2 3.5S15 9 15 9s2-1.84 2-3.5C17 3.33 15 2 15 2z"/>',
+  onion:'<path d="M12 2.5c0 2-.8 3.2-.8 3.2"/><path d="M12 6c4.2 1 7 4.6 7 8.4A7 7 0 0 1 12 21a7 7 0 0 1-7-6.6C5 10.6 7.8 7 12 6Z"/><path d="M12 6c-2 2.2-3 5.2-3 8.2s1 5.2 3 6.8M12 6c2 2.2 3 5.2 3 8.2s-1 5.2-3 6.8"/>',
+  potato:'<path d="M6.5 7.5C9.5 3.5 18 3.7 19.5 9.5S17.6 20.5 11.5 20.5 3.6 16.6 4.8 12.6c.5-1.7.8-3.4 1.7-5.1Z"/><path d="M10 10h.01M14.5 13.5h.01M12.5 8h.01M9 15h.01"/>',
+  wheat:'<path d="M2 22 16 8"/><path d="M3.47 12.53 5 11l1.53 1.53a3.5 3.5 0 0 1 0 4.94L5 19l-1.53-1.53a3.5 3.5 0 0 1 0-4.94ZM7.47 8.53 9 7l1.53 1.53a3.5 3.5 0 0 1 0 4.94L9 15l-1.53-1.53a3.5 3.5 0 0 1 0-4.94ZM11.47 4.53 13 3l1.53 1.53a3.5 3.5 0 0 1 0 4.94L13 11l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z"/><path d="M20 2h2v2a4 4 0 0 1-4 4h-2V6a4 4 0 0 1 4-4Z"/>',
+  zap:'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+  sunrise:'<path d="M12 2v8M4.93 10.93l1.41 1.41M2 18h2M20 18h2M19.07 10.93l-1.41 1.41M22 22H2M8 6l4-4 4 4M16 18a4 4 0 0 0-8 0"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+  sunset:'<path d="M12 10V2M4.93 10.93l1.41 1.41M2 18h2M20 18h2M19.07 10.93l-1.41 1.41M22 22H2M16 6l-4 4-4-4M16 18a4 4 0 0 0-8 0"/>',
+  sparkle:'<path d="M12 3l1.9 5.8L20 10.5l-6.1 1.7L12 18l-1.9-5.8L4 10.5l6.1-1.7Z"/><path d="M5 3v4M3 5h4M19 17v4M17 19h4"/>',
+  trash:'<path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+  lock:'<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/>',
+  vol:'<path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>',
+  volx:'<path d="M11 5 6 9H2v6h4l5 4z"/><path d="m22 9-6 6M16 9l6 6"/>',
+  scale:'<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1ZM2 16l3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10M12 3v18M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>',
+  down:'<path d="m22 17-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/>',
+  up:'<path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/>',
+  flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+  cash:'<rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>',
+  key:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/>',
+  repeat:'<path d="m17 2 4 4-4 4M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 0 1-4 4H3"/>',
+  bulb:'<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5M9 18h6M10 22h4"/>',
+  power:'<path d="M12 2v10M18.4 6.6a9 9 0 1 1-12.77.04"/>',
+  video:'<path d="m16 13 5.22 3.48a.5.5 0 0 0 .78-.42V7.87a.5.5 0 0 0-.75-.43L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
+  pulse:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  mail:'<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  cal:'<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  mega:'<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+  receipt:'<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 17.5v-11"/>',
+  frown:'<circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01"/>',
+  dot:'<circle class="f" cx="12" cy="12" r="5"/>',
+  camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+  edit:'<path d="M12 20h9"/><path d="M16.38 3.62a1 1 0 0 1 3 3L7.37 18.64a2 2 0 0 1-.85.5l-2.87.84a.5.5 0 0 1-.62-.62l.84-2.87a2 2 0 0 1 .5-.85z"/>',
+  tag:'<path d="M12.59 2.59A2 2 0 0 0 11.17 2H4a2 2 0 0 0-2 2v7.17a2 2 0 0 0 .59 1.42l8.7 8.7a2.43 2.43 0 0 0 3.42 0l6.58-6.58a2.43 2.43 0 0 0 0-3.42z"/><path d="M7.5 7.5h.01"/>',
+  help:'<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/>',
+  send:'<path d="M14.54 21.69a.5.5 0 0 0 .94-.03l6.5-19a.5.5 0 0 0-.64-.64l-19 6.5a.5.5 0 0 0-.03.94l7.93 3.18a2 2 0 0 1 1.11 1.11z"/><path d="m21.85 2.15-10.94 10.94"/>'
+};
+const EMO_ICON=(()=>{ const m={}, set=(list,n)=>[...list].forEach(c=>m[c]=n);
+  set('📍📌','pin'); set('🧑👤👵','user'); set('🌾','wheat'); set('🥬🥒🫛🫑🌶🥦🍆🌽🥗🌿🫚','leaf'); set('🥕🍠','carrot');
+  set('🧅🧄','onion'); set('🥔','potato'); set('🍎🍒🥭🍐🍅🍍🍈🥥🌰🍌🍊🍇🍉🫐🍓🎃','apple'); set('✅✓✔','check'); set('✕❌✖','x');
+  set('⚡','zap'); set('🔔','bell'); set('🔕','belloff'); set('⭐★🌟','star'); set('♥❤💚','heartf'); set('♡','heart'); set('🧺','basket'); set('🛒','cart');
+  set('🔍🔎','search'); set('🕖🕐⏳⏰⌛','clock'); set('🎉🆕✨','sparkle'); set('🏠','home'); set('📋','list'); set('📉','down'); set('📈','up');
+  set('🏪','store'); set('🗑','trash'); set('🔒','lock'); set('🔥','flame'); set('⚠','alert'); set('🔊','vol'); set('🔇','volx'); set('⚖','scale');
+  set('🔤🌐','globe'); set('📱','mobile'); set('📞☎','phone'); set('🟤🟢🔴','dot'); set('😕😔','frown'); set('📩📨✉','mail'); set('💵💰','cash');
+  set('🎤','mic'); set('🔁🔄','repeat'); set('💡','bulb'); set('🔑','key'); set('⏻','power'); set('🎬','video'); set('💬','chat'); set('🩺','pulse');
+  set('🌅','sunrise'); set('☀','sun'); set('🌇','sunset'); set('🛵🚚','truck'); set('🗓📅','cal'); set('📣','mega'); set('🧾','receipt'); set('📷','camera');
+  return m; })();
+const EMO_RE=/(?:[\u{1F1E6}-\u{1F1FF}]{2})|[\u{1F300}-\u{1FAFF}☀-➿⭐⭕⌚-⏿★♡♥✓✔✕✖]️?(?:‍[\u{1F300}-\u{1FAFF}☀-➿]️?)*/gu;
+function ic(n, cls){ return `<i class="ic${cls?' '+cls:''}" aria-hidden="true"><svg viewBox="0 0 24 24">${ICO[n]||''}</svg></i>`; }
+function emojiToIcons(root){
+  if(!root) return;
+  const walk=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode:n=>{
+    const p=n.parentNode; if(!p || /^(SCRIPT|STYLE|TEXTAREA|svg|SVG|TITLE|OPTION)$/.test(p.nodeName) || p.closest && p.closest('svg')) return NodeFilter.FILTER_REJECT;
+    EMO_RE.lastIndex=0; return EMO_RE.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT; }});
+  const hits=[]; while(walk.nextNode()) hits.push(walk.currentNode);
+  for(const t of hits){
+    const frag=document.createDocumentFragment(); let last=0; const v=t.nodeValue; EMO_RE.lastIndex=0; let m;
+    while((m=EMO_RE.exec(v))){
+      if(m.index>last) frag.appendChild(document.createTextNode(v.slice(last,m.index)));
+      const name=EMO_ICON[m[0].replace(/️/g,'')[0]] || EMO_ICON[[...m[0].replace(/️/g,'')][0]];
+      if(name){ const s=document.createElement('span'); s.innerHTML=ic(name); frag.appendChild(s.firstChild); }
+      last=m.index+m[0].length;
+    }
+    if(last<v.length) frag.appendChild(document.createTextNode(v.slice(last).replace(/^\s+$/,' ')));
+    t.parentNode.replaceChild(frag, t);
+  }
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  emojiToIcons(document.body);
+  new MutationObserver(ms=>{ for(const m of ms){
+    if(m.type==='characterData'){ if(m.target.parentNode) emojiToIcons(m.target.parentNode); }
+    else m.addedNodes.forEach(n=>{ if(n.nodeType===3){ if(n.parentNode) emojiToIcons(n.parentNode); } else if(n.nodeType===1 && !n.classList.contains('ic')) emojiToIcons(n); });
+  }}).observe(document.body,{childList:true,subtree:true,characterData:true});
+});
 
 window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('footAreas').innerHTML = MOCK_AREAS.map(a=>`<li>${a}</li>`).join('');
