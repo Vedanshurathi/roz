@@ -182,6 +182,15 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   session that is not the phone-verified Supabase user for that number. `customer_login_config()` (anon)
   tells the page. The platform/ API still uses the anonymous path — turn OTP on only for the live site.
 - Login is only required at booking time, never to browse.
+- **First-visit voice guide + spoken welcome** (4 Oct 2026). Shared engine in both live sites (`tourStart/tourShow/tourEnd`,
+  `say()`, `VOX`, `afterFirstTouch`; CSS `#tourBg/#tourHole/#tourCard`): spotlight steps with Next/Back/Skip, 🔊 mute, language
+  chips on step 1. Voice = the phone's own speechSynthesis (Google Hindi / Indian English on Android, Lekha on iPhone), so
+  it can say names and rates; browsers allow speech only after the first tap. Customer guide `CUST_TOUR` (`rb_tour_done`)
+  replaces the location pop-up on the first visit: real location step (`detectArea()` now returns its promise; the tour
+  hides while the village picker is open) + notification step + how to order. Later visits: `greet()` shows a navy card,
+  on first tap says “नमस्ते <first name> जी”, rates that changed since the last visit (`rb_rates`, max 4, changed first,
+  then new items) and the tagline “रोज़बाज़ार — स्लॉट बुक करो, ताज़ी सब्ज़ी घर पे पाओ”. `rb_voice='off'` mutes; Account
+  has “Voice welcome & guide” (toggle) and “How to use the app (guide)”.
 - Product images are inline SVG illustrations via `pImg()` / `art()`; a vendor's
   uploaded photo overrides the illustration.
 
@@ -271,6 +280,9 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   cancelled / reassigned / price reminder (`notify_user` pushes for vendors), bill disputed, order missed,
   new rating, item approved/rejected, 20:45 daily summary, password approved/rejected.
 - Migrations `20260926e_vendor_app_notifications.sql`, `20260926f_vendor_phone_password.sql`.
+- **First-login guide** `VEND_TOUR` (`rb_vtour_done`, `maybeVendorGuide()` from `go('home')`): notifications, location
+  (`vendorLocate()` sets `BASE`), stock, slots, order steps with the real button labels, dashboard. Profile → “🧭 How to use
+  the app (guide)”. Same engine/voice as the customer site; no spoken welcome on the vendor side.
 - **Dashboard tab** (was "Earnings"): `vendor_dashboard(p_from, p_to)` (migration `20260926k_vendor_dashboard.sql`)
   returns total sale, orders, avg, cash/UPI, commission (`commission_rate()` % of the sale — owed by the
   vendor, customers pay nothing extra), what the vendor keeps, booked/cancelled/missed, daily (or monthly

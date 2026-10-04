@@ -769,6 +769,39 @@ body.has-nav .scr{padding-bottom:200px}
   .birow .stepper{margin-left:64px}
   .birow .rm{margin-left:auto}
 }
+/* ---------- first-time guide + voice (4 Oct 2026) ---------- */
+#tourBg{position:fixed;inset:0;z-index:9990;background:transparent;touch-action:none}
+#tourBg.dim{background:rgba(16,27,48,.62)}
+#tourHole{position:fixed;z-index:9991;border-radius:16px;pointer-events:none;display:none;
+  box-shadow:0 0 0 3px #7ECB53,0 0 0 200vmax rgba(16,27,48,.62);transition:all .32s cubic-bezier(.22,1,.36,1)}
+#tourCard{position:fixed;z-index:9992;left:12px;right:12px;max-width:456px;margin:0 auto;background:#fff;color:#16150F;
+  border-radius:22px;padding:16px 18px 16px;box-shadow:0 18px 50px rgba(16,27,48,.35);
+  font-family:-apple-system,'Segoe UI',Roboto,'Noto Sans',Arial,sans-serif;animation:tourIn .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes tourIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+#tourCard .tc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+#tourCard .tc-dots{display:flex;gap:4px;flex:1;flex-wrap:wrap}
+#tourCard .tc-dots i{width:7px;height:7px;border-radius:9px;background:#E9E5DD;transition:all .2s}
+#tourCard .tc-dots i.on{width:20px;background:#1E8E3E}
+#tourCard .tc-ic{border:0;background:#F3F2EF;border-radius:12px;height:34px;min-width:34px;padding:0 10px;font-weight:800;
+  font-size:13px;color:#5B564C;cursor:pointer}
+#tourCard .tc-em{font-size:34px;line-height:1;margin:2px 0 6px}
+#tourCard b.tc-t{display:block;font-size:18px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px}
+#tourCard p{font-size:15px;font-weight:600;line-height:1.5;color:#5B564C;margin:0}
+#tourCard .tc-lang{display:flex;gap:8px;margin-top:12px}
+#tourCard .tc-lang button{flex:1;border:2px solid #E9E5DD;background:#fff;border-radius:14px;padding:10px;font-weight:800;font-size:15px;cursor:pointer}
+#tourCard .tc-lang button.on{border-color:#1E8E3E;background:#E7F5DD;color:#14682c}
+#tourCard .tc-btns{display:flex;gap:8px;margin-top:14px}
+#tourCard .tc-btns button{flex:1;border:0;border-radius:14px;padding:13px 10px;font-weight:800;font-size:15px;cursor:pointer;
+  transition:transform .15s cubic-bezier(.34,1.56,.64,1)}
+#tourCard .tc-btns button:active{transform:scale(.95)}
+#tourCard .tc-go{background:#1E8E3E;color:#fff;box-shadow:0 6px 16px rgba(30,142,62,.3)}
+#tourCard .tc-go[disabled]{opacity:.6}
+#tourCard .tc-sec{background:#F3F2EF;color:#16150F;flex:0 0 auto!important;padding-left:16px!important;padding-right:16px!important}
+#tourCard .tc-speak{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:#1E8E3E;margin-top:8px;min-height:16px}
+#tourCard .tc-speak i{display:inline-block;width:3px;height:10px;background:#1E8E3E;border-radius:2px;animation:tcBar .8s ease-in-out infinite}
+#tourCard .tc-speak i:nth-child(2){animation-delay:.15s}#tourCard .tc-speak i:nth-child(3){animation-delay:.3s}
+@keyframes tcBar{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1.3)}}
+@media (prefers-reduced-motion:reduce){#tourCard,#tourHole,#greetCard{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -1823,7 +1856,7 @@ function go(s){
   document.querySelectorAll('.duty-nav button').forEach(b=>b.classList.toggle('on', b.dataset.dn===s));
   const fab=document.getElementById('fabContact');
   if(fab) fab.style.display = ['contact','login','setpw','run','bill','pay','code','item','stock','slots'].includes(s) ? 'none' : 'flex';
-  if(s==='home'){ RUN_DAY=0; renderHome(); }   /* the nav button says "Today" — it should mean it */
+  if(s==='home'){ RUN_DAY=0; renderHome(); maybeVendorGuide(); }   /* the nav button says "Today" — it should mean it */
   if(s==='run')   renderRun();
   if(s==='bill')  renderBill();
   if(s==='code')  renderCode();
@@ -1998,7 +2031,8 @@ function pwCard(){
       <input class="fld" id="cpw2" type="password" autocomplete="new-password">
       <button class="btn btn-g btn-sm" style="margin-top:14px" onclick="requestPasswordChange()">${first?T('Save password','पासवर्ड सेव करो'):T('Send to admin for approval','एडमिन को अप्रूवल के लिए भेजो')}</button>
     </div>
-    <button class="btn btn-out" style="margin-top:4px" onclick="vendorLogout()">🚪 ${T('Log out','लॉग आउट')}</button>`;
+    <button class="btn btn-out" style="margin-top:4px" onclick="openVendorGuide()">🧭 ${T('How to use the app (guide)','ऐप कैसे चलाएँ (गाइड)')}</button>
+    <button class="btn btn-out" style="margin-top:8px" onclick="vendorLogout()">🚪 ${T('Log out','लॉग आउट')}</button>`;
 }
 async function vendorLogout(){
   if(!confirm(T('Log out of this phone?','इस फ़ोन से लॉग आउट करें?'))) return;
@@ -4480,6 +4514,197 @@ function burst(host){
     s.style.animation=`fly ${.62+Math.random()*.3}s ${.4+i*.016}s var(--ez) forwards`;
     host.appendChild(s);
   }
+}
+
+/* ---------- Voice + first-time guide (4 Oct 2026) ----------
+   Voice = the phone's own text-to-speech (speechSynthesis): on Android that is Google's Hindi /
+   Indian-English voice, on iPhone "Lekha". Nothing is downloaded and the text can include the
+   person's name and today's rates. Browsers only allow speech after the person has touched the
+   page once, so speech waits for the first tap (afterFirstTouch). rb_voice = 'off' mutes it. */
+const VOX={ ok: typeof window.speechSynthesis!=='undefined' && typeof window.SpeechSynthesisUtterance!=='undefined',
+  on: (()=>{ try{ return localStorage.getItem('rb_voice')!=='off'; }catch(e){ return true; } })(), busy:false };
+if(VOX.ok){ try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices(); }catch(e){ VOX.ok=false; } }
+function voxVoice(lang){
+  let vs=[]; try{ vs=speechSynthesis.getVoices()||[]; }catch(e){}
+  const want = lang==='hi' ? ['hi-in','hi'] : ['en-in','en-gb','en-us','en'];
+  for(const w of want){
+    const m=vs.filter(v=>String(v.lang||'').replace('_','-').toLowerCase().startsWith(w));
+    if(m.length) return m.find(v=>/google|lekha|natural|neural|online/i.test(v.name)) || m[0];
+  }
+  return null;
+}
+function voxStop(){ VOX.busy=false; if(VOX.ok) try{ speechSynthesis.cancel(); }catch(e){} paintSpeaking(); }
+/* speaks text in the app's current language, sentence by sentence (Chrome cuts long utterances) */
+function say(text, onend){
+  const done=()=>{ VOX.busy=false; paintSpeaking(); onend&&onend(); };
+  if(!VOX.ok || !VOX.on || !text) { onend&&onend(); return false; }
+  try{ speechSynthesis.cancel(); }catch(e){}
+  const parts=String(text).split(/(?<=[.!?।])\s+/).map(s=>s.trim()).filter(Boolean);
+  const lang=LANG==='hi'?'hi':'en', v=voxVoice(lang);
+  VOX.busy=true; paintSpeaking();
+  parts.forEach((p,i)=>{
+    const u=new SpeechSynthesisUtterance(p);
+    u.lang = lang==='hi' ? 'hi-IN' : 'en-IN'; if(v) u.voice=v;
+    u.rate = lang==='hi' ? .95 : 1; u.pitch = 1.04;
+    if(i===parts.length-1){ u.onend=done; }
+    u.onerror=e=>{ if(i===parts.length-1 || (e&&e.error==='not-allowed')) done(); };
+    try{ speechSynthesis.speak(u); }catch(e){ done(); }
+  });
+  return true;
+}
+function setVoice(on){ VOX.on=!!on; try{ localStorage.setItem('rb_voice', on?'on':'off'); }catch(e){} if(!on) voxStop(); }
+function afterFirstTouch(fn){
+  if(navigator.userActivation && navigator.userActivation.hasBeenActive) return fn();
+  const evs=['pointerdown','keydown','touchstart'];
+  const h=()=>{ evs.forEach(e=>removeEventListener(e,h,true)); setTimeout(fn,60); };
+  evs.forEach(e=>addEventListener(e,h,true));
+}
+function paintSpeaking(){
+  const el=document.getElementById('tourSpeak');
+  if(el) el.innerHTML = VOX.busy ? '<i></i><i></i><i></i> '+T('Speaking…','बोल रहे हैं…') : '';
+  const g=document.getElementById('greetWave'); if(g) g.style.visibility = VOX.busy ? 'visible' : 'hidden';
+}
+
+/* ---- guide engine: steps = [{em, en:[title,text], hi:[title,text], sel?, act?, actEn?, actHi?, skip?, lang?}] ---- */
+let TOUR=null;
+function tourStart(steps, key, onEnd){
+  if(TOUR) return;
+  TOUR={steps, i:0, key, onEnd};
+  const bg=document.createElement('div'); bg.id='tourBg';
+  const hole=document.createElement('div'); hole.id='tourHole';
+  const card=document.createElement('div'); card.id='tourCard'; card.setAttribute('role','dialog');
+  document.body.append(bg, hole, card);
+  addEventListener('resize', tourPlace); addEventListener('scroll', tourPlace, true);
+  tourShow();
+}
+function tourEnd(){
+  if(!TOUR) return;
+  const t=TOUR; TOUR=null; voxStop();
+  ['tourBg','tourHole','tourCard'].forEach(id=>{ const e=document.getElementById(id); if(e) e.remove(); });
+  removeEventListener('resize', tourPlace); removeEventListener('scroll', tourPlace, true);
+  try{ localStorage.setItem(t.key,'1'); }catch(e){}
+  t.onEnd && t.onEnd();
+}
+function tourTarget(){
+  const s=TOUR && TOUR.steps[TOUR.i]; if(!s || !s.sel) return null;
+  const list=[].concat(s.sel);
+  for(const q of list){
+    const el=[...document.querySelectorAll(q)].find(e=>{ const r=e.getBoundingClientRect(); return r.width>0 && r.height>0 && r.bottom>0 && r.top<innerHeight+2000 && getComputedStyle(e).visibility!=='hidden' && !(r.top>=innerHeight && getComputedStyle(e).position==='fixed'); });
+    if(el) return el;
+  }
+  return null;
+}
+function tourPlace(){
+  if(!TOUR) return;
+  const el=tourTarget(), hole=document.getElementById('tourHole'), bg=document.getElementById('tourBg'), card=document.getElementById('tourCard');
+  if(!hole||!card) return;
+  if(!el){ hole.style.display='none'; bg.classList.add('dim');
+    card.style.top=''; card.style.bottom='calc(16px + env(safe-area-inset-bottom))'; return; }
+  const r=el.getBoundingClientRect(), pad=6;
+  bg.classList.remove('dim'); hole.style.display='block';
+  Object.assign(hole.style,{left:(r.left-pad)+'px', top:(r.top-pad)+'px', width:(r.width+pad*2)+'px', height:(r.height+pad*2)+'px'});
+  if(r.top+r.height/2 > innerHeight/2){ card.style.bottom=''; card.style.top='calc(12px + env(safe-area-inset-top))'; }
+  else { card.style.top=''; card.style.bottom='calc(16px + env(safe-area-inset-bottom))'; }
+}
+async function tourShow(){
+  if(!TOUR) return;
+  const s=TOUR.steps[TOUR.i];
+  if(s.skip){ let sk=false; try{ sk=await s.skip(); }catch(e){} if(sk) return tourGo(1, true); }
+  if(s.before) try{ s.before(); }catch(e){}
+  const [title,text]=LANG==='hi'?s.hi:s.en, n=TOUR.steps.length, last=TOUR.i===n-1;
+  const card=document.getElementById('tourCard');
+  const btns = s.act
+    ? `<button class="tc-sec" onclick="tourGo(1)">${T('Later','बाद में')}</button><button class="tc-go" id="tourAct" onclick="tourDo()">${T(s.actEn,s.actHi)}</button>`
+    : `${TOUR.i>0?`<button class="tc-sec" onclick="tourGo(-1)" aria-label="Back">←</button>`:''}<button class="tc-go" onclick="${last?'tourEnd()':'tourGo(1)'}">${last?T(s.doneEn||'Start',s.doneHi||'शुरू करें'):(TOUR.i===0?T('Start the guide','गाइड शुरू करें'):T('Next','आगे'))} ${last?'':'→'}</button>`;
+  card.innerHTML=`<div class="tc-top"><div class="tc-dots">${TOUR.steps.map((x,i)=>`<i class="${i===TOUR.i?'on':''}"></i>`).join('')}</div>
+      ${VOX.ok?`<button class="tc-ic" onclick="tourVoice()" aria-label="Voice">${VOX.on?'🔊':'🔇'}</button>`:''}
+      ${last?'':`<button class="tc-ic" onclick="tourEnd()">${T('Skip','छोड़ें')}</button>`}</div>
+    <div class="tc-em">${s.em||''}</div><b class="tc-t">${title}</b><p>${text}</p>
+    ${s.lang?`<div class="tc-lang"><button class="${LANG==='en'?'on':''}" onclick="tourLang('en')">English</button><button class="${LANG==='hi'?'on':''}" onclick="tourLang('hi')">हिन्दी</button></div>`:''}
+    <div class="tc-speak" id="tourSpeak"></div>
+    <div class="tc-btns">${btns}</div>`;
+  card.style.animation='none'; void card.offsetWidth; card.style.animation='';
+  const el=tourTarget();
+  if(el){ el.scrollIntoView({block:'center', behavior:'smooth'}); setTimeout(tourPlace, 380); }
+  tourPlace();
+  say((/[.!?।]$/.test(title)?title:title+'.')+' '+text.replace(/<[^>]+>/g,' '));
+}
+function tourGo(d, auto){
+  if(!TOUR) return;
+  const i=TOUR.i+d;
+  if(i<0) return;
+  if(i>=TOUR.steps.length) return tourEnd();
+  TOUR.i=i; tourShow();
+}
+async function tourDo(){
+  const s=TOUR && TOUR.steps[TOUR.i]; if(!s) return;
+  const b=document.getElementById('tourAct'); if(b){ b.disabled=true; b.textContent=T('Please wait…','रुकिए…'); }
+  voxStop();
+  try{ await s.act(); }catch(e){}
+  if(!TOUR) return;
+  if(s.wait){ const card=document.getElementById('tourCard'), bg=document.getElementById('tourBg'), hole=document.getElementById('tourHole');
+    let w=0; while(TOUR && s.wait() && w<600){ [card,bg,hole].forEach(x=>x&&(x.style.visibility='hidden')); await new Promise(r=>setTimeout(r,500)); w++; }
+    [card,bg,hole].forEach(x=>x&&(x.style.visibility='')); }
+  tourGo(1);
+}
+function tourVoice(){ setVoice(!VOX.on); if(TOUR) tourShow(); }
+function tourLang(l){ setLang(l); if(TOUR) tourShow(); }
+
+/* Vendor first-login guide (rb_vtour_done) — Hindi by default like the rest of the app. */
+function vendorLocate(){
+  return new Promise(res=>{
+    if(!navigator.geolocation) return res();
+    navigator.geolocation.getCurrentPosition(
+      pos=>{ BASE={lat:pos.coords.latitude, lng:pos.coords.longitude, acc:pos.coords.accuracy}; areasGeoLoaded=false;
+             toast(T('Location on — nearby villages will show distance','लोकेशन चालू — पास के गाँव की दूरी दिखेगी')); res(); },
+      err=>{ toast(err.code===1?T('Permission denied — you can turn it on later in Profile → Area','परमिशन नहीं मिली — बाद में प्रोफ़ाइल → इलाका में चालू कर सकते हो'):T('Could not find you right now','अभी लोकेशन नहीं मिली')); res(); },
+      {enableHighAccuracy:true, timeout:12000, maximumAge:0});
+  });
+}
+const VEND_TOUR=[
+  {em:'🙏', lang:true,
+   en:['Welcome to the RozBazaar vendor app!','Learn in one minute how to take orders and get paid. Choose your language below.'],
+   hi:['रोज़बाज़ार वेंडर ऐप में स्वागत है!','एक मिनट में सीखो कि ऑर्डर कैसे लेने हैं और पैसे कैसे मिलते हैं। नीचे अपनी भाषा चुनो।']},
+  {em:'🔔', act:()=>askNotifVendor(), actEn:'🔔 Turn on notifications', actHi:'🔔 सूचनाएँ चालू करो',
+   skip:()=>!('Notification' in window) || Notification.permission!=='default',
+   en:['Turn on notifications','Your phone will ring as soon as a new order comes. Tap the button, then “Allow”.'],
+   hi:['सूचनाएँ चालू करो','नया ऑर्डर आते ही फ़ोन पर घंटी बजेगी। बटन दबाओ, फिर “Allow” दबाओ।']},
+  {em:'📍', act:()=>vendorLocate(), actEn:'📍 Turn on location', actHi:'📍 लोकेशन चालू करो',
+   skip:async()=>{ if(!navigator.geolocation) return true;
+     try{ const st=await navigator.permissions.query({name:'geolocation'}); if(st.state!=='prompt'){ if(st.state==='granted') vendorLocate(); return true; } }catch(e){}
+     return false; },
+   en:['Turn on location','We use it to show which villages are near you and how far they are. Tap “Allow”.'],
+   hi:['लोकेशन चालू करो','इससे दिखेगा कि कौन से गाँव आपके पास हैं और कितनी दूर हैं। “Allow” दबाओ।']},
+  {em:'🥬', sel:['.bn [data-bn="stock"]','.duty-nav [data-dn="stock"]'],
+   en:['Stock & rates','Every morning put today’s rate and stock of your items here. Customers see exactly these rates.'],
+   hi:['स्टॉक और रेट','हर सुबह यहाँ अपने सामान का आज का रेट और स्टॉक डालो। ग्राहक यही रेट देखेंगे।']},
+  {em:'🕖', sel:['.bn [data-bn="slots"]','.duty-nav [data-dn="slots"]'],
+   en:['Slots','Tell us how many orders you can take in the morning, afternoon and evening, and which villages you go to.'],
+   hi:['स्लॉट','बताओ कि सुबह, दोपहर और शाम में कितने ऑर्डर ले सकते हो और किस गाँव जाओगे।']},
+  {em:'📋', sel:['#runList'],
+   en:['New orders show here','When an order comes it appears here. At slot time tap “I’m on the way”.'],
+   hi:['नए ऑर्डर यहाँ दिखेंगे','ऑर्डर आते ही यहाँ दिखेगा। स्लॉट के समय “रास्ते में हूँ” दबाओ।']},
+  {em:'⚖️',
+   en:['Reach, weigh, send the bill','At the house tap “Reached — make bill”, weigh in front of the customer, enter the real quantity and tap “Send to customer”.'],
+   hi:['पहुँचो, तौलो, बिल भेजो','घर पहुँचकर “पहुँच गया — बिल बनाओ” दबाओ, ग्राहक के सामने तौलो, असली मात्रा डालो और “ग्राहक को भेजो” दबाओ।']},
+  {em:'💵',
+   en:['Take the payment','The customer pays you directly. Tap “Cash received” or “UPI received”.'],
+   hi:['पैसे लो','ग्राहक सीधे आपको पैसे देगा। फिर “नकद मिल गया” या “UPI मिल गया” दबाओ।']},
+  {em:'🔑',
+   en:['Enter the customer’s code','Ask the customer for their 4-digit delivery code and type it in — the order is complete.'],
+   hi:['ग्राहक का कोड डालो','ग्राहक से उसका 4 अंकों का डिलीवरी कोड पूछो और डालो — ऑर्डर पूरा!']},
+  {em:'📊', sel:['.bn [data-bn="earn"]','.duty-nav [data-dn="earn"]'],
+   en:['Dashboard','See today’s sale, cash and UPI, and what you keep.'],
+   hi:['डैशबोर्ड','यहाँ आज की बिक्री, नकद-UPI और आपकी कमाई देखो।']},
+  {em:'🎉', doneEn:'Start', doneHi:'शुरू करो',
+   en:['All set!','You can open this guide again from Profile.'],
+   hi:['सब तैयार!','यह गाइड प्रोफ़ाइल में दोबारा खोल सकते हो।']}
+];
+function openVendorGuide(){ go('home'); setTimeout(()=>tourStart(VEND_TOUR,'rb_vtour_done'), 250); }
+function maybeVendorGuide(){
+  if(DEMO || !VENDOR || TOUR) return;
+  try{ if(localStorage.getItem('rb_vtour_done')) return; }catch(e){ return; }
+  setTimeout(()=>{ if(!TOUR && (document.querySelector('.scr.on')||{}).id==='s-home') tourStart(VEND_TOUR,'rb_vtour_done'); }, 900);
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
