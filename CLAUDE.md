@@ -186,9 +186,9 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   on Vedanshu's request — don't bring it back unasked). Shared code in both live sites: `introVoice()`, `playVoice()`, `say()`,
   `VOX`, `afterFirstTouch` + `#greetCard` CSS. Recorded MP3s in `voice/hi|en/` (Kokoro: `hf_alpha` Hindi, `af_heart` English;
   upload the `voice/` folder with the site): customer `greet` = “नमस्ते! आपका स्वागत है रोज़बाज़ार में। आपकी सब्ज़ी, आपका
-  भरोसेमंद वेंडर, आपके टाइम पर।”, `greet_n` = same without “नमस्ते”. Sound allowed at load → full recording at once (no name);
-  otherwise on the first tap: phone voice says “नमस्ते <first name> जी!” (only if logged in) + `greet_n`. The card always shows
-  the name. Customer then says rates changed since the last visit (`rb_rates`, max 4) with the phone voice. `rb_voice='off'`
+  भरोसेमंद वेंडर, आपके टाइम पर।”, `greet_n` = same without “नमस्ते”. **Logged in** (saved `sb-…-auth-token`): always waits for
+  the first tap so the phone voice can say “नमस्ते <first name> जी!” (browsers allow speechSynthesis only after a tap) + `greet_n`;
+  the name is cached in `rb_vox_name` for the next reload. **Guest**: full `greet` at once if sound is allowed, else on the first tap. Customer then says rates changed since the last visit (`rb_rates`, max 4) with the phone voice. `rb_voice='off'`
   mutes (🔇 on the card; Account → “Voice welcome” toggles).
 - Product images are inline SVG illustrations via `pImg()` / `art()`; a vendor's
   uploaded photo overrides the illustration.

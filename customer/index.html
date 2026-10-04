@@ -5571,31 +5571,42 @@ function afterFirstTouch(fn){
 }
 function paintSpeaking(){ const g=document.getElementById('greetWave'); if(g) g.style.visibility = VOX.busy ? 'visible' : 'hidden'; }
 function hideGreet(ms){ setTimeout(()=>{ const g=document.getElementById('greetCard'); if(g){ g.classList.remove('on'); setTimeout(()=>g.remove(),300); } }, ms||0); }
-/* o = {key, getName(), title(name), sub, fallback, after()} */
+/* o = {key, getName(), title(name), sub, fallback, after()}
+   Logged in (a saved Supabase session): the welcome waits for the first tap, because only then may the phone's
+   voice say the name — "नमस्ते <name> जी!" + the recording without "नमस्ते". The name is remembered
+   (rb_vox_name) so it is ready at once on the next reload. Guest: the full recording, at once if allowed. */
+function hasSession(){ try{ return Object.keys(localStorage).some(k=>/^sb-.*-auth-token$/.test(k) && localStorage.getItem(k)); }catch(e){ return false; } }
 function introVoice(o){
   if(!VOX.on || document.getElementById('greetCard')) return;
+  const logged=hasSession();
+  let saved=''; try{ saved=logged ? (localStorage.getItem('rb_vox_name')||'') : ''; if(!logged) localStorage.removeItem('rb_vox_name'); }catch(e){}
+  const nameNow=()=>{ const n=o.getName(); if(n){ try{ localStorage.setItem('rb_vox_name', n); }catch(e){} } return n || saved; };
   const card=document.createElement('div'); card.id='greetCard';
   card.innerHTML=`<div class="gc-tx"><b id="greetTitle"></b><span id="greetSub"></span></div>
     <span class="gc-wave" id="greetWave"><i></i><i></i><i></i></span>
     <button class="gc-x" onclick="event.stopPropagation();setVoice(false);hideGreet();toast(T('Voice off — turn it on again in your account','आवाज़ बंद — अकाउंट में फिर चालू कर सकते हैं'))" aria-label="Voice off">🔇</button>`;
   document.body.appendChild(card); requestAnimationFrame(()=>card.classList.add('on'));
-  const paint=()=>{ const t=document.getElementById('greetTitle'); if(t) t.textContent=o.title(o.getName()); };
-  paint(); document.getElementById('greetSub').textContent=o.sub;
+  const sub=t=>{ const e=document.getElementById('greetSub'); if(e) e.textContent=t; };
+  const paint=()=>{ const t=document.getElementById('greetTitle'); if(t) t.textContent=o.title(nameNow()); };
+  paint(); sub(o.sub);
   let n=0; const nt=setInterval(()=>{ paint(); if(o.getName()||++n>20) clearInterval(nt); }, 250);
   const after=()=>{ if(o.after) o.after(); else hideGreet(1500); };
-  playVoice(o.key, o.fallback, after, ()=>{
-    document.getElementById('greetSub').textContent=T('🔊 Tap anywhere to listen','🔊 सुनने के लिए कहीं भी छुएँ');
+  const withName=async()=>{
+    if(!VOX.on || !document.getElementById('greetCard')) return;
+    sub(o.sub);
+    const t0=Date.now(); while(!nameNow() && logged && Date.now()-t0<2500) await new Promise(r=>setTimeout(r,150));
+    const name=nameNow();
+    const line = name ? (LANG==='hi' ? `नमस्ते ${name} जी!` : `Namaste ${name}!`) : '';
+    if(line && VOX.tts) say(line, ()=>playVoice(o.key+'_n', o.fallback, after));
+    else playVoice(o.key, o.fallback, after);
+  };
+  const waitTap=()=>{
+    sub(T('🔊 Tap anywhere to listen','🔊 सुनने के लिए कहीं भी छुएँ'));
     const drop=setTimeout(()=>hideGreet(), 25000);
-    afterFirstTouch(()=>{
-      clearTimeout(drop);
-      if(!VOX.on || !document.getElementById('greetCard')) return;
-      document.getElementById('greetSub').textContent=o.sub;
-      const name=o.getName();
-      const line = name ? (LANG==='hi' ? `नमस्ते ${name} जी!` : `Namaste ${name}!`) : '';
-      if(line && VOX.tts) say(line, ()=>playVoice(o.key+'_n', o.fallback, after));
-      else playVoice(o.key, o.fallback, after);
-    });
-  });
+    afterFirstTouch(()=>{ clearTimeout(drop); withName(); });
+  };
+  if(logged && VOX.tts) return waitTap();
+  playVoice(o.key, o.fallback, after, waitTap);
 }
 
 /* customer: welcome + the rates that changed since the last visit (rb_rates, max 4) */
