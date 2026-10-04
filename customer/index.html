@@ -1031,6 +1031,11 @@ details summary::-webkit-details-marker{display:none}
 .ic{display:inline-flex;width:1.05em;height:1.05em;vertical-align:-.16em;flex:none;line-height:1}
 .ic svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .ic svg .f{fill:currentColor;stroke:none}
+/* food emojis become small real photos (catalog pictures), not line drawings */
+img.ic.ph{width:1.3em;height:1.3em;border-radius:50%;object-fit:cover;vertical-align:-.3em;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.18);display:inline-block}
+.pt .pe img.ic.ph,.cat-card .ce img.ic.ph,.qt img.ic.ph{border-radius:16px;width:1.4em;height:1.4em;border:2px solid #fff}
+.h-tab .ti img.ic.ph{width:1.25em;height:1.25em;border:2px solid rgba(255,255,255,.85)}
+.pimg .emfall img{width:78%;height:78%;object-fit:cover;border-radius:18px}
 .pv-star .ic,.rstar .ic{color:#F5A623}
 
 /* ADD → quantity stepper (shows how many are in the basket) */
@@ -2613,7 +2618,8 @@ function art(p){
   if(!p) return '';
   if(p.photo) return `<img src="${esc(p.photo)}" alt="${esc(p.en)}" loading="lazy" data-pid="${esc(p.id)}" onerror="artFail(this)">`;
   const sv = ART[p.id] || (p.art_key && ART[p.art_key]);
-  if(!sv) return `<span class="emfall">${ic(p.cat==='fruit'?'apple':p.cat==='onion_potato'?'onion':'leaf')}</span>`;
+  if(!sv){ const e=p.cat==='fruit'?'🍎':p.cat==='onion_potato'?'🧅':'🥬';
+    return `<span class="emfall">${icPhoto(e).replace('class="ic ph"','class="ph"')}</span>`; }
   /* the same vegetable can appear in a rail, a grid and a quad tile at once.
      SVG gradient ids are document-global, so scope them per instance. */
   const u='_'+(_artN++);
@@ -6011,6 +6017,14 @@ const EMO_ICON=(()=>{ const m={}, set=(list,n)=>[...list].forEach(c=>m[c]=n);
   set('🌅','sunrise'); set('☀','sun'); set('🌇','sunset'); set('🛵🚚','truck'); set('🗓📅','cal'); set('📣','mega'); set('🧾','receipt'); set('📷','camera');
   return m; })();
 const EMO_RE=/(?:[\u{1F1E6}-\u{1F1FF}]{2})|[\u{1F300}-\u{1FAFF}☀-➿⭐⭕⌚-⏿★♡♥✓✔✕✖]️?(?:‍[\u{1F300}-\u{1FAFF}☀-➿]️?)*/gu;
+const PHOTO_BASE='https://srvpfyjmwaruebbkqkdj.supabase.co/storage/v1/object/public/item-photos/catalog/';
+const EMO_PHOTO=(()=>{ const m={}, k={'🥬':'p36','🥒':'p15','🫛':'p16','🫑':'p17','🌶':'p13','🥦':'p78','🍆':'p8','🌽':'p40','🥗':'p124',
+  '🌿':'p12','🫚':'p38','🥕':'p14','🍠':'p29','🧅':'p2','🧄':'p3','🥔':'p1','🍎':'p21','🍒':'p52','🥭':'p108','🍐':'p46','🍅':'p6',
+  '🍍':'p45','🍈':'p47','🥥':'p48','🌰':'p100','🍌':'p20','🍊':'p22','🍇':'p24','🍉':'p25','🫐':'p50','🍓':'p52','🎃':'p28'};
+  for(const e in k) m[e]=PHOTO_BASE+k[e]+(k[e]==='p38'?'.png':'.jpg'); return m; })();
+/* real photo for a food emoji; if it can't load, the line icon takes its place */
+function icPhoto(ch){ const u=EMO_PHOTO[ch]; if(!u) return '';
+  return `<img class="ic ph" src="${u}" alt="" loading="lazy" aria-hidden="true" onerror="this.outerHTML=ic('${EMO_ICON[ch]||'leaf'}')">`; }
 function ic(n, cls){ return `<i class="ic${cls?' '+cls:''}" aria-hidden="true"><svg viewBox="0 0 24 24">${ICO[n]||''}</svg></i>`; }
 function emojiToIcons(root){
   if(!root) return;
@@ -6022,8 +6036,9 @@ function emojiToIcons(root){
     const frag=document.createDocumentFragment(); let last=0; const v=t.nodeValue; EMO_RE.lastIndex=0; let m;
     while((m=EMO_RE.exec(v))){
       if(m.index>last) frag.appendChild(document.createTextNode(v.slice(last,m.index)));
-      const name=EMO_ICON[m[0].replace(/️/g,'')[0]] || EMO_ICON[[...m[0].replace(/️/g,'')][0]];
-      if(name){ const s=document.createElement('span'); s.innerHTML=ic(name); frag.appendChild(s.firstChild); }
+      const ch=[...m[0].replace(/️/g,'')][0], name=EMO_ICON[m[0].replace(/️/g,'')[0]] || EMO_ICON[ch];
+      if(EMO_PHOTO[ch]){ const s=document.createElement('span'); s.innerHTML=icPhoto(ch); frag.appendChild(s.firstChild); }
+      else if(name){ const s=document.createElement('span'); s.innerHTML=ic(name); frag.appendChild(s.firstChild); }
       last=m.index+m[0].length;
     }
     if(last<v.length) frag.appendChild(document.createTextNode(v.slice(last).replace(/^\s+$/,' ')));
