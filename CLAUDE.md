@@ -182,19 +182,14 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   session that is not the phone-verified Supabase user for that number. `customer_login_config()` (anon)
   tells the page. The platform/ API still uses the anonymous path — turn OTP on only for the live site.
 - Login is only required at booking time, never to browse.
-- **First-visit voice guide + spoken welcome** (4 Oct 2026). Shared engine in both live sites (`tourStart/tourShow/tourEnd`,
-  `playVoice()`, `say()`, `VOX`, `afterFirstTouch`, `waitAnswered`; CSS `#tourBg/#tourHole/#tourCard`). **Voice = recorded MP3s**
-  in `voice/hi/*.mp3` + `voice/en/*.mp3` (upload the `voice/` folder with the site): made offline with Kokoro (`hf_alpha` Hindi,
-  `af_heart` English, 40 kbps mono); keys `greet`, `c0`–`c10` (customer), `v0`–`v10` (vendor). If you change a step's text, re-record
-  its line (or it falls back to the phone's speechSynthesis). The phone's voice is used only for changing text (today's rates).
-  Sound is tried at once (installed app usually allowed) and retried on the first tap. Step 1 = big card with big English /
-  हिन्दी buttons; other steps = small card with ONE big pulsing button — nothing advances by itself; permission steps have no
-  "Later" (only Skip, which ends the guide) and move on as soon as the prompt is answered (`waitAnswered`), the GPS / push work
-  continues behind. Customer guide `CUST_TOUR` (`rb_tour_done`) starts 2.15 s after load instead of the location pop-up; the
-  tour hides while the village picker is open (`AREA_SHEET_OPEN`). Every later open/reload: `greet()` immediately shows a navy
-  card (“नमस्ते <name> जी! आपका स्वागत है”) and plays “नमस्ते! आपका स्वागत है रोज़बाज़ार में। आपकी सब्ज़ी, आपका भरोसेमंद
-  वेंडर, आपके टाइम पर।”, then rates changed since the last visit (`rb_rates`, max 4) by device voice + on the card.
-  `rb_voice='off'` mutes; Account has “Voice welcome & guide” (toggle) and “How to use the app (guide)”.
+- **Spoken welcome on every open / reload** (4 Oct 2026; the first-visit step-by-step guide was built and then removed
+  on Vedanshu's request — don't bring it back unasked). Shared code in both live sites: `introVoice()`, `playVoice()`, `say()`,
+  `VOX`, `afterFirstTouch` + `#greetCard` CSS. Recorded MP3s in `voice/hi|en/` (Kokoro: `hf_alpha` Hindi, `af_heart` English;
+  upload the `voice/` folder with the site): customer `greet` = “नमस्ते! आपका स्वागत है रोज़बाज़ार में। आपकी सब्ज़ी, आपका
+  भरोसेमंद वेंडर, आपके टाइम पर।”, `greet_n` = same without “नमस्ते”. Sound allowed at load → full recording at once (no name);
+  otherwise on the first tap: phone voice says “नमस्ते <first name> जी!” (only if logged in) + `greet_n`. The card always shows
+  the name. Customer then says rates changed since the last visit (`rb_rates`, max 4) with the phone voice. `rb_voice='off'`
+  mutes (🔇 on the card; Account → “Voice welcome” toggles).
 - Product images are inline SVG illustrations via `pImg()` / `art()`; a vendor's
   uploaded photo overrides the illustration.
 
@@ -284,9 +279,9 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   cancelled / reassigned / price reminder (`notify_user` pushes for vendors), bill disputed, order missed,
   new rating, item approved/rejected, 20:45 daily summary, password approved/rejected.
 - Migrations `20260926e_vendor_app_notifications.sql`, `20260926f_vendor_phone_password.sql`.
-- **First-login guide** `VEND_TOUR` (`rb_vtour_done`, `maybeVendorGuide()` from `go('home')`): notifications, location
-  (`vendorLocate()` sets `BASE`), stock, slots, order steps with the real button labels, dashboard. Profile → “🧭 How to use
-  the app (guide)”. Same engine/voice as the customer site; no spoken welcome on the vendor side.
+- **Spoken welcome** on every open / reload: `vendorGreet()` (same engine as the customer site), recordings `vgreet` /
+  `vgreet_n` (“नमस्ते! रोज़बाज़ार वेंडर ऐप में आपका स्वागत है। आज के ऑर्डर देखिए, और समय पर पहुँचिए।”), name from
+  `VENDOR.name`. Profile → “🔊 आवाज़ वाला स्वागत: चालू/बंद”.
 - **Dashboard tab** (was "Earnings"): `vendor_dashboard(p_from, p_to)` (migration `20260926k_vendor_dashboard.sql`)
   returns total sale, orders, avg, cash/UPI, commission (`commission_rate()` % of the sale — owed by the
   vendor, customers pay nothing extra), what the vendor keeps, booked/cancelled/missed, daily (or monthly
