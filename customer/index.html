@@ -1014,37 +1014,46 @@ details summary::-webkit-details-marker{display:none}
 .addr-pick .at span{display:block;font-size:12.5px;font-weight:600;color:var(--mut);line-height:1.4;margin-top:2px}
 /* ---------- first-time guide + voice (4 Oct 2026) ---------- */
 #tourBg{position:fixed;inset:0;z-index:9990;background:transparent;touch-action:none}
-#tourBg.dim{background:rgba(16,27,48,.62)}
+#tourBg.dim{background:rgba(16,27,48,.6)}
 #tourHole{position:fixed;z-index:9991;border-radius:16px;pointer-events:none;display:none;
-  box-shadow:0 0 0 3px #7ECB53,0 0 0 200vmax rgba(16,27,48,.62);transition:all .32s cubic-bezier(.22,1,.36,1)}
-#tourCard{position:fixed;z-index:9992;left:12px;right:12px;max-width:456px;margin:0 auto;background:#fff;color:#16150F;
-  border-radius:22px;padding:16px 18px 16px;box-shadow:0 18px 50px rgba(16,27,48,.35);
-  font-family:-apple-system,'Segoe UI',Roboto,'Noto Sans',Arial,sans-serif;animation:tourIn .3s cubic-bezier(.34,1.56,.64,1)}
-@keyframes tourIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
-#tourCard .tc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  box-shadow:0 0 0 3px #7ECB53,0 0 0 200vmax rgba(16,27,48,.6);transition:all .28s cubic-bezier(.22,1,.36,1)}
+#tourCard{position:fixed;z-index:9992;left:10px;right:10px;max-width:460px;margin:0 auto;background:#fff;color:#16150F;
+  border-radius:22px;box-shadow:0 18px 50px rgba(16,27,48,.35);
+  font-family:-apple-system,'Segoe UI',Roboto,'Noto Sans',Arial,sans-serif;animation:tourIn .22s cubic-bezier(.34,1.56,.64,1)}
+#tourCard.big{padding:18px 18px 18px}
+#tourCard.small{padding:10px 12px 12px;border-radius:20px}
+@keyframes tourIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+#tourCard .tc-top{display:flex;align-items:center;gap:6px;margin-bottom:8px}
 #tourCard .tc-dots{display:flex;gap:4px;flex:1;flex-wrap:wrap}
-#tourCard .tc-dots i{width:7px;height:7px;border-radius:9px;background:#E9E5DD;transition:all .2s}
-#tourCard .tc-dots i.on{width:20px;background:#1E8E3E}
-#tourCard .tc-ic{border:0;background:#F3F2EF;border-radius:12px;height:34px;min-width:34px;padding:0 10px;font-weight:800;
-  font-size:13px;color:#5B564C;cursor:pointer}
-#tourCard .tc-em{font-size:34px;line-height:1;margin:2px 0 6px}
-#tourCard b.tc-t{display:block;font-size:18px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px}
-#tourCard p{font-size:15px;font-weight:600;line-height:1.5;color:#5B564C;margin:0}
-#tourCard .tc-lang{display:flex;gap:8px;margin-top:12px}
-#tourCard .tc-lang button{flex:1;border:2px solid #E9E5DD;background:#fff;border-radius:14px;padding:10px;font-weight:800;font-size:15px;cursor:pointer}
+#tourCard .tc-dots i{width:6px;height:6px;border-radius:9px;background:#E9E5DD;transition:all .2s}
+#tourCard .tc-dots i.on{width:18px;background:#1E8E3E}
+#tourCard .tc-ic{border:0;background:#F3F2EF;border-radius:11px;height:32px;min-width:32px;padding:0 9px;font-weight:800;
+  font-size:12.5px;color:#5B564C;cursor:pointer}
+#tourCard.big .tc-em{font-size:40px;line-height:1;margin:2px 0 8px}
+#tourCard.big b.tc-t{display:block;font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:6px}
+#tourCard.big p{font-size:16px;font-weight:600;line-height:1.5;color:#5B564C;margin:0}
+#tourCard .tc-row{display:flex;gap:10px;align-items:flex-start}
+#tourCard.small .tc-em{font-size:26px;line-height:1.1}
+#tourCard.small b.tc-t{display:block;font-size:15.5px;font-weight:800;margin-bottom:2px}
+#tourCard.small p{font-size:13px;font-weight:600;line-height:1.4;color:#5B564C;margin:0;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+#tourCard .tc-lang{display:flex;gap:10px;margin-top:16px}
+#tourCard .tc-lang button{flex:1;border:2.5px solid #E9E5DD;background:#fff;border-radius:16px;padding:16px 10px;font-weight:800;font-size:19px;cursor:pointer}
 #tourCard .tc-lang button.on{border-color:#1E8E3E;background:#E7F5DD;color:#14682c}
-#tourCard .tc-btns{display:flex;gap:8px;margin-top:14px}
-#tourCard .tc-btns button{flex:1;border:0;border-radius:14px;padding:13px 10px;font-weight:800;font-size:15px;cursor:pointer;
-  transition:transform .15s cubic-bezier(.34,1.56,.64,1)}
+#tourCard .tc-btns{display:flex;gap:8px;margin-top:12px}
+#tourCard .tc-btns button{border:0;border-radius:16px;font-weight:800;cursor:pointer;transition:transform .15s cubic-bezier(.34,1.56,.64,1)}
 #tourCard .tc-btns button:active{transform:scale(.95)}
-#tourCard .tc-go{background:#1E8E3E;color:#fff;box-shadow:0 6px 16px rgba(30,142,62,.3)}
-#tourCard .tc-go[disabled]{opacity:.6}
-#tourCard .tc-sec{background:#F3F2EF;color:#16150F;flex:0 0 auto!important;padding-left:16px!important;padding-right:16px!important}
-#tourCard .tc-speak{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:#1E8E3E;margin-top:8px;min-height:16px}
-#tourCard .tc-speak i{display:inline-block;width:3px;height:10px;background:#1E8E3E;border-radius:2px;animation:tcBar .8s ease-in-out infinite}
+#tourCard .tc-go{flex:1;min-height:60px;font-size:19px;background:#1E8E3E;color:#fff;box-shadow:0 8px 20px rgba(30,142,62,.35);
+  animation:tcPulse 1.6s ease-in-out infinite}
+#tourCard .tc-go[disabled]{opacity:.7;animation:none;font-size:15px}
+@keyframes tcPulse{0%,100%{box-shadow:0 8px 20px rgba(30,142,62,.35),0 0 0 0 rgba(30,142,62,.35)}50%{box-shadow:0 8px 20px rgba(30,142,62,.35),0 0 0 8px rgba(30,142,62,0)}}
+#tourCard .tc-sec{flex:0 0 60px;min-height:60px;font-size:20px;background:#F3F2EF;color:#16150F}
+#tourCard .tc-speak{display:inline-flex;align-items:center;gap:3px;min-width:16px}
+#tourCard .tc-speak i{display:inline-block;width:3px;height:12px;background:#1E8E3E;border-radius:2px;animation:tcBar .8s ease-in-out infinite}
 #tourCard .tc-speak i:nth-child(2){animation-delay:.15s}#tourCard .tc-speak i:nth-child(3){animation-delay:.3s}
 @keyframes tcBar{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1.3)}}
-@media (prefers-reduced-motion:reduce){#tourCard,#tourHole,#greetCard{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){#tourCard,#tourHole,#greetCard,#tourCard .tc-go{animation:none!important;transition:none!important}}
+#greetCard{animation:none!important;transition:none!important}}
 #greetCard{position:fixed;z-index:950;left:12px;right:12px;max-width:456px;margin:0 auto;top:calc(10px + env(safe-area-inset-top));
   display:flex;align-items:center;gap:10px;background:#101B30;color:#fff;border-radius:18px;padding:10px 10px 10px 14px;
   box-shadow:0 12px 32px rgba(16,27,48,.3);transform:translateY(-130%);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
@@ -5535,69 +5544,109 @@ function renderAll(){
   renderAcct(); syncCart();
 }
 /* ---------- Voice + first-time guide (4 Oct 2026) ----------
-   Voice = the phone's own text-to-speech (speechSynthesis): on Android that is Google's Hindi /
-   Indian-English voice, on iPhone "Lekha". Nothing is downloaded and the text can include the
-   person's name and today's rates. Browsers only allow speech after the person has touched the
-   page once, so speech waits for the first tap (afterFirstTouch). rb_voice = 'off' mutes it. */
-const VOX={ ok: typeof window.speechSynthesis!=='undefined' && typeof window.SpeechSynthesisUtterance!=='undefined',
-  on: (()=>{ try{ return localStorage.getItem('rb_voice')!=='off'; }catch(e){ return true; } })(), busy:false };
-if(VOX.ok){ try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices(); }catch(e){ VOX.ok=false; } }
+   Voice = recorded MP3s in ./voice/<hi|en>/<key>.mp3 (neural voices, made once with Kokoro:
+   hf_alpha Hindi, af_heart English) for every fixed line; the phone's own speechSynthesis only for
+   lines that change (today's rates). Browsers may block sound until the first tap (an installed
+   app usually may play at once), so playback is tried immediately and retried on the first tap.
+   rb_voice = 'off' mutes everything. */
+const VOX={ tts: typeof window.speechSynthesis!=='undefined' && typeof window.SpeechSynthesisUtterance!=='undefined',
+  on: (()=>{ try{ return localStorage.getItem('rb_voice')!=='off'; }catch(e){ return true; } })(), busy:false, tok:0 };
+VOX.ok = true;
+const VAUD = new Audio(); VAUD.preload='auto';
+if(VOX.tts){ try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices(); }catch(e){ VOX.tts=false; } }
+function voiceUrl(key){ return 'voice/'+(LANG==='hi'?'hi':'en')+'/'+key+'.mp3'; }
+function preloadVoice(key){ try{ const a=new Audio(); a.preload='auto'; a.src=voiceUrl(key); }catch(e){} }
 function voxVoice(lang){
   let vs=[]; try{ vs=speechSynthesis.getVoices()||[]; }catch(e){}
-  const want = lang==='hi' ? ['hi-in','hi'] : ['en-in','en-gb','en-us','en'];
-  for(const w of want){
-    const m=vs.filter(v=>String(v.lang||'').replace('_','-').toLowerCase().startsWith(w));
-    if(m.length) return m.find(v=>/google|lekha|natural|neural|online/i.test(v.name)) || m[0];
-  }
-  return null;
+  const L=v=>String(v.lang||'').replace('_','-').toLowerCase();
+  const pool = vs.filter(v=>L(v).startsWith(lang==='hi'?'hi':'en'));
+  if(!pool.length) return null;
+  /* best first: neural / natural / online voices, then Google's, then Indian accent, then anything */
+  const score=v=>(/natural|neural|online|premium|enhanced/i.test(v.name)?8:0)+(/google/i.test(v.name)?4:0)
+    +(L(v).endsWith('-in')?2:0)+(/female|samantha|lekha|heera|swara|neerja|emma|sonia/i.test(v.name)?1:0)+(v.localService===false?1:0);
+  return pool.slice().sort((a,b)=>score(b)-score(a))[0];
 }
-function voxStop(){ VOX.busy=false; if(VOX.ok) try{ speechSynthesis.cancel(); }catch(e){} paintSpeaking(); }
-/* speaks text in the app's current language, sentence by sentence (Chrome cuts long utterances) */
+function voxStop(){ VOX.tok++; VOX.busy=false; try{ VAUD.pause(); }catch(e){} if(VOX.tts) try{ speechSynthesis.cancel(); }catch(e){} paintSpeaking(); }
+/* device voice — only for changing text */
 function say(text, onend){
   const done=()=>{ VOX.busy=false; paintSpeaking(); onend&&onend(); };
-  if(!VOX.ok || !VOX.on || !text) { onend&&onend(); return false; }
+  if(!VOX.tts || !VOX.on || !text) { onend&&onend(); return false; }
   try{ speechSynthesis.cancel(); }catch(e){}
-  const parts=String(text).split(/(?<=[.!?।])\s+/).map(s=>s.trim()).filter(Boolean);
+  const parts=String(text).split(/(?<=[.!?।;])\s+/).map(s=>s.trim()).filter(Boolean);
   const lang=LANG==='hi'?'hi':'en', v=voxVoice(lang);
   VOX.busy=true; paintSpeaking();
   parts.forEach((p,i)=>{
     const u=new SpeechSynthesisUtterance(p);
-    u.lang = lang==='hi' ? 'hi-IN' : 'en-IN'; if(v) u.voice=v;
-    u.rate = lang==='hi' ? .95 : 1; u.pitch = 1.04;
-    if(i===parts.length-1){ u.onend=done; }
+    u.lang = lang==='hi' ? 'hi-IN' : 'en-IN'; if(v){ u.voice=v; u.lang=v.lang; }
+    u.rate = lang==='hi' ? .95 : .98; u.pitch = 1;
+    if(i===parts.length-1) u.onend=done;
     u.onerror=e=>{ if(i===parts.length-1 || (e&&e.error==='not-allowed')) done(); };
     try{ speechSynthesis.speak(u); }catch(e){ done(); }
   });
   return true;
 }
+/* recorded voice; falls back to the device voice if the file is missing. onblocked = sound needs a tap first */
+function playVoice(key, fallback, onend, onblocked){
+  if(!VOX.on){ onend&&onend(); return; }
+  voxStop();
+  const t=++VOX.tok;
+  let fell=false;
+  const fall=()=>{ if(fell||t!==VOX.tok) return; fell=true; VOX.busy=false; say(fallback, onend); };
+  VAUD.onended=()=>{ if(t!==VOX.tok) return; VOX.busy=false; paintSpeaking(); onend&&onend(); };
+  VAUD.onerror=fall;
+  VAUD.src=voiceUrl(key);
+  VOX.busy=true; paintSpeaking();
+  const p=VAUD.play();
+  if(p && p.catch) p.catch(err=>{
+    if(t!==VOX.tok) return;
+    VOX.busy=false; paintSpeaking();
+    if(err && err.name==='NotAllowedError'){
+      onblocked&&onblocked();
+      afterFirstTouch(()=>{ if(t!==VOX.tok || !VOX.on) return; VOX.busy=true; paintSpeaking(); VAUD.play().catch(()=>{ VOX.busy=false; paintSpeaking(); }); });
+    } else fall();
+  });
+}
 function setVoice(on){ VOX.on=!!on; try{ localStorage.setItem('rb_voice', on?'on':'off'); }catch(e){} if(!on) voxStop(); }
 function afterFirstTouch(fn){
-  if(navigator.userActivation && navigator.userActivation.hasBeenActive) return fn();
+  if(navigator.userActivation && navigator.userActivation.isActive) return fn();
   const evs=['pointerdown','keydown','touchstart'];
-  const h=()=>{ evs.forEach(e=>removeEventListener(e,h,true)); setTimeout(fn,60); };
+  const h=()=>{ evs.forEach(e=>removeEventListener(e,h,true)); setTimeout(fn,30); };
   evs.forEach(e=>addEventListener(e,h,true));
 }
 function paintSpeaking(){
   const el=document.getElementById('tourSpeak');
-  if(el) el.innerHTML = VOX.busy ? '<i></i><i></i><i></i> '+T('Speaking…','बोल रहे हैं…') : '';
+  if(el) el.innerHTML = VOX.busy ? '<i></i><i></i><i></i>' : '';
   const g=document.getElementById('greetWave'); if(g) g.style.visibility = VOX.busy ? 'visible' : 'hidden';
 }
+/* resolves when a permission prompt has been answered (or after ms) — the guide moves on at once,
+   the work behind it (finding the village, saving the push subscription) keeps going */
+function waitAnswered(isPending, ms){
+  return new Promise(res=>{ const t0=Date.now(); (async function tick(){
+    let p=true; try{ p=await isPending(); }catch(e){ p=false; }
+    if(!p || Date.now()-t0>ms) return res(); setTimeout(tick, 250); })(); });
+}
+const geoPending=async()=>{ try{ return (await navigator.permissions.query({name:'geolocation'})).state==='prompt'; }catch(e){ return false; } };
+const notifPending=()=>('Notification' in window) && Notification.permission==='default';
 
-/* ---- guide engine: steps = [{em, en:[title,text], hi:[title,text], sel?, act?, actEn?, actHi?, skip?, lang?}] ---- */
+/* ---- guide engine: steps = [{v (voice key), em, en:[title,text], hi:[title,text], sel?, act?, actEn?, actHi?, skip?, lang?}]
+   Step 1 (language) is a big card; the others are small cards with one big button. Nothing moves on by
+   itself — only the button does; "Skip" ends the guide. ---- */
 let TOUR=null;
-function tourStart(steps, key, onEnd){
+function tourStart(steps, key, onEnd, pauseWhen){
   if(TOUR) return;
-  TOUR={steps, i:0, key, onEnd};
+  TOUR={steps, i:0, key, onEnd, pauseWhen};
   const bg=document.createElement('div'); bg.id='tourBg';
   const hole=document.createElement('div'); hole.id='tourHole';
   const card=document.createElement('div'); card.id='tourCard'; card.setAttribute('role','dialog');
   document.body.append(bg, hole, card);
   addEventListener('resize', tourPlace); addEventListener('scroll', tourPlace, true);
+  if(pauseWhen) TOUR.pt=setInterval(()=>{ const hide=!!pauseWhen(); [bg,hole,card].forEach(x=>x.style.visibility=hide?'hidden':''); if(!hide) tourPlace(); }, 300);
+  steps.forEach(s=>s.v&&preloadVoice(s.v));
   tourShow();
 }
 function tourEnd(){
   if(!TOUR) return;
-  const t=TOUR; TOUR=null; voxStop();
+  const t=TOUR; TOUR=null; voxStop(); clearInterval(t.pt);
   ['tourBg','tourHole','tourCard'].forEach(id=>{ const e=document.getElementById(id); if(e) e.remove(); });
   removeEventListener('resize', tourPlace); removeEventListener('scroll', tourPlace, true);
   try{ localStorage.setItem(t.key,'1'); }catch(e){}
@@ -5605,8 +5654,7 @@ function tourEnd(){
 }
 function tourTarget(){
   const s=TOUR && TOUR.steps[TOUR.i]; if(!s || !s.sel) return null;
-  const list=[].concat(s.sel);
-  for(const q of list){
+  for(const q of [].concat(s.sel)){
     const el=[...document.querySelectorAll(q)].find(e=>{ const r=e.getBoundingClientRect(); return r.width>0 && r.height>0 && r.bottom>0 && r.top<innerHeight+2000 && getComputedStyle(e).visibility!=='hidden' && !(r.top>=innerHeight && getComputedStyle(e).position==='fixed'); });
     if(el) return el;
   }
@@ -5617,37 +5665,43 @@ function tourPlace(){
   const el=tourTarget(), hole=document.getElementById('tourHole'), bg=document.getElementById('tourBg'), card=document.getElementById('tourCard');
   if(!hole||!card) return;
   if(!el){ hole.style.display='none'; bg.classList.add('dim');
-    card.style.top=''; card.style.bottom='calc(16px + env(safe-area-inset-bottom))'; return; }
+    card.style.top=''; card.style.bottom='calc(14px + env(safe-area-inset-bottom))'; return; }
   const r=el.getBoundingClientRect(), pad=6;
   bg.classList.remove('dim'); hole.style.display='block';
   Object.assign(hole.style,{left:(r.left-pad)+'px', top:(r.top-pad)+'px', width:(r.width+pad*2)+'px', height:(r.height+pad*2)+'px'});
-  if(r.top+r.height/2 > innerHeight/2){ card.style.bottom=''; card.style.top='calc(12px + env(safe-area-inset-top))'; }
-  else { card.style.top=''; card.style.bottom='calc(16px + env(safe-area-inset-bottom))'; }
+  if(r.top+r.height/2 > innerHeight/2){ card.style.bottom=''; card.style.top='calc(10px + env(safe-area-inset-top))'; }
+  else { card.style.top=''; card.style.bottom='calc(14px + env(safe-area-inset-bottom))'; }
 }
 async function tourShow(){
   if(!TOUR) return;
   const s=TOUR.steps[TOUR.i];
-  if(s.skip){ let sk=false; try{ sk=await s.skip(); }catch(e){} if(sk) return tourGo(1, true); }
+  if(s.skip){ let sk=false; try{ sk=await s.skip(); }catch(e){} if(sk) return tourGo(1); }
+  if(!TOUR) return;
   if(s.before) try{ s.before(); }catch(e){}
-  const [title,text]=LANG==='hi'?s.hi:s.en, n=TOUR.steps.length, last=TOUR.i===n-1;
+  const [title,text]=LANG==='hi'?s.hi:s.en, n=TOUR.steps.length, last=TOUR.i===n-1, big=!!s.lang;
   const card=document.getElementById('tourCard');
-  const btns = s.act
-    ? `<button class="tc-sec" onclick="tourGo(1)">${T('Later','बाद में')}</button><button class="tc-go" id="tourAct" onclick="tourDo()">${T(s.actEn,s.actHi)}</button>`
-    : `${TOUR.i>0?`<button class="tc-sec" onclick="tourGo(-1)" aria-label="Back">←</button>`:''}<button class="tc-go" onclick="${last?'tourEnd()':'tourGo(1)'}">${last?T(s.doneEn||'Start',s.doneHi||'शुरू करें'):(TOUR.i===0?T('Start the guide','गाइड शुरू करें'):T('Next','आगे'))} ${last?'':'→'}</button>`;
+  card.className = big ? 'big' : 'small';
+  const main = s.act
+    ? `<button class="tc-go" id="tourAct" onclick="tourDo()">${T(s.actEn,s.actHi)}</button>`
+    : `<button class="tc-go" onclick="${last?'tourEnd()':'tourGo(1)'}">${last?T(s.doneEn||'Start',s.doneHi||'शुरू करें'):(TOUR.i===0?T('Start the guide','गाइड शुरू करें'):T('Next','आगे'))}${last?'':' →'}</button>`;
+  const back = (!big && TOUR.i>0 && !s.act) ? `<button class="tc-sec" onclick="tourGo(-1)" aria-label="Back">←</button>` : '';
   card.innerHTML=`<div class="tc-top"><div class="tc-dots">${TOUR.steps.map((x,i)=>`<i class="${i===TOUR.i?'on':''}"></i>`).join('')}</div>
-      ${VOX.ok?`<button class="tc-ic" onclick="tourVoice()" aria-label="Voice">${VOX.on?'🔊':'🔇'}</button>`:''}
+      <span class="tc-speak" id="tourSpeak"></span>
+      <button class="tc-ic" onclick="tourVoice()" aria-label="Voice">${VOX.on?'🔊':'🔇'}</button>
       ${last?'':`<button class="tc-ic" onclick="tourEnd()">${T('Skip','छोड़ें')}</button>`}</div>
-    <div class="tc-em">${s.em||''}</div><b class="tc-t">${title}</b><p>${text}</p>
+    ${big?`<div class="tc-em">${s.em||''}</div><b class="tc-t">${title}</b><p>${text}</p>`
+         :`<div class="tc-row"><span class="tc-em">${s.em||''}</span><div><b class="tc-t">${title}</b><p>${text}</p></div></div>`}
     ${s.lang?`<div class="tc-lang"><button class="${LANG==='en'?'on':''}" onclick="tourLang('en')">English</button><button class="${LANG==='hi'?'on':''}" onclick="tourLang('hi')">हिन्दी</button></div>`:''}
-    <div class="tc-speak" id="tourSpeak"></div>
-    <div class="tc-btns">${btns}</div>`;
+    <div class="tc-btns">${back}${main}</div>`;
   card.style.animation='none'; void card.offsetWidth; card.style.animation='';
   const el=tourTarget();
   if(el){ el.scrollIntoView({block:'center', behavior:'smooth'}); setTimeout(tourPlace, 380); }
   tourPlace();
-  say((/[.!?।]$/.test(title)?title:title+'.')+' '+text.replace(/<[^>]+>/g,' '));
+  const plain=(/[.!?।]$/.test(title)?title:title+'.')+' '+text.replace(/<[^>]+>/g,' ');
+  if(s.v) playVoice(s.v, plain); else say(plain);
+  const nx=TOUR.steps[TOUR.i+1]; if(nx&&nx.v) preloadVoice(nx.v);
 }
-function tourGo(d, auto){
+function tourGo(d){
   if(!TOUR) return;
   const i=TOUR.i+d;
   if(i<0) return;
@@ -5656,13 +5710,9 @@ function tourGo(d, auto){
 }
 async function tourDo(){
   const s=TOUR && TOUR.steps[TOUR.i]; if(!s) return;
-  const b=document.getElementById('tourAct'); if(b){ b.disabled=true; b.textContent=T('Please wait…','रुकिए…'); }
+  const b=document.getElementById('tourAct'); if(b){ b.disabled=true; b.textContent=T('Waiting for your answer…','आपके जवाब का इंतज़ार…'); }
   voxStop();
   try{ await s.act(); }catch(e){}
-  if(!TOUR) return;
-  if(s.wait){ const card=document.getElementById('tourCard'), bg=document.getElementById('tourBg'), hole=document.getElementById('tourHole');
-    let w=0; while(TOUR && s.wait() && w<600){ [card,bg,hole].forEach(x=>x&&(x.style.visibility='hidden')); await new Promise(r=>setTimeout(r,500)); w++; }
-    [card,bg,hole].forEach(x=>x&&(x.style.visibility='')); }
   tourGo(1);
 }
 function tourVoice(){ setVoice(!VOX.on); if(TOUR) tourShow(); }
@@ -5671,46 +5721,46 @@ function tourLang(l){ setLang(l); if(TOUR) tourShow(); }
 /* Customer first-visit guide (rb_tour_done). Location + notification steps ask for real;
    location finds the village by GPS (detectArea → area_from_point). */
 const CUST_TOUR=[
-  {em:'🙏', lang:true,
+  {v:'c0', em:'🙏', lang:true,
    en:['Welcome to RozBazaar!','Learn in one minute how to order fresh vegetables. Choose your language below.'],
    hi:['रोज़बाज़ार में आपका स्वागत है!','एक मिनट में सीखिए कि ताज़ी सब्ज़ी कैसे मँगाएँ। नीचे अपनी भाषा चुनें।']},
-  {em:'📍', act:()=>detectArea(), actEn:'📍 Turn on location', actHi:'📍 लोकेशन चालू करें',
-   wait:()=>document.getElementById('areaSheet').classList.contains('on'),
+  {v:'c1', em:'📍', act:()=>{ detectArea(); return waitAnswered(geoPending, 20000); }, actEn:'📍 Turn on location', actHi:'📍 लोकेशन चालू करें',
    skip:async()=>{ if(!navigator.geolocation) return true;
      try{ const st=await navigator.permissions.query({name:'geolocation'}); if(st.state==='granted'){ detectArea(); return true; } if(st.state==='denied') return true; }catch(e){}
      return false; },
-   en:['Turn on your location','We will find your village by itself and show the vendors and rates there. Tap the button, then tap “Allow”.'],
-   hi:['अपनी लोकेशन चालू करें','हम आपका गाँव अपने आप ढूँढ लेंगे और वहीं के वेंडर और रेट दिखाएँगे। बटन दबाएँ, फिर “Allow” दबाएँ।']},
-  {em:'🔔', act:()=>askNotif(), actEn:'🔔 Turn on notifications', actHi:'🔔 सूचनाएँ चालू करें',
+   en:['Turn on your location','We will find your village by itself and show the vendors and rates there. Tap the green button, then “Allow”.'],
+   hi:['अपनी लोकेशन चालू करें','हम आपका गाँव अपने आप ढूँढ लेंगे और वहीं के वेंडर और रेट दिखाएँगे। हरा बटन दबाएँ, फिर “Allow” दबाएँ।']},
+  {v:'c2', em:'🔔', act:()=>{ askNotif(); return waitAnswered(notifPending, 20000); }, actEn:'🔔 Turn on notifications', actHi:'🔔 सूचनाएँ चालू करें',
    skip:()=>!('Notification' in window) || Notification.permission!=='default',
-   en:['Turn on notifications','We will tell you on your phone when the vendor sets out, arrives and sends the bill. Tap “Allow”.'],
-   hi:['सूचनाएँ चालू करें','वेंडर निकलेगा, पहुँचेगा या बिल भेजेगा — हम आपके फ़ोन पर बताएँगे। “Allow” दबाएँ।']},
-  {em:'🥬', sel:['#catRow .cat-grid','.h-tabs'],
+   en:['Turn on notifications','We will tell you on your phone when the vendor sets out, arrives and sends the bill. Tap the green button, then “Allow”.'],
+   hi:['सूचनाएँ चालू करें','वेंडर निकलेगा, पहुँचेगा या बिल भेजेगा — हम आपके फ़ोन पर बताएँगे। हरा बटन दबाएँ, फिर “Allow” दबाएँ।']},
+  {v:'c3', em:'🥬', sel:['#catRow .cat-grid','.h-tabs'],
    en:['Pick a category','Choose vegetables, fruits or onion-potato here.'],
    hi:['सामान चुनें','यहाँ से सब्ज़ी, फल या प्याज़-आलू चुनें।']},
-  {em:'🛒', sel:['#homeGrid .add'],
+  {v:'c4', em:'🛒', sel:['#homeGrid .add'],
    en:['Tap ADD','Tap ADD to put an item in your basket. The price shown is today’s rate; the vendor weighs it at your door.'],
    hi:['ADD दबाएँ','ADD दबाकर सामान टोकरी में डालें। यह आज का रेट है — वेंडर आपके दरवाज़े पर तौलेगा।']},
-  {em:'🕖', sel:['#cart.on','#cart'],
+  {v:'c5', em:'🕖', sel:['#cart.on','#cart'],
    en:['Choose a time slot','Open the basket, tap “Confirm booking” and choose when the vendor should come: morning 7–11, afternoon 12–4 or evening 5–8.'],
    hi:['आने का समय चुनें','टोकरी खोलें, “बुकिंग पक्की करें” दबाएँ और समय चुनें — सुबह 7–11, दोपहर 12–4 या शाम 5–8।']},
-  {em:'📱',
+  {v:'c6', em:'📱',
    en:['Log in once','The first time, type your name and phone number. That is all.'],
    hi:['एक बार लॉगिन करें','पहली बार अपना नाम और फ़ोन नंबर डालें — बस इतना ही।']},
-  {em:'🏠',
+  {v:'c7', em:'🏠',
    en:['Save your address','Choose your village and put the 📍 pin on your house on the map, so the vendor finds you.'],
    hi:['अपना पता सेव करें','अपना गाँव चुनें और नक्शे पर 📍 पिन अपने घर पर रखें, ताकि वेंडर सीधे पहुँचे।']},
-  {em:'⚖️',
+  {v:'c8', em:'⚖️',
    en:['The vendor comes to you','The vendor comes in your slot, weighs in front of you and sends the bill to your phone. Pay the vendor directly — cash or UPI.'],
    hi:['वेंडर आपके घर आएगा','वेंडर आपके समय में आएगा, सामने तौलेगा और बिल आपके फ़ोन पर भेजेगा। पैसे सीधे वेंडर को दें — नकद या UPI।']},
-  {em:'🔑', sel:['.bn [data-bn="bookings"]','#nav'], before:()=>{ if(!needsProfile()) document.getElementById('bn').classList.add('show'); },
+  {v:'c9', em:'🔑', sel:['.bn [data-bn="bookings"]','#nav'], before:()=>{ if(!needsProfile()) document.getElementById('bn').classList.add('show'); },
    en:['Give your delivery code','At the end, tell the vendor your 4-digit delivery code — the order is complete. You can see everything in Bookings.'],
    hi:['डिलीवरी कोड बताएँ','आख़िर में वेंडर को अपना 4 अंकों का डिलीवरी कोड बताएँ — ऑर्डर पूरा! सब कुछ “बुकिंग” में दिखेगा।']},
-  {em:'🎉', doneEn:'Start shopping', doneHi:'ख़रीदारी शुरू करें',
+  {v:'c10', em:'🎉', doneEn:'Start shopping', doneHi:'ख़रीदारी शुरू करें',
    en:['That’s it!','Now pick your vegetables. You can open this guide again from Account.'],
    hi:['बस इतना ही!','अब अपनी सब्ज़ी चुनिए। यह गाइड “अकाउंट” में दोबारा खोल सकते हैं।']}
 ];
-function openGuide(){ go('home'); setTimeout(()=>tourStart(CUST_TOUR,'rb_tour_done',()=>saveRates(rateMap())), 250); }
+const AREA_SHEET_OPEN=()=>{ const a=document.getElementById('areaSheet'); return a && a.classList.contains('on'); };
+function openGuide(){ go('home'); setTimeout(()=>tourStart(CUST_TOUR,'rb_tour_done',()=>saveRates(rateMap()),AREA_SHEET_OPEN), 150); }
 function tourDoneBefore(){ try{ return !!localStorage.getItem('rb_tour_done'); }catch(e){ return true; } }
 
 /* ---- spoken welcome on every open / reload: namaste + name, rates that changed since the last
@@ -5734,47 +5784,53 @@ function unitSay(u){
   if(/^(bunch|gaddi|gucchi)/.test(w)) return hi?'गड्डी':'a bunch';
   return hi?s:'per '+s;
 }
-function greetText(){
-  const first=user && user.name ? String(user.name).trim().split(/\s+/)[0] : '';
+function changedRates(){
   let prev=null; try{ prev=JSON.parse(localStorage.getItem('rb_rates')||'null'); }catch(e){}
   const cur=rateMap();
-  /* price changed first, then items that are new since the last visit */
-  const changed=prev ? [...Object.keys(cur).filter(k=>k in prev && prev[k]!==cur[k].price), ...Object.keys(cur).filter(k=>!(k in prev))].slice(0,4)
-                     : Object.keys(cur).slice(0,3);
+  /* price changed first, then items that are new since the last visit (nothing on the very first visit) */
+  const keys=prev ? [...Object.keys(cur).filter(k=>k in prev && prev[k]!==cur[k].price), ...Object.keys(cur).filter(k=>!(k in prev))].slice(0,4) : [];
   const hi=LANG==='hi';
-  const list=changed.map(k=>{ const p=cur[k];
+  const list=keys.map(k=>{ const p=cur[k];
     return hi ? `${p.hi||p.en} ${p.price} रुपये ${unitSay(p.unit)}` : `${p.en}, ${p.price} rupees ${unitSay(p.unit)}`; });
-  const line = hi
-    ? `नमस्ते${first?' '+first+' जी':''}! ` + (list.length?`आज के ताज़ा रेट: ${list.join(', ')}। `:'') + 'रोज़बाज़ार — स्लॉट बुक करो, ताज़ी सब्ज़ी घर पे पाओ।'
-    : `Namaste${first?' '+first:''}! ` + (list.length?`Today's fresh rates: ${list.join('; ')}. `:'') + 'RozBazaar — book a slot, get fresh vegetables at your door.';
-  return {line, cur, changed:list.length};
+  return {cur, list, text: list.length ? (hi?`आज के नए रेट: ${list.join(', ')}।`:`Today's new rates: ${list.join('; ')}.`) : ''};
 }
-function hideGreet(){ const g=document.getElementById('greetCard'); if(g){ g.classList.remove('on'); setTimeout(()=>g.remove(),300); } }
-async function greet(){
-  if(!VOX.ok || !VOX.on || DEMO) return;
-  const t0=Date.now();
-  /* wait for the catalogue and the login check (both load in the background) */
-  while(Date.now()-t0<8000 && (!(PRODUCTS&&PRODUCTS.length) || (!user && Date.now()-t0<3500))) await new Promise(r=>setTimeout(r,250));
-  if(TOUR) return;
-  const g=greetText();
+function hideGreet(ms){ setTimeout(()=>{ const g=document.getElementById('greetCard'); if(g){ g.classList.remove('on'); setTimeout(()=>g.remove(),300); } }, ms||0); }
+function greetTitle(){
+  const first=user && user.name ? String(user.name).trim().split(/\s+/)[0] : '';
+  return LANG==='hi' ? `नमस्ते${first?' '+first+' जी':''}! आपका स्वागत है 🙏` : `Namaste${first?' '+first:''}! Welcome to RozBazaar 🙏`;
+}
+/* Spoken welcome on every open / reload (not on the first visit — the guide runs then). Starts at once:
+   recorded "नमस्ते! आपका स्वागत है रोज़बाज़ार में। आपकी सब्ज़ी, आपका भरोसेमंद वेंडर, आपके टाइम पर।",
+   then the rates that changed since the last visit (device voice + shown on the card). */
+function greet(){
+  if(!VOX.on || DEMO || TOUR || document.getElementById('greetCard')) return;
   const card=document.createElement('div'); card.id='greetCard';
-  card.innerHTML=`<div class="gc-ic">🔊</div><div class="gc-tx"><b>${g.line.split('!')[0]}!</b><span>${g.changed?T('Today’s new rates — tap anywhere to listen','आज के नए रेट — सुनने के लिए कहीं भी छुएँ'):T('Tap anywhere to listen','सुनने के लिए कहीं भी छुएँ')}</span></div>
+  card.innerHTML=`<div class="gc-tx"><b id="greetTitle">${greetTitle()}</b><span id="greetSub">${T('Your vegetables, your trusted vendor, on your time','आपकी सब्ज़ी, आपका भरोसेमंद वेंडर, आपके टाइम पर')}</span></div>
     <span class="gc-wave" id="greetWave"><i></i><i></i><i></i></span>
     <button class="gc-x" onclick="event.stopPropagation();setVoice(false);hideGreet();toast(T('Voice off — turn it on again in Account','आवाज़ बंद — अकाउंट में फिर चालू कर सकते हैं'))" aria-label="Voice off">🔇</button>`;
   document.body.appendChild(card); requestAnimationFrame(()=>card.classList.add('on'));
-  let started=false;
-  const drop=setTimeout(()=>{ if(!started) hideGreet(); }, 25000);
-  afterFirstTouch(()=>{
-    if(!document.getElementById('greetCard') || !VOX.on || TOUR) return;
-    started=true; clearTimeout(drop);
-    say(g.line, ()=>{ saveRates(g.cur); setTimeout(hideGreet, 800); });
-    paintSpeaking();
+  /* the name arrives with the login check a moment later */
+  let n=0; const nt=setInterval(()=>{ const t=document.getElementById('greetTitle'); if(!t||++n>16) return clearInterval(nt); if(user){ t.textContent=greetTitle(); clearInterval(nt); } }, 250);
+  const fallback=T('Namaste! Welcome to RozBazaar. Your vegetables, your trusted vendor, on your time.','नमस्ते! आपका स्वागत है रोज़बाज़ार में। आपकी सब्ज़ी, आपका भरोसेमंद वेंडर, आपके टाइम पर।');
+  playVoice('greet', fallback, afterGreet, ()=>{
+    const sub=document.getElementById('greetSub'); if(sub) sub.textContent=T('🔊 Tap anywhere to listen','🔊 सुनने के लिए कहीं भी छुएँ');
+    setTimeout(()=>{ if(!VOX.busy) hideGreet(); }, 20000);
   });
+}
+async function afterGreet(){
+  const t0=Date.now();
+  while(Date.now()-t0<3000 && !(PRODUCTS&&PRODUCTS.length)) await new Promise(r=>setTimeout(r,200));
+  const r=changedRates();
+  if(!r.text){ saveRates(r.cur); return hideGreet(1500); }
+  const sub=document.getElementById('greetSub'); if(sub) sub.textContent='🆕 '+r.list.join(' · ');
+  const spoke=say(r.text, ()=>{ saveRates(r.cur); hideGreet(2500); });
+  if(!spoke){ saveRates(r.cur); hideGreet(6000); }
 }
 function paintVoiceRow(){
   const el=document.getElementById('voiceRowState'); if(el) el.textContent = VOX.on ? T('On','चालू') : T('Off','बंद');
 }
 function toggleVoiceSetting(){ setVoice(!VOX.on); paintVoiceRow(); if(VOX.on) say(T('Voice is on.','आवाज़ चालू है।')); }
+
 
 window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('footAreas').innerHTML = MOCK_AREAS.map(a=>`<li>${a}</li>`).join('');
@@ -5790,13 +5846,13 @@ window.addEventListener('DOMContentLoaded',()=>{
      usual location pop-up / reminder bar + the spoken welcome with today's changed rates */
   if(!tourDoneBefore() && !DEMO && !location.hash.includes('access_token')){
     setTimeout(()=>{
-      if((document.querySelector('.scr.on')||{}).id==='s-home') tourStart(CUST_TOUR,'rb_tour_done',()=>{ saveRates(rateMap()); setTimeout(nag, 9000); });
+      if((document.querySelector('.scr.on')||{}).id==='s-home') tourStart(CUST_TOUR,'rb_tour_done',()=>{ saveRates(rateMap()); setTimeout(nag, 9000); }, AREA_SHEET_OPEN);
       else { showLocAsk(); setTimeout(nag, 6400); }
-    }, 2500);
+    }, 2150);
   }else{
     setTimeout(showLocAsk, 2600);
     setTimeout(nag, 9000);
-    setTimeout(greet, 2300);
+    greet();
   }
   maybeRemindAbandonedCart();
   setTimeout(()=>document.getElementById('splash').classList.add('gone'), 2100);

@@ -183,14 +183,18 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   tells the page. The platform/ API still uses the anonymous path — turn OTP on only for the live site.
 - Login is only required at booking time, never to browse.
 - **First-visit voice guide + spoken welcome** (4 Oct 2026). Shared engine in both live sites (`tourStart/tourShow/tourEnd`,
-  `say()`, `VOX`, `afterFirstTouch`; CSS `#tourBg/#tourHole/#tourCard`): spotlight steps with Next/Back/Skip, 🔊 mute, language
-  chips on step 1. Voice = the phone's own speechSynthesis (Google Hindi / Indian English on Android, Lekha on iPhone), so
-  it can say names and rates; browsers allow speech only after the first tap. Customer guide `CUST_TOUR` (`rb_tour_done`)
-  replaces the location pop-up on the first visit: real location step (`detectArea()` now returns its promise; the tour
-  hides while the village picker is open) + notification step + how to order. Later visits: `greet()` shows a navy card,
-  on first tap says “नमस्ते <first name> जी”, rates that changed since the last visit (`rb_rates`, max 4, changed first,
-  then new items) and the tagline “रोज़बाज़ार — स्लॉट बुक करो, ताज़ी सब्ज़ी घर पे पाओ”. `rb_voice='off'` mutes; Account
-  has “Voice welcome & guide” (toggle) and “How to use the app (guide)”.
+  `playVoice()`, `say()`, `VOX`, `afterFirstTouch`, `waitAnswered`; CSS `#tourBg/#tourHole/#tourCard`). **Voice = recorded MP3s**
+  in `voice/hi/*.mp3` + `voice/en/*.mp3` (upload the `voice/` folder with the site): made offline with Kokoro (`hf_alpha` Hindi,
+  `af_heart` English, 40 kbps mono); keys `greet`, `c0`–`c10` (customer), `v0`–`v10` (vendor). If you change a step's text, re-record
+  its line (or it falls back to the phone's speechSynthesis). The phone's voice is used only for changing text (today's rates).
+  Sound is tried at once (installed app usually allowed) and retried on the first tap. Step 1 = big card with big English /
+  हिन्दी buttons; other steps = small card with ONE big pulsing button — nothing advances by itself; permission steps have no
+  "Later" (only Skip, which ends the guide) and move on as soon as the prompt is answered (`waitAnswered`), the GPS / push work
+  continues behind. Customer guide `CUST_TOUR` (`rb_tour_done`) starts 2.15 s after load instead of the location pop-up; the
+  tour hides while the village picker is open (`AREA_SHEET_OPEN`). Every later open/reload: `greet()` immediately shows a navy
+  card (“नमस्ते <name> जी! आपका स्वागत है”) and plays “नमस्ते! आपका स्वागत है रोज़बाज़ार में। आपकी सब्ज़ी, आपका भरोसेमंद
+  वेंडर, आपके टाइम पर।”, then rates changed since the last visit (`rb_rates`, max 4) by device voice + on the card.
+  `rb_voice='off'` mutes; Account has “Voice welcome & guide” (toggle) and “How to use the app (guide)”.
 - Product images are inline SVG illustrations via `pImg()` / `art()`; a vendor's
   uploaded photo overrides the illustration.
 
