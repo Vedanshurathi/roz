@@ -1428,7 +1428,13 @@ details summary::-webkit-details-marker{display:none}
     <button class="ghostbtn" id="phoneLoginBtn" style="width:100%;opacity:.45;pointer-events:none" onclick="phoneLogin()">
       📱 <span data-en="Continue with phone number" data-hi="सिर्फ़ फ़ोन नंबर से आगे बढ़ें">Continue with phone number</span>
     </button>
-    <p style="text-align:center;font-size:11px;font-weight:600;color:var(--mut);margin-top:8px"
+    <div id="otpBox" style="display:none;margin-top:14px">
+      <p style="font-size:12.5px;font-weight:700;color:var(--tx2);margin-bottom:8px" id="otpSentTo"></p>
+      <div class="phone-box"><div class="cc">🔑</div><input id="inOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="● ● ● ● ● ●" oninput="this.value=this.value.replace(/\D/g,'');if(this.value.length===6)phoneLogin()"></div>
+      <button class="ghostbtn" id="otpVerifyBtn" style="width:100%;margin-top:10px" onclick="phoneLogin()">✅ <span data-en="Verify code" data-hi="कोड वेरिफ़ाई करें">Verify code</span></button>
+      <button id="otpResendBtn" style="display:block;margin:10px auto 0;background:none;border:0;color:var(--g);font-weight:800;font-size:12.5px;cursor:pointer" onclick="resendOtp()" data-en="Send the code again" data-hi="कोड दोबारा भेजें">Send the code again</button>
+    </div>
+    <p id="phoneNote" style="text-align:center;font-size:11px;font-weight:600;color:var(--mut);margin-top:8px"
        data-en="No OTP — just your name and number" data-hi="कोई OTP नहीं — बस नाम और नंबर">No OTP — just your name and number</p>
 
     <p class="muted" style="text-align:center;margin-top:20px;font-size:11.5px" data-en="By continuing you agree to RozBazaar's terms. Payment is always direct to the vendor — cash or UPI."
@@ -2622,13 +2628,32 @@ async function ensureSession(){
   }catch(e){ return false; }
 }
 
+/* Security (4 Oct 2026): everything the server sends can contain text typed by someone else
+   (item names by vendors; names, addresses, notes, reviews by customers). Many screens build
+   HTML with template strings, so a name like <img src=x onerror=…> would have run as code on
+   another person's phone. Every string from the server is made inert here, once, before any
+   screen sees it: < > " ' ` become look-alike typographic characters (‹ › ” ’ ‘), which can't
+   open a tag or break out of an attribute. Photo data-URLs and https links are kept usable. */
+const SAFE_CH={'<':'‹','>':'›','"':'”',"'":'’','`':'‘'};
+function safeStr(s){
+  if(/^data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=\s]*$/i.test(s)) return s;
+  if(/^https?:\/\/[^\s]*$/i.test(s)) return s.replace(/["'<>`]/g,c=>encodeURIComponent(c));
+  return s.replace(/[<>"'`]/g,c=>SAFE_CH[c]);
+}
+function safeData(v){
+  if(typeof v==='string') return safeStr(v);
+  if(Array.isArray(v)) return v.map(safeData);
+  if(v && typeof v==='object'){ const o={}; for(const k in v) o[k]=safeData(v[k]); return o; }
+  return v;
+}
 async function rpc(fn, args={}){
   try{
     const c = await getSb();
     const {data, error} = await c.rpc(fn, args);
-    if(error) return {ok:false, msg:error.message};
-    if(data && typeof data==='object' && 'ok' in data) return data;
-    return {ok:true, data};
+    if(error) return {ok:false, msg:safeStr(String(error.message||''))};
+    const d=safeData(data);
+    if(d && typeof d==='object' && 'ok' in d) return d;
+    return {ok:true, data:d};
   }catch(e){
     return {ok:false, msg:T('Network problem — please try again','नेटवर्क की दिक्कत — दोबारा कोशिश करें'), offline:true};
   }
@@ -3036,6 +3061,7 @@ function go(s){
   document.querySelectorAll('.scr').forEach(x=>x.classList.remove('on'));
   document.getElementById('s-'+s).classList.add('on');
   window.scrollTo(0,0);
+  if(s==='login') otpRequired();
   const gated=needsProfile();
   document.getElementById('bn').classList.toggle('show', NAVS.includes(s) && !gated);
   document.querySelectorAll('#nav, .h-icons, .h-loc').forEach(el=>{
@@ -4547,6 +4573,62 @@ async function googleLogin(){
    real session (required for RLS to work at all), then a dedicated
    RPC that finds-or-creates the customer record by phone number,
    independent of which anonymous session asked for it. */
+/* SMS OTP (4 Oct 2026). Off until Supabase Auth → Phone has an SMS provider and the admin turns
+   it on (admin → Settings). customer_phone_login checks it in the DB too: with the switch on, the
+   session must be the Supabase phone user for this exact number, so the page cannot skip it. */
+let OTP_ON=null, OTP_FOR='', OTP_SENT_AT=0;
+async function otpRequired(){
+  if(DEMO) return false;
+  if(OTP_ON===null){
+    const r=await rpc('customer_login_config',{});
+    OTP_ON=!!(r.ok && r.data && r.data.otp);
+    paintOtpNote();
+  }
+  return OTP_ON;
+}
+function paintOtpNote(){
+  const el=document.getElementById('phoneNote'); if(!el) return;
+  const en=OTP_ON?'We will send a 6-digit code by SMS':'No OTP — just your name and number';
+  const hi=OTP_ON?'हम SMS से 6 अंकों का कोड भेजेंगे':'कोई OTP नहीं — बस नाम और नंबर';
+  el.dataset.en=en; el.dataset.hi=hi; el.textContent=T(en,hi);
+}
+function otpError(e){
+  const m=String((e&&e.message)||e||'').toLowerCase();
+  if(m.includes('provider')||m.includes('sms')&&m.includes('disabled')||m.includes('unsupported phone'))
+    return T('SMS login is not set up yet — please try again later','SMS लॉगिन अभी चालू नहीं है — थोड़ी देर बाद कोशिश करें');
+  if(m.includes('expired')||m.includes('invalid')||m.includes('token'))
+    return T('Wrong or expired code — check the SMS or send it again','कोड गलत है या पुराना हो गया — SMS देखें या दोबारा भेजें');
+  if(m.includes('rate')||m.includes('seconds')||m.includes('too many'))
+    return T('Please wait a minute before asking for another code','दूसरा कोड माँगने से पहले एक मिनट रुकें');
+  return T('Could not send or check the code — try again','कोड भेजा या जाँचा नहीं जा सका — दोबारा कोशिश करें');
+}
+async function sendOtp(c,p){
+  const {error}=await c.auth.signInWithOtp({phone:'+91'+p});
+  if(error){ toast(otpError(error)); return false; }
+  OTP_FOR=p; OTP_SENT_AT=Date.now();
+  document.getElementById('otpBox').style.display='block';
+  document.getElementById('otpSentTo').textContent=T('Code sent by SMS to +91 '+p,'+91 '+p+' पर SMS से कोड भेजा गया');
+  const i=document.getElementById('inOtp'); i.value=''; setTimeout(()=>i.focus(),50);
+  toast(T('Code sent by SMS 📩','SMS से कोड भेजा गया 📩'));
+  return true;
+}
+/* returns a session for this verified number, or null after sending the code / on a wrong code */
+async function otpSession(c,p,session){
+  if(session && session.user && session.user.phone==='91'+p) return session;
+  if(OTP_FOR!==p){ await sendOtp(c,p); return null; }
+  const code=document.getElementById('inOtp').value.trim();
+  if(code.length!==6){ toast(T('Enter the 6-digit code from the SMS','SMS वाला 6 अंकों का कोड डालें')); return null; }
+  const {data,error}=await c.auth.verifyOtp({phone:'+91'+p, token:code, type:'sms'});
+  if(error||!data||!data.session){ toast(otpError(error||'invalid')); return null; }
+  return data.session;
+}
+async function resendOtp(){
+  const p=document.getElementById('inPhone').value.trim();
+  if(p.length!==10) return toast(T('A 10-digit phone number is required','10 अंकों का नंबर भरना ज़रूरी है'));
+  if(Date.now()-OTP_SENT_AT<60000) return toast(T('Please wait a minute before asking for another code','दूसरा कोड माँगने से पहले एक मिनट रुकें'));
+  await sendOtp(await getSb(),p);
+}
+
 async function phoneLogin(){
   const n=document.getElementById('inName').value.trim();
   const p=document.getElementById('inPhone').value.trim();
@@ -4572,13 +4654,19 @@ async function phoneLogin(){
   try{
     const c=await getSb();
     let {data:{session}}=await c.auth.getSession();
-    if(!session){
+    if(await otpRequired()){
+      session=await otpSession(c,p,session);
+      if(!session){ btn.style.pointerEvents='auto'; btn.style.opacity='1'; return; }
+    }else if(!session){
       const {data,error}=await c.auth.signInAnonymously();
       if(error) throw error;
       session=data.session;
     }
     const r=await rpc('customer_phone_login',{p_name:n, p_phone:p});
+    if(!r.ok && r.code==='OTP_REQUIRED'){ OTP_ON=true; paintOtpNote(); btn.style.pointerEvents='auto'; btn.style.opacity='1'; return toast(r.msg); }
     if(!r.ok) throw new Error(r.msg||'login failed');
+    OTP_FOR='';
+    document.getElementById('otpBox').style.display='none';
     const d=r.data;
     SESSION=session;
     user={name:d.name||n, phone:d.phone||p, email:d.email||''};

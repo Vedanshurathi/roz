@@ -1469,13 +1469,32 @@ async function ensureSession(){
   }catch(e){ return false; }
 }
 
+/* Security (4 Oct 2026): everything the server sends can contain text typed by someone else
+   (item names by vendors; names, addresses, notes, reviews by customers). Many screens build
+   HTML with template strings, so a name like <img src=x onerror=…> would have run as code on
+   another person's phone. Every string from the server is made inert here, once, before any
+   screen sees it: < > " ' ` become look-alike typographic characters (‹ › ” ’ ‘), which can't
+   open a tag or break out of an attribute. Photo data-URLs and https links are kept usable. */
+const SAFE_CH={'<':'‹','>':'›','"':'”',"'":'’','`':'‘'};
+function safeStr(s){
+  if(/^data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=\s]*$/i.test(s)) return s;
+  if(/^https?:\/\/[^\s]*$/i.test(s)) return s.replace(/["'<>`]/g,c=>encodeURIComponent(c));
+  return s.replace(/[<>"'`]/g,c=>SAFE_CH[c]);
+}
+function safeData(v){
+  if(typeof v==='string') return safeStr(v);
+  if(Array.isArray(v)) return v.map(safeData);
+  if(v && typeof v==='object'){ const o={}; for(const k in v) o[k]=safeData(v[k]); return o; }
+  return v;
+}
 async function rpc(fn,args={}){
   try{
     const c=await getSb();
     const {data,error}=await c.rpc(fn,args);
-    if(error) return {ok:false,msg:error.message};
-    if(data && typeof data==='object' && 'ok' in data) return data;
-    return {ok:true,data};
+    if(error) return {ok:false,msg:safeStr(String(error.message||''))};
+    const d=safeData(data);
+    if(d && typeof d==='object' && 'ok' in d) return d;
+    return {ok:true,data:d};
   }catch(e){
     return {ok:false,offline:true,msg:T('Network problem — try again','नेटवर्क की दिक्कत — दुबारा करो')};
   }

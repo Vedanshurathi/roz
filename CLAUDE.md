@@ -175,8 +175,12 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   = https://vendor.rozbazaar.shop/). `#s-home` has bottom padding so nothing hides under the
   bottom nav / cart bar.
 - **Login:** Google OAuth OR phone-only (`signInAnonymously()` + `customer_phone_login`).
-  Phone login has **no OTP by design** — face-to-face village delivery; whoever
-  last typed a number owns that account. Don't "fix" this without asking.
+  Phone login had **no OTP by design** (whoever last typed a number owns that account). Since 4 Oct 2026
+  there is an **SMS OTP switch** (`app_settings.customer_otp`, admin → Settings → "Customer login: SMS OTP",
+  `admin_set_customer_otp`), **off** until Supabase Auth → Phone has an SMS provider. When on, the page uses
+  `signInWithOtp({phone:'+91…'})` + `verifyOtp` and `customer_phone_login` refuses (code `OTP_REQUIRED`) any
+  session that is not the phone-verified Supabase user for that number. `customer_login_config()` (anon)
+  tells the page. The platform/ API still uses the anonymous path — turn OTP on only for the live site.
 - Login is only required at booking time, never to browse.
 - Product images are inline SVG illustrations via `pImg()` / `art()`; a vendor's
   uploaded photo overrides the illustration.
@@ -213,7 +217,8 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   alerts. Bell = `team_notifications()` / `team_mark_read()`. Each site has its own `sw.js`
   (CSP `worker-src 'self'`). iPhone push works only after "Add to Home Screen" (iOS 16.4+).
 - Migration `database/migrations/20260926d_commission_tasks_targets_notifications.sql`.
-- Known gap (pre-existing): `send-push` has `verify_jwt=false` and accepts any caller.
+- `send-push` has `verify_jwt=false` but since 4 Oct 2026 needs the `x-rb-push-secret` header (= `app_settings.push_secret`,
+  sent by `push_note`); anything else gets 403.
 
 ### Notifications to customers + admin broadcast (migration `20260926g_customer_notifications_broadcast.sql`)
 - `notify_person(user, role, type, title_hi, title_en, msg_hi, msg_en, booking)` = in-app row + push in
@@ -471,6 +476,23 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
 - Asset paths in `public/index.html` are **relative** (`./styles.css`) on purpose.
 - Every new store function needs **both** branches: the Supabase RPC call and
   the mock implementation — mock mode must keep working.
+
+### Security lockdown (4 Oct 2026 — migrations `20261004a/b/c`)
+- **No table/view/sequence privileges for `anon` / `authenticated`** (and none by default for new tables). Before this,
+  RLS only checked ownership, so through `/rest/v1/<table>` a vendor could approve itself or its products, mark a
+  booking delivered without the code, a customer could change totals or delete payments, and anyone could read vendor
+  phones. Every site only uses RPCs, so nothing broke. **A new table needs no grants — add an RPC instead.**
+  When you write a test as `authenticated`, do table setup before `set_config('role',…)`.
+- Order-state rules in the RPCs: `vendor_set_status` only forward (repeat = ok, no-op), vendor cancel only before the
+  bill, OTP issue only after the bill, customer dispute only on a bill, payment 0 < amount ≤ 1,00,000, bill lines
+  qty 0–1000 / price 0–1,00,000, a bill can only add the vendor's own products. `customer_update_profile` validates
+  the number and refuses one used by another customer. `maps_url` is internal only.
+- **Stored XSS fix in both live sites**: vendor item names and customer names / notes / addresses went into
+  `innerHTML` unescaped. `rpc()` in `customer/index.html` and `vendor-site/index.html` now passes every response
+  through `safeData()` (`< > " ' \`` → look-alike ‹ › ” ’ ‘; data:image and https URLs kept). Keep all server data
+  going through `rpc()`.
+- Still open (by choice): `vendor_login_lookup` returns a vendor's login email; `notification_track` and
+  `log_visit` are anon-callable; Supabase "leaked password protection" is a dashboard toggle (Auth → Passwords).
 
 ### Key business logic in the DB
 - `match_vendor()` — auto-assigns least-loaded, best-rated vendor for a slot.

@@ -31,6 +31,25 @@ function ensureVapid() {
   return vapidReady;
 }
 
+// Only the database may call this (push_note sends app_settings.push_secret in x-rb-push-secret).
+// Before 4 Oct 2026 anyone could POST here and send a notification with any text and link.
+let secretP: Promise<string> | null = null;
+function pushSecret() {
+  if (!secretP) secretP = (async () => {
+    const env = Deno.env.get("PUSH_SECRET");
+    if (env) return env;
+    const { data } = await supabase.from("app_settings").select("value").eq("key", "push_secret").maybeSingle();
+    return typeof data?.value === "string" ? data.value : "";
+  })();
+  return secretP;
+}
+function sameText(a: string, b: string) {
+  if (!a || a.length !== b.length) return false;
+  let d = 0;
+  for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return d === 0;
+}
+
 async function record(nid: string | undefined, devices: number, sent: number, failed: number) {
   if (!nid) return;
   await supabase.from("notifications")
@@ -40,6 +59,10 @@ async function record(nid: string | undefined, devices: number, sent: number, fa
 
 Deno.serve(async (req) => {
   try {
+    const want = await pushSecret();
+    if (!want || !sameText(req.headers.get("x-rb-push-secret") || "", want)) {
+      return new Response(JSON.stringify({ ok: false, msg: "forbidden" }), { status: 403 });
+    }
     await ensureVapid();
     const { user_id, role, title, body, url, notification_id } = await req.json();
     if (!user_id || !role || !title) {
@@ -60,7 +83,8 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true, sent: 0, note: "no subscriptions" }));
     }
 
-    const payload = JSON.stringify({ title, body: body || "", url: url || "/", nid: notification_id || null });
+    const safeUrl = typeof url === "string" && (url.startsWith("/") || url.startsWith("https://")) ? url : "/";
+    const payload = JSON.stringify({ title: String(title).slice(0, 120), body: String(body || "").slice(0, 400), url: safeUrl, nid: notification_id || null });
     let sent = 0, failed = 0;
     for (const s of real) {
       try {

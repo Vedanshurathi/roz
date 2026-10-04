@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NwI4ypt4yLprKEhxFKKBj9+/OC+rCypy38eW6KJmTxk=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-PVFKb6AZ7cwg+EPgH7Xovw/RJRbeCV5YrdqmIdrKATk=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -1819,6 +1819,11 @@ function vSettings(el, rv) {
         ${kpi('30 din ka commission', money(f.platform_revenue), `${money(f.gmv_month)} sale ka ${r}%`, 'good', '📈')}
         ${kpi('Ab tak ka commission', money(f.platform_revenue_all), `${money(f.gmv_all)} sale ka ${r}%`, '', '💼')}</div>
       <div class="mu" style="margin-top:10px">Example: ₹1,000 ki sale pe ₹${Math.round(1000 * r / 100)} commission.</div></div>
+    <div class="card ${rv} d2" style="margin-top:14px"><b style="font-size:16px">🔑 Customer login: SMS OTP</b>
+      <p class="mu" style="margin:4px 0 12px;line-height:1.55">Abhi: <b>${D.settings.customer_otp ? 'ON — phone login pe SMS code lagta hai' : 'OFF — sirf naam + number (koi bhi number daal ke login kar sakta hai)'}</b>.<br>
+        ON karne se pehle Supabase → Authentication → Sign In / Providers → <b>Phone</b> me SMS provider (MSG91 / Twilio) set karo aur khud ek baar test karo —
+        warna koi bhi customer phone se login nahi kar paayega. Google login pe asar nahi.</p>
+      <button class="btn ${D.settings.customer_otp ? '' : 'btn-g'}" data-act="toggleOtp">${D.settings.customer_otp ? 'OTP band karo' : 'OTP chalu karo'}</button></div>
     <div class="${rv} d2" style="margin-top:14px">${pushCard()}</div>
     <div class="card ${rv} d3"><b style="font-size:15px">🔔 Aapko kab notification aata hai</b>
       <p class="mu" style="margin-top:6px;line-height:1.6">Naya order, naya customer, naya vendor · staff ne kaam complete kiya ya nahi ho paya. <br>
@@ -1829,6 +1834,13 @@ async function saveComm() {
   if (!(v >= 0 && v <= 50)) return toast('0 se 50 ke beech daalo');
   const m = await modal({ title: `Commission ${v}% karein?`, sub: `Abhi ${rate()}% hai. Dashboard ka commission turant naye rate se dikhega.`, ok: 'Haan, badlo' });
   if (m) await act('admin_set_commission', { p_rate: v });
+}
+async function toggleOtp() {
+  const on = !D.settings.customer_otp;
+  const m = await modal({ title: on ? 'SMS OTP chalu karein?' : 'SMS OTP band karein?',
+    sub: on ? 'Pakka karo ki Supabase me Phone provider (SMS) chal raha hai — warna phone login band ho jaayega.' : 'Phir koi bhi sirf naam + number se kisi bhi number ka account khol sakta hai.',
+    ok: on ? 'Haan, chalu karo' : 'Haan, band karo' });
+  if (m) await act('admin_set_customer_otp', { p_on: on });
 }
 function onFreshNotifs(fresh) {
   const n = fresh[0]; toast(`${NICON[n.type] || '🔔'} ${n.title}`);
@@ -2253,6 +2265,7 @@ document.addEventListener('click', e => {
     case 'addTarget': addTarget(); break;
     case 'delTarget': delTarget(a); break;
     case 'saveComm': saveComm(); break;
+    case 'toggleOtp': toggleOtp(); break;
     case 'customer': openCustomer(a); break;
     case 'staffActive': act('admin_set_staff_active', { p_staff: a, p_active: a2 === 'true' }); break;
     case 'markRead': act('admin_mark_message_read', { p_message: a, p_read: a2 === 'true' }, a2 === 'true' ? 'Padh liya ✓' : 'Unread'); break;
