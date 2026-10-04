@@ -1032,10 +1032,10 @@ details summary::-webkit-details-marker{display:none}
 .ic svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .ic svg .f{fill:currentColor;stroke:none}
 /* food emojis become small real photos (catalog pictures), not line drawings */
-img.ic.ph{width:1.3em;height:1.3em;border-radius:50%;object-fit:cover;vertical-align:-.3em;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.18);display:inline-block}
-.pt .pe img.ic.ph,.cat-card .ce img.ic.ph,.qt img.ic.ph{border-radius:16px;width:1.4em;height:1.4em;border:2px solid #fff}
-.h-tab .ti img.ic.ph{width:1.25em;height:1.25em;border:2px solid rgba(255,255,255,.85)}
-.pimg .emfall img{width:78%;height:78%;object-fit:cover;border-radius:18px}
+img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;display:inline-block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.18))}
+.pt .pe img.ic.ph,.cat-card .ce img.ic.ph{width:1.6em;height:1.6em;filter:drop-shadow(0 5px 8px rgba(0,0,0,.2))}
+.h-tab .ti img.ic.ph{width:1.4em;height:1.4em;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}
+.pimg .emfall img{width:80%;height:80%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.15))}
 .pv-star .ic,.rstar .ic{color:#F5A623}
 
 /* ADD → quantity stepper (shows how many are in the basket) */
@@ -6017,11 +6017,12 @@ const EMO_ICON=(()=>{ const m={}, set=(list,n)=>[...list].forEach(c=>m[c]=n);
   set('🌅','sunrise'); set('☀','sun'); set('🌇','sunset'); set('🛵🚚','truck'); set('🗓📅','cal'); set('📣','mega'); set('🧾','receipt'); set('📷','camera');
   return m; })();
 const EMO_RE=/(?:[\u{1F1E6}-\u{1F1FF}]{2})|[\u{1F300}-\u{1FAFF}☀-➿⭐⭕⌚-⏿★♡♥✓✔✕✖]️?(?:‍[\u{1F300}-\u{1FAFF}☀-➿]️?)*/gu;
-const PHOTO_BASE='https://srvpfyjmwaruebbkqkdj.supabase.co/storage/v1/object/public/item-photos/catalog/';
-const EMO_PHOTO=(()=>{ const m={}, k={'🥬':'p36','🥒':'p15','🫛':'p16','🫑':'p17','🌶':'p13','🥦':'p78','🍆':'p8','🌽':'p40','🥗':'p124',
-  '🌿':'p12','🫚':'p38','🥕':'p14','🍠':'p29','🧅':'p2','🧄':'p3','🥔':'p1','🍎':'p21','🍒':'p52','🥭':'p108','🍐':'p46','🍅':'p6',
-  '🍍':'p45','🍈':'p47','🥥':'p48','🌰':'p100','🍌':'p20','🍊':'p22','🍇':'p24','🍉':'p25','🫐':'p50','🍓':'p52','🎃':'p28'};
-  for(const e in k) m[e]=PHOTO_BASE+k[e]+(k[e]==='p38'?'.png':'.jpg'); return m; })();
+/* food emojis → clean cut-out photos (transparent background), shipped with the site in img/items/ */
+const EMO_PHOTO=(()=>{ const m={}, k={'🥬':'cabbage','🥒':'cucumber','🫛':'peas','🫑':'capsicum','🌶':'chilli','🥦':'broccoli','🍆':'brinjal','🌽':'corn',
+  '🥗':'lettuce','🌿':'herbs','🫚':'ginger','🥕':'carrot','🍠':'sweet-potato','🧅':'onion','🧄':'garlic','🥔':'potato','🍎':'apple','🍒':'strawberry',
+  '🥭':'mango','🍐':'pear','🍅':'tomato','🍍':'pineapple','🍈':'muskmelon','🥥':'coconut','🌰':'water-chestnut','🍌':'banana','🍊':'orange',
+  '🍇':'grapes','🍉':'watermelon','🫐':'jamun','🍓':'strawberry','🎃':'pumpkin'};
+  for(const e in k) m[e]='img/items/'+k[e]+'.webp'; return m; })();
 /* real photo for a food emoji; if it can't load, the line icon takes its place */
 function icPhoto(ch){ const u=EMO_PHOTO[ch]; if(!u) return '';
   return `<img class="ic ph" src="${u}" alt="" loading="lazy" aria-hidden="true" onerror="this.outerHTML=ic('${EMO_ICON[ch]||'leaf'}')">`; }

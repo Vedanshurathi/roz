@@ -200,8 +200,9 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   uploaded photo overrides the illustration.
 - **No emojis on screen** (4 Oct 2026): an icon engine (`ICO` path set, `EMO_ICON` emoji → icon map, `ic(name)` →
   `<i class="ic"><svg>`) runs `emojiToIcons()` at load and from a MutationObserver, so every emoji anywhere (markup,
-  toasts, translated text) becomes a vector icon; unmapped emojis/flags are dropped. **Food emojis become real
-  photos** instead (`EMO_PHOTO` → catalog photo in Storage, `icPhoto()`, `img.ic.ph`; falls back to the line icon if it
+  toasts, translated text) becomes a vector icon; unmapped emojis/flags are dropped. **Food emojis become clean
+  cut-out photos** instead (`EMO_PHOTO` → `customer/img/items/<name>.webp`, 31 transparent 160 px WebP files made with rembg
+  from Commons photos — upload the `img/` folder with the site; `icPhoto()`, `img.ic.ph`; falls back to the line icon if it
   can't load) — category tabs, offer tiles, cards, and the no-drawing product fallback. Emojis in code are fine — they are
   converted — but add a mapping in `EMO_ICON` for a new one.
 - **ADD → qty stepper**: `addBtn(id)` renders ADD or `− qty +` (`.qstep`) from `cart`; `paintAllAdds()` (end of
