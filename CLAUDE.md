@@ -186,10 +186,16 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   on Vedanshu's request — don't bring it back unasked). Shared code in both live sites: `introVoice()`, `playVoice()`, `say()`,
   `VOX`, `afterFirstTouch` + `#greetCard` CSS. Recorded MP3s in `voice/hi|en/` (Kokoro: `hf_alpha` Hindi, `af_heart` English;
   upload the `voice/` folder with the site): customer `greet` = “नमस्ते! आपका स्वागत है रोज़बाज़ार में। आपकी सब्ज़ी, आपका
-  भरोसेमंद वेंडर, आपके टाइम पर।”, `greet_n` = same without “नमस्ते”. **Logged in** (saved `sb-…-auth-token`): always waits for
-  the first tap so the phone voice can say “नमस्ते <first name> जी!” (browsers allow speechSynthesis only after a tap) + `greet_n`;
-  the name is cached in `rb_vox_name` for the next reload. **Guest**: full `greet` at once if sound is allowed, else on the first tap. Customer then says rates changed since the last visit (`rb_rates`, max 4) with the phone voice. `rb_voice='off'`
+  भरोसेमंद वेंडर, आपके टाइम पर।”, `greet_n` = same without “नमस्ते”. It **plays by itself** at load: **logged in** (saved `sb-…-auth-token`) → phone voice
+  “नमस्ते <first name> जी!” then `greet_n`; guest → full `greet`. Only if the browser blocks sound before a tap (plain
+  browser tab; the installed app normally allows it) does it wait for the first tap — and still says the name. `say()` reports
+  "blocked" (error `not-allowed` / nothing started in 2.5 s) so the code can fall back. Name cached in `rb_vox_name`. Customer then says rates changed since the last visit (`rb_rates`, max 4) with the phone voice. `rb_voice='off'`
   mutes (🔇 on the card; Account → “Voice welcome” toggles).
+- **Saved items** (4 Oct 2026): the ♥ on a product card = `customer_toggle_favourite`; Account → “❤️ Saved items” opens
+  `#savedSheet` (`openSaved/renderSaved`, refreshes `favourites` from `customer_home`), cards with ADD, note for saved items
+  not sold in the current village.
+- **Slot list** uses `customer_slot_status_for(type, area, date, p_vendor = sel.vendorId)` → seats left with the basket's
+  vendor (“N ऑर्डर की जगह बाकी”), `closed` = vendor switched the slot off (“बंद”); `paintSlotList()` refreshes every 30 s.
 - Product images are inline SVG illustrations via `pImg()` / `art()`; a vendor's
   uploaded photo overrides the illustration.
 
@@ -279,6 +285,13 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   cancelled / reassigned / price reminder (`notify_user` pushes for vendors), bill disputed, order missed,
   new rating, item approved/rejected, 20:45 daily summary, password approved/rejected.
 - Migrations `20260926e_vendor_app_notifications.sql`, `20260926f_vendor_phone_password.sql`.
+- **Slots screen = settings for every day** (4 Oct 2026; it used to save TODAY only, so tomorrow kept the default open/15):
+  `vendor_get_slot_settings()` (capacity, open, booked today/tomorrow) + `vendor_save_slot_settings(p_slots)` (one call;
+  defaults table + every future day row, never below orders already booked; slot villages too). See “Slots & seats” below.
+- **All orders** tab (5th bottom-nav button + link under Home + desktop duty-nav): `vendor_orders(p_from, p_to)` (≤ 62 days,
+  cancelled included, no delivery code), ranges Today / Yesterday / 7 / 30 days / coming 7, status chips To do / Completed /
+  Cancelled / Missed with counts, tap a card = items, reason, payment, call; today's open order → “Open order”. Home stays
+  “only orders still to do”.
 - **Spoken welcome** on every open / reload: `vendorGreet()` (same engine as the customer site), recordings `vgreet` /
   `vgreet_n` (“नमस्ते! रोज़बाज़ार वेंडर ऐप में आपका स्वागत है। आज के ऑर्डर देखिए, और समय पर पहुँचिए।”), name from
   `VENDOR.name`. Profile → “🔊 आवाज़ वाला स्वागत: चालू/बंद”.
@@ -504,6 +517,17 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   going through `rpc()`.
 - Still open (by choice): `vendor_login_lookup` returns a vendor's login email; `notification_track` and
   `log_visit` are anon-callable; Supabase "leaked password protection" is a dashboard toggle (Auth → Passwords).
+
+### Slots & seats (4 Oct 2026, migration `20261004d_slot_settings.sql`)
+- `vendor_slot_defaults(vendor, slot, capacity, is_open)` = the vendor's standing setting; `slot_cap_default()` /
+  `slot_open_default()` are used by every reader (`customer_slot_status_for`, `customer_available_vendors`, `match_vendor`,
+  `customer_create_booking`, `vendor_my_slots`) when a day has no `vendor_slots` row.
+- `vendor_slots.booked_count` is **recounted from real bookings** (status not cancelled / missed) by `slot_recount()` on every
+  booking insert / update / delete (`tg_slot_count`, triggers `trg_slot_ins/upd/del`) — a cancelled order frees its seat at once.
+  `admin_reassign_booking` no longer touches the counter itself. 10 drifted counts were fixed on 4 Oct.
+- `customer_slot_status(type, area, date)` still exists (platform API uses it) and just calls `customer_slot_status_for(…, null)`.
+- The Supabase MCP `execute_sql` / `apply_migration` hang on `DROP …` (they wait for a confirmation nobody can give here) —
+  avoid DROP in tool calls; keep old signatures and add a new function instead.
 
 ### Key business logic in the DB
 - `match_vendor()` — auto-assigns least-loaded, best-rated vendor for a slot.

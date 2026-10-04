@@ -1096,6 +1096,7 @@ body.has-nav .scr{padding-bottom:200px}
         <button data-dn="stock" onclick="go('stock')" data-en="Stock & rates" data-hi="स्टॉक और रेट">Stock & rates</button>
         <button data-dn="slots" onclick="go('slots')" data-en="Slots" data-hi="स्लॉट">Slots</button>
         <button data-dn="earn" onclick="go('earn')" data-en="Dashboard" data-hi="डैशबोर्ड">Dashboard</button>
+        <button data-dn="orders" onclick="go('orders')" data-en="All orders" data-hi="सारे ऑर्डर">All orders</button>
       </div>
     </div>
   </div>
@@ -1117,6 +1118,7 @@ body.has-nav .scr{padding-bottom:200px}
       </div>
       <div id="nextWrap"></div>
       <div id="runList"></div>
+      <button class="btn btn-out" style="width:100%;margin-top:12px" onclick="go('orders')">📋 <span data-en="All orders — done, cancelled, earlier days" data-hi="सारे ऑर्डर — पूरे, कैंसल, पिछले दिन">All orders — done, cancelled, earlier days</span></button>
     </div>
     <div class="desk-side" id="deskSide"></div>
   </div>
@@ -1228,8 +1230,8 @@ body.has-nav .scr{padding-bottom:200px}
   </div>
   <div class="wrap" style="padding-top:16px">
     <div class="note green"><span>🕖</span>
-      <span data-en="Turn a slot off and customers cannot book it. Capacity is how many houses you can cover in that window."
-            data-hi="स्लॉट बंद कर दोगे तो ग्राहक उसमें बुक नहीं कर पाएंगे। कैपेसिटी मतलब उस समय में कितने घर जा सकते हो।">Turn a slot off and customers cannot book it.</span></div>
+      <span data-en="This applies to every day. Turn a slot off and customers cannot book it. Capacity is how many houses you can cover in that window — cancelled orders free a place."
+            data-hi="ये हर दिन के लिए है। स्लॉट बंद कर दोगे तो ग्राहक उसमें बुक नहीं कर पाएंगे। कैपेसिटी मतलब उस समय में कितने घर जा सकते हो — कैंसल ऑर्डर की जगह फिर खाली हो जाती है।">This applies to every day. Turn a slot off and customers cannot book it.</span></div>
     <div id="slotList"></div>
   </div>
   <div class="bar"><div class="bar-in">
@@ -1238,6 +1240,20 @@ body.has-nav .scr{padding-bottom:200px}
 </div>
 
 <!-- ================= EARNINGS ================= -->
+<div class="scr" id="s-orders">
+  <div class="topbar">
+    <button class="bk" onclick="go('home')" aria-label="Back">←</button>
+    <div><h1 data-en="All orders" data-hi="सारे ऑर्डर">All orders</h1>
+    <div class="sub" data-en="completed, cancelled and earlier days" data-hi="पूरे हुए, कैंसल और पिछले दिनों के">completed, cancelled and earlier days</div></div>
+    <button class="dref" onclick="loadOrders()" aria-label="Refresh">↻</button>
+  </div>
+  <div class="wrap" style="padding-top:12px">
+    <div id="ordRange" style="display:flex;gap:7px;overflow-x:auto;padding-bottom:4px"></div>
+    <div id="ordStatus" style="display:flex;gap:7px;overflow-x:auto;padding:8px 0 4px"></div>
+    <div id="ordSum" style="font-size:13px;font-weight:800;color:var(--tx2);margin:8px 2px 10px"></div>
+    <div id="ordList"></div>
+  </div>
+</div>
 <div class="scr" id="s-earn">
   <div class="topbar">
     <button class="bk" onclick="go('home')" aria-label="Back">←</button>
@@ -1293,6 +1309,7 @@ body.has-nav .scr{padding-bottom:200px}
   <button class="bni" data-bn="stock" onclick="go('stock')"><span class="i">🥬</span><span data-en="Stock" data-hi="स्टॉक">Stock</span></button>
   <button class="bni" data-bn="slots" onclick="go('slots')"><span class="i">🕖</span><span data-en="Slots" data-hi="स्लॉट">Slots</span></button>
   <button class="bni" data-bn="earn" onclick="go('earn')"><span class="i">📊</span><span data-en="Dashboard" data-hi="डैशबोर्ड">Dashboard</span></button>
+  <button class="bni" data-bn="orders" onclick="go('orders')"><span class="i">📋</span><span data-en="All orders" data-hi="सारे ऑर्डर">All orders</span></button>
 </div></nav>
 
 <button class="fab-contact" id="fabContact" onclick="go('contact')" aria-label="Contact us">
@@ -1750,16 +1767,13 @@ async function api(fn, args={}){
     case 'sendMessage':
       return await rpc('customer_send_message',
         {p_name:args.name, p_body:args.body, p_phone:args.phone||null});
-    case 'saveSlots': {
-      const d=istISO(0);
-      for(const s of (args.slots||[])){
-        await rpc('vendor_set_capacity',{p_date:d, p_slot:s.id, p_capacity:s.cap, p_open:s.open});
-        await rpc('vendor_set_slot_areas',{p_slot:s.id, p_areas: Array.isArray(s.areas)?s.areas:null});
-      }
-      return {ok:true};
-    }
+    case 'saveSlots':
+      /* one call, for EVERY day from today (it used to save today only, so customers booking
+         tomorrow still saw the old capacity / an "open" slot the vendor had closed) */
+      return await rpc('vendor_save_slot_settings',{p_slots:(args.slots||[]).map(s=>({
+        slot:s.id, capacity:s.cap, open:s.open, areas: Array.isArray(s.areas)?s.areas:null}))});
     case 'getSlotAreas': return await rpc('vendor_get_slot_areas',{});
-    case 'getMySlots': return await rpc('vendor_my_slots',{p_from:istISO(0), p_days:0});
+    case 'getMySlots': return await rpc('vendor_get_slot_settings',{});
     case 'saveAreas':
       return await rpc('vendor_update_profile',{p_areas:args.areas});
     case 'getWeekEarnings':
@@ -1826,7 +1840,7 @@ function toast(m){
 }
 
 /* ---------- navigation ---------- */
-const NAV=['home','stock','slots','earn'];
+const NAV=['home','stock','slots','earn','orders'];
 function go(s){
   document.querySelectorAll('.scr').forEach(x=>x.classList.remove('on'));
   document.getElementById('s-'+s).classList.add('on');
@@ -1844,6 +1858,7 @@ function go(s){
   if(s==='code')  renderCode();
   if(s==='stock') renderStock();
   if(s==='slots'){ loadSlots(); loadSlotAreas(); renderSlots(); }
+  if(s==='orders') loadOrders();
   if(s==='earn')  renderEarn();
   if(s==='contact') initVendorContact();
   if(s==='type')  renderTypes();
@@ -4180,6 +4195,75 @@ function renderPending(){
   stagger('#pendBox .pend-card', 70);
 }
 
+
+/* ---------------- ALL ORDERS (4 Oct 2026) ----------------
+   Home shows only orders still to do; this screen has everything — completed, cancelled, missed, earlier
+   days and the coming week — from vendor_orders(p_from, p_to) (max 62 days, delivery code never sent). */
+const ORD={range:'today', status:'all', rows:[], open:null};
+const ORD_RANGES=[['today','Today','आज',0,0],['yday','Yesterday','बीता कल',-1,-1],['week','Last 7 days','पिछले 7 दिन',-6,0],
+                  ['month','Last 30 days','पिछले 30 दिन',-29,0],['next','Coming 7 days','आने वाले 7 दिन',1,7]];
+const ORD_STATUS=[['all','All','सब'],['todo','To do','बाकी'],['done','Completed','पूरे'],['cancelled','Cancelled','कैंसल'],['missed','Missed','छूटे']];
+const ORD_GROUP={placed:'todo',on_the_way:'todo',reached:'todo',bill_final:'todo',bill_approved:'todo',paid:'todo',disputed:'todo',
+                 delivered:'done',completed:'done',cancelled:'cancelled',missed:'missed',pending_review:'missed'};
+const ORD_LABEL={placed:['New','नया','#2874F0'],on_the_way:['On the way','रास्ते में','#F2760D'],reached:['Reached','पहुँच गए','#F2760D'],
+  bill_final:['Bill sent','बिल भेजा','#7c3aed'],bill_approved:['Bill approved','बिल मंज़ूर','#7c3aed'],paid:['Paid — code left','पैसे मिले — कोड बाकी','#0e7490'],
+  delivered:['Completed ✓','पूरा ✓','#1E8E3E'],completed:['Completed ✓','पूरा ✓','#1E8E3E'],cancelled:['Cancelled','कैंसल','#d93025'],
+  missed:['Missed','छूट गया','#918B7E'],pending_review:['Under review','जाँच में','#918B7E'],disputed:['Complaint','शिकायत','#d93025']};
+function ordDate(iso){ const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString(LANG==='en'?'en-IN':'hi-IN',{day:'numeric',month:'short',weekday:'short'}); }
+async function loadOrders(){
+  paintOrderFilters();
+  const rg=ORD_RANGES.find(r=>r[0]===ORD.range);
+  document.getElementById('ordList').innerHTML=`<div class="empty"><div class="e">⏳</div><b>${T('Loading…','लोड हो रहा है…')}</b></div>`;
+  const r = DEMO ? {ok:true, data:RUNS.map(x=>({id:x.id, code:x.code, booking_date:istISO(0), slot:x.slot, status:x.raw||'placed',
+                   customer_name:x.name, customer_phone:x.phone, area:x.area, house_no:x.house, final_total:x.final, est_total:runTotal(x), items:[]}))}
+                 : await rpc('vendor_orders',{p_from:istISO(rg[3]), p_to:istISO(rg[4])});
+  if(!r.ok){ document.getElementById('ordList').innerHTML=`<div class="empty"><div class="e">😕</div><b>${r.msg||T('Could not load','लोड नहीं हुआ')}</b>
+    <button class="btn btn-g" style="margin-top:16px" onclick="loadOrders()">${T('Retry','दुबारा')}</button></div>`; return; }
+  ORD.rows=r.data||[];
+  paintOrders();
+}
+function paintOrderFilters(){
+  const chip=(on,label,fn)=>`<button class="chip ${on?'on':''}" style="white-space:nowrap" onclick="${fn}">${label}</button>`;
+  document.getElementById('ordRange').innerHTML=ORD_RANGES.map(r=>chip(ORD.range===r[0],T(r[1],r[2]),`ORD.range='${r[0]}';loadOrders()`)).join('');
+  const cnt=k=>k==='all'?ORD.rows.length:ORD.rows.filter(o=>ORD_GROUP[o.status]===k).length;
+  document.getElementById('ordStatus').innerHTML=ORD_STATUS.map(s=>chip(ORD.status===s[0],T(s[1],s[2])+(ORD.rows.length?` · ${cnt(s[0])}`:''),`ORD.status='${s[0]}';paintOrders()`)).join('');
+}
+function paintOrders(){
+  paintOrderFilters();
+  const list=ORD.rows.filter(o=>ORD.status==='all' || ORD_GROUP[o.status]===ORD.status);
+  const done=ORD.rows.filter(o=>ORD_GROUP[o.status]==='done');
+  const sale=done.reduce((t,o)=>t+Number(o.pay_amount??o.final_total??0),0);
+  document.getElementById('ordSum').textContent = T(`${list.length} orders · completed sale ₹${Math.round(sale)}`, `${list.length} ऑर्डर · पूरे हुए ऑर्डर की बिक्री ₹${Math.round(sale)}`);
+  document.getElementById('ordList').innerHTML = list.length ? list.map(o=>{
+    const L=ORD_LABEL[o.status]||[o.status,o.status,'#5B564C'];
+    const amt=o.pay_amount??o.final_total??o.est_total;
+    const open=ORD.open===o.id;
+    const items=(o.items||[]).filter(i=>!i.removed).map(i=>`<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;padding:3px 0">
+        <span>${i.product_name||'—'} × ${Number(i.final_qty??i.qty??1)}</span><span>₹${Math.round(Number(i.final_price??i.price_at_booking??0)*Number(i.final_qty??i.qty??1))}</span></div>`).join('');
+    return `<div class="card" style="margin-bottom:10px;cursor:pointer" onclick="ORD.open=ORD.open==='${o.id}'?null:'${o.id}';paintOrders()">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="min-width:0;flex:1">
+          <b style="font-size:15px;display:block">${o.customer_name||'—'}</b>
+          <span style="font-size:12px;font-weight:700;color:var(--mut)">${o.code} · ${ordDate(o.booking_date)} · ${slotName(o.slot)}${o.area?' · '+o.area:''}</span>
+        </div>
+        <div style="text-align:right">
+          <b style="font-size:15px;display:block">${amt!=null?'₹'+Math.round(Number(amt)):''}</b>
+          <span style="display:inline-block;margin-top:3px;font-size:11px;font-weight:800;color:#fff;background:${L[2]};border-radius:20px;padding:3px 9px">${T(L[0],L[1])}</span>
+        </div>
+      </div>
+      ${open?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line)">
+        ${items||`<div style="font-size:13px;color:var(--mut)">${T('No items','कोई सामान नहीं')}</div>`}
+        ${o.cancel_reason?`<div style="font-size:12.5px;font-weight:700;color:#d93025;margin-top:6px">${T('Reason','कारण')}: ${o.cancel_reason}</div>`:''}
+        ${o.pay_method?`<div style="font-size:12.5px;font-weight:700;color:var(--tx2);margin-top:6px">${o.pay_method==='cash'?T('Paid in cash','नकद मिला'):T('Paid by UPI','UPI से मिला')}</div>`:''}
+        <div style="display:flex;gap:8px;margin-top:10px">
+          ${o.customer_phone?`<a class="btn btn-out btn-sm" href="tel:${o.customer_phone}" onclick="event.stopPropagation()">📞 ${T('Call','कॉल')}</a>`:''}
+          ${ORD_GROUP[o.status]==='todo' && o.booking_date===istISO(0)?`<button class="btn btn-g btn-sm" onclick="event.stopPropagation();openOrderToday('${o.code}')">${T('Open order','ऑर्डर खोलो')}</button>`:''}
+        </div></div>`:''}
+    </div>`;
+  }).join('') : `<div class="empty"><div class="e">📭</div><b>${T('No orders here','यहाँ कोई ऑर्डर नहीं')}</b></div>`;
+}
+async function openOrderToday(code){ RUN_DAY=0; await api('getRuns'); openRun(code); }
+
 /* ---------------- SLOTS ---------------- */
 let slotsLoaded=false;
 async function loadSlots(){
@@ -4191,14 +4275,10 @@ async function loadSlots(){
      was actually saved. A vendor changing 15 to 20 and saving would
      see it revert to 15 the moment they left and came back, with no
      way to tell that from a genuine failure to save. */
-  if(DEMO || slotsLoaded) return;
+  if(DEMO) return;
   const r=await api('getMySlots');
-  if(r.ok && Array.isArray(r.data)){
-    const today=istISO(0);
-    r.data.filter(x=>x.slot_date===today).forEach(x=>{
-      const s=SLOTS.find(sl=>sl.id===x.slot);
-      if(s){ s.cap=x.capacity; s.open=x.is_open; }
-    });
+  if(r.ok && r.data && typeof r.data==='object'){
+    SLOTS.forEach(s=>{ const x=r.data[s.id]; if(x){ s.cap=x.capacity; s.open=!!x.open; s.bt=x.booked_today||0; s.bm=x.booked_tomorrow||0; } });
     slotsLoaded=true;
     renderSlots();
   }
@@ -4234,6 +4314,7 @@ function renderSlots(){
           <button onclick="capStep('${s.id}',-1)">−</button><i>${s.cap}</i><button onclick="capStep('${s.id}',1)">+</button>
         </div>
       </div>
+      ${(s.bt||s.bm)?`<div style="font-size:12px;font-weight:700;color:var(--tx2);margin-top:8px">📋 ${T('Booked','बुक हो चुके')}: ${T('today','आज')} ${s.bt||0} · ${T('tomorrow','कल')} ${s.bm||0}</div>`:''}
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:${restricted?'10px':'0'}">
           <span style="font-size:13px;font-weight:800;color:var(--tx2);flex:1">${T('Which villages?','कौनसे गाँव?')}</span>
@@ -4278,8 +4359,15 @@ function toggleSlotArea(id, name){
 function toggleSlot(id){ const s=slotOf(id); s.open=!s.open; renderSlots(); }
 function capStep(id,d){ const s=slotOf(id); s.cap=Math.max(1,Math.min(60,s.cap+d)); renderSlots(); }
 async function saveSlots(){
-  await api('saveSlots',{slots:SLOTS});
-  toast(T('Slots saved','स्लॉट सेव हो गए'));
+  const b=document.querySelector('#s-slots .btn-g[onclick="saveSlots()"]'); if(b){ b.disabled=true; b.style.opacity='.6'; }
+  const r=await api('saveSlots',{slots:SLOTS});
+  if(b){ b.disabled=false; b.style.opacity=''; }
+  if(!r || !r.ok) return toast(r&&r.msg ? r.msg : T('Could not save — try again','सेव नहीं हुआ — दोबारा कोशिश करो'));
+  const kept=(r.data&&r.data.kept)||[];
+  toast(kept.length
+    ? T('Saved for every day. Some days already have more orders — those stay as booked.','हर दिन के लिए सेव हो गया। कुछ दिनों में पहले से ज़्यादा ऑर्डर हैं — वो वैसे ही रहेंगे।')
+    : T('Saved for every day — customers see it now','हर दिन के लिए सेव हो गया — ग्राहकों को अभी से दिखेगा'));
+  loadSlots();
 }
 
 /* ---------------- EARNINGS ---------------- */
@@ -4500,11 +4588,8 @@ function burst(host){
 
 /* ---------- Spoken welcome on every open / reload (4 Oct 2026) ----------
    Recorded MP3s in ./voice/<hi|en>/ (neural voices made once with Kokoro: hf_alpha Hindi, af_heart English).
-   A recording can't say the person's name, so when we know it the phone's own voice says
-   "नमस्ते <name> जी!" and the recording without "नमस्ते" follows (<key>_n). Browsers block sound until
-   the person has tapped once and block the phone's voice even longer, so: sound allowed at load (often
-   in the installed app) → the full recording plays at once, no name; otherwise it starts on the first
-   tap, with the name. rb_voice = 'off' mutes it. */
+   A recording can't say the person's name, so the phone's own voice says "नमस्ते <name> जी!" and the
+   recording without "नमस्ते" follows (<key>_n). rb_voice = 'off' mutes it. */
 const VOX={ tts: typeof window.speechSynthesis!=='undefined' && typeof window.SpeechSynthesisUtterance!=='undefined',
   on: (()=>{ try{ return localStorage.getItem('rb_voice')!=='off'; }catch(e){ return true; } })(), busy:false, tok:0 };
 const VAUD = new Audio(); VAUD.preload='auto';
@@ -4521,10 +4606,13 @@ function voxVoice(lang){
 }
 function voxStop(){ VOX.tok++; VOX.busy=false; try{ VAUD.pause(); }catch(e){} if(VOX.tts) try{ speechSynthesis.cancel(); }catch(e){} paintSpeaking(); }
 /* phone voice — for the name and other changing text only */
-function say(text, onend){
+function say(text, onend, onblocked){
   const done=()=>{ VOX.busy=false; paintSpeaking(); onend&&onend(); };
   if(!VOX.tts || !VOX.on || !text){ onend&&onend(); return false; }
   try{ speechSynthesis.cancel(); }catch(e){}
+  let started=false, gaveUp=false;
+  const blocked=()=>{ if(started||gaveUp) return; gaveUp=true; try{ speechSynthesis.cancel(); }catch(e){} VOX.busy=false; paintSpeaking(); onblocked(); };
+  if(onblocked) setTimeout(blocked, 2500);   /* nothing started = the browser is holding speech back */
   const parts=String(text).split(/(?<=[.!?।;])\s+/).map(s=>s.trim()).filter(Boolean);
   const lang=LANG==='hi'?'hi':'en', v=voxVoice(lang);
   VOX.busy=true; paintSpeaking();
@@ -4533,8 +4621,9 @@ function say(text, onend){
     const u=new SpeechSynthesisUtterance(p);
     u.lang = lang==='hi' ? 'hi-IN' : 'en-IN'; if(v){ u.voice=v; u.lang=v.lang; }
     u.rate = lang==='hi' ? .95 : .98;
-    if(i===parts.length-1) u.onend=fin;
-    u.onerror=e=>{ if(i===parts.length-1 || (e&&e.error==='not-allowed')) fin(); };
+    u.onstart=()=>{ started=true; };
+    if(i===parts.length-1) u.onend=()=>{ if(!gaveUp) fin(); };
+    u.onerror=e=>{ if(gaveUp) return; if(e&&e.error==='not-allowed'&&onblocked&&!started) return blocked(); if(i===parts.length-1 || (e&&e.error==='not-allowed')) fin(); };
     try{ speechSynthesis.speak(u); }catch(e){ fin(); }
   });
   return true;
@@ -4567,9 +4656,10 @@ function afterFirstTouch(fn){
 function paintSpeaking(){ const g=document.getElementById('greetWave'); if(g) g.style.visibility = VOX.busy ? 'visible' : 'hidden'; }
 function hideGreet(ms){ setTimeout(()=>{ const g=document.getElementById('greetCard'); if(g){ g.classList.remove('on'); setTimeout(()=>g.remove(),300); } }, ms||0); }
 /* o = {key, getName(), title(name), sub, fallback, after()}
-   Logged in (a saved Supabase session): the welcome waits for the first tap, because only then may the phone's
-   voice say the name — "नमस्ते <name> जी!" + the recording without "नमस्ते". The name is remembered
-   (rb_vox_name) so it is ready at once on the next reload. Guest: the full recording, at once if allowed. */
+   Plays by itself as soon as the page opens. Logged in (a saved Supabase session): the phone's voice says
+   "नमस्ते <name> जी!", then the recording without "नमस्ते" (<key>_n); the name is remembered (rb_vox_name)
+   so it is ready at once on the next reload. Guest: the full recording. Only when the browser blocks all sound
+   before a tap (a normal browser tab) does it wait for the first tap, and then it still says the name. */
 function hasSession(){ try{ return Object.keys(localStorage).some(k=>/^sb-.*-auth-token$/.test(k) && localStorage.getItem(k)); }catch(e){ return false; } }
 function introVoice(o){
   if(!VOX.on || document.getElementById('greetCard')) return;
@@ -4600,7 +4690,21 @@ function introVoice(o){
     const drop=setTimeout(()=>hideGreet(), 25000);
     afterFirstTouch(()=>{ clearTimeout(drop); withName(); });
   };
-  if(logged && VOX.tts) return waitTap();
+  /* try at once — the installed app (and a browser the person uses often) usually allows sound without a tap */
+  if(logged && VOX.tts){
+    const t0=Date.now(); let tries=0;
+    (async function go(){
+      while(!nameNow() && Date.now()-t0<2500) await new Promise(r=>setTimeout(r,150));
+      const name=nameNow();
+      if(!name) return playVoice(o.key, o.fallback, after, waitTap);
+      say(LANG==='hi' ? `नमस्ते ${name} जी!` : `Namaste ${name}!`,
+          ()=>playVoice(o.key+'_n', o.fallback, after),
+          /* speech held back: the recording may still be allowed — play it now (name stays on the card),
+             and if sound is blocked too, everything waits for the first tap */
+          ()=>playVoice(o.key, o.fallback, after, waitTap));
+    })();
+    return;
+  }
   playVoice(o.key, o.fallback, after, waitTap);
 }
 

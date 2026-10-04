@@ -1554,6 +1554,7 @@ details summary::-webkit-details-marker{display:none}
       <button class="arow" onclick="window.open(VENDOR_SITE,'_blank','noopener')"><div class="ai">🧑‍🌾</div><div><b data-en="Become a vendor" data-hi="वेंडर बनें">Become a vendor</b><span data-en="sell in your village, get orders on your phone" data-hi="अपने गाँव में बेचें, ऑर्डर फ़ोन पर पाएँ">sell in your village, get orders on your phone</span></div><span class="ch">›</span></button>
       <button class="arow" onclick="go('how')"><div class="ai">🎬</div><div><b data-en="How it works" data-hi="यह कैसे काम करता है">How it works</b><span data-en="the whole process, in 3 steps" data-hi="पूरा तरीका, 3 कदम में">the whole process, in 3 steps</span></div><span class="ch">›</span></button>
       <button class="arow" onclick="go('contact')"><div class="ai">💬</div><div><b data-en="Contact us" data-hi="संपर्क करें">Contact us</b><span data-en="drop a message, we read every one" data-hi="मैसेज छोड़ें, हम सब पढ़ते हैं">drop a message, we read every one</span></div><span class="ch">›</span></button>
+      <button class="arow" onclick="openSaved()"><div class="ai">❤️</div><div><b data-en="Saved items" data-hi="सेव किया हुआ सामान">Saved items</b><span data-en="everything you tapped ♥ on — add to basket from here" data-hi="जिन पर ♥ दबाया — यहीं से टोकरी में डालें">everything you tapped ♥ on — add to basket from here</span></div><span class="ch" id="savedCount" style="font-size:13px;font-weight:800;color:var(--g)"></span></button>
       <button class="arow" onclick="openCheck()"><div class="ai">🩺</div><div><b data-en="Check notifications &amp; location" data-hi="सूचनाएँ और लोकेशन जाँचें">Check notifications &amp; location</b><span data-en="see what is blocked, send yourself a test" data-hi="देखें क्या बंद है, खुद को टेस्ट भेजें">see what is blocked, send yourself a test</span></div><span class="ch">›</span></button>
       <button class="arow" onclick="toggleVoiceSetting()"><div class="ai">🔊</div><div><b data-en="Voice welcome" data-hi="आवाज़ में स्वागत">Voice welcome</b><span data-en="greeting and today’s new rates when you open the app" data-hi="ऐप खोलते ही नमस्ते और आज के नए रेट">greeting and today’s new rates when you open the app</span></div><span class="ch" id="voiceRowState" style="font-size:13px;font-weight:800;color:var(--g)"></span></button>
       <a class="arow" href="/privacy.html" style="text-decoration:none;color:inherit"><div class="ai">🔒</div><div><b data-en="Privacy policy" data-hi="गोपनीयता नीति">Privacy policy</b><span data-en="what we collect and how to delete your account" data-hi="हम क्या जानकारी लेते हैं और अकाउंट कैसे हटाएँ">what we collect and how to delete your account</span></div><span class="ch">›</span></a>
@@ -1780,6 +1781,18 @@ details summary::-webkit-details-marker{display:none}
       <button class="bk" onclick="closeCheck()" aria-label="Close">✕</button>
     </div>
     <div id="checkList" style="padding:0 16px 26px;max-height:66vh;overflow-y:auto"></div>
+  </div>
+</div>
+<div class="sheet-wrap" id="savedSheet" style="z-index:165">
+  <div class="sheet-bg" onclick="closeSaved()"></div>
+  <div class="sheet">
+    <div class="sheet-grab"></div>
+    <div class="sheet-hd">
+      <div><b data-en="Saved items" data-hi="सेव किया हुआ सामान">Saved items</b>
+      <span id="savedSub"></span></div>
+      <button class="bk" onclick="closeSaved()" aria-label="Close">✕</button>
+    </div>
+    <div id="savedList" style="max-height:70vh;overflow-y:auto;padding-bottom:20px"></div>
   </div>
 </div>
 <div class="sheet-wrap" id="notifSheet" style="z-index:160">
@@ -2825,13 +2838,14 @@ async function mockApi(fn, args={}){
 
     case 'getSlots': {
       const iso = istISO(sel.day);
-      const r = await rpc('customer_slot_status',
-        {p_type: sel.type||'vegetable', p_area: AREA, p_date: iso});
+      /* with an item in the basket the order goes to that vendor, so show THAT vendor's seats */
+      const r = await rpc('customer_slot_status_for',
+        {p_type: sel.type||'vegetable', p_area: AREA, p_date: iso, p_vendor: sel.vendorId||null});
       if(!r.ok) return {ok:false, msg:r.msg};
       const rows = (r.data||[]).slice().sort((a,b)=>SLOT_ORDER[a.slot]-SLOT_ORDER[b.slot]);
       return {ok:true, data: rows.map(s=>{
         const base = SLOTS.find(x=>x.id===s.slot) || SLOTS[0];
-        return {...base, left: s.has_room ? (s.free||0) : 0, past: !!s.is_past};
+        return {...base, left: s.has_room ? (s.free||0) : 0, past: !!s.is_past, closed: !!s.closed};
       })};
     }
 
@@ -3078,7 +3092,7 @@ function go(s){
   document.getElementById('s-'+s).classList.add('on');
   window.scrollTo(0,0);
   if(s==='login') otpRequired();
-  if(s==='acct') paintVoiceRow();
+  if(s==='acct'){ paintVoiceRow(); paintSavedCount(); }
   const gated=needsProfile();
   document.getElementById('bn').classList.toggle('show', NAVS.includes(s) && !gated);
   document.querySelectorAll('#nav, .h-icons, .h-loc').forEach(el=>{
@@ -3392,7 +3406,9 @@ async function toggleFav(e,id){
   const b=e.currentTarget;
   b.classList.toggle('on',FAVS.has(id));
   b.textContent=FAVS.has(id)?'♥':'♡';
-  toast(FAVS.has(id)?T('Saved','सेव हो गया'):T('Removed','हटा दिया'));
+  toast(FAVS.has(id)?T('Saved — see it in Account → Saved items','सेव हो गया — अकाउंट → सेव किया सामान में देखें'):T('Removed','हटा दिया'));
+  paintSavedCount();
+  if(document.getElementById('savedSheet').classList.contains('on')) setTimeout(renderSaved, 250);
   if(!DEMO){
     const r=await rpc('customer_toggle_favourite',{p_product:id});
     if(!r.ok){                       /* roll the heart back if it did not stick */
@@ -3871,6 +3887,11 @@ async function renderSlotScreen(){
   document.getElementById('days').innerHTML = dayLabels().map(d=>
     `<button class="day-pill ${sel.day===d.i?'sel':''}" onclick="pickDay(${d.i})">
       <i>${d.lbl}</i><b>${d.num}</b><span>${d.mon}</span></button>`).join('');
+  await paintSlotList();
+}
+/* the slot list alone — also refreshed every 30 s while it is on screen, so a vendor closing a slot,
+   changing how many orders they take, or a cancelled order freeing a seat shows up without reopening */
+async function paintSlotList(){
   const res=await mockApi('getSlots');
   const rows = res.data || [];
   const closed = rows.filter(s=>!s.past && s.left>0).length===0;
@@ -3891,12 +3912,13 @@ async function renderSlotScreen(){
         <span class="cap">${T('N/A','उपलब्ध नहीं')}</span>
       </button>`;
     }
-    const past = !!s.past, full = !past && s.left===0, off = past||full;
+    const past = !!s.past, shut = !past && s.closed, full = !past && !shut && s.left===0, off = past||shut||full;
     const why  = past ? T('this window has already started','इसका समय निकल चुका है')
+               : shut ? T('the vendor is not coming in this window','वेंडर इस समय नहीं आ रहा')
                : full ? T('vendor is fully booked','वेंडर भर गया')
                       : T('vendor comes in this window','वेंडर इसी समय में आएगा');
-    const tag  = past ? T('CLOSED','समय निकला') : full ? T('FULL','भरा')
-                      : s.left+' '+T('slots left','स्लॉट बचे');
+    const tag  = past ? T('CLOSED','समय निकला') : shut ? T('OFF','बंद') : full ? T('FULL','भरा')
+                      : T(s.left+(s.left===1?' order left':' orders left'), s.left+' ऑर्डर की जगह बाकी');
     return `<button class="slot ${off?'full':''} ${sel.slot===s.id?'sel':''}" ${off?'disabled':''}
       onclick="${off?'':`pickSlot('${s.id}')`}">
       <span class="se">${s.em}</span>
@@ -3911,6 +3933,9 @@ async function renderSlotScreen(){
   if(sel.slot && !rows.some(s=>s.id===sel.slot && !s.past && s.left>0)) sel.slot=null;
   checkSlot();
 }
+setInterval(()=>{
+  const on=document.getElementById('s-slot'); if(on && on.classList.contains('on') && document.visibilityState==='visible') paintSlotList();
+}, 30000);
 function pickType(t){
   if(sel.type!==t) sel.vendorId=null;   /* a vendor picked for veg doesn't carry over to fruit */
   sel.type=t; renderSlotScreen();
@@ -5061,6 +5086,31 @@ async function syncPush(){
 let CK={}, CK_TEST=null;
 function openCheck(){ document.getElementById('checkSheet').classList.add('on'); runCheck(); }
 function closeCheck(){ document.getElementById('checkSheet').classList.remove('on'); }
+/* Saved items = the products the customer tapped ♥ on (customer_toggle_favourite; loaded with customer_home) */
+async function openSaved(){
+  if(!DEMO && !user){ toast(T('Log in to see your saved items','सेव किया सामान देखने के लिए लॉगिन करें')); return go('login'); }
+  document.getElementById('savedSheet').classList.add('on');
+  document.getElementById('savedList').innerHTML=skeletons(2);
+  if(!PRODUCTS.length) await mockApi('getCatalogue',{type:'all'});
+  /* the ♥ list is loaded with the catalogue — refresh it, a guest who logged in later has none yet */
+  if(!DEMO){ const r=await rpc('customer_home',{p_area:AREA}); if(r.ok && r.data && Array.isArray(r.data.favourites)){ FAVS.clear(); r.data.favourites.forEach(id=>FAVS.add(id)); } }
+  renderSaved();
+}
+function closeSaved(){ document.getElementById('savedSheet').classList.remove('on'); }
+function renderSaved(){
+  const list=PRODUCTS.filter(p=>FAVS.has(p.id));
+  const away=FAVS.size-list.length;
+  document.getElementById('savedSub').textContent = list.length
+    ? T(list.length+(list.length===1?' item':' items'), list.length+' सामान') : '';
+  document.getElementById('savedList').innerHTML = list.length
+    ? `<div class="grid" style="grid-template-columns:1fr 1fr;max-width:none;padding:4px 16px 8px">${list.map(card).join('')}</div>`
+      + (away>0 ? `<div class="note" style="margin:6px 16px 0"><span>📍</span><span>${T(away+' saved item(s) are not sold in '+AREA+' right now','आपके सेव किए '+away+' सामान अभी '+AREA+' में नहीं मिल रहे')}</span></div>` : '')
+    : `<div class="empty" style="padding:30px 16px"><div class="ee">♡</div><b>${T('Nothing saved yet','अभी कुछ सेव नहीं किया')}</b>
+        <p>${T('Tap the heart ♡ on any item to keep it here','किसी भी सामान पर ♡ दबाएँ, वो यहाँ दिखेगा')}</p>
+        <button class="bigbtn" style="margin-top:16px;padding:13px 26px" onclick="closeSaved();go('home')">${T('Browse items','सामान देखें')}</button></div>`;
+  paintSavedCount();
+}
+function paintSavedCount(){ const el=document.getElementById('savedCount'); if(el) el.textContent = FAVS.size ? String(FAVS.size) : ''; }
 function ckRow(ok, title, detail){
   const ic = ok===true?'✅':ok===false?'❌':ok==='warn'?'⚠️':'⏳';
   return `<div class="ckrow"><div class="ck">${ic}</div><div style="min-width:0"><b>${title}</b>${detail?`<span>${detail}</span>`:''}</div></div>`;
@@ -5505,11 +5555,8 @@ function renderAll(){
 }
 /* ---------- Spoken welcome on every open / reload (4 Oct 2026) ----------
    Recorded MP3s in ./voice/<hi|en>/ (neural voices made once with Kokoro: hf_alpha Hindi, af_heart English).
-   A recording can't say the person's name, so when we know it the phone's own voice says
-   "नमस्ते <name> जी!" and the recording without "नमस्ते" follows (<key>_n). Browsers block sound until
-   the person has tapped once and block the phone's voice even longer, so: sound allowed at load (often
-   in the installed app) → the full recording plays at once, no name; otherwise it starts on the first
-   tap, with the name. rb_voice = 'off' mutes it. */
+   A recording can't say the person's name, so the phone's own voice says "नमस्ते <name> जी!" and the
+   recording without "नमस्ते" follows (<key>_n). rb_voice = 'off' mutes it. */
 const VOX={ tts: typeof window.speechSynthesis!=='undefined' && typeof window.SpeechSynthesisUtterance!=='undefined',
   on: (()=>{ try{ return localStorage.getItem('rb_voice')!=='off'; }catch(e){ return true; } })(), busy:false, tok:0 };
 const VAUD = new Audio(); VAUD.preload='auto';
@@ -5526,10 +5573,13 @@ function voxVoice(lang){
 }
 function voxStop(){ VOX.tok++; VOX.busy=false; try{ VAUD.pause(); }catch(e){} if(VOX.tts) try{ speechSynthesis.cancel(); }catch(e){} paintSpeaking(); }
 /* phone voice — for the name and other changing text only */
-function say(text, onend){
+function say(text, onend, onblocked){
   const done=()=>{ VOX.busy=false; paintSpeaking(); onend&&onend(); };
   if(!VOX.tts || !VOX.on || !text){ onend&&onend(); return false; }
   try{ speechSynthesis.cancel(); }catch(e){}
+  let started=false, gaveUp=false;
+  const blocked=()=>{ if(started||gaveUp) return; gaveUp=true; try{ speechSynthesis.cancel(); }catch(e){} VOX.busy=false; paintSpeaking(); onblocked(); };
+  if(onblocked) setTimeout(blocked, 2500);   /* nothing started = the browser is holding speech back */
   const parts=String(text).split(/(?<=[.!?।;])\s+/).map(s=>s.trim()).filter(Boolean);
   const lang=LANG==='hi'?'hi':'en', v=voxVoice(lang);
   VOX.busy=true; paintSpeaking();
@@ -5538,8 +5588,9 @@ function say(text, onend){
     const u=new SpeechSynthesisUtterance(p);
     u.lang = lang==='hi' ? 'hi-IN' : 'en-IN'; if(v){ u.voice=v; u.lang=v.lang; }
     u.rate = lang==='hi' ? .95 : .98;
-    if(i===parts.length-1) u.onend=fin;
-    u.onerror=e=>{ if(i===parts.length-1 || (e&&e.error==='not-allowed')) fin(); };
+    u.onstart=()=>{ started=true; };
+    if(i===parts.length-1) u.onend=()=>{ if(!gaveUp) fin(); };
+    u.onerror=e=>{ if(gaveUp) return; if(e&&e.error==='not-allowed'&&onblocked&&!started) return blocked(); if(i===parts.length-1 || (e&&e.error==='not-allowed')) fin(); };
     try{ speechSynthesis.speak(u); }catch(e){ fin(); }
   });
   return true;
@@ -5572,9 +5623,10 @@ function afterFirstTouch(fn){
 function paintSpeaking(){ const g=document.getElementById('greetWave'); if(g) g.style.visibility = VOX.busy ? 'visible' : 'hidden'; }
 function hideGreet(ms){ setTimeout(()=>{ const g=document.getElementById('greetCard'); if(g){ g.classList.remove('on'); setTimeout(()=>g.remove(),300); } }, ms||0); }
 /* o = {key, getName(), title(name), sub, fallback, after()}
-   Logged in (a saved Supabase session): the welcome waits for the first tap, because only then may the phone's
-   voice say the name — "नमस्ते <name> जी!" + the recording without "नमस्ते". The name is remembered
-   (rb_vox_name) so it is ready at once on the next reload. Guest: the full recording, at once if allowed. */
+   Plays by itself as soon as the page opens. Logged in (a saved Supabase session): the phone's voice says
+   "नमस्ते <name> जी!", then the recording without "नमस्ते" (<key>_n); the name is remembered (rb_vox_name)
+   so it is ready at once on the next reload. Guest: the full recording. Only when the browser blocks all sound
+   before a tap (a normal browser tab) does it wait for the first tap, and then it still says the name. */
 function hasSession(){ try{ return Object.keys(localStorage).some(k=>/^sb-.*-auth-token$/.test(k) && localStorage.getItem(k)); }catch(e){ return false; } }
 function introVoice(o){
   if(!VOX.on || document.getElementById('greetCard')) return;
@@ -5605,7 +5657,21 @@ function introVoice(o){
     const drop=setTimeout(()=>hideGreet(), 25000);
     afterFirstTouch(()=>{ clearTimeout(drop); withName(); });
   };
-  if(logged && VOX.tts) return waitTap();
+  /* try at once — the installed app (and a browser the person uses often) usually allows sound without a tap */
+  if(logged && VOX.tts){
+    const t0=Date.now(); let tries=0;
+    (async function go(){
+      while(!nameNow() && Date.now()-t0<2500) await new Promise(r=>setTimeout(r,150));
+      const name=nameNow();
+      if(!name) return playVoice(o.key, o.fallback, after, waitTap);
+      say(LANG==='hi' ? `नमस्ते ${name} जी!` : `Namaste ${name}!`,
+          ()=>playVoice(o.key+'_n', o.fallback, after),
+          /* speech held back: the recording may still be allowed — play it now (name stays on the card),
+             and if sound is blocked too, everything waits for the first tap */
+          ()=>playVoice(o.key, o.fallback, after, waitTap));
+    })();
+    return;
+  }
   playVoice(o.key, o.fallback, after, waitTap);
 }
 
