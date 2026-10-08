@@ -1,0 +1,32 @@
+# RozBazaar customer website (rozbazaar.shop) — the original app.
+# It talks to Supabase straight from the browser, so this file must NOT carry the new app's
+# Content-Security-Policy (that one only allows api.rozbazaar.shop and blocked all data).
+Options -Indexes
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+  RewriteRule ^vendor/?$ /vendor.html [L]
+</IfModule>
+<IfModule mod_headers.c>
+  Header always unset Content-Security-Policy
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Strict-Transport-Security "max-age=31536000"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(self), camera=(self), microphone=(), payment=()"
+  # The app files keep the same names, so phones must always check for a newer copy.
+  <FilesMatch "(\.html|sw\.js|app\.js|styles\.css|manifest\.webmanifest)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+# Android app download (rozbazaar.shop/app/RozBazaar.apk): right type, always saved as a file.
+<IfModule mod_mime.c>
+  AddType application/vnd.android.package-archive .apk
+</IfModule>
+<IfModule mod_headers.c>
+  <FilesMatch "\.apk$">
+    Header set Content-Disposition "attachment; filename=RozBazaar.apk"
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>

@@ -1,0 +1,3 @@
+-- Re-applied public.rb_backup_sql() with typed text literals (an untyped literal appended to the
+-- text[] buffer was read as an array: "malformed array literal"). The full, current definition is
+-- in 20261001a_backup_export.sql (that file already contains the fix), so this file has no SQL.
