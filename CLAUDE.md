@@ -182,15 +182,11 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   session that is not the phone-verified Supabase user for that number. `customer_login_config()` (anon)
   tells the page. The platform/ API still uses the anonymous path — turn OTP on only for the live site.
 - Login is only required at booking time, never to browse.
-- **Spoken welcome on every open / reload** (4 Oct 2026; the first-visit step-by-step guide was built and then removed
-  on Vedanshu's request — don't bring it back unasked). Shared code in both live sites: `introVoice()`, `playVoice()`, `say()`,
-  `VOX`, `afterFirstTouch` + `#greetCard` CSS. Recorded MP3s in `voice/hi|en/` (Kokoro: `hf_alpha` Hindi, `af_heart` English;
-  upload the `voice/` folder with the site): customer `greet` = “नमस्ते! आपका स्वागत है रोज़बाज़ार में। आपकी सब्ज़ी, आपका
-  भरोसेमंद वेंडर, आपके टाइम पर।”, `greet_n` = same without “नमस्ते”. It **plays by itself** at load: **logged in** (saved `sb-…-auth-token`) → phone voice
-  “नमस्ते <first name> जी!” then `greet_n`; guest → full `greet`. Only if the browser blocks sound before a tap (plain
-  browser tab; the installed app normally allows it) does it wait for the first tap — and still says the name. `say()` reports
-  "blocked" (error `not-allowed` / nothing started in 2.5 s) so the code can fall back. Name cached in `rb_vox_name`. Customer then says rates changed since the last visit (`rb_rates`, max 4) with the phone voice. `rb_voice='off'`
-  mutes (🔇 on the card; Account → “Voice welcome” toggles).
+- **No spoken welcome any more** (removed 8 Oct 2026 on Vedanshu's request, both live sites; the `voice/` folders are
+  deleted). The engine code (`introVoice`, `playVoice`, `say`, `VOX`, `#greetCard` CSS) is still in both files but nothing calls
+  it — don't wire it back unasked. The step-by-step first-visit guide was also removed earlier — don't bring it back unasked.
+  What the voice used to do for the rates board is now `rememberRates()` at load: the board compares with `RATES_PREV`
+  (rb_rates read once at load), then today's rates are saved for the next visit.
 - **Saved items** (4 Oct 2026): the ♥ on a product card = `customer_toggle_favourite`; Account → “❤️ Saved items” opens
   `#savedSheet` (`openSaved/renderSaved`, refreshes `favourites` from `customer_home`), cards with ADD, note for saved items
   not sold in the current village.
@@ -209,7 +205,11 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   `rb_appstrip_hide`) + "App" pill in the desktop nav (`#navGet`) → `getApp()`. Android = one tap downloads
   `customer/app/RozBazaar.apk` straight away, no sheet (TWA `shop.rozbazaar.twa` 1.0.0.0, signed with the upload key
   67:8E…07:E0 that is in assetlinks — NOT the Play-signed build); iPhone = small `#iosTip` bubble pointing at Share →
-  "Add to Home Screen" (iOS allows no APK and no install prompt; Vedanshu asked for no big sheet); computer = `#appSheet` with only a QR code to `/?get=app` (opens the flow on the phone). Hidden inside the app (`appInstalled()`).
+  "Add to Home Screen" (iOS allows no APK and no install prompt; Vedanshu asked for no big sheet); computer = `#appSheet` with only a QR code to `/?get=app` (opens the flow on the phone). Also a row in My account (`#acctGetApp`). Installed check: `checkAppInstalled()` uses Chrome's
+  `navigator.getInstalledRelatedApps()` (manifest `related_applications` = play `shop.rozbazaar.twa` + the webapp; the APK
+  carries asset statements for rozbazaar.shop), re-checked when the tab comes back: installed → every Download button hidden,
+  not installed (incl. after an uninstall) → shown again. Browsers without that API (iPhone etc.): after a download tap
+  (`rb_app_dl`) the top strip/pill hide for 7 days, the Account row stays. Always hidden inside the app (`appInstalled()`).
   `.htaccess` serves `.apk` as `application/vnd.android.package-archive`. Downloads are logged as `log_visit('apk_download')`.
   Replace the APK file when a new version is built (same file name).
 - **ADD → qty stepper**: `addBtn(id)` renders ADD or `− qty +` (`.qstep`) from `cart`; `paintAllAdds()` (end of

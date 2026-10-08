@@ -850,6 +850,7 @@ details summary::-webkit-details-marker{display:none}
   justify-content:center;font-family:var(--disp);font-size:24px;font-weight:800;flex-shrink:0}
 .prof b{display:block;font-size:17px;font-weight:800}
 .prof span{font-size:13px;font-weight:700;color:var(--g-dk)}
+.arow[hidden]{display:none}
 .arow{display:flex;align-items:center;gap:13px;padding:16px 2px;border-bottom:1px solid var(--line);width:100%;text-align:left}
 .arow:last-child{border-bottom:none}
 .arow .ai{width:38px;height:38px;border-radius:11px;background:var(--grey);display:flex;align-items:center;
@@ -1657,7 +1658,7 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
       <button class="arow" onclick="go('contact')"><div class="ai">💬</div><div><b data-en="Contact us" data-hi="संपर्क करें">Contact us</b><span data-en="drop a message, we read every one" data-hi="मैसेज छोड़ें, हम सब पढ़ते हैं">drop a message, we read every one</span></div><span class="ch">›</span></button>
       <button class="arow" onclick="openSaved()"><div class="ai">❤️</div><div><b data-en="Saved items" data-hi="सेव किया हुआ सामान">Saved items</b><span data-en="everything you tapped ♥ on — add to basket from here" data-hi="जिन पर ♥ दबाया — यहीं से टोकरी में डालें">everything you tapped ♥ on — add to basket from here</span></div><span class="ch" id="savedCount" style="font-size:13px;font-weight:800;color:var(--g)"></span></button>
       <button class="arow" onclick="openCheck()"><div class="ai">🩺</div><div><b data-en="Check notifications &amp; location" data-hi="सूचनाएँ और लोकेशन जाँचें">Check notifications &amp; location</b><span data-en="see what is blocked, send yourself a test" data-hi="देखें क्या बंद है, खुद को टेस्ट भेजें">see what is blocked, send yourself a test</span></div><span class="ch">›</span></button>
-      <button class="arow" onclick="toggleVoiceSetting()"><div class="ai">🔊</div><div><b data-en="Voice welcome" data-hi="आवाज़ में स्वागत">Voice welcome</b><span data-en="greeting and today’s new rates when you open the app" data-hi="ऐप खोलते ही नमस्ते और आज के नए रेट">greeting and today’s new rates when you open the app</span></div><span class="ch" id="voiceRowState" style="font-size:13px;font-weight:800;color:var(--g)"></span></button>
+      <button class="arow" id="acctGetApp" onclick="getApp()" hidden><div class="ai"><i class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg></i></div><div><b data-en="Download the RozBazaar app" data-hi="RozBazaar ऐप डाउनलोड करें">Download the RozBazaar app</b><span data-en="Android app · iPhone home-screen app" data-hi="Android ऐप · iPhone होम-स्क्रीन ऐप">Android app · iPhone home-screen app</span></div><span class="ch">›</span></button>
       <a class="arow" href="/privacy.html" style="text-decoration:none;color:inherit"><div class="ai">🔒</div><div><b data-en="Privacy policy" data-hi="गोपनीयता नीति">Privacy policy</b><span data-en="what we collect and how to delete your account" data-hi="हम क्या जानकारी लेते हैं और अकाउंट कैसे हटाएँ">what we collect and how to delete your account</span></div><span class="ch">›</span></a>
     </div>
     <p class="muted" style="text-align:center;margin-top:26px;font-size:11.5px">RozBazaar · Pataudi • Haileymandi • aas-paas</p>
@@ -3267,7 +3268,7 @@ function go(s){
   document.getElementById('s-'+s).classList.add('on');
   window.scrollTo(0,0);
   if(s==='login') otpRequired();
-  if(s==='acct'){ paintVoiceRow(); paintSavedCount(); }
+  if(s==='acct'){ paintGetApp(); paintSavedCount(); }
   if(s==='contact') renderFaq();
   const gated=needsProfile();
   document.getElementById('bn').classList.toggle('show', NAVS.includes(s) && !gated);
@@ -3632,6 +3633,7 @@ async function renderHome(){
   refreshRepeat();
 }
 /* Today's rates: every item in stock, cheapest vendor's price, with ▲/▼ against the last visit (rb_rates) */
+const RATES_PREV=(()=>{ try{ return JSON.parse(localStorage.getItem('rb_rates')||'null'); }catch(e){ return null; } })();
 let RATES_ALL=false;
 function renderRates(all){
   const sec=document.getElementById('ratesSec'), box=document.getElementById('ratesBoard'); if(!sec||!box) return;
@@ -3640,7 +3642,7 @@ function renderRates(all){
   const order={vegetable:0,onion_potato:1,fruit:2};
   const list=Object.values(m).sort((a,b)=>(order[a.cat]??3)-(order[b.cat]??3) || pname(a).localeCompare(pname(b)));
   if(!list.length){ sec.style.display='none'; return; }
-  let prev=null; try{ prev=JSON.parse(localStorage.getItem('rb_rates')||'null'); }catch(e){}
+  let prev=RATES_PREV;
   const shown=RATES_ALL?list:list.slice(0,8);
   document.getElementById('ratesDate').textContent=new Date().toLocaleDateString(LANG==='en'?'en-IN':'hi-IN',{day:'numeric',month:'short'});
   box.innerHTML=shown.map(p=>{
@@ -5312,13 +5314,31 @@ const IS_ANDROID=/Android/i.test(UA);
 function appInstalled(){
   try{ return IN_APP || navigator.standalone===true || matchMedia('(display-mode: standalone)').matches; }catch(e){ return IN_APP; }
 }
-function paintGetApp(){
-  const inst=appInstalled();
-  const nav=document.getElementById('navGet'); if(nav) nav.hidden=inst;
-  const st=document.getElementById('appStrip'); if(!st) return;
-  let hid=0; try{ hid=+localStorage.getItem('rb_appstrip_hide')||0; }catch(e){}
-  st.hidden = inst || (Date.now()-hid < 3*864e5);
+/* Is the app on this phone?  Chrome on Android tells us (getInstalledRelatedApps + manifest related_applications +
+   the APK's asset statements). true = installed → hide every Download button; false = not installed (also after an
+   uninstall) → show them again; null = this browser can't tell (iPhone, others) → hide the top strip for 7 days after a
+   download tap, the Account row stays. */
+let HAS_APP=null;
+async function checkAppInstalled(){
+  if(!navigator.getInstalledRelatedApps) return paintGetApp();
+  try{
+    const l=await navigator.getInstalledRelatedApps();
+    HAS_APP = l.some(a=>a.id==='shop.rozbazaar.twa' || a.platform==='webapp');
+    if(!HAS_APP){ try{ localStorage.removeItem('rb_app_dl'); }catch(e){} }
+  }catch(e){}
+  paintGetApp();
 }
+addEventListener('appinstalled', ()=>{ HAS_APP=true; paintGetApp(); });
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') checkAppInstalled(); });
+function paintGetApp(){
+  const inst = appInstalled() || HAS_APP===true;
+  let hid=0, dl=0; try{ hid=+localStorage.getItem('rb_appstrip_hide')||0; dl=+localStorage.getItem('rb_app_dl')||0; }catch(e){}
+  const recentDl = HAS_APP===null && Date.now()-dl < 7*864e5;
+  const nav=document.getElementById('navGet'); if(nav) nav.hidden = inst || recentDl;
+  const row=document.getElementById('acctGetApp'); if(row) row.hidden = inst;
+  const st=document.getElementById('appStrip'); if(st) st.hidden = inst || recentDl || (Date.now()-hid < 3*864e5);
+}
+function markDownloaded(){ try{ localStorage.setItem('rb_app_dl', String(Date.now())); }catch(e){} paintGetApp(); }
 function hideAppStrip(){
   try{ localStorage.setItem('rb_appstrip_hide', String(Date.now())); }catch(e){}
   paintGetApp();
@@ -5326,7 +5346,7 @@ function hideAppStrip(){
 function startApkDownload(){
   const a=document.createElement('a'); a.href=APK_URL; a.download='RozBazaar.apk';
   document.body.appendChild(a); a.click(); a.remove();
-  apkClicked();
+  apkClicked(); markDownloaded();
 }
 function apkClicked(){
   const st=document.getElementById('gaStatus'); if(st) st.hidden=false;
@@ -5348,7 +5368,7 @@ function showIosTip(){
   const top=/CriOS|FxiOS|EdgiOS/.test(UA);           /* Chrome/Firefox on iPhone: Share is at the top */
   t.classList.toggle('top', top);
   document.getElementById('iosTipT').textContent = top ? T('Tap Share above','ऊपर शेयर बटन दबाएँ') : T('Tap Share below','नीचे शेयर बटन दबाएँ');
-  t.classList.add('on'); clearTimeout(iosTipT); iosTipT=setTimeout(hideIosTip, 15000);
+  t.classList.add('on'); markDownloaded(); clearTimeout(iosTipT); iosTipT=setTimeout(hideIosTip, 15000);
   if(!DEMO) rpc('log_visit',{p_page:'ios_install_tip'}).catch(()=>{});
 }
 function hideIosTip(){ const t=document.getElementById('iosTip'); if(t) t.classList.remove('on'); }
@@ -6067,6 +6087,12 @@ function changedRates(){
   const list=keys.map(k=>{ const p=cur[k]; return hi ? `${p.hi||p.en} ${p.price} रुपये ${unitSay(p.unit)}` : `${p.en}, ${p.price} rupees ${unitSay(p.unit)}`; });
   return {cur, list, text: list.length ? (hi?`आज के नए रेट: ${list.join(', ')}।`:`Today's new rates: ${list.join('; ')}.`) : ''};
 }
+/* the board compares with the rates seen on the PREVIOUS visit — read once, before this visit saves its own */
+async function rememberRates(){
+  const t0=Date.now();
+  while(Date.now()-t0<6000 && !(PRODUCTS&&PRODUCTS.length)) await new Promise(r=>setTimeout(r,250));
+  if(PRODUCTS&&PRODUCTS.length) saveRates(rateMap());
+}
 async function afterGreet(){
   const t0=Date.now();
   while(Date.now()-t0<3000 && !(PRODUCTS&&PRODUCTS.length)) await new Promise(r=>setTimeout(r,200));
@@ -6212,10 +6238,10 @@ window.addEventListener('DOMContentLoaded',()=>{
   restoreSession();
   paintHeaderIdentity();
   if(!DEMO){ rpc('log_visit',{p_page:'customer'}).catch(()=>{}); }
-  paintGetApp();
+  checkAppInstalled();
   if(/[?&]get=app/.test(location.search) && !appInstalled()) setTimeout(getApp, 2300);   /* QR code on the computer */
   loadAreas();
-  greet();                       /* spoken welcome on every open / reload */
+  rememberRates();               /* store today's rates for the ▲/▼ board on the next visit (voice welcome removed 8 Oct) */
   setTimeout(showLocAsk, 2600);
   setTimeout(nag, 9000);
   maybeRemindAbandonedCart();

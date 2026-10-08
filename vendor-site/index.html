@@ -2029,7 +2029,6 @@ function pwCard(){
       <input class="fld" id="cpw2" type="password" autocomplete="new-password">
       <button class="btn btn-g btn-sm" style="margin-top:14px" onclick="requestPasswordChange()">${first?T('Save password','पासवर्ड सेव करो'):T('Send to admin for approval','एडमिन को अप्रूवल के लिए भेजो')}</button>
     </div>
-    <button class="btn btn-out" style="margin-top:4px" onclick="toggleVendorVoice()">🔊 ${T('Voice welcome','आवाज़ वाला स्वागत')}: ${VOX.on?T('On','चालू'):T('Off','बंद')}</button>
     <button class="btn btn-out" style="margin-top:8px" onclick="vendorLogout()">🚪 ${T('Log out','लॉग आउट')}</button>`;
 }
 async function vendorLogout(){
@@ -4749,7 +4748,6 @@ window.addEventListener('DOMContentLoaded',()=>{
   });
   setLang(LANG, true);
   restoreSession();
-  vendorGreet();                 /* spoken welcome on every open / reload */
   setTimeout(()=>{
     const sp=document.getElementById('splash');
     sp.classList.add('out');
