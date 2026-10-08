@@ -20,3 +20,13 @@ Options -Indexes
     Header set Cache-Control "no-cache"
   </FilesMatch>
 </IfModule>
+# Android app download (rozbazaar.shop/app/RozBazaar.apk): right type, always saved as a file.
+<IfModule mod_mime.c>
+  AddType application/vnd.android.package-archive .apk
+</IfModule>
+<IfModule mod_headers.c>
+  <FilesMatch "\.apk$">
+    Header set Content-Disposition "attachment; filename=RozBazaar.apk"
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
