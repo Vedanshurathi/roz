@@ -206,10 +206,10 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   can't load) — category tabs, offer tiles, cards, and the no-drawing product fallback. Emojis in code are fine — they are
   converted — but add a mapping in `EMO_ICON` for a new one.
 - **Get the app** (8 Oct 2026): strip at the top of the mobile home header (`#appStrip`, × hides it 3 days via
-  `rb_appstrip_hide`) + "App" pill in the desktop nav (`#navGet`) → `getApp()`. Android = direct APK download
-  `customer/app/RozBazaar.apk` (TWA `shop.rozbazaar.twa` 1.0.0.0, signed with the upload key 67:8E…07:E0 that is in
-  assetlinks — NOT the Play-signed build) + install steps sheet `#appSheet`; iPhone = "Add to Home Screen" steps (iOS can't
-  install APKs); computer = QR code to `/?get=app` (opens the flow on the phone). Hidden inside the app (`appInstalled()`).
+  `rb_appstrip_hide`) + "App" pill in the desktop nav (`#navGet`) → `getApp()`. Android = one tap downloads
+  `customer/app/RozBazaar.apk` straight away, no sheet (TWA `shop.rozbazaar.twa` 1.0.0.0, signed with the upload key
+  67:8E…07:E0 that is in assetlinks — NOT the Play-signed build); iPhone = small `#iosTip` bubble pointing at Share →
+  "Add to Home Screen" (iOS allows no APK and no install prompt; Vedanshu asked for no big sheet); computer = `#appSheet` with only a QR code to `/?get=app` (opens the flow on the phone). Hidden inside the app (`appInstalled()`).
   `.htaccess` serves `.apk` as `application/vnd.android.package-archive`. Downloads are logged as `log_visit('apk_download')`.
   Replace the APK file when a new version is built (same file name).
 - **ADD → qty stepper**: `addBtn(id)` renders ADD or `− qty +` (`.qstep`) from `cart`; `paintAllAdds()` (end of
