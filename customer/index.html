@@ -2003,6 +2003,12 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
 <div class="toast" id="toast"></div>
 
 <script>
+/* links shared as rozbazaar.shop/?v=2 (to get a fresh WhatsApp preview) or with tracking tags show as plain
+   rozbazaar.shop in the address bar. Only these share-tags are removed — ?get=app, ?source=pwa, ?code= stay. */
+(function(){ try{
+  const u=new URL(location.href), drop=[...u.searchParams.keys()].filter(k=>k==='v'||/^utm_/.test(k)||k==='fbclid'||k==='gclid');
+  if(drop.length){ drop.forEach(k=>u.searchParams.delete(k)); history.replaceState(history.state,'',u.pathname+(u.searchParams.toString()?'?'+u.searchParams:'')+u.hash); }
+}catch(e){} })();
 const RB_BUILD='2026.08.12-1';
 console.log('RozBazaar customer build', RB_BUILD);
 
