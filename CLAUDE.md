@@ -41,7 +41,8 @@ Business docs: `docs/` (pitch deck summary, problem validation, Haryana govt sch
 customer/          → deployed to Hostinger public_html (rozbazaar.shop)
   index.html         single-file customer app (~535 KB: HTML+CSS+JS, inline SVG art)
   sw.js              service worker for web push — MUST sit at public_html root
-  og.jpg             link-preview image (1200×630)
+  og-customer.jpg    link-preview image (1200×630) — og:image points here (?v=2); og.jpg is the same picture.
+                     After changing it, use a NEW file name (WhatsApp/Facebook cache by URL) and re-scrape.
   _headers _redirects  Netlify-style headers/redirects (kept for portability)
 vendor/            → also deployed to the same public_html (rozbazaar.shop/vendor.html) — OLD vendor app
   vendor.html        single-file vendor app (~400 KB)
