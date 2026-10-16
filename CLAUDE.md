@@ -44,12 +44,14 @@ customer/          → deployed to Hostinger public_html (rozbazaar.shop)
   og-customer.jpg    link-preview image (1200×630) — og:image points here (?v=2); og.jpg is the same picture.
                      After changing it, use a NEW file name (WhatsApp/Facebook cache by URL) and re-scrape.
   _headers _redirects  Netlify-style headers/redirects (kept for portability)
-vendor/            → also deployed to the same public_html (rozbazaar.shop/vendor.html) — OLD vendor app
+vendor/            → OLD vendor app, NOT deployed any more (kept for reference). rozbazaar.shop/vendor.html is now
+                     customer/vendor.html — a 1 KB page that forwards to vendor.rozbazaar.shop (it was a 404 on 16 Oct 2026)
   vendor.html        single-file vendor app (~400 KB)
   og-vendor.jpg
 vendor-site/       → its OWN Hostinger website — the vendor app to use (old UI + phone/password login)
   index.html         single-file vendor app — registered: phone + password; first time: Google registration
   sw.js, manifest.webmanifest, icon-*.png, badge-96.png, .htaccess, robots.txt
+  og-vendor.jpg      link-preview image (og:image = https://vendor.rozbazaar.shop/og-vendor.jpg; rozbazaar.shop's copy is gone)
 staff-site/        → its OWN Hostinger website for employees (same layout as admin-site)
   index.html         single-file staff app (sales + intern views) — login with phone + password
   sw.js, manifest.webmanifest, icon-*.png, badge-96.png   web push + installable PWA
