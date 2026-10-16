@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-PVFKb6AZ7cwg+EPgH7Xovw/RJRbeCV5YrdqmIdrKATk=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-WCGZAZ3oueB5YCoYt2W85tAkhNU2b/+Iof4FkxoJXD4=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -633,7 +633,7 @@ const TITLES = {
   customers: ['Customers', 'naam pe click karo — saare orders'], areas: ['Villages', 'gaon, location, coverage'],
   messages: ['Messages', 'customers kya bol rahe hain'], staff: ['Team', 'sales + interns — role, type, password approval'], tasks: ['Kaam (tasks)', 'sales ya intern ko kaam do — status yahan dikhega'],
   ws: ['Intern workspace', 'har intern ki to-do sheet, files, meetings aur daily report'],
-  targets: ['Sales targets', 'sale ka target aur time — progress apne aap'], broadcast: ['Notification bhejo', 'sab customers / vendors / staff ke phone pe ek saath'], dreport: ['Kisko mila / khola', 'har notification — kis phone number pe pahuncha, kisne khola'], settings: ['Settings', 'commission aur notifications'], traffic: ['Traffic', 'kitne log aa rahe hain'],
+  targets: ['Sales targets', 'sale ka target aur time — progress apne aap'], broadcast: ['Notification bhejo', 'sab customers / vendors / staff ke phone pe ek saath'], dreport: ['Kisko mila / khola', 'har notification — kis phone number pe pahuncha, kisne khola'], settings: ['Settings', 'commission, minimum order aur notifications'], traffic: ['Traffic', 'kitne log aa rahe hain'],
   launch: ['Launch check', 'real order ke liye kya baaki hai']
 };
 function go(v) {
@@ -1819,6 +1819,13 @@ function vSettings(el, rv) {
         ${kpi('30 din ka commission', money(f.platform_revenue), `${money(f.gmv_month)} sale ka ${r}%`, 'good', '📈')}
         ${kpi('Ab tak ka commission', money(f.platform_revenue_all), `${money(f.gmv_all)} sale ka ${r}%`, '', '💼')}</div>
       <div class="mu" style="margin-top:10px">Example: ₹1,000 ki sale pe ₹${Math.round(1000 * r / 100)} commission.</div></div>
+    <div class="card ${rv} d2" style="margin-top:14px"><b style="font-size:16px">🧺 Minimum order</b>
+      <p class="mu" style="margin:4px 0 14px;line-height:1.55">Isse kam ka order customer book nahi kar sakta. Basket me 2 vendor ka saman ho to
+        <b>har vendor ka order alag</b> se itna hona chahiye (har vendor alag aata hai). Badalte hi website aur app pe turant lagu.</p>
+      <div class="row"><div style="position:relative;flex:0 0 140px"><span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-weight:800;color:var(--mut)">₹</span>
+        <input class="fld" id="minOrder" inputmode="numeric" value="${D.settings.min_order ?? 50}" style="padding-left:30px;font-size:20px;font-weight:800"></div>
+        <button class="btn btn-g" data-act="saveMinOrder">Save</button>
+        <span class="mu">${D.settings.min_order_updated_at ? 'Aakhri badlav ' + when(D.settings.min_order_updated_at) : 'Abhi default ₹50'}</span></div></div>
     <div class="card ${rv} d2" style="margin-top:14px"><b style="font-size:16px">🔑 Customer login: SMS OTP</b>
       <p class="mu" style="margin:4px 0 12px;line-height:1.55">Abhi: <b>${D.settings.customer_otp ? 'ON — phone login pe SMS code lagta hai' : 'OFF — sirf naam + number (koi bhi number daal ke login kar sakta hai)'}</b>.<br>
         ON karne se pehle Supabase → Authentication → Sign In / Providers → <b>Phone</b> me SMS provider (MSG91 / Twilio) set karo aur khud ek baar test karo —
@@ -1834,6 +1841,12 @@ async function saveComm() {
   if (!(v >= 0 && v <= 50)) return toast('0 se 50 ke beech daalo');
   const m = await modal({ title: `Commission ${v}% karein?`, sub: `Abhi ${rate()}% hai. Dashboard ka commission turant naye rate se dikhega.`, ok: 'Haan, badlo' });
   if (m) await act('admin_set_commission', { p_rate: v });
+}
+async function saveMinOrder() {
+  const v = Math.round(Number(String($('minOrder').value).replace(/[^0-9.]/g, '')));
+  if (!(v >= 0 && v <= 5000)) return toast('₹0 se ₹5000 ke beech daalo');
+  const m = await modal({ title: `Minimum order ₹${v} karein?`, sub: `Abhi ₹${D.settings.min_order ?? 50} hai. Customers ko turant naya minimum dikhega.`, ok: 'Haan, badlo' });
+  if (m) await act('admin_set_min_order', { p_amount: v });
 }
 async function toggleOtp() {
   const on = !D.settings.customer_otp;
@@ -2266,6 +2279,7 @@ document.addEventListener('click', e => {
     case 'delTarget': delTarget(a); break;
     case 'saveComm': saveComm(); break;
     case 'toggleOtp': toggleOtp(); break;
+    case 'saveMinOrder': saveMinOrder(); break;
     case 'customer': openCustomer(a); break;
     case 'staffActive': act('admin_set_staff_active', { p_staff: a, p_active: a2 === 'true' }); break;
     case 'markRead': act('admin_mark_message_read', { p_message: a, p_read: a2 === 'true' }, a2 === 'true' ? 'Padh liya ✓' : 'Unread'); break;

@@ -2805,7 +2805,7 @@ const SLOTS = [
   {id:'afternoon', em:'☀️', en:'Afternoon 12–4', hi:'दोपहर 12–4', left:0},
   {id:'evening',   em:'🌇', en:'Evening 5–8',    hi:'शाम 5–8',    left:3}
 ];
-const MIN_BASKET = 50;
+let MIN_BASKET = 50;   /* set by the admin (Settings → Minimum order); loaded by loadAppConfig() */
 
 /* ---------------- MOCK API (shaped like the real one) ---------------- */
 /* ============================================================
@@ -3367,7 +3367,7 @@ const FAQ=[
  {k:'charge fee delivery cost free extra paisa',q:['Is there a delivery charge?','क्या डिलीवरी चार्ज लगता है?'],
   a:['No. There is no delivery charge — you pay only for what the vendor weighs, at the price shown in the app.','नहीं। कोई डिलीवरी चार्ज नहीं — आप सिर्फ़ उतने सामान के पैसे देते हैं जितना वेंडर तौलता है, ऐप वाले रेट पर।']},
  {k:'minimum order kam se kam least',q:['Is there a minimum order?','कम से कम कितने का ऑर्डर?'],
-  a:[`Yes, ₹${MIN_BASKET} — so the vendor's trip to your house is worth it.`,`हाँ, ₹${MIN_BASKET} — ताकि वेंडर का आपके घर आना ठीक रहे।`]},
+  get a(){ return [`Yes, ₹${MIN_BASKET} for each vendor's order — so the vendor's trip to your house is worth it.`,`हाँ, हर वेंडर का ऑर्डर कम से कम ₹${MIN_BASKET} — ताकि वेंडर का आपके घर आना ठीक रहे।`]; }},
  {k:'pay payment upi cash online paise kaise',q:['How do I pay?','पैसे कैसे दें?'],
   a:['Pay the vendor directly at your door — cash or UPI. The app never takes money from you.','पैसे सीधे वेंडर को दरवाज़े पर दें — नकद या UPI से। ऐप आपसे कभी पैसे नहीं लेता।']},
  {k:'bill different more price weigh weight final change zyada',q:['Why can the final bill be different?','बिल अलग क्यों हो सकता है?'],
@@ -4987,6 +4987,16 @@ function addrLine(){
 }
 
 
+/* admin-set values the page needs (minimum order) — public_app_config() works before login */
+async function loadAppConfig(){
+  if(DEMO) return;
+  try{
+    const r=await rpc('public_app_config');
+    const m=r.ok && r.data ? Number(r.data.min_order) : NaN;
+    if(m>=0 && m!==MIN_BASKET){ MIN_BASKET=m; syncCart(); if(document.getElementById('s-basket').classList.contains('on')) renderBasket(); }
+  }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') loadAppConfig(); });
 /* ---------------- BASKET ----------------
    One order goes to one vendor. Since 16 Oct 2026 a basket with items from two vendors becomes TWO
    separate orders (Vedanshu's ask): both vendors come in the chosen slot, each with his own items,
@@ -5354,7 +5364,8 @@ async function createBooking(){
   if(!done.length){
     const res=failed[0].res;
     if(res.code==='OUT_OF_STOCK' || res.code==='OTHER_VENDOR'){ await refreshCatalogue(true); if(!document.getElementById('s-basket').classList.contains('on')) go('basket'); else renderBasket(); }
-    if(res.code==='VENDOR_FULL' || res.code==='NO_VENDOR'){ sel.slot=null; go('slot'); }
+    if(res.code==='VENDOR_FULL' || res.code==='NO_VENDOR' || res.code==='SLOT_PAST'){ sel.slot=null; go('slot'); }
+    if(res.code==='BELOW_MIN'){ await loadAppConfig(); go('basket'); }
     return toast((groups.length>1 && failed[0].g.name ? failed[0].g.name+': ' : '')+(res.msg||T('Could not book — try again','बुकिंग नहीं हुई — दोबारा कोशिश करें')));
   }
   syncCart(); pushCart(); ADDR_PICKED=false;
@@ -6591,6 +6602,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   checkAppInstalled();
   if(/[?&]get=app/.test(location.search) && !appInstalled()) setTimeout(getApp, 2300);   /* QR code on the computer */
   loadAreas();
+  loadAppConfig();
   rememberRates();               /* store today's rates for the ▲/▼ board on the next visit (voice welcome removed 8 Oct) */
   setTimeout(showLocAsk, 2600);
   setTimeout(nag, 9000);

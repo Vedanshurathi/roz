@@ -280,6 +280,7 @@ customer_last_order() [definer]
 customer_my_addresses() [definer]
 customer_my_bookings(p_limit=30) [definer]
 customer_phone_login(p_name, p_phone) [definer]        ← phone-only login, no OTP (deliberate); a 2nd device is LINKED (customer_logins), not moved
+public_app_config() [definer, anon]                     ← {min_order, otp} for the customer site
 customer_cart_get() [definer]                          ← shared basket {items:{product:qty}, vendor_id, rev} (16 Oct 2026)
 customer_cart_apply(p_changes jsonb, p_vendor uuid, p_clear bool) [definer]   ← absolute qty per product, 0 = remove
 customer_rate(p_booking, p_stars, p_comment) [definer]
@@ -341,6 +342,7 @@ staff_update_my_name(p_name) · staff_request_password(p_password) · staff_pass
 ```
 tables: app_settings(key, value jsonb) · staff.kind ('sales'|'intern') · staff_tasks · sales_targets
 commission_rate() · admin_settings() · admin_set_commission(p_rate)            ← default 10 (%)
+min_order() · admin_set_min_order(p_amount)                                   ← default ₹50, per vendor order, enforced in customer_create_booking
 is_sales() · my_staff_id() · team_notify(user, role, type, title, msg) · notify_ops(type, title, msg)
 admin_add_staff(p_name, p_phone, p_password, p_role=null, p_kind='sales') · admin_update_staff(p_staff, p_name, p_role, p_kind=null)
 admin_tasks() · admin_add_task(p_staff uuid[], p_title, p_details, p_priority, p_due) · admin_update_task · admin_reopen_task · admin_delete_task

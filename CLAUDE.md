@@ -22,6 +22,9 @@ villages of the Pataudi / Haileymandi belt, Haryana, India.
   items, books. A real local vendor (thela-wala) comes in that window.
 - Vendor **weighs at the door**, finalises the bill in the vendor app, customer
   pays **directly** (cash or UPI). A 4-digit **delivery OTP** confirms handover.
+- **Minimum order: admin-set** (`app_settings.min_order`, default ₹50; admin → Settings → "Minimum order",
+  `admin_set_min_order`). Customer site reads it with `public_app_config()` (anon) into `MIN_BASKET`; each vendor's
+  order must reach it; `customer_create_booking` enforces it (code `BELOW_MIN`) — migration `20261016d_min_order_booking_guards.sql`.
 - **Commission: 10% (admin-editable).** Customers still pay vendors directly, so the app
   never collects money; "commission" = GMV × `commission_rate()` (setting in
   `app_settings`, changed from admin → Settings via `admin_set_commission`) — i.e. what
@@ -585,6 +588,15 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
 - `customer_slot_status(type, area, date)` still exists (platform API uses it) and just calls `customer_slot_status_for(…, null)`.
 - The Supabase MCP `execute_sql` / `apply_migration` hang on `DROP …` (they wait for a confirmation nobody can give here) —
   avoid DROP in tool calls; keep old signatures and add a new function instead.
+
+### Booking guards in `customer_create_booking` (16 Oct 2026, migration `20261016d`)
+Refused on the server, not just hidden in the app: today's slot after its cut-off (60 min before start, same rule as
+`customer_slot_status_for`; code `SLOT_PAST`), dates more than 14 days ahead, qty outside 0 < q ≤ 100 / > 60 lines
+(`BAD_QTY`), total under `min_order()` (`BELOW_MIN`), a 7th open order for the same day (`TOO_MANY`), a vendor who does
+not cover the address's village in that slot (`vendor_covers_area_in_slot` — it was only checking `areas_served`),
+other vendors' items (`OTHER_VENDOR`). `vendor_record_payment` notifies admins (`payment_low`) when the payment is under
+80% of the bill (commission is computed from payments). Rating comment / dispute reason / order note are cut to 500 chars.
+Still open by choice: phone login has no OTP until an SMS provider is set (anyone who types a number gets that account).
 
 ### Key business logic in the DB
 - `match_vendor()` — auto-assigns least-loaded, best-rated vendor for a slot.
