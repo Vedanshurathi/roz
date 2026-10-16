@@ -279,7 +279,9 @@ customer_join_waitlist(p_area, p_type, p_phone) [definer]
 customer_last_order() [definer]
 customer_my_addresses() [definer]
 customer_my_bookings(p_limit=30) [definer]
-customer_phone_login(p_name, p_phone) [definer]        ← phone-only login, no OTP (deliberate)
+customer_phone_login(p_name, p_phone) [definer]        ← phone-only login, no OTP (deliberate); a 2nd device is LINKED (customer_logins), not moved
+customer_cart_get() [definer]                          ← shared basket {items:{product:qty}, vendor_id, rev} (16 Oct 2026)
+customer_cart_apply(p_changes jsonb, p_vendor uuid, p_clear bool) [definer]   ← absolute qty per product, 0 = remove
 customer_rate(p_booking, p_stars, p_comment) [definer]
 customer_save_address(p_label, p_house, p_street, p_landmark, p_area, p_lat, p_lng, p_make_default=true, p_address_id) [definer]
 customer_send_message(p_name, p_body, p_phone, p_email) [definer]
@@ -297,7 +299,7 @@ customer_vendors_in_area(p_area) [definer]
 ```
 area_from_point(p_lat, p_lng) [definer]       ← GPS → village; returns in_range/served/confident
 catalog_items_list() [definer]
-is_admin() [definer] · my_customer_id() · my_vendor_id() · my_role() · my_lang()
+is_admin() [definer] · my_customer_id() (own row OR customer_logins link) · my_customer_uid() (primary auth user) · my_vendor_id() · my_role() · my_lang()
 ist_date() · ist_now() · ist_time()           ← ALWAYS use these, never now()/current_date for business logic
 km_between(lat1, lng1, lat2, lng2)
 log_action(p_action, p_entity, p_id, p_detail) [definer]

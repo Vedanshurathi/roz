@@ -1233,10 +1233,11 @@ body.has-nav .scr{padding-bottom:200px}
     <div class="note green"><span>🕖</span>
       <span data-en="This applies to every day. Turn a slot off and customers cannot book it. Capacity is how many houses you can cover in that window — cancelled orders free a place."
             data-hi="ये हर दिन के लिए है। स्लॉट बंद कर दोगे तो ग्राहक उसमें बुक नहीं कर पाएंगे। कैपेसिटी मतलब उस समय में कितने घर जा सकते हो — कैंसल ऑर्डर की जगह फिर खाली हो जाती है।">This applies to every day. Turn a slot off and customers cannot book it.</span></div>
+    <div id="slotSaveSt" style="font-size:13px;font-weight:800;margin:2px 2px 12px;min-height:18px"></div>
     <div id="slotList"></div>
   </div>
   <div class="bar"><div class="bar-in">
-    <button class="btn btn-g" onclick="saveSlots()" data-en="Save slots" data-hi="स्लॉट सेव करो">Save slots</button>
+    <button class="btn btn-g" onclick="saveSlots(false)" data-en="Save slots" data-hi="स्लॉट सेव करो">Save slots</button>
   </div></div>
 </div>
 
@@ -1843,6 +1844,7 @@ function toast(m){
 /* ---------- navigation ---------- */
 const NAV=['home','stock','slots','earn','orders'];
 function go(s){
+  if(s!=='slots' && SLOT_DIRTY) saveSlots(true);   /* never lose a slot change by leaving the screen */
   document.querySelectorAll('.scr').forEach(x=>x.classList.remove('on'));
   document.getElementById('s-'+s).classList.add('on');
   window.scrollTo(0,0);
@@ -1858,7 +1860,7 @@ function go(s){
   if(s==='bill')  renderBill();
   if(s==='code')  renderCode();
   if(s==='stock') renderStock();
-  if(s==='slots'){ loadSlots(); loadSlotAreas(); renderSlots(); }
+  if(s==='slots'){ paintSlotSave(SLOT_DIRTY?'wait':''); loadSlots(); loadSlotAreas(); renderSlots(); }
   if(s==='orders') loadOrders();
   if(s==='earn')  renderEarn();
   if(s==='contact') initVendorContact();
@@ -3288,7 +3290,11 @@ async function deleteItem(){
 }
 
 /* ---------- vendor location / areas ---------- */
-function servedAreas(){ return AREAS.filter(a=>a.on); }
+function servedAreas(){
+  /* AREAS comes from public_areas at login; if that call failed, the vendor's own list still counts */
+  if(!AREAS.length && VENDOR && Array.isArray(VENDOR.areas_served)) return VENDOR.areas_served.map(n=>({name:n,on:true}));
+  return AREAS.filter(a=>a.on);
+}
 function areaLabel(){
   const on=servedAreas();
   if(!on.length) return T('No area set','कोई एरिया नहीं');
@@ -4278,39 +4284,60 @@ function paintOrders(){
 }
 async function openOrderToday(code){ RUN_DAY=0; await api('getRuns'); openRun(code); }
 
-/* ---------------- SLOTS ---------------- */
-let slotsLoaded=false;
+/* ---------------- SLOTS ----------------
+   Every change saves by itself (≈1 s after the last tap) — vendors used to change a slot, leave
+   without pressing "Save slots", and the app kept showing the change while customers never got it.
+   Villages: when a slot covers all villages, every chip is ON and tapping one turns THAT village off
+   (it used to make the tapped village the only one — a vendor's evening ended up "Jatola only"). */
+var slotsLoaded=false, SLOT_DIRTY=false, SLOT_SAVE_T=null, SLOT_SAVING=null;
 async function loadSlots(){
-  /* This was the actual bug: vendor_set_capacity genuinely saved every
-     time (confirmed directly against the database), but nothing ever
-     read the real saved value back — SLOTS started at hardcoded
-     15/10/12 and stayed there forever, so leaving and returning to
-     this screen always showed the same old numbers regardless of what
-     was actually saved. A vendor changing 15 to 20 and saving would
-     see it revert to 15 the moment they left and came back, with no
-     way to tell that from a genuine failure to save. */
   if(DEMO) return;
   const r=await api('getMySlots');
+  if(SLOT_DIRTY || SLOT_SAVING) return;   /* a change is waiting to be saved — don't undo it on screen */
   if(r.ok && r.data && typeof r.data==='object'){
     SLOTS.forEach(s=>{ const x=r.data[s.id]; if(x){ s.cap=x.capacity; s.open=!!x.open; s.bt=x.booked_today||0; s.bm=x.booked_tomorrow||0; } });
     slotsLoaded=true;
     renderSlots();
   }
 }
-let slotAreasLoaded=false;
 async function loadSlotAreas(){
-  if(DEMO || slotAreasLoaded) return;
+  if(DEMO) return;
   const r=await api('getSlotAreas');
+  if(SLOT_DIRTY || SLOT_SAVING) return;
   if(r.ok && r.data){
     SLOTS.forEach(s=>{ s.areas = (r.data[s.id] && r.data[s.id].length) ? r.data[s.id] : null; });
-    slotAreasLoaded=true;
     renderSlots();
   }
 }
+/* the villages this slot really goes to (null in the DB = all my villages) */
+function slotVillages(s){
+  const served=servedAreas().map(a=>a.name);
+  return (Array.isArray(s.areas) && s.areas.length) ? served.filter(n=>s.areas.includes(n)) : served;
+}
+function slotRestricted(s){
+  const served=servedAreas().map(a=>a.name);
+  return Array.isArray(s.areas) && s.areas.length>0 && !served.every(n=>s.areas.includes(n));
+}
+function paintSlotSave(st){
+  const e=document.getElementById('slotSaveSt'); if(!e) return;
+  const M={wait:['var(--mut)',T('Saving…','सेव हो रहा है…')], saving:['var(--mut)',T('Saving…','सेव हो रहा है…')],
+           ok:['var(--g)','✓ '+T('Saved — customers see it now','सेव हो गया — ग्राहकों को अभी से दिखेगा')],
+           err:['#d93025',T('Not saved — check the internet, then tap "Save slots"','सेव नहीं हुआ — इंटरनेट देखो, फिर "स्लॉट सेव करो" दबाओ')]};
+  const m=M[st]; e.style.color=m?m[0]:''; e.textContent=m?m[1]:'';
+}
+function slotsChanged(){
+  SLOT_DIRTY=true; paintSlotSave('wait');
+  clearTimeout(SLOT_SAVE_T); SLOT_SAVE_T=setTimeout(()=>saveSlots(true), 900);
+}
 function renderSlots(){
   const served=servedAreas().map(a=>a.name);
-  document.getElementById('slotList').innerHTML = SLOTS.map(s=>{
-    const restricted = Array.isArray(s.areas) && s.areas.length>0;
+  const allClosed=SLOTS.every(s=>!s.open);
+  document.getElementById('slotList').innerHTML = (allClosed?`
+    <div class="note" style="background:var(--or-s);color:#8a3d00;margin-bottom:12px"><span>⚠️</span>
+      <span>${T('All slots are off — customers cannot book you at all. Turn on at least one slot.','सारे स्लॉट बंद हैं — ग्राहक आपको बुक ही नहीं कर पाएंगे। कम से कम एक स्लॉट चालू करो।')}</span></div>`:'')
+  + SLOTS.map(s=>{
+    const restricted = slotRestricted(s);
+    const on = slotVillages(s);
     return `
     <div class="card" style="${s.open?'':'opacity:.62'}">
       <div style="display:flex;align-items:center;gap:12px">
@@ -4330,22 +4357,19 @@ function renderSlots(){
       </div>
       ${(s.bt||s.bm)?`<div style="font-size:12px;font-weight:700;color:var(--tx2);margin-top:8px">📋 ${T('Booked','बुक हो चुके')}: ${T('today','आज')} ${s.bt||0} · ${T('tomorrow','कल')} ${s.bm||0}</div>`:''}
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:${restricted?'10px':'0'}">
+        <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:13px;font-weight:800;color:var(--tx2);flex:1">${T('Which villages?','कौनसे गाँव?')}</span>
-          <span style="font-size:12px;font-weight:700;color:var(--mut)">${
-            restricted ? T('Only some','कुछ ही') : T('All my villages','सारे गाँव')}</span>
+          <span style="font-size:12px;font-weight:700;color:${on.length?'var(--mut)':'#d93025'}">${
+            !on.length ? T('None','कोई नहीं') : restricted ? T('Only some','कुछ ही') : T('All my villages','सारे गाँव')}</span>
           <button class="chip" style="font-size:11.5px;padding:6px 11px" onclick="toggleSlotAreaEditor('${s.id}')">
             ${T('Change','बदलो')}</button>
         </div>
-        <div id="slotAreaEditor-${s.id}" style="display:none;flex-wrap:wrap;gap:7px;margin-top:8px">
-          ${served.map(name=>{
-            const on = restricted ? s.areas.includes(name) : true;
-            return `<button class="chip ${on?'on':''}" style="font-size:12px"
-              onclick="toggleSlotArea('${s.id}','${name.replace(/'/g,"\\'")}')">${esc(name)}</button>`;
-          }).join('')}
+        <div id="slotAreaEditor-${s.id}" style="display:none;flex-wrap:wrap;gap:7px;margin-top:10px">
+          <div style="width:100%;font-size:11.5px;font-weight:700;color:var(--mut)">${T('Green = you go there in this slot. Tap to switch a village on or off.','हरा = इस स्लॉट में वहाँ जाओगे। गाँव चालू/बंद करने के लिए दबाओ।')}</div>
+          ${served.map(name=>`<button class="chip ${on.includes(name)?'on':''}" style="font-size:12px"
+              onclick="toggleSlotArea('${s.id}','${name.replace(/'/g,"\\'")}')">${on.includes(name)?'✓ ':''}${esc(name)}</button>`).join('')}
         </div>
-        ${restricted ? `<div style="font-size:11.5px;font-weight:700;color:var(--mut);margin-top:6px">
-          ${s.areas.join(', ')}</div>` : ''}
+        ${restricted && on.length ? `<div style="font-size:11.5px;font-weight:700;color:var(--mut);margin-top:6px">${esc(on.join(', '))}</div>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -4357,30 +4381,36 @@ function toggleSlotAreaEditor(id){
 }
 function toggleSlotArea(id, name){
   const s=slotOf(id); const served=servedAreas().map(a=>a.name);
-  /* Starting from "all villages" (areas is null) and tapping ONE
-     specific village means "restrict to just this one" — not
-     "deselect this one out of an implicit full list", since nothing
-     is actually stored yet to deselect from. */
-  if(!Array.isArray(s.areas)) s.areas = [name];
-  else if(s.areas.includes(name)){
-    s.areas = s.areas.filter(a=>a!==name);
-    if(s.areas.length===0) s.areas=null;   /* emptied out = back to "all" */
-  }else s.areas.push(name);
+  let on=slotVillages(s);
+  on = on.includes(name) ? on.filter(a=>a!==name) : on.concat(name);
+  if(!on.length) return toast(T('Keep at least one village — or turn this slot off','कम से कम एक गाँव रखो — या ये स्लॉट बंद कर दो'));
+  s.areas = served.every(n=>on.includes(n)) ? null : on;   /* all of them again = "all my villages" */
   renderSlots();
   const el=document.getElementById('slotAreaEditor-'+id);
   if(el) el.style.display='flex';   /* keep the editor open through the re-render */
+  slotsChanged();
 }
-function toggleSlot(id){ const s=slotOf(id); s.open=!s.open; renderSlots(); }
-function capStep(id,d){ const s=slotOf(id); s.cap=Math.max(1,Math.min(60,s.cap+d)); renderSlots(); }
-async function saveSlots(){
-  const b=document.querySelector('#s-slots .btn-g[onclick="saveSlots()"]'); if(b){ b.disabled=true; b.style.opacity='.6'; }
-  const r=await api('saveSlots',{slots:SLOTS});
+function toggleSlot(id){ const s=slotOf(id); s.open=!s.open; renderSlots(); slotsChanged(); }
+function capStep(id,d){ const s=slotOf(id); const c=Math.max(1,Math.min(60,s.cap+d)); if(c===s.cap) return; s.cap=c; renderSlots(); slotsChanged(); }
+async function saveSlots(auto){
+  clearTimeout(SLOT_SAVE_T);
+  if(SLOT_SAVING){ await SLOT_SAVING; if(!SLOT_DIRTY && auto) return; }
+  SLOT_DIRTY=false; paintSlotSave('saving');
+  const b=document.querySelector('#s-slots .btn-g[onclick^="saveSlots"]'); if(b){ b.disabled=true; b.style.opacity='.6'; }
+  const served=servedAreas().map(a=>a.name);
+  const send=SLOTS.map(s=>Object.assign({},s,{areas: slotRestricted(s) ? slotVillages(s) : null}));
+  SLOT_SAVING=api('saveSlots',{slots:send});
+  const r=await SLOT_SAVING; SLOT_SAVING=null;
   if(b){ b.disabled=false; b.style.opacity=''; }
-  if(!r || !r.ok) return toast(r&&r.msg ? r.msg : T('Could not save — try again','सेव नहीं हुआ — दोबारा कोशिश करो'));
+  if(!r || !r.ok){
+    SLOT_DIRTY=true; paintSlotSave('err');
+    return toast(r&&r.msg ? r.msg : T('Could not save — try again','सेव नहीं हुआ — दोबारा कोशिश करो'));
+  }
+  if(SLOT_DIRTY) return;          /* more taps came in while saving — the next save is already on its way */
+  paintSlotSave('ok');
   const kept=(r.data&&r.data.kept)||[];
-  toast(kept.length
-    ? T('Saved for every day. Some days already have more orders — those stay as booked.','हर दिन के लिए सेव हो गया। कुछ दिनों में पहले से ज़्यादा ऑर्डर हैं — वो वैसे ही रहेंगे।')
-    : T('Saved for every day — customers see it now','हर दिन के लिए सेव हो गया — ग्राहकों को अभी से दिखेगा'));
+  if(kept.length) toast(T('Saved for every day. Some days already have more orders — those stay as booked.','हर दिन के लिए सेव हो गया। कुछ दिनों में पहले से ज़्यादा ऑर्डर हैं — वो वैसे ही रहेंगे।'));
+  else if(!auto) toast(T('Saved for every day — customers see it now','हर दिन के लिए सेव हो गया — ग्राहकों को अभी से दिखेगा'));
   loadSlots();
 }
 

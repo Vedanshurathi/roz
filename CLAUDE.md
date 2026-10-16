@@ -141,9 +141,14 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   in. A bar above the bottom nav keeps asking (9 s after open, then 2 min after each close) until
   notifications AND location are allowed; if the browser blocked one it explains how to unblock.
   `syncPush()` saves the push subscription after login. Address: `getPreciseLocation()` (one shared
-  GPS session; keeps the most accurate fix for up to 20 s, stops at ±20 m) then a Leaflet map
-  (satellite = Esri World Imagery, map = OSM, loaded lazily from jsdelivr) with a draggable 📍 pin —
-  tap/drag sets `addrCoords.pinned`; fixes worse than ±60 m show a red "location is rough" hint. Home
+  GPS session; keeps the most accurate fix for up to 20 s, stops at ±20 m; a passing "unavailable"/timeout
+  error no longer ends it; a second caller gets the running search's best fix at once) and a Leaflet map
+  (satellite = Esri World Imagery, maxNativeZoom 18, map = OSM, from jsdelivr) with a draggable 📍 pin.
+  **Map speed (16 Oct 2026):** `warmMap()` fetches Leaflet + preconnects the tile hosts when the address
+  screen (or the basket, for a customer with no address) opens; the map shows at the FIRST GPS reading
+  (~0.2 s, it used to wait up to 20 s) and the pin follows sharper readings until the customer moves it;
+  no GPS / "I'll type it myself" → `openVillageMap()` shows the chosen village so they can tap their house
+  (nothing is captured until they tap/drag). Tap/drag sets `addrCoords.pinned`; fixes worse than ±60 m show a red "location is rough" hint. Home
   "use my location" uses the same helper and never switches village on a fix worse than ±3 km.
   (A real address was once saved 57 km away from a coarse first fix.) House no. / street / landmark
   are optional — village + (GPS pin or any text).
@@ -169,14 +174,29 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   `customer_set_default_address`, 🗑 = `customer_delete_address` — hides instead of deleting when old
   bookings use it). `openAddrEditor(id|null)` opens the form (new = empty form). "Other" asks for a
   name (saved in `addresses.label`). At "Confirm booking" with 2+ addresses a "Deliver to which
-  address?" sheet opens; the basket card has Change. Saving an address only books when it was added
-  during checkout (`LOC_FROM_CHECKOUT`). Auto-filled text = house no., road, mohalla/hamlet + OUR
+  address?" sheet opens ("Deliver here — confirm booking" when it books); the basket card has Change.
+  **Saving an address never books** (16 Oct 2026 — it used to place the order the moment an address added
+  during checkout was saved): back to the basket with that address chosen, "Confirm booking" pulses. Auto-filled text = house no., road, mohalla/hamlet + OUR
   village — never OSM's display_name (it gave "Farrukhnagar, Gurgaon, Haryana, India").
 - Home ends with small social chips + a navy mini-footer ("Become a vendor" → `VENDOR_SITE`
   = https://vendor.rozbazaar.shop/). `#s-home` has bottom padding so nothing hides under the
   bottom nav / cart bar.
 - **Login:** Google OAuth OR phone-only (`signInAnonymously()` + `customer_phone_login`).
-  Phone login had **no OTP by design** (whoever last typed a number owns that account). Since 4 Oct 2026
+  Phone login had **no OTP by design** (anyone who types the number gets that account). **One account on several
+  devices (16 Oct 2026, migration `20261016a_shared_login_cart_sync.sql`):** phone login on a 2nd device used to MOVE
+  `customers.auth_user_id` to it, silently logging the 1st device out (cart/orders/🔔 gone there). Now extra devices are
+  linked in `customer_logins (auth_user_id → customer_id)`; `my_customer_id()` = own row OR link, `my_customer_uid()` =
+  the customer's primary auth user. Customer notifications stay stored under the primary user (`customer_notifications`
+  / `customer_mark_read` read those) and `save_push_subscription(role customer)` saves every device's subscription under
+  it, so pushes reach all devices. `customer_me / set_profile / update_profile / set_language / my_lang / my_role /
+  customer_bootstrap` use `my_customer_id()` (bootstrap never creates a 2nd empty row for a linked device).
+  **Shared basket:** `customer_carts (customer_id, items {product uuid: qty}, vendor_id, rev)`, `customer_cart_get()`,
+  `customer_cart_apply(p_changes {id: qty, 0 = remove}, p_vendor, p_clear)`. Page: `cartLogin()` at login /
+  session restore (guest basket merges in = bigger qty of each; a device that already shared this account's
+  basket (`rb_cart_owner`) takes the account's basket, so an order placed elsewhere doesn't come back), `cartChanged()`
+  from `syncCart()` sends the diff vs `CART_SRV` (600 ms), `pullCart()` on focus / basket open / every 12 s
+  ("Basket updated from your other device"), booking → `pushCart()` at once, logout keeps the account's basket.
+  If logging in mid-checkout added items from the other device, the basket opens instead of booking. Since 4 Oct 2026
   there is an **SMS OTP switch** (`app_settings.customer_otp`, admin → Settings → "Customer login: SMS OTP",
   `admin_set_customer_otp`), **off** until Supabase Auth → Phone has an SMS provider. When on, the page uses
   `signInWithOtp({phone:'+91…'})` + `verifyOtp` and `customer_phone_login` refuses (code `OTP_REQUIRED`) any
@@ -314,6 +334,10 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   cancelled / reassigned / price reminder (`notify_user` pushes for vendors), bill disputed, order missed,
   new rating, item approved/rejected, 20:45 daily summary, password approved/rejected.
 - Migrations `20260926e_vendor_app_notifications.sql`, `20260926f_vendor_phone_password.sql`.
+- **Slots screen autosaves** (16 Oct 2026): every toggle / ± / village tap saves ~1 s later (`slotsChanged` → `saveSlots(true)`,
+  also flushed when leaving the screen; status line "Saved — customers see it now"). Village chips show the real villages
+  (all green when the slot covers all) and a tap turns THAT village off — it used to make the tapped village the only one
+  (Vedanshu's own vendor ended up with evening = "Jatola only"); the last village can't be removed; all slots off → warning.
 - **Slots screen = settings for every day** (4 Oct 2026; it used to save TODAY only, so tomorrow kept the default open/15):
   `vendor_get_slot_settings()` (capacity, open, booked today/tomorrow) + `vendor_save_slot_settings(p_slots)` (one call;
   defaults table + every future day row, never below orders already booked; slot villages too). See “Slots & seats” below.
@@ -574,6 +598,11 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   (`customer_vendors_for_product`) showing each vendor's price. Single-vendor
   items add directly. The first item in the cart sets `sel.vendorId`; adding an
   item from a different vendor shows a warning toast (a booking goes to one vendor).
+  **One booking = one vendor's items (16 Oct 2026, migration `20261016c_booking_one_vendor.sql`):** 11 real orders went
+  to one vendor with the other vendor's items/prices. The basket now marks other-vendor items (`basketVendor`,
+  `otherVendorItems`, `sameItemFrom` by catalog key / name → "Take <vendor>’s · ₹x" or Remove) and Confirm is blocked
+  until fixed; `customer_create_booking` refuses them (code `OTHER_VENDOR`) and, with no vendor named but all items
+  from one vendor, books that vendor instead of `match_vendor`'s pick.
 - Times: always `ist_date()` / `ist_now()` for business logic. The DB clock is UTC.
   No function uses `current_date` any more (migration `20260926n_ist_dates_row_checks.sql` rewrote all of
   them, and every `if rec is [not] null` on a table-row variable → `rec.id`).
@@ -622,6 +651,11 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
    ```
 7. This is the **production** database. Create your own test rows, verify,
    then delete them. Never touch real in-progress bookings.
+   Since Oct 2026 the Supabase MCP holds every DELETE (and a migration containing `delete from auth.users`) for the
+   owner's confirmation and times out when nobody answers — prefer tests that create nothing (fake supabase in the
+   browser), or test with SELECT/UPDATE-only paths. Leftover from 16 Oct: test customer phone `9000000071`
+   ("Test Device", 2 anonymous auth users, push subscription on example.invalid switched off) — delete in the
+   dashboard SQL editor.
 8. Browser tests of the HTML apps: intercept the Supabase CDN script and return a
    fake `window.supabase` whose `rpc()` returns shaped mock data. Make mock data
    match the real view shape exactly (e.g. `booking_full` has `v_type`, not `type`)

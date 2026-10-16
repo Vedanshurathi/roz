@@ -610,6 +610,8 @@ select.field{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg 
 .fly{position:fixed;z-index:300;font-size:42px;pointer-events:none;transition:all .7s cubic-bezier(.45,0,.25,1)}
 .pop{animation:pop .42s var(--sp)}
 @keyframes pop{0%{transform:scale(1)}42%{transform:scale(1.06)}100%{transform:scale(1)}}
+.bigbtn.nudge{animation:nudge 1.1s var(--sp) 2}
+@keyframes nudge{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(30,142,62,.45)}40%{transform:scale(1.04);box-shadow:0 0 0 10px rgba(30,142,62,0)}}
 
 /* ============================================================
    SHARED PAGE FURNITURE (sub-screens)
@@ -1411,7 +1413,7 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
     </div>
 
     <label class="lbl" style="margin-top:15px" data-en="Your village / area *" data-hi="आपका गाँव / इलाका *">Your village / area *</label>
-    <select class="field" id="aArea"></select>
+    <select class="field" id="aArea" onchange="if(!addrCoords && !document.getElementById('pinWrap').hidden) openVillageMap()"></select>
     <p id="areaDetected" style="font-size:11.5px;font-weight:700;margin-top:6px;display:none"></p>
 
     <label class="lbl" style="margin-top:15px" data-en="Landmark (optional)" data-hi="लैंडमार्क (वैकल्पिक)">Landmark (optional)</label>
@@ -2890,7 +2892,7 @@ function mapProduct(p){
     id:p.id, em:EMOJI_ALIAS[(p.name||'').trim().toLowerCase()]||'🥬', en:p.name_en||p.name, hi:hi, roman:p.name, unit:p.unit,
     price:Number(p.price), kal:freshPrice, cat:p.category,
     fresh:p.in_stock!==false, photo:p.image_url||p.stock_image_url||null,
-    vendorId:p.vendor_id||null, vendorName:p.vendor_name||null, vendorRating:Number(p.vendor_rating)||0,
+    vendorId:p.vendor_id||null, vendorName:p.vendor_name||null, vendorRating:Number(p.vendor_rating)||0, ckey:p.catalog_key||null,
     art_key:ART_ALIAS[(p.name||'').trim().toLowerCase()] || null
   };
 }
@@ -3053,6 +3055,7 @@ async function mockApi(fn, args={}){
 
     case 'getBill': {
       const bk = BOOKINGS.find(x=>x.code===args.code) || BOOKINGS[0];
+      if(!bk) return {ok:false, msg:T('Order not found — open My bookings','ऑर्डर नहीं मिला — मेरी बुकिंग खोलें')};
       const r  = await rpc('customer_bill_preview',{p_booking:bk.id});
       if(!r.ok) return r;
       return {ok:true, data: mapBill(bk, r.data)};
@@ -3060,6 +3063,7 @@ async function mockApi(fn, args={}){
 
     case 'approveBill': {
       const bk = BOOKINGS.find(x=>x.code===args.code) || BOOKINGS[0];
+      if(!bk) return {ok:false, msg:T('Order not found — open My bookings','ऑर्डर नहीं मिला — मेरी बुकिंग खोलें')};
       return await rpc('customer_approve_bill',{p_booking:bk.id});
     }
 
@@ -3069,6 +3073,7 @@ async function mockApi(fn, args={}){
 
     case 'submitRating': {
       const bk = BOOKINGS.find(x=>x.code===args.code) || BOOKINGS[0];
+      if(!bk) return {ok:false, msg:T('Order not found — open My bookings','ऑर्डर नहीं मिला — मेरी बुकिंग खोलें')};
       return await rpc('customer_rate',
         {p_booking:bk.id, p_stars:args.stars, p_comment:args.comment||null});
     }
@@ -3288,7 +3293,7 @@ function go(s){
   document.getElementById('cart').classList.toggle('show', count()>0 && ['home','cat','search'].includes(s));
   const fab=document.getElementById('fabContact');
   if(fab) fab.style.display = ['contact','login','loc','basket'].includes(s) ? 'none' : 'flex';
-  if(s==='basket')   renderBasket();
+  if(s==='basket'){  renderBasket(); pullCart(); if(SESSION && !ADDRS.length) setTimeout(warmMap, 1500); }
   if(s==='bookings') renderBookings();
   if(s==='bill')     renderBill();
   if(s==='slot')     renderSlotScreen();
@@ -4062,6 +4067,7 @@ function syncCart(){
   if(fab) fab.style.bottom = (cartShowing && window.innerWidth<900) ? '242px' : '';
   saveCartLocal();
   paintAllAdds();
+  cartChanged();
 }
 /* Cart survives closing the app entirely — previously it only lived
    in memory, so anyone who added items and simply came back later
@@ -4078,6 +4084,113 @@ function restoreCartLocal(){
   }catch(e){}
   return false;
 }
+/* ---------------- BASKET ON EVERY DEVICE ----------------
+   The basket used to live only in this browser (localStorage), so the same account on the phone app
+   and on the website had two different baskets. Logged in, it is now kept in the database
+   (customer_cart_get / customer_cart_apply): every change is sent as "item → new quantity", and the
+   basket is re-read when the app comes back on screen, when the basket opens, and every 12 s.
+   CART_SRV = the basket as the server last told us (only items sold in this village). */
+var CART_SRV=null, CART_REV=0, CART_CID=null, CART_PUSH_T=null, CART_PUSHING=false, CART_APPLYING=false, CART_LOGIN=null;
+function cartKnown(o){ const r={}; Object.entries(o||{}).forEach(([id,q])=>{ q=Math.floor(Number(q)||0); if(q>0 && prod(id)) r[id]=q; }); return r; }
+function cartSig(o){ return Object.keys(o||{}).sort().map(k=>k+':'+o[k]).join(','); }
+function cartDiff(){
+  const ch={}, srv=CART_SRV||{};
+  new Set([...Object.keys(cart),...Object.keys(srv)]).forEach(id=>{ const a=cart[id]||0, b=srv[id]||0; if(a!==b) ch[id]=a; });
+  return ch;
+}
+function cartSyncOn(){ return !DEMO && !!SESSION && CART_SRV!==null; }
+function cartChanged(){            /* called from syncCart() after every basket change */
+  if(CART_APPLYING || !cartSyncOn() || !Object.keys(cartDiff()).length) return;
+  clearTimeout(CART_PUSH_T); CART_PUSH_T=setTimeout(pushCart, 600);
+}
+function repaintCartViews(){
+  if(document.getElementById('s-basket').classList.contains('on')) renderBasket();
+  paintAllAdds();
+}
+/* take the server's basket; taps made while a request was on its way (sent = what we had sent) are kept */
+function adoptServerCart(S, sent){
+  const srv=cartKnown(S.items);
+  CART_SRV=srv; CART_REV=Number(S.rev)||0;
+  const next=Object.assign({}, srv);
+  if(sent) new Set([...Object.keys(cart),...Object.keys(sent)]).forEach(id=>{
+    if((cart[id]||0)!==(sent[id]||0)){ if(cart[id]>0) next[id]=cart[id]; else delete next[id]; } });
+  const changed=cartSig(next)!==cartSig(cart);
+  cart=next;
+  if(count() && S.vendor_id && !Object.keys(cart).some(id=>(prod(id)||{}).vendorId===sel.vendorId)) sel.vendorId=S.vendor_id;
+  if(changed){ CART_APPLYING=true; syncCart(); CART_APPLYING=false; repaintCartViews(); }
+  return changed;
+}
+async function pushCart(){
+  clearTimeout(CART_PUSH_T); CART_PUSH_T=null;
+  if(!cartSyncOn()) return;
+  if(CART_PUSHING){ CART_PUSH_T=setTimeout(pushCart, 300); return; }
+  const ch=cartDiff(); if(!Object.keys(ch).length) return;
+  CART_PUSHING=true; const sent=Object.assign({}, cart); let ok=false;
+  try{
+    const r=await rpc('customer_cart_apply',{p_changes:ch, p_vendor:sel.vendorId||null});
+    if(r.ok && r.data){ ok=true; adoptServerCart(r.data, sent); }
+  }catch(e){} finally{ CART_PUSHING=false; }
+  /* more taps arrived meanwhile → send those too (a failed send is retried on the next change or check) */
+  if(ok && Object.keys(cartDiff()).length && !CART_PUSH_T) CART_PUSH_T=setTimeout(pushCart, 300);
+}
+/* at login (and when a saved session comes back). Returns true when the basket on screen changed. */
+async function cartLogin(cid){
+  if(DEMO || !SESSION || !cid) return false;
+  if(CART_LOGIN) return CART_LOGIN;
+  CART_LOGIN=(async()=>{
+    CART_CID=String(cid); CART_SRV=null;
+    try{ await mockApi('getCatalogue',{type:'all'}); }catch(e){}
+    if(!PRODUCTS.length) return false;               /* can't tell which items exist here yet — try again later */
+    const r=await rpc('customer_cart_get'); if(!r.ok || !r.data) return false;
+    let owner=null; try{ owner=localStorage.getItem('rb_cart_owner'); }catch(e){}
+    const before=cartSig(cart), srv=cartKnown(r.data.items);
+    let next;
+    if(owner===CART_CID){
+      /* this device already shared this account's basket: the account's basket wins — an order
+         placed on the other phone must not come back from this phone's old copy */
+      next=Object.assign({}, srv);
+    }else{
+      /* a basket filled before logging in joins the account's basket (the bigger quantity of each item) */
+      next=Object.assign({}, srv);
+      Object.entries(cartKnown(cart)).forEach(([id,q])=>{ if(q>(next[id]||0)) next[id]=q; });
+    }
+    CART_SRV=srv; CART_REV=Number(r.data.rev)||0;
+    cart=next;
+    if(count() && r.data.vendor_id && !Object.keys(cart).some(id=>(prod(id)||{}).vendorId===sel.vendorId)) sel.vendorId=r.data.vendor_id;
+    if(count() && !sel.vendorId){ const p=prod(Object.keys(cart)[0]); if(p) sel.vendorId=p.vendorId||null; }
+    try{ localStorage.setItem('rb_cart_owner', CART_CID); }catch(e){}
+    CART_APPLYING=true; syncCart(); CART_APPLYING=false; repaintCartViews();
+    if(Object.keys(cartDiff()).length) pushCart();
+    return cartSig(cart)!==before;
+  })();
+  try{ return await CART_LOGIN; } finally{ CART_LOGIN=null; }
+}
+async function pullCart(){
+  if(DEMO || !SESSION || !CART_CID || CART_LOGIN) return;
+  if(CART_SRV===null) return cartLogin(CART_CID);
+  if(!PRODUCTS.length || CART_PUSHING || CART_PUSH_T || Object.keys(cartDiff()).length) return;
+  let r; try{ r=await rpc('customer_cart_get'); }catch(e){ return; }
+  if(!r || !r.ok || !r.data || CART_PUSHING || CART_PUSH_T || Object.keys(cartDiff()).length) return;
+  if((Number(r.data.rev)||0)===CART_REV) return;
+  if(adoptServerCart(r.data, null)) toast(T('Basket updated from your other device','टोकरी दूसरे फ़ोन/कंप्यूटर से अपडेट हुई'));
+}
+/* logging in mid-checkout added items saved on the account's other device: show the basket
+   instead of booking straight away, so nothing is ordered that the customer hasn't seen */
+function cartChangedAtLogin(){
+  go('basket');
+  toast(T('Your basket now has the items from your other device too — check and tap "Confirm booking"','आपकी टोकरी में दूसरे फ़ोन/कंप्यूटर वाला सामान भी जुड़ गया — जाँच कर "बुकिंग पक्की करें" दबाएँ'));
+}
+function cartLogout(){
+  clearTimeout(CART_PUSH_T); CART_PUSH_T=null; CART_SRV=null; CART_CID=null; CART_REV=0;
+  try{ localStorage.removeItem('rb_cart_owner'); }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible') pullCart();
+  else if(cartSyncOn() && Object.keys(cartDiff()).length) pushCart();   /* app going to the background: send now */
+});
+window.addEventListener('focus',()=>pullCart());
+setInterval(()=>{ if(document.visibilityState==='visible') pullCart(); }, 12000);
+
 function maybeRemindAbandonedCart(){
   if(!count()) return;
   const lastShown=Number(localStorage.getItem('rb_cart_remind_at')||0);
@@ -4336,6 +4449,7 @@ function slotLine(){
 let addrCoords=null, addrTag='Ghar', gpsBusy=false;
 
 async function initAddr(){
+  warmMap();
   /* Every fresh visit to this screen starts with no captured GPS reading —
      never carry over a location from a previous address, and never show
      a "located" confirmation that no longer matches what will actually
@@ -4377,6 +4491,7 @@ function openAddrEditor(id){ EDIT_ID=id||null; paintCheckoutBanner(); go('loc');
 function leaveAddrEditor(){ const back=LOC_FROM_CHECKOUT?'basket':(SESSION?'acct':'home'); EDIT_ID=null; LOC_FROM_CHECKOUT=false; go(back); }
 function skipGps(){
   document.getElementById('locateCard').hidden=true;
+  openVillageMap();
   document.getElementById('aFull').focus();
   toast(T('No problem — just fill the address below','कोई बात नहीं — नीचे पता भर दें'));
 }
@@ -4385,7 +4500,12 @@ function skipGps(){
    So: keep listening, keep the most accurate fix, stop at ±20 m or after maxMs. */
 let GEO_RUN=null;   /* one GPS session at a time — a second caller joins the running one */
 function getPreciseLocation(onUpdate, maxMs, goodAcc){
-  if(GEO_RUN){ if(onUpdate) GEO_RUN.subs.push(onUpdate); return GEO_RUN.p; }
+  if(GEO_RUN){
+    /* joining a search already running (e.g. Home's village check): hand over its best reading now
+       instead of waiting for a sharper one — the map used to stay hidden until that search ended */
+    if(onUpdate){ GEO_RUN.subs.push(onUpdate); const b=GEO_RUN.best; if(b) setTimeout(()=>{ try{ onUpdate(b); }catch(e){} }, 0); }
+    return GEO_RUN.p;
+  }
   maxMs=maxMs||20000; goodAcc=goodAcc||20;
   const run={subs: onUpdate?[onUpdate]:[]};
   run.p=new Promise((resolve,reject)=>{
@@ -4394,9 +4514,14 @@ function getPreciseLocation(onUpdate, maxMs, goodAcc){
     const stop=()=>{ done=true; GEO_RUN=null; if(wid!==null) navigator.geolocation.clearWatch(wid); };
     const end=()=>{ if(done) return; stop(); best ? resolve(best) : reject({code:3}); };
     wid=navigator.geolocation.watchPosition(p=>{
-      if(!best || p.coords.accuracy < best.coords.accuracy){ best=p; run.subs.forEach(f=>{ try{ f(p); }catch(e){} }); }
+      if(!best || p.coords.accuracy < best.coords.accuracy){ best=p; run.best=p; run.subs.forEach(f=>{ try{ f(p); }catch(e){} }); }
       if(best.coords.accuracy<=goodAcc) end();
-    }, err=>{ if(best) return end(); if(done) return; stop(); reject(err); },
+    }, err=>{
+      if(done) return;
+      /* a passing "position unavailable"/timeout while a reading is in hand used to end the search
+         at the first rough fix — keep listening until maxMs (only "denied" stops it) */
+      if(best){ if(err.code===1) end(); return; }
+      stop(); reject(err); },
     {enableHighAccuracy:true, timeout:maxMs, maximumAge:0});
     setTimeout(end, maxMs);
   });
@@ -4405,15 +4530,28 @@ function getPreciseLocation(onUpdate, maxMs, goodAcc){
 }
 /* ---------- map with a draggable pin (Leaflet + OpenStreetMap / Esri satellite) ---------- */
 let LMAP=null, LPIN=null, LCIRC=null, LLAYERS=null, leafletP=null;
+/* The map used to start downloading only after the GPS search finished (up to 20 s), so it
+   appeared late. Now the map code is fetched as soon as the basket / address screen opens, the
+   tile servers are contacted early, and the map shows at the FIRST GPS reading (the pin then
+   moves as the reading gets sharper, until the customer moves it themselves). */
 function loadLeaflet(){
-  if(window.L) return Promise.resolve();
+  if(window.L && window.L.map) return Promise.resolve();
   if(leafletP) return leafletP;
   leafletP=new Promise((res,rej)=>{
-    const c=document.createElement('link'); c.rel='stylesheet'; c.href='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(c);
+    let css=false, js=false; const ok=()=>{ if(css&&js) res(); };
+    const c=document.createElement('link'); c.rel='stylesheet'; c.href='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css';
+    c.onload=c.onerror=()=>{ css=true; ok(); }; document.head.appendChild(c);
     const j=document.createElement('script'); j.src='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';
-    j.onload=()=>res(); j.onerror=()=>{ leafletP=null; rej(); }; document.head.appendChild(j);
+    j.onload=()=>{ js=true; ok(); }; j.onerror=()=>{ leafletP=null; rej(); }; document.head.appendChild(j);
   });
   return leafletP;
+}
+var mapWarm=false;
+function warmMap(){
+  if(mapWarm || DEMO) return; mapWarm=true;
+  ['https://server.arcgisonline.com','https://tile.openstreetmap.org'].forEach(h=>{
+    const l=document.createElement('link'); l.rel='preconnect'; l.href=h; l.crossOrigin=''; document.head.appendChild(l); });
+  loadLeaflet().catch(()=>{});
 }
 function setMapLayer(k){
   if(!LMAP||!LLAYERS) return;
@@ -4440,17 +4578,18 @@ function setPin(lat,lng,byUser){
     const t=document.getElementById('locTitle'); if(t) t.textContent=T('Exact location set by you','सही लोकेशन आपने लगाई');
     matchAreaFromCoords(lat,lng); clearTimeout(window.__fillT); window.__fillT=setTimeout(()=>fillFromCoords(lat,lng), 700); }
 }
-async function openPinMap(lat,lng,acc){
+async function openPinMap(lat,lng,acc,preview){
   const wrap=document.getElementById('pinWrap'); wrap.hidden=false;
   try{ await loadLeaflet(); }catch(e){ wrap.hidden=true; return; }
-  const z = acc>2000 ? 14 : acc>300 ? 16 : 18;
+  const z = preview ? 15 : acc>2000 ? 14 : acc>300 ? 16 : 18;
   if(!LMAP){
     LMAP=L.map('pinMap',{zoomControl:false, attributionControl:true}).setView([lat,lng], z);
     L.control.zoom({position:'topright'}).addTo(LMAP);
     LLAYERS={
+      /* village imagery is sharpest at 18 — zoom 19 just enlarges those tiles instead of waiting for "no data" ones */
       sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        {maxZoom:19, attribution:'Imagery © Esri'}),
-      street: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'© OpenStreetMap'})
+        {maxZoom:19, maxNativeZoom:18, keepBuffer:1, attribution:'Imagery © Esri'}),
+      street: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, keepBuffer:1, attribution:'© OpenStreetMap'})
     };
     LLAYERS.sat.addTo(LMAP);
     const icon=L.divIcon({className:'', html:'<div class="rbpin">📍</div>', iconSize:[38,38], iconAnchor:[19,36]});
@@ -4461,9 +4600,18 @@ async function openPinMap(lat,lng,acc){
     LMAP.setView([lat,lng], z); LPIN.setLatLng([lat,lng]);
   }
   if(LCIRC){ LMAP.removeLayer(LCIRC); LCIRC=null; }
-  if(acc && acc>15) LCIRC=L.circle([lat,lng],{radius:acc, color:'#1E8E3E', weight:1, fillOpacity:.08}).addTo(LMAP);
+  if(!preview && acc && acc>15) LCIRC=L.circle([lat,lng],{radius:acc, color:'#1E8E3E', weight:1, fillOpacity:.08}).addTo(LMAP);
   setTimeout(()=>LMAP.invalidateSize(), 200);
-  pinHint(acc||0,false);
+  if(preview){ const h=document.getElementById('pmHint'); if(h){ h.classList.remove('warn');
+    h.textContent=T('Tap your house on the map (or drag the pin) — or tap ◎ for GPS','नक्शे पर अपने घर पर टैप करें (या पिन खींचें) — या GPS के लिए ◎ दबाएँ'); } }
+  else pinHint(acc||0,false);
+}
+/* no GPS: show the chosen village so the customer can still drop the pin on their house */
+function openVillageMap(){
+  if(addrCoords) return;
+  const name=(document.getElementById('aArea')||{}).value || AREA;
+  const a=AREAS.find(x=>x && typeof x==='object' && x.name===name && x.lat!=null && x.lng!=null);
+  if(a) openPinMap(Number(a.lat), Number(a.lng), 0, true);
 }
 function showLocated(lat,lng,acc){
   addrCoords={lat,lng,acc}; try{ localStorage.setItem('rb_geo_ok','1'); }catch(e){}
@@ -4492,12 +4640,18 @@ async function useGps(){
   const reset=()=>{ gpsBusy=false; if(btn){btn.disabled=false; lbl.textContent=T('Allow location access','लोकेशन की अनुमति दें');} };
   if(btn){btn.disabled=true; lbl.textContent=T('Finding you…','आपको ढूँढ रहे हैं…');}
   toast(T('Getting your exact location — keep the phone still for a few seconds','आपकी सही लोकेशन ले रहे हैं — कुछ सेकंड फ़ोन स्थिर रखें'));
+  warmMap();
+  if(addrCoords && addrCoords.pinned) addrCoords.pinned=false;   /* ◎ / Redo = the customer asks for GPS again */
+  const userPinned=()=>!!(addrCoords && addrCoords.pinned);
   try{
     const best=await getPreciseLocation(p=>{
+      if(userPinned()) return;
       if(btn) lbl.textContent=T('Sharpening… ±','और सही कर रहे हैं… ±')+Math.round(p.coords.accuracy)+T(' m',' मी');
       showLocated(p.coords.latitude, p.coords.longitude, p.coords.accuracy);
+      openPinMap(p.coords.latitude, p.coords.longitude, p.coords.accuracy);   /* map now, pin follows the sharper readings */
     }, 20000, 20);
     reset();
+    if(userPinned()) return;
     const c=best.coords;
     showLocated(c.latitude, c.longitude, c.accuracy);
     openPinMap(c.latitude, c.longitude, c.accuracy);
@@ -4511,6 +4665,7 @@ async function useGps(){
       ? T('Permission denied — please type the address below','अनुमति नहीं मिली — नीचे पता लिख दें')
       : T('Could not find you — please type the address below','लोकेशन नहीं मिली — नीचे पता लिख दें'));
     if(err && err.code===1) setTimeout(nag, 1500);
+    openVillageMap();
   }
 }
 /* Optional nicety: turn coordinates into a written line. If it fails,
@@ -4655,9 +4810,16 @@ async function saveAddress(){
   const fromCheckout=LOC_FROM_CHECKOUT;
   EDIT_ID=null; LOC_FROM_CHECKOUT=false;
   renderAcct();
-  /* only book when this address was added while placing an order — editing an address from
-     My account with items in the basket used to place the order straight away */
-  if(fromCheckout && count()>0){ ADDR_PICKED=true; return createBooking(); }
+  /* Saving an address never books by itself any more — it used to place the order the moment
+     the address was saved during checkout. Back to the basket with this address chosen; the
+     customer checks everything and taps "Confirm booking" themselves. */
+  if(fromCheckout && count()>0){
+    ADDR_PICKED=true; go('basket');
+    toast(T('Address saved — now check and tap "Confirm booking"','पता सेव हो गया — अब जाँच कर "बुकिंग पक्की करें" दबाएँ'));
+    const cb=document.querySelector('#basketStick .bigbtn');
+    if(cb){ cb.classList.remove('nudge'); void cb.offsetWidth; cb.classList.add('nudge'); }
+    return;
+  }
   go(SESSION?'acct':'home');
 }
 async function saveAddressToDb(){
@@ -4710,6 +4872,8 @@ async function makeDefaultAddr(id){
 /* ---------- checkout: which address? ---------- */
 function openAddrPicker(thenBook){
   PICK_THEN_BOOK=!!thenBook; PICK_SEL=(addr&&addr.id)||(ADDRS[0]&&ADDRS[0].id);
+  const go_=document.getElementById('addrPickGo');
+  if(go_) go_.textContent = PICK_THEN_BOOK ? T('Deliver here — confirm booking','यहीं मँगाएँ — बुकिंग पक्की करें') : T('Deliver here','यहीं मँगाएँ');
   renderAddrPicker(); document.getElementById('addrSheet').classList.add('on');
 }
 function closeAddrPicker(){ document.getElementById('addrSheet').classList.remove('on'); PICK_THEN_BOOK=false; }
@@ -4748,6 +4912,31 @@ function addrLine(){
 
 
 /* ---------------- BASKET ---------------- */
+/* One booking goes to ONE vendor. A basket could still hold another vendor's items (added from a
+   different vendor, or merged from another device) and the order then reached the first vendor with
+   the other vendor's items and prices — 11 real orders had this. The basket now marks those items:
+   switch to the same item from this order's vendor, or remove it. */
+function basketVendor(){
+  const ids=Object.keys(cart).filter(id=>prod(id));
+  if(sel.vendorId && ids.some(id=>prod(id).vendorId===sel.vendorId)) return sel.vendorId;
+  const first=ids.map(prod).find(p=>p.vendorId);
+  if(first) sel.vendorId=first.vendorId;
+  return first ? first.vendorId : sel.vendorId;
+}
+function otherVendorItems(){
+  const bv=basketVendor(); if(!bv) return [];
+  return Object.keys(cart).filter(id=>{ const p=prod(id); return p && p.vendorId && p.vendorId!==bv; });
+}
+function sameItemFrom(p, vendorId){
+  const n=x=>String(x||'').trim().toLowerCase();
+  return PRODUCTS.find(x=>x.vendorId===vendorId && x.id!==p.id && x.fresh!==false &&
+    ((p.ckey && x.ckey===p.ckey) || n(x.en)===n(p.en) || n(x.roman)===n(p.roman)));
+}
+function swapToVendor(id){
+  const p=prod(id), bv=basketVendor(), alt=p&&sameItemFrom(p,bv); if(!alt) return;
+  const q=cart[id]; delete cart[id]; cart[alt.id]=(cart[alt.id]||0)+q;
+  syncCart(); renderBasket(); toast(T('Switched to '+(alt.vendorName||'your vendor'),(alt.vendorName||'आपके वेंडर')+' वाला ले लिया'));
+}
 let BASKET_NOTE='';   /* the basket's "note for the vendor" — it was never sent before */
 function renderBasket(){
   const body=document.getElementById('basketBody'), stick=document.getElementById('basketStick');
@@ -4764,6 +4953,8 @@ function renderBasket(){
     return;
   }
   stick.style.display='block';
+  const foreign=otherVendorItems(), bv=basketVendor();
+  const bvName=((PRODUCTS.find(x=>x.vendorId===bv)||{}).vendorName)||T('your vendor','आपके वेंडर');
   const v=VENDOR_TYPES.find(x=>x.id===(sel.type||'vegetable'));
   body.innerHTML=`
     <div class="card" style="background:var(--lime-s);border-color:transparent">
@@ -4784,7 +4975,10 @@ function renderBasket(){
       <div class="brow"${p.fresh===false?' style="opacity:.7"':''}>
         <div class="be">${art(p)}</div>
         <div style="min-width:0"><b>${pname(p)}</b><span>${p.unit} · ₹${p.price}</span>
-          ${p.fresh===false?`<span style="display:block;color:#D93025;font-weight:800">${T('Out of stock now — please remove','अभी स्टॉक ख़त्म — कृपया हटाएँ')}</span>`:''}</div>
+          ${p.fresh===false?`<span style="display:block;color:#D93025;font-weight:800">${T('Out of stock now — please remove','अभी स्टॉक ख़त्म — कृपया हटाएँ')}</span>`:''}
+          ${foreign.includes(id)?(()=>{ const alt=sameItemFrom(p,bv); return `<span style="display:block;color:#B45309;font-weight:800">${T('From '+(p.vendorName||'another vendor')+' — this order goes to '+bvName,(p.vendorName||'दूसरे वेंडर')+' का है — यह ऑर्डर '+bvName+' को जाएगा')}</span>
+            ${alt?`<button class="pill" style="margin-top:6px" onclick="swapToVendor('${id}')">${T('Take '+bvName+'’s · ₹'+alt.price,bvName+' वाला लें · ₹'+alt.price)}</button>`
+                 :`<button class="pill" style="margin-top:6px" onclick="setQty('${id}',-${cart[id]})">${T('Remove','हटाएँ')}</button>`}`; })():''}</div>
         <div class="qty">
           <button onclick="setQty('${id}',-1)">−</button><i>${cart[id]}</i><button onclick="setQty('${id}',1)">+</button>
         </div>
@@ -4989,6 +5183,7 @@ async function phoneLogin(){
     SESSION=session;
     user={name:d.name||n, phone:d.phone||p, email:d.email||'', photo:d.photo_url||null};
     await loadMyAddress();
+    const cartMoved=await cartLogin(d.id);   /* same basket as this account's other devices */
     renderAcct(); paintHeaderIdentity();
     /* same as the Google path: language, push subscription and the 🔔 list — phone-login
        customers used to get none of these until they reloaded the page */
@@ -5000,7 +5195,7 @@ async function phoneLogin(){
     toast(T('Hello, '+n.split(' ')[0]+' 🙏','नमस्ते, '+n.split(' ')[0]+' 🙏'));
     if(pendingCheckout){
       pendingCheckout=false;
-      placeBooking();
+      if(cartMoved) cartChangedAtLogin(); else placeBooking();
     }else{
       go('acct');
     }
@@ -5018,6 +5213,10 @@ function paintCheckoutBanner(){
   if(loc){ loc.innerHTML=html; loc.style.display= n>0 ? 'flex' : 'none'; }
 }
 function placeBooking(){
+  if(otherVendorItems().length){
+    if(!document.getElementById('s-basket').classList.contains('on')) go('basket'); else renderBasket();
+    return toast(T('Some items are from another vendor — switch or remove them (one order goes to one vendor)','कुछ सामान दूसरे वेंडर का है — बदलें या हटाएँ (एक ऑर्डर एक ही वेंडर को जाता है)'));
+  }
   const oos=Object.keys(cart).map(prod).filter(p=>p && p.fresh===false);
   if(oos.length) return toast(T('Out of stock now: ','अभी स्टॉक ख़त्म: ')+oos.map(pname).join(', ')+T(' — please remove',' — कृपया हटाएँ'));
   if(total()<MIN_BASKET) return toast(T(`Minimum booking is ₹${MIN_BASKET}`,`कम से कम बुकिंग ₹${MIN_BASKET} है`));
@@ -5034,7 +5233,7 @@ async function createBooking(){
   toast(T('Booking the vendor…','वेंडर को बता रहे हैं…'));
   const res=await mockApi('createBooking',{items:cart, slot:sel});
   if(!res.ok){
-    if(res.code==='OUT_OF_STOCK'){ await refreshCatalogue(true); if(!document.getElementById('s-basket').classList.contains('on')) go('basket'); }
+    if(res.code==='OUT_OF_STOCK' || res.code==='OTHER_VENDOR'){ await refreshCatalogue(true); if(!document.getElementById('s-basket').classList.contains('on')) go('basket'); else renderBasket(); }
     if(res.code==='VENDOR_FULL' || res.code==='NO_VENDOR'){ sel.slot=null; go('slot'); }
     return toast(res.msg||T('Could not book — try again','बुकिंग नहीं हुई — दोबारा कोशिश करें'));
   }
@@ -5045,7 +5244,7 @@ async function createBooking(){
     addr:addrLine()||'', tag:(addr&&addr.tag)||'Ghar', name:(user&&user.name)||''
   };
   BOOKINGS.unshift(b);            /* replaced by the server list on the bookings screen */
-  cart={}; syncCart(); ADDR_PICKED=false; BASKET_NOTE='';
+  cart={}; syncCart(); pushCart(); ADDR_PICKED=false; BASKET_NOTE='';
   document.getElementById('sucId').textContent=b.code;
   document.getElementById('sucOtp').textContent=b.otp;
   document.getElementById('sucLine').textContent=T('The vendor has been told. See you '+b.slot.toLowerCase()+'.','वेंडर को बता दिया गया है — '+b.slot);
@@ -5093,11 +5292,11 @@ async function restoreSession(){
     const c=await getSb();
     c.auth.onAuthStateChange((evt, session)=>{
       if(session && !sessionReady){ sessionReady=true; adoptSession(session); }
-      if(evt==='SIGNED_OUT'){ user=null; addr=null; ADDRS=[]; SESSION=null; sessionReady=false; renderAcct(); }
+      if(evt==='SIGNED_OUT'){ cartLogout(); user=null; addr=null; ADDRS=[]; SESSION=null; sessionReady=false; renderAcct(); }
     });
     const {data:{session}}=await c.auth.getSession();
     if(session && !sessionReady){ sessionReady=true; await adoptSession(session); }
-    else if(!session && !location.hash.includes('access_token')) renderAcct();
+    else if(!session && !location.hash.includes('access_token')){ cartLogout(); renderAcct(); }
   }catch(e){ SESSION_ERR=(e&&e.message)||'Sign-in check failed'; renderAcct(); }
 }
 
@@ -5137,6 +5336,7 @@ async function adoptSession(session){
           phone:d.phone||(pending&&pending.phone)||'',
           email:d.email||session.user.email||'', photo:d.photo_url||null};
     await loadMyAddress();
+    const cartMoved=await cartLogin(d.id);   /* same basket as this account's other devices */
     renderAcct();
     paintHeaderIdentity();
     rpc('set_language',{p_lang:LANG});   /* messages + pushes come in the language this app is showing */
@@ -5153,7 +5353,7 @@ async function adoptSession(session){
       go('login');
     }else if(pendingCheckout || restoredCheckout){
       pendingCheckout=false;
-      placeBooking();          /* resume exactly where they left off — cart
+      if(cartMoved) cartChangedAtLogin(); else placeBooking();          /* resume exactly where they left off — cart
                                    and slot were just restored above, this
                                    moves straight to address or booking */
     }else if(document.getElementById('s-login').classList.contains('on')){
@@ -5196,6 +5396,7 @@ function paintHeaderIdentity(){
   });
 }
 async function logout(){
+  cartLogout(); SESSION=null; sessionReady=false;
   if(!DEMO){ try{ const c=await getSb(); await c.auth.signOut(); }catch(e){} }
   user=null; addr=null; ADDRS=[]; ADDR_PICKED=false; cart={}; BOOKINGS=[]; FAVS.clear();
   try{ localStorage.removeItem('rb_addr_draft'); }catch(e){}
@@ -5726,6 +5927,11 @@ async function renderBill(){
   const el=document.getElementById('billBody');
   el.innerHTML=`<div class="card"><div class="sk" style="height:120px"></div></div>`;
   const res=await mockApi('getBill',{code:billCode});
+  if(!res.ok || !res.data){
+    el.innerHTML=`<div class="empty"><div class="ee">🧾</div><b>${esc(res.msg||T('Could not load the bill','बिल लोड नहीं हुआ'))}</b>
+      <button class="bigbtn" style="margin-top:20px;padding:14px 28px" onclick="go('bookings')">${T('My bookings','मेरी बुकिंग')}</button></div>`;
+    return;
+  }
   const {b,changes,unchanged,oldT,newT}=res.data;
   el.innerHTML=`
     <div class="card" style="background:var(--or-s);border-color:transparent">
