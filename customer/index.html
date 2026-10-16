@@ -611,6 +611,28 @@ select.field{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg 
 .pop{animation:pop .42s var(--sp)}
 @keyframes pop{0%{transform:scale(1)}42%{transform:scale(1.06)}100%{transform:scale(1)}}
 .bigbtn.nudge{animation:nudge 1.1s var(--sp) 2}
+/* basket split into one order per vendor */
+.ord-info{background:#FFF7E6;border:1.5px solid #F5D28A;border-radius:16px;padding:13px 15px;margin-top:14px}
+.ord-info b{display:block;font-size:14.5px;font-weight:800;color:#7a3f04}
+.ord-info span{display:block;font-size:12.5px;font-weight:700;color:var(--tx2);margin-top:5px;line-height:1.5}
+.ord-hd{display:flex;align-items:center;gap:9px;margin:16px 2px 8px}
+.ord-hd b{flex:1;min-width:0;font-size:15px;font-weight:800}
+.ord-hd>span:last-child{font-size:14px;font-weight:800;color:var(--g-dk)}
+.ord-n{width:24px;height:24px;border-radius:50%;background:var(--g);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;flex-shrink:0}
+.ord-warn{background:#FDECEA;color:#B42318;border-radius:12px;padding:10px 12px;font-size:12.5px;font-weight:800;margin-top:10px;line-height:1.45}
+.suc-ord{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:14px 15px;margin-top:12px;text-align:left}
+.suc-ord .so-hd{display:flex;align-items:center;gap:9px}
+.suc-ord .so-hd b{flex:1;min-width:0;font-size:15px;font-weight:800}
+.suc-ord .so-code{font-size:12px;font-weight:800;color:var(--tx2);background:var(--grey);border-radius:99px;padding:4px 10px}
+.suc-ord .so-items{font-size:12.5px;font-weight:700;color:var(--tx2);margin-top:7px}
+.suc-ord .so-otp{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;background:var(--lime-s);border-radius:12px;padding:9px 12px}
+.suc-ord .so-otp span{font-size:12px;font-weight:800;color:var(--g-dk)}
+.suc-ord .so-otp b{font-size:26px;font-weight:800;letter-spacing:5px;color:var(--tx)}
+.vcard .vimg{width:58px;height:58px;border-radius:14px;flex-shrink:0;background:var(--grey);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.vcard .vimg img,.vcard .vimg svg{width:100%;height:100%;object-fit:cover}
+.vcard .vprice{font-size:17px;font-weight:800;color:var(--g-dk);white-space:nowrap}
+.vcard .vtag{display:inline-block;font-size:10.5px;font-weight:800;border-radius:99px;padding:2px 8px;margin-top:4px}
+.pmulti{font-size:11px;font-weight:800;color:#2559b8;margin-top:3px}
 @keyframes nudge{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(30,142,62,.45)}40%{transform:scale(1.04);box-shadow:0 0 0 10px rgba(30,142,62,0)}}
 
 /* ============================================================
@@ -1567,10 +1589,12 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
     <div class="suc-ring" id="sucRing">
       <svg viewBox="0 0 52 52"><path d="M13 27 L22 36 L39 17"/></svg>
     </div>
-    <h1 data-en="Booking confirmed! 🎉" data-hi="बुकिंग पक्की हो गई! 🎉">Booking confirmed! 🎉</h1>
+    <h1 id="sucH1" data-en="Booking confirmed! 🎉" data-hi="बुकिंग पक्की हो गई! 🎉">Booking confirmed! 🎉</h1>
     <p id="sucLine">The vendor has been told. See you in the slot.</p>
     <div class="idpill" id="sucId">RB-104217</div>
-    <div class="otp-card">
+    <div id="sucMulti" style="width:100%;max-width:420px"></div>
+    <div id="sucFail" style="width:100%;max-width:420px"></div>
+    <div class="otp-card" id="sucOtpCard">
       <span data-en="DELIVERY CODE" data-hi="डिलीवरी कोड">DELIVERY CODE</span>
       <b id="sucOtp">4821</b>
       <i data-en="Show this to the vendor at your door" data-hi="यह कोड दरवाज़े पर वेंडर को दिखाएँ">Show this to the vendor at your door</i>
@@ -3023,11 +3047,20 @@ async function mockApi(fn, args={}){
 
     case 'getSlots': {
       const iso = istISO(sel.day);
-      /* with an item in the basket the order goes to that vendor, so show THAT vendor's seats */
-      const r = await rpc('customer_slot_status_for',
-        {p_type: sel.type||'vegetable', p_area: AREA, p_date: iso, p_vendor: sel.vendorId||null});
-      if(!r.ok) return {ok:false, msg:r.msg};
-      const rows = (r.data||[]).slice().sort((a,b)=>SLOT_ORDER[a.slot]-SLOT_ORDER[b.slot]);
+      /* with an item in the basket the order goes to that vendor, so show THAT vendor's seats.
+         Items from 2 vendors = 2 orders in the same slot: a slot counts only if EVERY one of them can come. */
+      const gs = basketGroups().filter(g=>g.vendorId);
+      if(gs.length>1) await ensureVendorTypes();
+      const asks = gs.length>1 ? gs.map(g=>({t:vendorTypeOf(g.vendorId), v:g.vendorId})) : [{t:sel.type||'vegetable', v:sel.vendorId||null}];
+      const all = await Promise.all(asks.map(a=>rpc('customer_slot_status_for',{p_type:a.t, p_area:AREA, p_date:iso, p_vendor:a.v})));
+      const bad = all.find(x=>!x.ok); if(bad) return {ok:false, msg:bad.msg};
+      let merged = all[0].data||[];
+      if(all.length>1) merged = merged.filter(s=>all.every(x=>(x.data||[]).some(y=>y.slot===s.slot))).map(s=>{
+        const xs=all.map(x=>(x.data||[]).find(y=>y.slot===s.slot));
+        return {...s, has_room: xs.every(x=>x.has_room), free: Math.min(...xs.map(x=>x.has_room?(x.free||0):0)),
+                is_past: xs.some(x=>x.is_past), closed: xs.some(x=>x.closed)};
+      });
+      const rows = merged.slice().sort((a,b)=>SLOT_ORDER[a.slot]-SLOT_ORDER[b.slot]);
       return {ok:true, data: rows.map(s=>{
         const base = SLOTS.find(x=>x.id===s.slot) || SLOTS[0];
         return {...base, left: s.has_room ? (s.free||0) : 0, past: !!s.is_past, closed: !!s.closed};
@@ -3035,13 +3068,13 @@ async function mockApi(fn, args={}){
     }
 
     case 'createBooking': {
-      const items = Object.entries(cart).map(([id,q])=>({product_id:id, qty:q}));
+      const items = Object.entries(args.items||cart).map(([id,q])=>({product_id:id, qty:q}));
       const saved = await ensureAddress();
       if(!saved.ok) return saved;
       const r = await rpc('customer_create_booking',{
-        p_type: sel.type||'vegetable', p_address_id: saved.id,
+        p_type: args.type||sel.type||'vegetable', p_address_id: saved.id,
         p_date: istISO(sel.day), p_slot: sel.slot||'morning',
-        p_items: items, p_note: [BASKET_NOTE.trim(), addr&&addr.note].filter(Boolean).join(' · ')||null, p_vendor_id: sel.vendorId||null
+        p_items: items, p_note: [BASKET_NOTE.trim(), addr&&addr.note].filter(Boolean).join(' · ')||null, p_vendor_id: args.vendorId||sel.vendorId||null
       });
       if(!r.ok) return r;
       return {ok:true, data:{code:r.data.code, otp:r.data.delivery_otp||r.data.otp, id:r.data.id}};
@@ -3525,7 +3558,7 @@ function soon(){toast(T('2–3 hour delivery — coming soon ⚡','2–3 घं�
 let tT;
 function toast(m){
   const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show');
-  clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),1900);
+  clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'), Math.max(1900, Math.min(5200, String(m).length*45)));   /* long messages stay long enough to read */
 }
 
 /* ---------------- PRODUCT CARD ---------------- */
@@ -3555,7 +3588,8 @@ function cardQty(e,id,d){
 }
 function card(p){
   const oos = p.fresh===false;   /* fresh doubles as "in stock" — see mapProduct */
-  return `<div class="pcard${oos?' oos':''}">
+  const n=sellersOf(p).length;
+  return `<div class="pcard${oos?' oos':''}"${n>1?` onclick="cardTap('${p.id}')"`:''}>
     <div class="pimg">${art(p)}<button class="fav ${FAVS.has(p.id)?'on':''}" aria-label="Save" onclick="toggleFav(event,'${p.id}')">${FAVS.has(p.id)?'♥':'♡'}</button>
       ${oos ? `<span class="oosbadge">${T('Out of stock','स्टॉक खत्म')}</span>`
             : `<span class="addw" data-pid="${p.id}">${addBtn(p.id)}</span>`}</div>
@@ -3564,10 +3598,12 @@ function card(p){
     ${p.vendorName ? `<div class="pvendor" onclick="event.stopPropagation();openVendorPicker(pname(prod('${p.id}')),null,'${p.id}')">
       \u{1F9D1} ${p.vendorName}${p.vendorRating>0?` <span class="pv-star">\u2B50 ${p.vendorRating.toFixed(1)}</span>`:''}
     </div>` : ''}
+    ${n>1?`<div class="pmulti">${T(n+' vendors sell this — tap to compare',n+' वेंडर बेचते हैं — दाम देखने के लिए दबाएँ')}</div>`:''}
     <div class="pslot">🕖 ${slotBadge()}</div>
     <div class="prow">${priceLine(p)}</div>
   </div>`;
 }
+function cardTap(id){ const p=prod(id); if(p && sellersOf(p).length>1) openVendorPicker(pname(p), id); }
 function skeletons(n){
   return Array.from({length:n}).map(()=>`<div class="pcard sk-card"><div class="sk sk1"></div><div class="sk sk2"></div><div class="sk sk3"></div></div>`).join('');
 }
@@ -3888,6 +3924,7 @@ async function openVendorPicker(productName, addMode, pid){
   titleEl.textContent = LANG==='en' ? titleEn : titleHi;
   subEl.textContent = LANG==='en' ? subEn : subHi;
   document.getElementById('vendShowAllBtn').style.display = productVendorMode ? 'none' : '';
+  const sr=document.getElementById('vendSortRow'); if(sr) sr.style.display = productVendorMode ? 'none' : '';   /* comparing one item: price matters, not sorting */
   const r = productVendorMode
     ? await mockApi('getVendorsForProduct',{name:((PICK_PID&&prod(PICK_PID))||{}).roman || productVendorMode})
     : await mockApi('getVendors');
@@ -3919,6 +3956,30 @@ function renderVendorList(){
     const p=PRODUCTS.find(x=>inCartIds.has(x.id) && x.vendorId);
     return p ? p.vendorId : null;
   })() : null;
+  if(productVendorMode){
+    const inBasket=new Set(Object.keys(cart).map(prod).filter(Boolean).map(p=>p.vendorId));
+    const live=list.filter(v=>v.in_stock!==false), low=live.length>1 ? Math.min(...live.map(v=>Number(v.price))) : null;
+    const base=prod(PICK_PID)||{};
+    document.getElementById('vendList').innerHTML = list.length ? list.map(v=>{
+      const ip=prod(v.product_id)||base, out=v.in_stock===false;
+      const sep = inBasket.size && !inBasket.has(v.id);
+      return `<button class="vcard" onclick="pickVendor('${v.id}')" ${out?'disabled style="opacity:.55"':''}>
+        <div class="vimg">${art(ip)}</div>
+        <div class="vt">
+          <b>${esc(v.name)}</b>
+          <div class="vmeta">
+            ${v.avg_rating>0 ? `<span class="vstars">⭐ ${Number(v.avg_rating).toFixed(1)}</span><span class="vdot">·</span>` : ''}
+            <span class="vch">${v.orders_completed||0} ${T('orders done','ऑर्डर पूरे')}</span></div>
+          ${out ? `<span class="vtag" style="background:#FDECEA;color:#B42318">${T('Out of stock','स्टॉक ख़त्म')}</span>`
+            : inBasket.has(v.id) ? `<span class="vtag" style="background:var(--lime-s);color:var(--g-dk)">${T('already in your basket','पहले से टोकरी में')}</span>`
+            : sep ? `<span class="vtag" style="background:#FFF7E6;color:#7a3f04">${T('separate order · own bill','अलग ऑर्डर · अलग बिल')}</span>` : ''}
+          ${!out && low!==null && Number(v.price)===low ? `<span class="vtag" style="background:#E8F0FE;color:#2559b8">${T('lowest price','सबसे सस्ता')}</span>`:''}
+        </div>
+        <div class="vprice">₹${v.price}<small style="display:block;font-size:11px;color:var(--mut);text-align:right">${esc(v.unit||ip.unit||'')}</small></div>
+      </button>`; }).join('')
+      : `<div class="empty"><div class="ee">🧑‍🌾</div><b>${T('No one sells this here yet','अभी कोई यह नहीं बेचता')}</b></div>`;
+    return;
+  }
   document.getElementById('vendList').innerHTML = list.length ? list.map(v=>`
     <button class="vcard ${catVendorFilter===v.id?'sel':''}" onclick="pickVendor('${v.id}')" ${productVendorMode&&v.in_stock===false?'disabled style="opacity:.5"':''}>
       ${v.photo_url ? `<img class="vav" src="${v.photo_url}" alt="">` : `<div class="vav">${(v.name||'?')[0].toUpperCase()}</div>`}
@@ -3947,14 +4008,15 @@ function pickVendor(id){
         PRODUCTS.push(Object.assign({}, base, {id:v.product_id, price:Number(v.price), unit:v.unit||base.unit,
           vendorId:v.id, vendorName:v.name, vendorRating:Number(v.avg_rating)||0, fresh:true}));
       }
+      const vendorsBefore=new Set(Object.keys(cart).map(prod).filter(Boolean).map(p=>p.vendorId));
       cart[v.product_id]=(cart[v.product_id]||0)+1;
+      /* This is a real, explicit choice, not a guess — it carries through to booking. An empty
+         basket takes this vendor as its (first) order; otherwise the basket's first vendor stays. */
+      if(!vendorsBefore.size){ sel.vendorId = id; if(v.v_type) sel.type = v.v_type; }
       syncCart();
-      /* This is a real, explicit choice, not a guess — it should carry
-         all the way through to booking, not get silently forgotten and
-         asked again as if nothing had been decided yet. */
-      sel.vendorId = id;
-      if(v.v_type) sel.type = v.v_type;
-      toast(T(pendingAddName+' added — from '+v.name, pendingAddName+' जुड़ गया — '+v.name+' से'));
+      toast(vendorsBefore.size && !vendorsBefore.has(id)
+        ? T(pendingAddName+' added from '+v.name+' — a separate order with its own bill', pendingAddName+' '+v.name+' से जुड़ा — यह अलग ऑर्डर होगा, अलग बिल')
+        : T(pendingAddName+' added — from '+v.name, pendingAddName+' जुड़ गया — '+v.name+' से'));
     }
     pendingAddName=null;
     closeVendorPicker();
@@ -3984,8 +4046,8 @@ function fly(e,id){
      happened to render first hides a choice the person would
      reasonably want to make. Only ask when it's a real choice —
      one vendor selling it still adds instantly, same as always. */
-  const same=(a,b)=>String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();
-  const siblings = p ? PRODUCTS.filter(x=>x.fresh!==false && ((x.en&&same(x.en,p.en)) || same(x.roman,p.roman))) : [];
+  if(cart[id]){ flyAnimate(e, id); return; }        /* "+" on an item already chosen: no need to ask again */
+  const siblings = sellersOf(p).filter(x=>x.fresh!==false);
   if(siblings.length>1){ openVendorPicker(pname(p), id); return; }
   flyAnimate(e, id);
 }
@@ -4024,18 +4086,19 @@ function addCart(id){
      was added first instead. A genuinely fresh cart (wasEmpty) always
      resets the baseline; a stale value left over from a previous
      cart/session shouldn't get to override that. */
-  const p=prod(id);
+  const p=prod(id); let sepMsg='';
   if(p && p.vendorId){
     if(wasEmpty || !sel.vendorId) sel.vendorId=p.vendorId;
-    else if(sel.vendorId!==p.vendorId){
-      const cartVendorName=(PRODUCTS.find(x=>x.vendorId===sel.vendorId)||{}).vendorName||T('your other vendor','दूसरा वेंडर');
-      toast(T(`Added — but this is from a different vendor than ${cartVendorName}`,
-              `जुड़ गया — पर यह ${cartVendorName} से अलग वेंडर का है`));
+    else if(sel.vendorId!==p.vendorId && !Object.keys(cart).some(x=>x!==id && (prod(x)||{}).vendorId===p.vendorId)){
+      /* first item from a second vendor: it becomes its own order — say so once */
+      sepMsg=T(`${pname(p)} from ${p.vendorName||'another vendor'} — a separate order with its own bill`,
+               `${pname(p)} ${p.vendorName||'दूसरे वेंडर'} से — यह अलग ऑर्डर होगा, अलग बिल`);
     }
   }
   syncCart(); paintAdd(id);
   const q=cart[id], pp=prod(id);
-  if(pp) toast(T(`${pname(pp)} — ${q} in basket`, `${pname(pp)} — टोकरी में ${q}`));
+  if(sepMsg) toast(sepMsg);
+  else if(pp) toast(T(`${pname(pp)} — ${q} in basket`, `${pname(pp)} — टोकरी में ${q}`));
   const i=document.getElementById('cartIn');
   i.classList.remove('pop'); void i.offsetWidth; i.classList.add('pop');
 }
@@ -4226,6 +4289,7 @@ function dayLabels(){
   });
 }
 async function renderSlotScreen(){
+  if(count()) basketVendor();      /* the basket's items decide the vendor */
   const avail = DEMO ? VENDOR_TYPES
     : VENDOR_TYPES.filter(v=>LIVE_TYPES.some(t=>t.v_type===v.id));
   /* the common real case is exactly one category — a hyperlocal
@@ -4345,6 +4409,18 @@ async function loadSlotVendors(){
   if(wasHidden) wrap.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 function renderSlotVendorList(){
+  const gs=basketGroups().filter(g=>g.vendorId);
+  if(gs.length>1){
+    /* items from 2 vendors: nothing to choose — say plainly that both come, each with his own order */
+    const heading=document.getElementById('vendorHeading'), full=document.getElementById('slotVendorList'), compact=document.getElementById('vendorCompact');
+    heading.style.display='none'; full.style.display='none';
+    compact.style.cssText='display:flex;align-items:center;gap:10px;background:#FFF7E6;border:1.5px solid #F5D28A;border-radius:14px;padding:12px 15px;margin-bottom:6px';
+    compact.innerHTML=`<span style="font-size:22px">🧾</span><span style="font-size:13.5px;font-weight:800;color:#7a3f04">${
+      T(gs.length+' vendors, '+gs.length+' separate orders: ',gs.length+' वेंडर, '+gs.length+' अलग ऑर्डर: ')}${esc(gs.map(g=>g.name).join(' + '))}<br>
+      <span style="font-weight:700;color:var(--tx2)">${T('Only times when all of them come are shown','सिर्फ़ वही समय दिखाए हैं जब सब आ सकते हैं')}</span></span>`;
+    sel.vendorId=gs[0].vendorId;
+    checkSlot(); return;
+  }
   const list=[...SLOT_VENDORS].sort((a,b)=>(b.avg_rating||0)-(a.avg_rating||0));
   /* Was a vendor already genuinely chosen before this render — either
      picked while adding an item to the cart, or kept from an earlier
@@ -4911,33 +4987,46 @@ function addrLine(){
 }
 
 
-/* ---------------- BASKET ---------------- */
-/* One booking goes to ONE vendor. A basket could still hold another vendor's items (added from a
-   different vendor, or merged from another device) and the order then reached the first vendor with
-   the other vendor's items and prices — 11 real orders had this. The basket now marks those items:
-   switch to the same item from this order's vendor, or remove it. */
-function basketVendor(){
-  const ids=Object.keys(cart).filter(id=>prod(id));
-  if(sel.vendorId && ids.some(id=>prod(id).vendorId===sel.vendorId)) return sel.vendorId;
-  const first=ids.map(prod).find(p=>p.vendorId);
-  if(first) sel.vendorId=first.vendorId;
-  return first ? first.vendorId : sel.vendorId;
-}
-function otherVendorItems(){
-  const bv=basketVendor(); if(!bv) return [];
-  return Object.keys(cart).filter(id=>{ const p=prod(id); return p && p.vendorId && p.vendorId!==bv; });
-}
-function sameItemFrom(p, vendorId){
+/* ---------------- BASKET ----------------
+   One order goes to one vendor. Since 16 Oct 2026 a basket with items from two vendors becomes TWO
+   separate orders (Vedanshu's ask): both vendors come in the chosen slot, each with his own items,
+   his own bill and his own delivery code. (Before, the whole basket went to the first vendor — 11 real
+   orders carried another vendor's items.) When the other vendor in the basket also has the same item
+   in stock, the basket OFFERS to move it into that order (one trip less) — it never moves by itself,
+   and never offers a vendor who doesn't have the item. */
+function sameItem(a,b){
   const n=x=>String(x||'').trim().toLowerCase();
-  return PRODUCTS.find(x=>x.vendorId===vendorId && x.id!==p.id && x.fresh!==false &&
-    ((p.ckey && x.ckey===p.ckey) || n(x.en)===n(p.en) || n(x.roman)===n(p.roman)));
+  return !!(a && b && ((a.ckey && a.ckey===b.ckey) || (a.en && n(a.en)===n(b.en)) || (a.roman && n(a.roman)===n(b.roman))));
 }
-function swapToVendor(id){
-  const p=prod(id), bv=basketVendor(), alt=p&&sameItemFrom(p,bv); if(!alt) return;
+function sellersOf(p){ return p ? PRODUCTS.filter(x=>sameItem(x,p)) : []; }      /* every vendor listing this item */
+function sameItemFrom(p, vendorId){ return PRODUCTS.find(x=>x.vendorId===vendorId && x.id!==p.id && x.fresh!==false && sameItem(x,p)); }
+function vendorNameOf(vid){ return ((PRODUCTS.find(x=>x.vendorId===vid)||{}).vendorName) || T('Vendor','वेंडर'); }
+/* the basket split by vendor — the vendor of the first chosen item first */
+function basketGroups(){
+  const ids=Object.keys(cart).filter(id=>prod(id)), map=new Map();
+  if(sel.vendorId && ids.some(id=>prod(id).vendorId===sel.vendorId)) map.set(sel.vendorId, []);
+  ids.forEach(id=>{ const v=prod(id).vendorId||'-'; if(!map.has(v)) map.set(v, []); map.get(v).push(id); });
+  return [...map.entries()].filter(([,l])=>l.length).map(([vid,l])=>({
+    vendorId: vid==='-'?null:vid, name: vid==='-'?'':vendorNameOf(vid), ids:l,
+    total: l.reduce((s,id)=>s+prod(id).price*cart[id],0), count: l.reduce((s,id)=>s+cart[id],0) }));
+}
+function basketVendor(){ const g=basketGroups(); if(g.length && g[0].vendorId) sel.vendorId=g[0].vendorId; return g.length ? g[0].vendorId : sel.vendorId; }
+function smallOrders(){ const g=basketGroups(); return g.length>1 ? g.filter(x=>x.total<MIN_BASKET) : []; }
+function moveToVendor(id, vid){
+  const p=prod(id), alt=p && sameItemFrom(p, vid); if(!alt) return;
   const q=cart[id]; delete cart[id]; cart[alt.id]=(cart[alt.id]||0)+q;
-  syncCart(); renderBasket(); toast(T('Switched to '+(alt.vendorName||'your vendor'),(alt.vendorName||'आपके वेंडर')+' वाला ले लिया'));
+  syncCart(); renderBasket(); toast(T('Moved to '+alt.vendorName+'’s order', alt.vendorName+' के ऑर्डर में डाल दिया'));
 }
-let BASKET_NOTE='';   /* the basket's "note for the vendor" — it was never sent before */
+/* each vendor's type (vegetable / fruit / onion_potato) — an order is booked with its own vendor's type */
+let VTYPE_BY_ID={}, VTYPE_AREA=null;
+async function ensureVendorTypes(){
+  if(DEMO || VTYPE_AREA===AREA) return;
+  const r=await mockApi('getVendors');
+  if(r.ok){ VTYPE_BY_ID={}; (r.data||[]).forEach(v=>{ VTYPE_BY_ID[v.id]=v.v_type; }); VTYPE_AREA=AREA; }
+}
+function vendorTypeOf(vid){ return (vid && VTYPE_BY_ID[vid]) || sel.type || 'vegetable'; }
+
+let BASKET_NOTE='';   /* the basket's "note for the vendor" — sent with every order */
 function renderBasket(){
   const body=document.getElementById('basketBody'), stick=document.getElementById('basketStick');
   /* an item the vendor removed since the page loaded would crash this screen */
@@ -4953,14 +5042,28 @@ function renderBasket(){
     return;
   }
   stick.style.display='block';
-  const foreign=otherVendorItems(), bv=basketVendor();
-  const bvName=((PRODUCTS.find(x=>x.vendorId===bv)||{}).vendorName)||T('your vendor','आपके वेंडर');
+  const groups=basketGroups(), multi=groups.length>1;
+  if(groups[0] && groups[0].vendorId) sel.vendorId=groups[0].vendorId;
   const v=VENDOR_TYPES.find(x=>x.id===(sel.type||'vegetable'));
+  const row=(id,g)=>{ const p=prod(id);
+    /* the same item is also with another vendor already in this basket → offer to move it there */
+    const other=multi ? groups.filter(h=>h!==g && h.vendorId).map(h=>({h, alt:sameItemFrom(p,h.vendorId)})).find(x=>x.alt) : null;
+    return `
+      <div class="brow"${p.fresh===false?' style="opacity:.7"':''}>
+        <div class="be">${art(p)}</div>
+        <div style="min-width:0"><b>${pname(p)}</b><span>${p.unit} · ₹${p.price}</span>
+          ${p.fresh===false?`<span style="display:block;color:#D93025;font-weight:800">${T('Out of stock now — please remove','अभी स्टॉक ख़त्म — कृपया हटाएँ')}</span>`:''}
+          ${other?`<button class="pill" style="margin-top:6px;font-size:11.5px;white-space:normal;text-align:left;line-height:1.3;max-width:100%" onclick="moveToVendor('${id}','${other.h.vendorId}')">${
+            T('Also with '+other.h.name+' · ₹'+other.alt.price+' — move to that order',other.h.name+' के पास भी है · ₹'+other.alt.price+' — उस ऑर्डर में डालें')}</button>`:''}</div>
+        <div class="qty">
+          <button onclick="setQty('${id}',-1)">−</button><i>${cart[id]}</i><button onclick="setQty('${id}',1)">+</button>
+        </div>
+      </div>`; };
   body.innerHTML=`
     <div class="card" style="background:var(--lime-s);border-color:transparent">
       <div style="display:flex;align-items:center;gap:12px">
         <span style="font-size:28px">${v.em}</span>
-        <div><b style="font-size:15px">${LANG==='en'?v.en:v.hi}</b>
+        <div style="min-width:0"><b style="font-size:15px">${multi ? T(groups.length+' vendors',groups.length+' वेंडर')+': '+esc(groups.map(g=>g.name).join(' + ')) : (LANG==='en'?v.en:v.hi)}</b>
         <div style="font-size:13px;font-weight:700;color:var(--g-dk)">🕖 ${slotLine()}</div></div>
         <button class="pill" style="margin-left:auto" onclick="go('slot')">${T('Change','बदलें')}</button>
       </div>
@@ -4970,25 +5073,24 @@ function renderBasket(){
                : `📍 ${T('Address not added yet — you will be asked before confirming','पता अभी नहीं डाला — पक्का करने से पहले पूछेंगे')}`}</div>
     </div>
 
+    ${multi?`<div class="ord-info"><b>🧾 ${T(groups.length+' vendors = '+groups.length+' separate orders',groups.length+' वेंडर = '+groups.length+' अलग ऑर्डर')}</b>
+      <span>${T('Each vendor comes in your slot with his own items, his own bill and his own delivery code. Pay each vendor only for his bill.',
+                'हर वेंडर आपके समय पर अपना सामान लेकर आएगा — हर एक का अलग बिल और अलग डिलीवरी कोड। हर वेंडर को सिर्फ़ उसका बिल दें।')}</span></div>`:''}
+
     <div class="h2">${T('Your items','आपका सामान')}</div>
-    <div class="card">${ids.map(id=>{const p=prod(id);return `
-      <div class="brow"${p.fresh===false?' style="opacity:.7"':''}>
-        <div class="be">${art(p)}</div>
-        <div style="min-width:0"><b>${pname(p)}</b><span>${p.unit} · ₹${p.price}</span>
-          ${p.fresh===false?`<span style="display:block;color:#D93025;font-weight:800">${T('Out of stock now — please remove','अभी स्टॉक ख़त्म — कृपया हटाएँ')}</span>`:''}
-          ${foreign.includes(id)?(()=>{ const alt=sameItemFrom(p,bv); return `<span style="display:block;color:#B45309;font-weight:800">${T('From '+(p.vendorName||'another vendor')+' — this order goes to '+bvName,(p.vendorName||'दूसरे वेंडर')+' का है — यह ऑर्डर '+bvName+' को जाएगा')}</span>
-            ${alt?`<button class="pill" style="margin-top:6px" onclick="swapToVendor('${id}')">${T('Take '+bvName+'’s · ₹'+alt.price,bvName+' वाला लें · ₹'+alt.price)}</button>`
-                 :`<button class="pill" style="margin-top:6px" onclick="setQty('${id}',-${cart[id]})">${T('Remove','हटाएँ')}</button>`}`; })():''}</div>
-        <div class="qty">
-          <button onclick="setQty('${id}',-1)">−</button><i>${cart[id]}</i><button onclick="setQty('${id}',1)">+</button>
-        </div>
-      </div>`}).join('')}</div>
+    ${groups.map((g,i)=>`
+      ${multi?`<div class="ord-hd"><span class="ord-n">${i+1}</span><b>${T('Order','ऑर्डर')} ${i+1} · ${esc(g.name)}</b><span>₹${g.total}</span></div>`:''}
+      <div class="card">${g.ids.map(id=>row(id,g)).join('')}
+        ${multi && g.total<MIN_BASKET?`<div class="ord-warn">${T('Add ₹'+(MIN_BASKET-g.total)+' more from '+g.name+' — each order needs at least ₹'+MIN_BASKET,
+          g.name+' से ₹'+(MIN_BASKET-g.total)+' का और सामान डालें — हर ऑर्डर कम से कम ₹'+MIN_BASKET+' का हो')}</div>`:''}
+      </div>`).join('')}
 
     <div class="h2">${T('Note for the vendor','वेंडर के लिए नोट')}</div>
     <textarea class="field" id="vnote" rows="2" maxlength="300" oninput="BASKET_NOTE=this.value" placeholder="${T('e.g. more tomatoes, less coriander','जैसे: ज़्यादा टमाटर, कम धनिया')}">${esc(BASKET_NOTE)}</textarea>
 
     <div class="card" style="margin-top:20px">
-      <div class="trow"><span>${T('Items','सामान')} (${count()})</span><span>₹${total()}</span></div>
+      ${multi ? groups.map((g,i)=>`<div class="trow"><span>${T('Order','ऑर्डर')} ${i+1} · ${esc(g.name)} (${g.count})</span><span>₹${g.total}</span></div>`).join('')
+              : `<div class="trow"><span>${T('Items','सामान')} (${count()})</span><span>₹${total()}</span></div>`}
       <div class="trow"><span>${T('Delivery','डिलीवरी')}</span><span style="color:var(--g);font-weight:800">${T('Free','मुफ़्त')}</span></div>
       <div class="trow big">
         <div><b>₹${total()}</b><span>${T('ESTIMATED TOTAL','अनुमानित कुल')}</span></div>
@@ -5213,13 +5315,16 @@ function paintCheckoutBanner(){
   if(loc){ loc.innerHTML=html; loc.style.display= n>0 ? 'flex' : 'none'; }
 }
 function placeBooking(){
-  if(otherVendorItems().length){
-    if(!document.getElementById('s-basket').classList.contains('on')) go('basket'); else renderBasket();
-    return toast(T('Some items are from another vendor — switch or remove them (one order goes to one vendor)','कुछ सामान दूसरे वेंडर का है — बदलें या हटाएँ (एक ऑर्डर एक ही वेंडर को जाता है)'));
-  }
   const oos=Object.keys(cart).map(prod).filter(p=>p && p.fresh===false);
   if(oos.length) return toast(T('Out of stock now: ','अभी स्टॉक ख़त्म: ')+oos.map(pname).join(', ')+T(' — please remove',' — कृपया हटाएँ'));
   if(total()<MIN_BASKET) return toast(T(`Minimum booking is ₹${MIN_BASKET}`,`कम से कम बुकिंग ₹${MIN_BASKET} है`));
+  /* two vendors = two trips: each order needs the minimum on its own */
+  const small=smallOrders();
+  if(small.length){
+    if(!document.getElementById('s-basket').classList.contains('on')) go('basket'); else renderBasket();
+    return toast(T(`Each order needs at least ₹${MIN_BASKET} — add more from ${small[0].name} or remove its items`,
+                   `हर ऑर्डर कम से कम ₹${MIN_BASKET} का हो — ${small[0].name} से और सामान डालें या उसका सामान हटाएँ`));
+  }
   if(!sel.slot) {toast(T('Pick a slot first','पहले स्लॉट चुनें')); return go('slot');}
   paintCheckoutBanner();
   if(!user) { pendingCheckout=true; return go('login'); }   /* login only at booking, never to browse */
@@ -5229,28 +5334,60 @@ function placeBooking(){
   if(!addr) addr=ADDRS[0];
   createBooking();
 }
+/* one booking per vendor in the basket (one vendor → exactly as before) */
 async function createBooking(){
-  toast(T('Booking the vendor…','वेंडर को बता रहे हैं…'));
-  const res=await mockApi('createBooking',{items:cart, slot:sel});
-  if(!res.ok){
+  const groups=basketGroups(); if(!groups.length) return;
+  toast(groups.length>1 ? T('Booking '+groups.length+' vendors…',groups.length+' वेंडर को बता रहे हैं…') : T('Booking the vendor…','वेंडर को बता रहे हैं…'));
+  if(groups.length>1) await ensureVendorTypes();
+  const done=[], failed=[], slot=slotLine();
+  for(const g of groups){
+    const items={}; g.ids.forEach(id=>{ items[id]=cart[id]; });
+    const res=await mockApi('createBooking',{items, vendorId:g.vendorId, type: groups.length>1 ? vendorTypeOf(g.vendorId) : (sel.type||'vegetable')});
+    if(res.ok){
+      done.push({g, d:res.data});
+      BOOKINGS.unshift({ id:res.data.id, code:res.data.code, otp:res.data.otp, status:'confirmed',
+        type:vendorTypeOf(g.vendorId), slot, items:g.ids.map(id=>({id,q:cart[id]})), est:g.total, rated:false,
+        addr:addrLine()||'', tag:(addr&&addr.tag)||'Ghar', name:(user&&user.name)||'' });   /* replaced by the server list later */
+      g.ids.forEach(id=>{ delete cart[id]; });
+    }else failed.push({g, res});
+  }
+  if(!done.length){
+    const res=failed[0].res;
     if(res.code==='OUT_OF_STOCK' || res.code==='OTHER_VENDOR'){ await refreshCatalogue(true); if(!document.getElementById('s-basket').classList.contains('on')) go('basket'); else renderBasket(); }
     if(res.code==='VENDOR_FULL' || res.code==='NO_VENDOR'){ sel.slot=null; go('slot'); }
-    return toast(res.msg||T('Could not book — try again','बुकिंग नहीं हुई — दोबारा कोशिश करें'));
+    return toast((groups.length>1 && failed[0].g.name ? failed[0].g.name+': ' : '')+(res.msg||T('Could not book — try again','बुकिंग नहीं हुई — दोबारा कोशिश करें')));
   }
-  const b={
-    id:res.data.id, code:res.data.code, otp:res.data.otp, status:'confirmed',
-    type:sel.type||'vegetable', slot:slotLine(),
-    items:Object.entries(cart).map(([id,q])=>({id,q})), est:total(), rated:false,
-    addr:addrLine()||'', tag:(addr&&addr.tag)||'Ghar', name:(user&&user.name)||''
-  };
-  BOOKINGS.unshift(b);            /* replaced by the server list on the bookings screen */
-  cart={}; syncCart(); pushCart(); ADDR_PICKED=false; BASKET_NOTE='';
-  document.getElementById('sucId').textContent=b.code;
-  document.getElementById('sucOtp').textContent=b.otp;
-  document.getElementById('sucLine').textContent=T('The vendor has been told. See you '+b.slot.toLowerCase()+'.','वेंडर को बता दिया गया है — '+b.slot);
+  syncCart(); pushCart(); ADDR_PICKED=false;
+  if(!failed.length) BASKET_NOTE='';
+  if(failed.length) sel.slot=null;            /* what is left needs another slot */
+  paintSuccess(done, failed, slot);
   go('success');
   burst();
   maybeAskNotif();
+}
+function paintSuccess(done, failed, slot){
+  const one=done.length===1, h=document.getElementById('sucH1');
+  if(h) h.textContent = one ? T('Booking confirmed! 🎉','बुकिंग पक्की हो गई! 🎉') : T(done.length+' bookings confirmed! 🎉',done.length+' बुकिंग पक्की हो गईं! 🎉');
+  document.getElementById('sucId').style.display = one ? '' : 'none';
+  document.getElementById('sucOtpCard').style.display = one ? '' : 'none';
+  if(one){
+    document.getElementById('sucId').textContent=done[0].d.code;
+    document.getElementById('sucOtp').textContent=done[0].d.otp;
+  }
+  document.getElementById('sucLine').textContent = one
+    ? T('The vendor has been told. See you '+slot.toLowerCase()+'.','वेंडर को बता दिया गया है — '+slot)
+    : T('Both vendors have been told — each comes '+slot.toLowerCase()+' with his own bill. Give each one his own code.',
+        'दोनों वेंडर को बता दिया — दोनों '+slot+' आएँगे, हर एक का अलग बिल। हर वेंडर को उसका अपना कोड दें।');
+  document.getElementById('sucMulti').innerHTML = one ? '' : done.map(({g,d},i)=>`
+    <div class="suc-ord">
+      <div class="so-hd"><span class="ord-n">${i+1}</span><b>${esc(g.name)}</b><span class="so-code">${esc(d.code)}</span></div>
+      <div class="so-items">${g.ids.map(id=>esc(pname(prod(id)))).join(', ')} · ₹${g.total}</div>
+      <div class="so-otp"><span>${T('Delivery code for '+g.name,g.name+' के लिए डिलीवरी कोड')}</span><b>${esc(d.otp)}</b></div>
+    </div>`).join('');
+  document.getElementById('sucFail').innerHTML = failed.map(({g,res})=>`
+    <div class="ord-warn" style="margin-top:12px;text-align:left">${T(g.name+'’s order was not placed: ',g.name+' का ऑर्डर नहीं हुआ: ')}${esc(res.msg||'')}
+      ${T(' — its items are still in your basket.',' — उसका सामान टोकरी में ही है।')}
+      <button class="pill" style="margin-top:8px" onclick="go('basket')">${T('Open basket','टोकरी खोलें')}</button></div>`).join('');
 }
 /* particle burst — fragments fly outward from the checkmark and fade */
 function burst(targetId){

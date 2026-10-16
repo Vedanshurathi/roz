@@ -601,10 +601,19 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   items add directly. The first item in the cart sets `sel.vendorId`; adding an
   item from a different vendor shows a warning toast (a booking goes to one vendor).
   **One booking = one vendor's items (16 Oct 2026, migration `20261016c_booking_one_vendor.sql`):** 11 real orders went
-  to one vendor with the other vendor's items/prices. The basket now marks other-vendor items (`basketVendor`,
-  `otherVendorItems`, `sameItemFrom` by catalog key / name → "Take <vendor>’s · ₹x" or Remove) and Confirm is blocked
-  until fixed; `customer_create_booking` refuses them (code `OTHER_VENDOR`) and, with no vendor named but all items
-  from one vendor, books that vendor instead of `match_vendor`'s pick.
+  to one vendor with the other vendor's items/prices. `customer_create_booking` refuses other vendors' items (code
+  `OTHER_VENDOR`) and, with no vendor named but all items from one vendor, books that vendor instead of `match_vendor`'s pick.
+  **Mixed basket = one order per vendor (16 Oct 2026, Vedanshu's ask):** `basketGroups()` splits the basket by vendor (the
+  first chosen vendor first); the basket shows "2 vendors = 2 separate orders" + "Order 1 · <vendor>" groups with subtotals,
+  each order needs ≥ ₹`MIN_BASKET` (`smallOrders`); `createBooking()` books each group separately (its own `p_vendor_id`,
+  items, vendor type via `ensureVendorTypes`/`vendorTypeOf`) in the same slot; the success screen (`paintSuccess`) lists every
+  order with its code + delivery code, and a failed one (e.g. VENDOR_FULL) stays in the basket with a note. The slot list
+  (`getSlots`) asks `customer_slot_status_for` for every vendor in the basket and shows only slots ALL of them can do.
+  If another vendor in the basket also has an item IN STOCK, the item row offers "Also with X · ₹y — move to that order"
+  (`moveToVendor`; never automatic, never to a vendor without stock). Items sold by 2+ vendors: the card says "N vendors
+  sell this — tap to compare"; tapping the card (`cardTap`) or ADD (when 2+ have it in stock) opens the comparison sheet
+  with each vendor's own photo of the item, price, "lowest price", "already in your basket" / "separate order · own bill";
+  "+" on an item already in the basket just adds (no sheet).
 - Times: always `ist_date()` / `ist_now()` for business logic. The DB clock is UTC.
   No function uses `current_date` any more (migration `20260926n_ist_dates_row_checks.sql` rewrote all of
   them, and every `if rec is [not] null` on a table-row variable → `rec.id`).
