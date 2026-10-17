@@ -598,6 +598,28 @@ other vendors' items (`OTHER_VENDOR`). `vendor_record_payment` notifies admins (
 80% of the bill (commission is computed from payments). Rating comment / dispute reason / order note are cut to 500 chars.
 Still open by choice: phone login has no OTP until an SMS provider is set (anyone who types a number gets that account).
 
+### Loophole fixes (17 Oct 2026, migrations `20261016e_audit_fixes.sql` + `20261016f_messages_hindi.sql`)
+- **Spam from anyone (anon):** `customer_join_waitlist` (village must exist, 10-digit phone, one per day, admin push only if ≤10/hour),
+  `customer_send_message` (≤2000 chars, ≤5/hour per customer or phone, ≤100/hour total), `log_visit` (<600 rows/minute).
+- **Customers:** `customer_save_address` (village must exist, GPS in range, length limits, ≤20 addresses); phone login on a new
+  device notifies the account ("🔐 New login on your account") and keeps the account's name; cancel reason ≤300.
+  `customer_create_schedule` (recurring orders) is not callable by anyone — no site uses it, and it skipped every booking guard.
+- **Seat race:** `customer_create_booking` takes `pg_advisory_xact_lock(vendor|date|slot)` and recounts real bookings before the
+  insert, so two people can't both take the last place (`VENDOR_FULL`).
+- **Vendors:** rates must be ₹1–₹1,00,000 (`vendor_bulk_prices`, `vendor_upsert_product`, `vendor_activate_catalog_item`);
+  renaming an approved item or giving it a new photo sends it back to admin approval (`review_status='pending'`, message says so);
+  category must be vegetable/fruit/onion_potato; photos go through `rb_valid_photo`; `vendor_update_profile` takes only villages
+  that exist (≤30), capacity 1–60; `vendor_set_capacity` 0–60 and today..+60 days; `vendor_apply` refuses anonymous logins;
+  **bill rate cap:** `vendor_finalize_bill` refuses a line rate above `booked rate × 2 + ₹20` (door-added items: app rate × 2 + ₹20),
+  named in the message; door items with qty ≤ 0 are skipped.
+- **Staff:** `team_post_save` edits only by the creator or an admin; `team_issue_save` edits only by creator, assignee or admin
+  (any staff could rewrite anyone's post/bug by id before).
+- **Messages:** 26 new `msg_i18n` rows; messages with a number or item name use `tr_dev(devanagari, english)` (internal, not
+  callable from outside). Customer "bill ready" / "order cancelled" notifications are proper Hindi/English with a title
+  ("🧾 बिल तैयार है — ₹150", not "Bill taiyaar hai — ₹355.0000"). Vendor-side notifications are still Hinglish (their old style).
+- Vendor site: a refused bill no longer leaves the order marked "bill sent" on the phone; "Save villages" shows the server's
+  refusal instead of always saying Saved.
+
 ### Key business logic in the DB
 - `match_vendor()` — auto-assigns least-loaded, best-rated vendor for a slot.
 - `vendor_covers_area_in_slot(vendor, area, slot)` — the single source of truth

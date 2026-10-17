@@ -3387,7 +3387,8 @@ function setBase(){
 async function saveAreas(){
   if(!servedAreas().length)
     return toast(T('Pick at least one village','कम से कम एक गाँव चुनो'));
-  await api('saveAreas',{areas:servedAreas().map(a=>a.name), base:BASE});
+  const res=await api('saveAreas',{areas:servedAreas().map(a=>a.name), base:BASE});
+  if(res && res.ok===false) return toast(res.msg||T('Could not save — try again','सेव नहीं हुआ — दोबारा कोशिश करो'));
   toast(T('Saved — customers in '+servedAreas().length+' village(s) can book you',
           servedAreas().length+' गाँव के ग्राहक अब आपको बुक कर सकते हैं'));
   go('profile');
@@ -3955,8 +3956,8 @@ function addItem(id){
 async function sendBill(){
   if(!draft.length) return toast(T('Add at least one item','कम से कम एक सामान डालो'));
   const r=current;
+  const before={bill:r.bill, final:r.final, status:r.status};   /* put back if the server refuses the bill */
   r.bill = draft.map(i=>({id:i.id, row_id:i.row_id, q:i.q}));
-  draft.forEach(i=>{ const p=prod(i.id); if(p) p.price = i.price; });   /* vendor corrected the rate — only if it's a real catalog item */
   r.final = billTotal();
   r.status='bill';
   /* row_id present -> this line existed on the original order, update it
@@ -3970,7 +3971,11 @@ async function sendBill(){
       ? {item_id:i.row_id, final_qty:i.q, final_price:i.price, removed:false}
       : {product_id:i.id, final_qty:i.q, final_price:i.price}),
     total:r.final});
-  if(!res.ok && !res.offline) return toast(res.msg||T('Bill not saved','बिल सेव नहीं हुआ'));
+  if(!res.ok && !res.offline){
+    Object.assign(r, before);
+    return toast(res.msg||T('Bill not saved','बिल सेव नहीं हुआ'));
+  }
+  draft.forEach(i=>{ const p=prod(i.id); if(p) p.price = i.price; });   /* vendor corrected the rate — only if it's a real catalog item */
   go('pay');
 }
 

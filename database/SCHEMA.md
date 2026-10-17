@@ -415,3 +415,18 @@ product_image(p_id uuid) [definer, anon ok] → {image_url}   one product photo,
   - `can_read_staff_file`, `vendor_login_email`.
 - `rls_auto_enable` is not executable by anyone.
 - `vendor_login_lookup` stays anon-callable until the old vendor site is retired (platform/docs/SECURITY.md #3).
+
+### Loophole fixes (17 Oct 2026 — `20261016e_audit_fixes.sql`, `20261016f_messages_hindi.sql`)
+```
+tr_dev(p_hi devanagari, p_en) → text   internal (no execute for anon/authenticated); for messages with numbers / item names
+customer_create_booking: pg_advisory_xact_lock(vendor|date|slot) + recount before insert → VENDOR_FULL
+customer_create_schedule: execute revoked from public, anon, authenticated (unused, skipped the booking guards)
+```
+- Input limits: waitlist / contact message / visit log rate limits; address (village exists, lat/lng range, ≤20);
+  vendor rates ₹1–₹1,00,000; product name ≤60, unit ≤30, category enum, photo via `rb_valid_photo`;
+  vendor profile villages must exist, capacity 1–60; `vendor_set_capacity` 0–60, today..+60 days.
+- `vendor_upsert_product`: renaming / new photo on an approved product → `review_status='pending'`.
+- `vendor_finalize_bill`: line rate ≤ booked rate × 2 + ₹20 (door items: product price × 2 + ₹20).
+- `vendor_apply` refuses anonymous auth users. `team_post_save` / `team_issue_save` edits limited to creator (+ assignee) or admin.
+- `customer_phone_login` link branch: `new_login` notification to the account owner.
+- 26 rows added to `msg_i18n`; bill-ready / cancelled customer notifications now have Devanagari + English titles.
