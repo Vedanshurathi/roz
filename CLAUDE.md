@@ -488,7 +488,11 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   delivered, cancel with reason), Vendors (filters, add, approve/block/remove, drawer
   with sale, rating, upcoming orders, items), Products (approval queue, all products
   with inline price + stock + edit, master catalog add/remove), Customers (search,
-  block, same-number flag), Villages (add, active toggle, set GPS point), Messages,
+  block, same-number flag), Villages (add, active toggle, "📍 Location set karo" = full-screen Leaflet map
+  (`openPinMap`): draggable pin / tap the map, "Meri GPS" keeps the sharpest reading for 20 s, paste coordinates
+  (DMS, decimal or a Google Maps link — `parseCoords`), radius slider, other villages shown as dots; Save =
+  `admin_set_area_point(…, verified=true)`. Leaflet 1.9.4 from jsdelivr with sha384 SRI; CSP allows jsdelivr CSS +
+  Esri/OSM tiles. Use sha384 for any SRI inside the inline script — `site-csp.py` refuses a 2nd `'sha256-…'`), Messages,
   Staff (add employee with role, edit name/role, approve/reject password requests,
   reset password, turn off), Traffic, Launch check. Customer + vendor drawers show full order history.
 - Modals replace `prompt()`/`confirm()`; one delegated click listener on `data-act`.

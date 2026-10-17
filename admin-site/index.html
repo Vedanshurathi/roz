@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-WCGZAZ3oueB5YCoYt2W85tAkhNU2b/+Iof4FkxoJXD4=' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-KkK/fcjQ3fFoM7WLjYBOH7JCMog1kVGCPjvnGB8TV0k=' https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co https://server.arcgisonline.com https://tile.openstreetmap.org; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -286,6 +286,24 @@ td.acts .btn+.btn{margin-left:6px}
   border-radius:30px;font-size:14px;font-weight:700;opacity:0;transition:all .3s var(--sp);z-index:200;pointer-events:none;box-shadow:var(--shl);max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ---------- village location: map + GPS + draggable pin ---------- */
+.msheet{position:fixed;inset:0;z-index:110;background:#fff;display:none;flex-direction:column}
+.msheet.show{display:flex}
+@media (min-width:861px){ .msheet{inset:24px;border-radius:20px;overflow:hidden;box-shadow:var(--shl)} }
+.ms-map{flex:1;min-height:240px;position:relative;background:var(--grey)}
+.ms-map #msMap{position:absolute;inset:0}
+.ms-lay{position:absolute;top:10px;right:10px;z-index:500;display:flex;gap:3px;background:#fff;border-radius:11px;padding:3px;box-shadow:var(--sh)}
+.ms-lay button{padding:7px 11px;border-radius:8px;font-weight:800;font-size:12.5px}
+.ms-lay button.on{background:var(--navy);color:#fff}
+.ms-b{border-top:1px solid var(--line);padding:12px 16px 16px;display:grid;gap:10px}
+.ms-info{font-size:13px;color:var(--tx2);line-height:1.5}
+.ms-info b{color:var(--tx)} .ms-info .bad{color:var(--red,#E14B4B)} .ms-info .ok{color:var(--g-dk)}
+.ms-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ms-row .fld{flex:1;min-width:190px;padding:10px 12px;font-size:14px}
+.ms-row input[type=range]{flex:1;min-width:120px;accent-color:var(--g)}
+.ms-pin{font-size:34px;line-height:1;filter:drop-shadow(0 3px 2px rgba(0,0,0,.35))}
+.ms-tip{font-weight:800;font-size:11.5px;padding:2px 7px}
+
 /* ---------- responsive ---------- */
 @media (max-width:1100px){ .k4{grid-template-columns:repeat(2,minmax(0,1fr))} .split{grid-template-columns:1fr} }
 @media (max-width:860px){
@@ -435,6 +453,19 @@ td.acts .btn+.btn{margin-left:6px}
 </aside>
 <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
 <div class="toast" id="toast"></div>
+<div class="msheet" id="mapSheet" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="dr-h"><h3 id="msTitle">Gaon ki location</h3><button class="x" data-act="mapClose" aria-label="Close">✕</button></div>
+  <div class="ms-map"><div id="msMap"></div>
+    <div class="ms-lay"><button class="on" id="msSat" data-act="mapLayer" data-arg="sat">Satellite</button><button id="msStreet" data-act="mapLayer" data-arg="street">Map</button></div></div>
+  <div class="ms-b">
+    <div class="ms-info" id="msInfo"></div>
+    <div class="ms-row"><button class="btn btn-o" id="msGpsBtn" data-act="mapGps" style="flex:1">📡 Meri GPS</button></div>
+    <div class="ms-row"><input class="fld" id="msCoords" autocomplete="off" placeholder="Coordinates: 28°23'00.8&quot;N 76°47'48.2&quot;E  ya  28.3836, 76.7967">
+      <button class="btn btn-o" data-act="mapCoords">Pin yahan</button></div>
+    <div class="ms-row"><span class="mu">Gaon kitna bada (radius)</span><input type="range" id="msRad" min="1" max="10" step="0.5" value="4"><b id="msRadV">4 km</b></div>
+    <div class="ms-row" style="justify-content:flex-end"><button class="btn btn-o" data-act="mapClose">Cancel</button><button class="btn btn-g" data-act="mapSave">✓ Location save karo</button></div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
 <script>
@@ -535,7 +566,7 @@ function showApp() {
   $('meAv').textContent = (ME.name || ME.email || 'A').trim()[0].toUpperCase();
   go(VIEW); refresh(); refreshPushSub();
   clearInterval(timer);
-  timer = setInterval(() => { if (!document.hidden && !document.querySelector('.modal.show,.drawer.show')) refresh(true); }, 60_000);
+  timer = setInterval(() => { if (!document.hidden && !document.querySelector('.modal.show,.drawer.show,.msheet.show')) refresh(true); }, 60_000);
 }
 async function checkAdmin(email) {
   const me = await rpc('staff_me');
@@ -1087,7 +1118,7 @@ function vAreas(el, rv) {
       ${kpi('Bina vendor', D.areas.filter(a => !a.vendor_count).length, 'yahan vendor chahiye', D.areas.some(a => !a.vendor_count) ? 'warn' : '', '🔍')}
       ${kpi('Location verified', D.areas.filter(a => a.coords_verified).length, 'baaki approximate', '', '✅')}
     </div>
-    <div class="toolbar ${rv} d2" style="margin-top:16px"><span class="mu">Location set karne ke liye us gaon me khade hoke "Meri GPS se" dabao.</span>
+    <div class="toolbar ${rv} d2" style="margin-top:16px"><span class="mu">"📍 Location set karo" dabao — apni GPS se, map pe pin kheench ke, ya coordinates daal ke.</span>
       <button class="btn btn-g" style="margin-left:auto" data-act="addArea">+ Naya gaon</button></div>
     <div class="tw ${rv} d3"><table><thead><tr><th>Gaon</th><th>Vendors</th><th>Waitlist</th><th>Location</th><th>Radius</th><th>Active</th><th></th></tr></thead><tbody>
       ${D.areas.map(a => { const w = D.gaps.filter(g => g.area === a.name).reduce((s, g) => s + num(g.requests), 0); return `<tr>
@@ -1098,7 +1129,7 @@ function vAreas(el, rv) {
           ${a.coords_verified ? ' <span class="pill p-g">verified</span>' : ' <span class="pill p-o">approx</span>'}</td>
         <td>${a.radius_km ?? '—'} km</td>
         <td><button class="pill ${a.is_active ? 'p-g' : 'p-m'}" data-act="areaActive" data-arg="${esc(a.name)}" data-arg2="${!a.is_active}">${a.is_active ? 'Active' : 'Band'}</button></td>
-        <td class="acts"><button class="btn btn-o btn-sm" data-act="pin" data-arg="${esc(a.name)}">📍 Meri GPS se</button></td></tr>`; }).join('')}
+        <td class="acts"><button class="btn btn-o btn-sm" data-act="pin" data-arg="${esc(a.name)}">📍 Location set karo</button></td></tr>`; }).join('')}
     </tbody></table></div>`;
 }
 
@@ -2184,12 +2215,160 @@ async function addArea() {
   if (!v) return; if (!v.name) return toast('Naam daalo');
   await act('admin_upsert_area', { p_name: v.name, p_active: true }, v.name + ' jud gaya');
 }
-function pin(name) {
-  if (!navigator.geolocation) return toast('Is device pe GPS nahi');
-  toast('GPS padh rahe hain — ' + name + ' me khade ho na?');
-  navigator.geolocation.getCurrentPosition(async p => {
-    await act('admin_set_area_point', { p_name: name, p_lat: p.coords.latitude, p_lng: p.coords.longitude, p_radius: 4, p_verified: true }, name + ' ki location set ho gayi');
-  }, () => toast('GPS nahi mila'), { enableHighAccuracy: true, timeout: 10000 });
+/* ---------- village location: map + GPS + draggable pin ----------
+   Opens a map at the village's saved point. The admin can press "Meri GPS" (keeps the sharpest
+   reading for up to 20 s), drag the pin, tap the map, or paste coordinates (degrees-minutes-seconds
+   or decimal, also a Google Maps link). Save = admin_set_area_point(…, verified = true). */
+const LEAFLET = {
+  js: ['https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js', 'sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH'],
+  css: ['https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css', 'sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H'] };
+let leafletP = null;
+function loadLeaflet() {
+  if (window.L && window.L.map) return Promise.resolve();
+  if (leafletP) return leafletP;
+  leafletP = new Promise((res, rej) => {
+    let n = 0; const done = () => { if (++n === 2) res(); };
+    const c = document.createElement('link'); c.rel = 'stylesheet'; c.href = LEAFLET.css[0]; c.integrity = LEAFLET.css[1]; c.crossOrigin = 'anonymous';
+    c.onload = c.onerror = done; document.head.appendChild(c);
+    const s = document.createElement('script'); s.src = LEAFLET.js[0]; s.integrity = LEAFLET.js[1]; s.crossOrigin = 'anonymous';
+    s.onload = done; s.onerror = () => { leafletP = null; rej(new Error('map')); }; document.head.appendChild(s);
+  });
+  return leafletP;
+}
+const PATAUDI = [28.3256, 76.7795];
+const MP = { name: null, map: null, layers: null, pin: null, ring: null, acc: null, others: null, old: null,
+             lat: null, lng: null, rad: 4, src: '', moved: false, watch: null, timer: null, best: null };
+function kmBetween(a, b, c, d) {
+  const r = Math.PI / 180, x = Math.sin((c - a) * r / 2) ** 2 + Math.cos(a * r) * Math.cos(c * r) * Math.sin((d - b) * r / 2) ** 2;
+  return 2 * 6371 * Math.asin(Math.sqrt(x));
+}
+/* "28°23'00.8"N 76°47'48.2"E", "28.3836, 76.7967" or a Google Maps link → [lat, lng] */
+function parseCoords(s) {
+  s = String(s || '').trim(); if (!s) return null;
+  const dms = [...s.matchAll(/(\d{1,3}(?:\.\d+)?)\s*[°º]\s*(?:(\d{1,2}(?:\.\d+)?)\s*['′’]\s*)?(?:(\d{1,2}(?:\.\d+)?)\s*(?:["″”]|'')\s*)?([NSEW])/gi)];
+  if (dms.length >= 2) {
+    let lat = null, lng = null;
+    dms.forEach(m => {
+      let v = +m[1] + (+m[2] || 0) / 60 + (+m[3] || 0) / 3600; const h = m[4].toUpperCase();
+      if (h === 'S' || h === 'W') v = -v;
+      if (h === 'N' || h === 'S') lat = v; else lng = v;
+    });
+    if (lat != null && lng != null) return [lat, lng];
+  }
+  const dec = s.match(/(-?\d{1,2}\.\d+)\s*[,\s]\s*(-?\d{1,3}\.\d+)/);
+  return dec ? [+dec[1], +dec[2]] : null;
+}
+function mapInfo() {
+  const el = $('msInfo'); if (!el) return;
+  if (MP.lat == null) { el.textContent = ''; return; }
+  const from = { old: 'abhi saved jagah', hand: 'aapne pin rakha', gps: 'aapki GPS', coords: 'coordinates se', start: 'shuruaat (Pataudi) — sahi jagah chuno' }[MP.src] || '';
+  const moved = MP.old ? kmBetween(MP.old[0], MP.old[1], MP.lat, MP.lng) : null;
+  let gps = '';
+  if (MP.best) gps = MP.best.acc <= 60
+    ? ` · <span class="ok">GPS ±${Math.round(MP.best.acc)} m</span>`
+    : ` · <span class="bad">GPS ±${Math.round(MP.best.acc)} m — kam sahi, bahar khule me dobara try karo ya pin kheencho</span>`;
+  el.innerHTML = `Pin: <b>${MP.lat.toFixed(6)}, ${MP.lng.toFixed(6)}</b> (${esc(from)})${gps}` +
+    (moved != null && moved >= 0.05 ? ` · purani jagah se <b>${moved < 1 ? Math.round(moved * 1000) + ' m' : moved.toFixed(1) + ' km'}</b>` : '') +
+    `<br><span class="mu">Pin ko kheencho ya map pe tap karo. Kale gol = baaki gaon.</span>`;
+}
+function setPin(lat, lng, src) {
+  MP.lat = lat; MP.lng = lng; MP.src = src;
+  if (src === 'hand') MP.moved = true;
+  if (MP.pin) { MP.pin.setLatLng([lat, lng]); MP.ring.setLatLng([lat, lng]); }
+  mapInfo();
+}
+async function openPinMap(name) {
+  const a = (D.areas || []).find(x => x.name === name); if (!a) return;
+  stopGps();
+  MP.name = name; MP.old = a.lat != null ? [num(a.lat), num(a.lng)] : null;
+  MP.rad = Math.min(10, Math.max(1, num(a.radius_km) || 4)); MP.moved = false; MP.best = null;
+  const start = MP.old || PATAUDI;
+  $('msTitle').textContent = '📍 ' + name + ' ki location';
+  $('msRad').value = MP.rad; $('msRadV').textContent = MP.rad + ' km'; $('msCoords').value = '';
+  $('mapSheet').classList.add('show'); $('mapSheet').setAttribute('aria-hidden', 'false');
+  setPin(start[0], start[1], MP.old ? 'old' : 'start');
+  try { await loadLeaflet(); }
+  catch (e) { $('msInfo').innerHTML += '<br><span class="bad">Map load nahi hua — internet check karo. GPS ya coordinates se phir bhi save ho jayega.</span>'; return; }
+  if (!MP.map) {
+    MP.map = L.map('msMap', { zoomControl: true }).setView(start, MP.old ? 15 : 13);   /* a view must exist before circles are added */
+    MP.layers = {
+      sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { maxZoom: 19, maxNativeZoom: 18, attribution: 'Esri' }),
+      street: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }) };
+    MP.layers.sat.addTo(MP.map);
+    MP.others = L.layerGroup().addTo(MP.map);
+    MP.ring = L.circle(start, { radius: MP.rad * 1000, color: '#1E8E3E', weight: 2, fillOpacity: .07, interactive: false }).addTo(MP.map);
+    MP.pin = L.marker(start, { draggable: true, autoPan: true, zIndexOffset: 1000,
+      icon: L.divIcon({ className: 'ms-pin', html: '📍', iconSize: [36, 36], iconAnchor: [18, 34] }) }).addTo(MP.map);
+    MP.pin.on('dragend', () => { const p = MP.pin.getLatLng(); setPin(p.lat, p.lng, 'hand'); });
+    MP.map.on('click', e => setPin(e.latlng.lat, e.latlng.lng, 'hand'));
+  }
+  MP.others.clearLayers();
+  if (MP.acc) { MP.map.removeLayer(MP.acc); MP.acc = null; }
+  D.areas.filter(x => x.name !== name && x.lat != null).forEach(x =>
+    L.circleMarker([num(x.lat), num(x.lng)], { radius: 6, color: '#101B30', weight: 2, fillColor: '#fff', fillOpacity: 1, interactive: false })
+      .bindTooltip(esc(x.name), { permanent: true, direction: 'top', offset: [0, -6], className: 'ms-tip' }).addTo(MP.others));
+  MP.ring.setRadius(MP.rad * 1000);
+  setPin(start[0], start[1], MP.src);
+  setTimeout(() => { MP.map.invalidateSize(); MP.map.setView(start, MP.old ? 15 : 13); }, 60);
+}
+function mapLayer(k) {
+  if (!MP.map) return;
+  Object.values(MP.layers).forEach(l => MP.map.removeLayer(l)); MP.layers[k].addTo(MP.map);
+  $('msSat').classList.toggle('on', k === 'sat'); $('msStreet').classList.toggle('on', k === 'street');
+}
+function stopGps(finished) {
+  if (MP.watch != null) navigator.geolocation.clearWatch(MP.watch);
+  clearTimeout(MP.timer); MP.watch = null; MP.timer = null;
+  const b = $('msGpsBtn'); if (b) b.textContent = '📡 Meri GPS';
+  if (finished && MP.best) toast(MP.best.acc <= 60 ? `GPS mil gayi (±${Math.round(MP.best.acc)} m) — pin check karke save karo`
+                                                   : `GPS kam sahi hai (±${Math.round(MP.best.acc)} m) — pin ko sahi jagah kheench do`);
+}
+function mapGps() {
+  if (!navigator.geolocation) return toast('Is phone/browser me GPS nahi hai');
+  stopGps(); MP.best = null; MP.moved = false;
+  $('msGpsBtn').textContent = '📡 GPS dhoondh rahe hain…';
+  const t0 = Date.now();
+  MP.watch = navigator.geolocation.watchPosition(p => {
+    const c = p.coords;
+    if (MP.best && c.accuracy >= MP.best.acc) return;            /* keep only the sharpest reading */
+    MP.best = { lat: c.latitude, lng: c.longitude, acc: c.accuracy };
+    if (MP.map) {
+      if (!MP.acc) MP.acc = L.circle([c.latitude, c.longitude], { radius: c.accuracy, color: '#2874F0', weight: 1, fillOpacity: .12, interactive: false }).addTo(MP.map);
+      else { MP.acc.setLatLng([c.latitude, c.longitude]); MP.acc.setRadius(c.accuracy); }
+    }
+    if (!MP.moved) {                                              /* once the admin drags the pin, GPS stops moving it */
+      setPin(c.latitude, c.longitude, 'gps');
+      if (MP.map) MP.map.setView([c.latitude, c.longitude], Math.max(MP.map.getZoom(), c.accuracy <= 60 ? 17 : 15));
+    } else mapInfo();
+    if (c.accuracy <= 15 || Date.now() - t0 > 20000) stopGps(true);
+  }, err => {
+    stopGps();
+    toast(err.code === 1 ? 'GPS ki permission nahi mili — browser me 🔒 dabao → Location → Allow' : 'GPS nahi mila — bahar khule me dobara try karo');
+  }, { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+  MP.timer = setTimeout(() => stopGps(true), 21000);
+}
+function mapCoords() {
+  const c = parseCoords($('msCoords').value);
+  if (!c) return toast('Coordinates samajh nahi aaye — jaise 28°23\'00.8"N 76°47\'48.2"E ya 28.3836, 76.7967');
+  if (c[0] < 6 || c[0] > 37 || c[1] < 68 || c[1] > 98) return toast('Ye jagah India ke bahar hai — coordinates check karo');
+  stopGps(); MP.moved = true;
+  setPin(c[0], c[1], 'coords');
+  if (MP.map) MP.map.setView(c, Math.max(MP.map.getZoom(), 16));
+}
+function mapRadius(v) {
+  MP.rad = Math.min(10, Math.max(1, +v || 4)); $('msRadV').textContent = MP.rad + ' km';
+  if (MP.ring) MP.ring.setRadius(MP.rad * 1000);
+}
+function mapClose() {
+  stopGps(); $('mapSheet').classList.remove('show'); $('mapSheet').setAttribute('aria-hidden', 'true');
+}
+async function mapSave() {
+  if (MP.lat == null || !MP.name) return;
+  if (MP.src === 'start') return toast('Pehle sahi jagah chuno — GPS, pin ya coordinates se');
+  const ok = await act('admin_set_area_point', { p_name: MP.name, p_lat: +MP.lat.toFixed(6), p_lng: +MP.lng.toFixed(6), p_radius: MP.rad, p_verified: true },
+    MP.name + ' ki location save ho gayi ✓');
+  if (ok) mapClose();
 }
 
 /* ---------- events ---------- */
@@ -2228,7 +2407,12 @@ document.addEventListener('click', e => {
     case 'blockCustomer': act('admin_block_customer', { p_customer: a, p_blocked: a2 === 'true' }, a2 === 'true' ? 'Block ho gaya' : 'Unblock ho gaya'); break;
     case 'addArea': addArea(); break;
     case 'areaActive': act('admin_upsert_area', { p_name: a, p_active: a2 === 'true' }, a + (a2 === 'true' ? ' active' : ' band')); break;
-    case 'pin': pin(a); break;
+    case 'pin': openPinMap(a); break;
+    case 'mapClose': mapClose(); break;
+    case 'mapLayer': mapLayer(a); break;
+    case 'mapGps': mapGps(); break;
+    case 'mapCoords': mapCoords(); break;
+    case 'mapSave': mapSave(); break;
     case 'mfilter': UI.mfilter = a; render(false); break;
     case 'addStaff': addStaff(); break;
     case 'staffPw': staffPw(a, a2); break;
@@ -2290,9 +2474,11 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey && e.target.id === 'wChatIn') { e.preventDefault(); wsChatSend(); }
   if (e.key === 'Enter' && e.target.dataset && e.target.dataset.price) e.target.blur();
   if (e.key === 'Enter' && e.target.closest && e.target.closest('#modal') && e.target.tagName === 'INPUT') modalOk();
-  if (e.key === 'Escape') { if ($('modal').classList.contains('show')) modalCancel(); else closeAll(); }
+  if (e.key === 'Enter' && e.target.id === 'msCoords') mapCoords();
+  if (e.key === 'Escape') { if ($('modal').classList.contains('show')) modalCancel(); else if ($('mapSheet').classList.contains('show')) mapClose(); else closeAll(); }
 });
 document.addEventListener('change', e => { if (e.target.dataset && e.target.dataset.price) editPrice(e.target.dataset.price, e.target.value); });
+document.addEventListener('input', e => { if (e.target.id === 'msRad') mapRadius(e.target.value); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden && D) refresh(true); });
 
 (async () => {
