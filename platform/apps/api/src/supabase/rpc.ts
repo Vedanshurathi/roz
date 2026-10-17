@@ -1,0 +1,94 @@
+/**
+ * Calls Postgres functions through PostgREST. Every business rule and every identity check
+ * still lives in the database (SECURITY DEFINER functions + RLS); the API forwards the user's
+ * own access token so `auth.uid()` inside those functions is the real caller — defence in depth.
+ */
+import { AppError, businessRule, forbidden, unauthenticated, upstream } from '../lib/errors.js';
+import { fetchJson } from './http.js';
+
+export type RpcCaller =
+  | { kind: 'anon' }
+  /** A logged-in user's Supabase access token. */
+  | { kind: 'user'; token: string }
+  /** Server-only privileged key. Never used with user-supplied function names. */
+  | { kind: 'service' };
+
+export interface RpcResult<T> {
+  data: T;
+  message: string | null;
+  /** Other top-level keys some functions return next to `data` (e.g. `now`, `maps_url`). */
+  extra: Record<string, unknown>;
+}
+
+export interface RpcGateway {
+  call<T = unknown>(fn: string, args: Record<string, unknown>, caller: RpcCaller): Promise<RpcResult<T>>;
+}
+
+interface PostgrestError {
+  code?: string;
+  message?: string;
+  details?: string | null;
+  hint?: string | null;
+}
+
+const FN_NAME = /^[a-z][a-z0-9_]{1,62}$/;
+
+export function createRpcGateway(opts: {
+  url: string;
+  anonKey: string;
+  serviceKey?: string | undefined;
+  timeoutMs: number;
+  onUnexpected?: (info: Record<string, unknown>) => void;
+}): RpcGateway {
+  return {
+    async call<T>(fn: string, args: Record<string, unknown>, caller: RpcCaller): Promise<RpcResult<T>> {
+      if (!FN_NAME.test(fn)) throw new Error(`Refusing to call function with unsafe name: ${fn}`);
+      let bearer = opts.anonKey;
+      if (caller.kind === 'user') bearer = caller.token;
+      if (caller.kind === 'service') {
+        if (!opts.serviceKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured');
+        bearer = opts.serviceKey;
+      }
+      const { status, body } = await fetchJson<unknown>(`${opts.url}/rest/v1/rpc/${fn}`, {
+        method: 'POST',
+        headers: {
+          apikey: opts.anonKey,
+          Authorization: `Bearer ${bearer}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'Content-Profile': 'public',
+        },
+        body: JSON.stringify(args),
+        timeoutMs: opts.timeoutMs,
+      });
+
+      if (status >= 400) {
+        const err = (body ?? {}) as PostgrestError;
+        if (status === 401 || err.code === 'PGRST301' || err.code === 'PGRST303') throw unauthenticated();
+        if (err.code === '42501' || status === 403) throw forbidden('You are not allowed to do this');
+        // A plain `raise exception '…'` inside a function: the text is written for users.
+        if (err.code === 'P0001' && err.message) throw businessRule(err.message);
+        opts.onUnexpected?.({ fn, status, code: err.code, message: err.message });
+        if (status === 429) throw new AppError(429, 'RATE_LIMITED', 'Too many requests, please slow down');
+        throw upstream();
+      }
+
+      if (body && typeof body === 'object' && !Array.isArray(body) && 'ok' in body) {
+        const { ok, data, msg, ...extra } = body as { ok: boolean; data?: T; msg?: string } & Record<
+          string,
+          unknown
+        >;
+        if (!ok) {
+          const code = typeof extra.code === 'string' ? extra.code : undefined;
+          throw businessRule(
+            typeof msg === 'string' && msg ? msg : 'Could not complete the request',
+            code ? { code, ...extra } : undefined,
+          );
+        }
+        return { data: data as T, message: typeof msg === 'string' ? msg : null, extra };
+      }
+      // Some functions return a bare value (e.g. public_areas returns an array).
+      return { data: body as T, message: null, extra: {} };
+    },
+  };
+}

@@ -150,6 +150,9 @@ td .mu{color:var(--mut);font-size:12px}
   padding:4px 9px;border-radius:20px;white-space:nowrap;transition:transform .15s var(--sp)}
 .pill:hover{transform:scale(1.05)}
 .p-g{background:var(--g-s);color:var(--g-lt)}
+.filter-pill{background:var(--bg3);border:1px solid var(--line);color:var(--tx2);cursor:pointer;
+  font-size:12px;padding:7px 13px;text-transform:capitalize}
+.filter-pill.on{background:var(--g-s);border-color:rgba(74,222,128,.4);color:var(--g-lt)}
 .p-o{background:var(--or-s);color:var(--or)}
 .p-r{background:var(--red-s);color:var(--red)}
 .p-b{background:var(--blue-s);color:var(--blue)}
