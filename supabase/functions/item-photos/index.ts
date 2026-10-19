@@ -4,6 +4,7 @@
 // Saved to the public bucket item-photos; the URL is written to
 //   catalog_items.image_url (+ products.stock_image_url of matching products)  mode 'catalog'
 //   products.stock_image_url                                                  mode 'product'
+//   products.image_url / vendors.photo_url / booking_items.image_url (uploaded photos → files) mode 'own'
 // Caller must send the token stored in app_settings.item_photos_token (the DB trigger
 // tg_product_fill and admins running the backfill do).
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -95,6 +96,34 @@ Deno.serve(async (req) => {
     const upd = db.from("products").update({ stock_image_url: url }).eq("id", body.id);
     await (body.file ? upd : upd.is("stock_image_url", null));
     return json({ ok: true, url });
+  }
+
+  // mode own: a photo someone uploaded (a data URL in the row) becomes a file in Storage and the row keeps
+  // only its link — 19 Oct 2026: every list sent the whole photo again (customer home 873 KB, re-sent every
+  // 25 s). File name = SHA-256 of the image, so copies (booking_items) share one file. The row is updated
+  // through photo_link_set() only if it still holds the same photo (a newer upload wins).
+  // body {table: products|vendors|booking_items, id}; called by trigger tg_photo_to_file.
+  if (body.mode === "own") {
+    const COL: Record<string, string> = { products: "image_url", vendors: "photo_url", booking_items: "image_url" };
+    const col = COL[body.table];
+    if (!col || !body.id) return json({ ok: false, msg: "table + id" }, 400);
+    const { data: row, error: e0 } = await db.from(body.table).select(col).eq("id", body.id).maybeSingle();
+    if (e0) return json({ ok: false, msg: e0.message }, 500);
+    const v = (row as any)?.[col];
+    if (typeof v !== "string" || !v.startsWith("data:image/")) return json({ ok: true, note: "nothing to do" });
+    const m = v.match(/^data:(image\/(jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
+    if (!m) return json({ ok: false, msg: "not a jpeg/png/webp data URL" }, 400);
+    const bin = Uint8Array.from(atob(m[3]), (c) => c.charCodeAt(0));
+    const hex = (b: ArrayBuffer) => Array.from(new Uint8Array(b)).map((x) => x.toString(16).padStart(2, "0")).join("");
+    const name = hex(await crypto.subtle.digest("SHA-256", bin)).slice(0, 32);
+    const sig = hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(v)));
+    const full = `u/${name}.${m[2] === "jpeg" ? "jpg" : m[2]}`;
+    const { error: e1 } = await db.storage.from("item-photos").upload(full, bin, { contentType: m[1], upsert: true, cacheControl: "31536000" });
+    if (e1) return json({ ok: false, msg: e1.message }, 500);
+    const url = db.storage.from("item-photos").getPublicUrl(full).data.publicUrl;
+    const { data: done, error: e2 } = await db.rpc("photo_link_set", { p_table: body.table, p_id: body.id, p_sig: sig, p_url: url });
+    if (e2) return json({ ok: false, msg: e2.message }, 500);
+    return json({ ok: true, url, updated: done });
   }
 
   // mode candidates: items = [{key, q}] → 4 Commons photos each, with small previews (for review)

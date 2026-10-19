@@ -430,3 +430,12 @@ customer_create_schedule: execute revoked from public, anon, authenticated (unus
 - `vendor_apply` refuses anonymous auth users. `team_post_save` / `team_issue_save` edits limited to creator (+ assignee) or admin.
 - `customer_phone_login` link branch: `new_login` notification to the account owner.
 - 26 rows added to `msg_i18n`; bill-ready / cancelled customer notifications now have Devanagari + English titles.
+
+### Photos as files (19 Oct 2026 — `20261019a_photos_as_files.sql`)
+```
+photo_link_set(p_table text, p_id uuid, p_sig text, p_url text) → boolean   service_role only (edge function item-photos)
+tg_photo_to_file()  triggers: trg_products_photo_file (products.image_url), trg_vendors_photo_file (vendors.photo_url),
+                    trg_booking_items_photo_file (booking_items.image_url) — AFTER INSERT/UPDATE OF col, data URLs only
+rb_valid_photo(p)   also accepts https://srvpfyjmwaruebbkqkdj.supabase.co/storage/v1/object/public/item-photos/u/<32 hex>.(jpg|png|webp)
+```
+Edge function `item-photos` mode `own` {token, table, id}: data URL → `item-photos/u/<sha256>.<ext>` → `photo_link_set`.

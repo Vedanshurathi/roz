@@ -624,6 +624,21 @@ Still open by choice: phone login has no OTP until an SMS provider is set (anyon
 - Vendor site: a refused bill no longer leaves the order marked "bill sent" on the phone; "Save villages" shows the server's
   refusal instead of always saying Saved.
 
+### Uploaded photos are files, not data URLs (19 Oct 2026, migration `20261019a_photos_as_files.sql`)
+- Vendor item photos (`products.image_url`), vendor profile photos (`vendors.photo_url`) and the copy in every booked item
+  (`booking_items.image_url`) used to be base64 data URLs sent inside every list: `customer_home` 873 KB (re-sent every 25 s
+  by a logged-in customer's poll), `customer_my_bookings` 557 KB, `admin_bookings` 2.6 MB (admin refreshes every 60 s) — the
+  free plan's 5 GB/month egress would run out with a handful of users. Now 18 KB / 47 KB / 127 KB.
+- Trigger `tg_photo_to_file` (after insert / update of those columns, only when the value is a `data:image/…`) → pg_net →
+  edge function `item-photos` mode `own` → file `item-photos/u/<sha256-32>.<ext>` (public, 1-year cache, same photo = same
+  file) → `photo_link_set(table, id, sha256-of-old-value, url)` (service role only) swaps the value only if the row still holds
+  that photo. Takes ~1–2 s after a save; apps already treat https links like data URLs.
+- `rb_valid_photo()` also accepts our own `…/item-photos/u/<hash>.<ext>` links (the vendor app sends the current photo back on
+  edit), nothing else from outside. Customer profile photos stay data URLs on purpose (only vendors see them; a public link
+  would be less private). Existing data was converted on 19 Oct (15 product/vendor photos + 35 booked-item copies → 16 files).
+- `send-push` (19 Oct): reads its secret / VAPID key with retries and remembers only a successful read — two copies booting
+  at once sometimes got a 401 on the first read and refused that push (one of the two 05:00 price reminders was lost every day).
+
 ### Key business logic in the DB
 - `match_vendor()` — auto-assigns least-loaded, best-rated vendor for a slot.
 - `vendor_covers_area_in_slot(vendor, area, slot)` — the single source of truth

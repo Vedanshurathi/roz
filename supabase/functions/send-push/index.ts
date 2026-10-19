@@ -16,32 +16,38 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
-// The private VAPID key is not in the code: it is read once from app_settings.vapid_private
-// (RLS-protected, only the service role reads it) or the VAPID_PRIVATE_KEY secret.
-let vapidReady: Promise<void> | null = null;
-function ensureVapid() {
-  if (!vapidReady) vapidReady = (async () => {
-    let key = Deno.env.get("VAPID_PRIVATE_KEY") || "";
-    if (!key) {
-      const { data } = await supabase.from("app_settings").select("value").eq("key", "vapid_private").maybeSingle();
-      key = typeof data?.value === "string" ? data.value : "";
-    }
-    webpush.setVapidDetails("mailto:vedanshurathi@gmail.com", VAPID_PUBLIC, key);
-  })();
-  return vapidReady;
+// Settings are read with the service role (RLS-protected). On a cold start two copies of this
+// function can boot at the same moment and the first read has come back 401 (18 Oct 2026, 05:00 IST
+// price reminder: one of two pushes was refused). So: retry a few times, and remember a value only
+// once it was really read — a failed read used to stick for the life of that copy.
+async function readSetting(key: string): Promise<string> {
+  for (let i = 0; i < 4; i++) {
+    const { data, error } = await supabase.from("app_settings").select("value").eq("key", key).maybeSingle();
+    if (!error && typeof data?.value === "string" && data.value) return data.value;
+    await new Promise((r) => setTimeout(r, 250 * (i + 1)));
+  }
+  return "";
+}
+
+// The private VAPID key is not in the code: it comes from app_settings.vapid_private or the
+// VAPID_PRIVATE_KEY secret.
+let vapidSet = false;
+async function ensureVapid() {
+  if (vapidSet) return;
+  const key = Deno.env.get("VAPID_PRIVATE_KEY") || await readSetting("vapid_private");
+  if (!key) throw new Error("VAPID key could not be read");
+  webpush.setVapidDetails("mailto:vedanshurathi@gmail.com", VAPID_PUBLIC, key);
+  vapidSet = true;
 }
 
 // Only the database may call this (push_note sends app_settings.push_secret in x-rb-push-secret).
 // Before 4 Oct 2026 anyone could POST here and send a notification with any text and link.
-let secretP: Promise<string> | null = null;
-function pushSecret() {
-  if (!secretP) secretP = (async () => {
-    const env = Deno.env.get("PUSH_SECRET");
-    if (env) return env;
-    const { data } = await supabase.from("app_settings").select("value").eq("key", "push_secret").maybeSingle();
-    return typeof data?.value === "string" ? data.value : "";
-  })();
-  return secretP;
+let secretCache = "";
+async function pushSecret() {
+  if (secretCache) return secretCache;
+  const v = Deno.env.get("PUSH_SECRET") || await readSetting("push_secret");
+  if (v) secretCache = v;
+  return v;
 }
 function sameText(a: string, b: string) {
   if (!a || a.length !== b.length) return false;
