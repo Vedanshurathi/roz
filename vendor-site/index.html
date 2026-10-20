@@ -1749,16 +1749,25 @@ function galiTag(r){
 /* ---------------- LIVE LOCATION while "on the way" ----------------
    20 Oct 2026: when the vendor taps "I'm on the way", this phone's GPS is sent every ~15 s
    (vendor_share_location) so that customer can watch the thela come on a map with an ETA.
-   Runs only while today has an order in on_the_way; stops by itself after "Reached" / when nothing is on
+   Runs while ANY order of this vendor is on_the_way — whatever day the screen shows (21 Oct 2026: the first real
+   test marked tomorrow's orders "on the way" and nothing was shared, because only today's list counted).
+   vendor_live_needed() is asked on open and with every 20 s poll; stops by itself after "Reached" / when nothing is on
    the way. The screen is kept awake (Wake Lock) because phones stop GPS for pages in the background.
    Only the customer of that order can see it (customer_track checks). */
-var LIVE={watch:null, wake:null, last:null, sentAt:0, sentPos:null, err:'', orders:0, busy:false, later:null, hb:null};
-function liveWanted(){ return !DEMO && RUN_DAY===0 && RUNS.some(r=>r.raw==='on_the_way'); }
+var LIVE={watch:null, wake:null, last:null, sentAt:0, sentPos:null, err:'', orders:0, busy:false, later:null, hb:null, need:0};
+function liveLocal(){ return RUNS.filter(r=>r.raw==='on_the_way').length; }
+function liveWanted(){ return !DEMO && !!VENDOR && (LIVE.need>0 || liveLocal()>0); }
 function liveSync(){
   if(liveWanted()) liveStart(); else liveStop();
 }
+/* ask the server how many of my orders are on the way (any date) */
+async function liveCheck(){
+  if(DEMO || !VENDOR) return;
+  try{ const r=await rpc('vendor_live_needed'); if(r.ok && r.data) LIVE.need=Number(r.data.orders)||0; }catch(e){}
+  liveSync();
+}
 function liveStart(){
-  LIVE.orders=RUNS.filter(r=>r.raw==='on_the_way').length;
+  LIVE.orders=Math.max(LIVE.need, liveLocal());
   if(!navigator.geolocation){ LIVE.err='nogps'; return paintLive(); }
   if(LIVE.watch==null){
     LIVE.err='';
@@ -1801,7 +1810,8 @@ async function livePos(pos, force){
     const r=await rpc('vendor_share_location',{p_lat:c.latitude, p_lng:c.longitude, p_acc:c.accuracy||null,
       p_heading:(c.heading==null||isNaN(c.heading))?null:c.heading, p_speed:(c.speed==null||isNaN(c.speed))?null:c.speed});
     if(r.ok){ LIVE.sentAt=now; LIVE.sentPos=here;
-      if(r.data && r.data.sharing===false){ RUNS.forEach(x=>{ if(x.raw==='on_the_way') x.raw='reached'; }); liveStop(); } }
+      if(r.data && r.data.sharing===false){ LIVE.need=0; RUNS.forEach(x=>{ if(x.raw==='on_the_way') x.raw='reached'; }); liveStop(); }
+      else if(r.data && r.data.orders){ LIVE.need=Number(r.data.orders)||LIVE.need; LIVE.orders=Math.max(LIVE.need, liveLocal()); } }
   }catch(e){}
   LIVE.busy=false; paintLive();
 }
@@ -1918,13 +1928,14 @@ async function askNotifVendor(){
 function startOrderPolling(){
   clearInterval(orderPollTimer);
   orderPollTimer=setInterval(async ()=>{
+    if(!DEMO && ONLINE && !document.hidden) liveCheck();
     if(DEMO || !ONLINE || document.hidden || RUN_DAY!==0) return;
     const r=await api('getRuns');
     if(r.ok){ checkForNewOrders(r.data||[]); if(document.getElementById('s-home')?.classList.contains('on')) renderHome(); }
   }, 20000);
 }
 document.addEventListener('visibilitychange',()=>{
-  if(!document.hidden && VENDOR) startOrderPolling();
+  if(!document.hidden && VENDOR){ startOrderPolling(); liveCheck(); }
 });
 
 function mapBooking(b){
@@ -2009,7 +2020,7 @@ async function api(fn, args={}){
       /* gali groups: neighbours in the same slot — bring the bonus to every house of a complete group */
       try{ const g=await rpc('vendor_gali_groups',{p_date:istISO(RUN_DAY)});
         if(g.ok && g.data && g.data.on){ GALI_V=g.data; RUNS.forEach(x=>{ x.gali=(g.data.groups||{})[x.id]||null; }); } }catch(e){}
-      if(RUN_DAY===0) liveSync();
+      liveSync();      /* LIVE.need (server, any date) keeps sharing on while another day's list is shown */
       return {ok:true, data:RUNS};
     }
     case 'getProducts': {
@@ -2217,6 +2228,7 @@ async function adoptVendor(session){
       const pw=await rpc('vendor_password_status');
       go(pw.ok && pw.data && !pw.data.has_password ? 'setpw' : 'home');
       startOrderPolling();
+      liveCheck();
       maybeAskNotifVendor();
     }else if(vendorUser.phone){
       /* brand-new vendor with name+phone already captured — straight to
@@ -4022,7 +4034,7 @@ async function setStatus(st){
   const res=await api('setStatus',{id:r.id, code:r.code, status:st});
   if(!res.ok && !res.offline) return toast(res.msg||T('Could not update','अपडेट नहीं हुआ'));
   r.status=st;
-  if(st==='way'){ r.raw='on_the_way'; liveSync(); }
+  if(st==='way'){ r.raw='on_the_way'; LIVE.need=Math.max(LIVE.need,1); liveSync(); setTimeout(liveCheck, 1500); }
   toast(st==='way'?T('Customer told you are coming — they can see you on the map','ग्राहक को बता दिया — वो आपको नक्शे पर आते देख सकते हैं'):'');
   renderRun();
 }

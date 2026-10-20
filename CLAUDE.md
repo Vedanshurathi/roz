@@ -661,6 +661,10 @@ Still open by choice: phone login has no OTP until an SMS provider is set (anyon
   ("Sanjiv is on the way · ~8 min · Track"), "Track live on map" on My bookings → `#trackSheet` (Leaflet + OSM, house pin, moving
   thela, dashed line, ETA/distance, "updated N s ago", call) polling `customer_track` every 10 s; at ~700 m the DB sends
   "🛵 almost there" (`booking_near`) once. Phones stop GPS for background pages — the vendor must keep the app open (the bar says so).
+  **Any date (21 Oct 2026, migration `20261021a_live_tracking_any_date.sql`):** the first real test marked TOMORROW's orders
+  "on the way" at 11:20 PM and nothing was shared — the app only looked at today's list and the server only counted today's
+  orders. Now every order marked on_the_way (yesterday … +14 days) counts; `vendor_live_needed()` is asked when the vendor app
+  opens, every 20 s poll and when it comes back on screen, so sharing runs whatever day the screen shows and restarts on reopen.
 - **Today's rates card for WhatsApp.** `rcDraw()` paints a 1080×1350 JPEG on a canvas: logo, date, village, up to 12 items with
   photos (Supabase Storage sends `Access-Control-Allow-Origin: *`; a failed photo falls back to the cut-out / a letter), link,
   QR (`RC_QR` = https://rozbazaar.shop/?src=card). Customer: "Send today's rates on WhatsApp" at the bottom of the rates board

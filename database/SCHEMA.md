@@ -450,6 +450,8 @@ vendor_share_location(p_lat, p_lng, p_acc, p_heading, p_speed) → {sharing, ord
     a fix ≤ 300 m within 0.7 km of a customer's pin → notify_person(… 'booking_near' …) once
 customer_track(p_booking) → {status, code, live, vendor{lat,lng,acc,heading,age_s}, dest{lat,lng,approx}, dist_km, eta_min, speed_kmh,
     vendor_name, vendor_photo}   own booking only; position only while on_the_way and < 5 min old; ETA = km × 1.3 / speed
+vendor_live_needed() → {orders}   (21 Oct, `20261021a`) my on_the_way orders, yesterday … +14 days; vendor_share_location uses
+    the same range (it was today/yesterday only)
 ```
 
 ### Gali group (20 Oct 2026 — `20261020b_gali_groups.sql`)
