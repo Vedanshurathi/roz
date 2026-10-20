@@ -10,6 +10,7 @@ Subcommands
   burn        burn an .ass/.srt file into a video
   punchin     quick zoom punch-ins at given timestamps
   finish      loudness-normalise and export a platform preset
+  compress    shrink a video to fit a target file size (e.g. 25 MB)
 
 Run `vedit.py <cmd> -h` for options.
 """
@@ -320,6 +321,35 @@ def cmd_finish(a):
     run(cmd + [a.output])
 
 
+# ---------------------------------------------------------------- compress
+def cmd_compress(a):
+    need_ffmpeg()
+    info = probe_info(a.input)
+    dur = info["duration"]
+    audio_k = 128 if info["has_audio"] else 0
+    # 3% headroom for container overhead
+    total_k = a.target_mb * 8 * 1024 * 0.97 / dur
+    video_k = int(total_k - audio_k)
+    if video_k < 300:
+        sys.exit(f"{a.target_mb} MB is too small for {dur:.0f}s - try a bigger target or trim it")
+    vf = []
+    if a.max_height and info.get("height", 0) > a.max_height:
+        vf = ["-vf", f"scale=-2:{a.max_height}"]
+    log = str(Path(a.output).with_suffix("")) + "_2pass"
+    common = ["-c:v", "libx264", "-preset", "slow", "-b:v", f"{video_k}k",
+              "-maxrate", f"{int(video_k * 1.5)}k", "-bufsize", f"{video_k * 2}k",
+              "-pix_fmt", "yuv420p", "-passlogfile", log]
+    run(["ffmpeg", "-y", "-hide_banner", "-i", a.input, *vf, *common, "-pass", "1",
+         "-an", "-f", "mp4", "/dev/null" if sys.platform != "win32" else "NUL"])
+    audio = ["-c:a", "aac", "-b:a", f"{audio_k}k"] if audio_k else ["-an"]
+    run(["ffmpeg", "-y", "-hide_banner", "-i", a.input, *vf, *common, "-pass", "2",
+         *audio, "-movflags", "+faststart", a.output])
+    for f in Path(log).parent.glob(Path(log).name + "*"):
+        f.unlink()
+    size = Path(a.output).stat().st_size / 1024 / 1024
+    print(f"{a.output}: {size:.1f} MB (target {a.target_mb} MB, video {video_k} kbps)")
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -382,6 +412,12 @@ def main():
     s.add_argument("--preset", choices=sorted(PRESETS), default="reels")
     s.add_argument("--crf", type=int, default=17)
     s.set_defaults(fn=cmd_finish)
+
+    s = sub.add_parser("compress")
+    s.add_argument("input"); s.add_argument("output")
+    s.add_argument("--target-mb", type=float, default=25)
+    s.add_argument("--max-height", type=int, default=1920, help="downscale if taller (keeps 1080x1920)")
+    s.set_defaults(fn=cmd_compress)
 
     a = p.parse_args()
     a.fn(a)

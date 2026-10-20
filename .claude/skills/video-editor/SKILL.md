@@ -30,10 +30,24 @@ You are editing for retention. Every decision answers one question:
    Run punch-ins *before* burning captions if you don't want captions to zoom too.
 7. **Finish** — loudness to −14 LUFS, platform codec settings:
    `vedit.py finish p.mp4 final.mp4 --preset reels|shorts|tiktok|youtube|youtube4k|square|feed45`.
+   Need a smaller file (upload limits, WhatsApp, email)?
+   `vedit.py compress final.mp4 small.mp4 --target-mb 25` (2-pass, hits the size, keeps 1080p).
 8. **QC** — extract frames at the hook, every caption change and the end
    (`ffmpeg -ss T -i final.mp4 -frames:v 1 f.png`) and look at them. Check
    captions stay inside the safe zone (see playbook), nothing is cut off,
    audio peaks below −1 dBTP (`vedit.py probe final.mp4`).
+
+## Getting large footage in (> 25–30 MB)
+
+Chat uploads are size-limited, and this cloud sandbox blocks Google Drive / Dropbox
+downloads. What works:
+- **GitHub release asset** (up to 2 GB, public repo): repo → Releases → Draft a new
+  release → drag the video in → Publish. Then fetch it with
+  `curl -L -o in.mp4 https://github.com/<owner>/<repo>/releases/download/<tag>/<file>`.
+  It is public while it exists — delete the release after the edit.
+- **git push** from a computer (files under 100 MB).
+- Or compress first (HandBrake "Fast 1080p30", or `vedit.py compress`) — Instagram
+  and TikTok re-encode to ~3–5 Mbps anyway, so a 1080p file at that rate loses little.
 
 ## Caption styles (`--style`)
 
