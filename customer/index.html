@@ -1141,6 +1141,121 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
 .faq-chat .b.bot{align-self:flex-start;background:var(--grey);color:var(--tx);border-bottom-left-radius:4px}
 .faq-sug{margin-top:8px}
 .faq-sug button{display:flex;gap:8px;align-items:center;width:100%;border:1.5px dashed var(--g);background:var(--lime-s);color:var(--g-dk);border-radius:12px;padding:9px 12px;font-weight:700;font-size:13px;margin-top:6px;cursor:pointer;text-align:left}
+/* order by voice */
+.vx-card{display:flex;align-items:center;gap:13px;width:calc(100% - 32px);margin:4px 16px 14px;padding:13px 14px;border-radius:18px;cursor:pointer;
+  border:1.5px solid #CFE8D6;background:linear-gradient(135deg,#F1FAF3,#fff 70%);text-align:left;color:var(--tx);transition:transform .2s var(--sp)}
+.vx-card:active{transform:scale(.97)}
+.vx-card .vxc-ic{width:46px;height:46px;border-radius:50%;background:var(--g);color:#fff;display:grid;place-items:center;flex:none;font-size:22px;
+  box-shadow:0 6px 16px rgba(30,142,62,.3)}
+.vx-card b{display:block;font-size:15.5px;font-weight:800;letter-spacing:-.2px}
+.vx-card small{display:block;font-size:12.5px;font-weight:700;color:var(--tx2);margin-top:2px}
+.vx-card .vxc-go{margin-left:auto;font-size:24px;font-weight:800;color:var(--g)}
+.h-search .h-mic{border:0;background:var(--lime-s);color:var(--g-dk);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:17px;flex:none;cursor:pointer;margin:-8px -6px -8px 0}
+.sq-mic,.nav-mic{border:0;background:var(--lime-s);color:var(--g-dk);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:16px;flex:none;cursor:pointer}
+.nav-search .nav-mic{width:30px;height:30px;font-size:14px;margin-right:-6px}
+#voxSheet .sheet{display:flex;flex-direction:column;max-height:90vh;overflow:hidden}
+.vx-body{overflow-y:auto;padding:0 16px 10px;flex:1}
+.vx-top{display:flex;flex-direction:column;align-items:center;gap:8px;padding:2px 0 12px}
+.vx-mic{position:relative;width:84px;height:84px;border-radius:50%;border:0;background:var(--g);color:#fff;font-size:34px;display:grid;place-items:center;cursor:pointer;
+  box-shadow:0 10px 26px rgba(30,142,62,.35);transition:transform .2s var(--sp),background .2s}
+.vx-mic:active{transform:scale(.93)}
+.vx-mic.on{background:#D93025;box-shadow:0 10px 26px rgba(217,48,37,.35)}
+.vx-mic.on::before,.vx-mic.on::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:3px solid rgba(217,48,37,.35);animation:vxring 1.4s ease-out infinite}
+.vx-mic.on::after{animation-delay:.7s}
+@keyframes vxring{from{transform:scale(.9);opacity:1}to{transform:scale(1.45);opacity:0}}
+@media (prefers-reduced-motion:reduce){.vx-mic.on::before,.vx-mic.on::after{animation:none}}
+.vx-hint{font-size:14px;font-weight:800;color:var(--tx);text-align:center;min-height:20px}
+.vx-hint.err{color:#B3261E;font-weight:700;font-size:13px;line-height:1.45;max-width:340px}
+.vx-langs{display:flex;gap:6px}
+.vx-langs button{border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:5px 12px;font-weight:800;font-size:12.5px;color:var(--tx2);cursor:pointer}
+.vx-langs button.on{border-color:var(--g);background:var(--lime-s);color:var(--g-dk)}
+.vx-heard{min-height:0;font-size:15px;font-weight:700;color:var(--mut);font-style:italic;text-align:center;padding:0 6px 8px}
+.vx-lbl{font-size:12px;font-weight:800;color:var(--mut);letter-spacing:.3px;margin:4px 0 6px}
+.vx-txt{width:100%;min-height:52px;resize:vertical;border:1.5px solid var(--line);border-radius:14px;padding:11px 12px;font:600 15px/1.45 inherit;font-family:inherit;color:var(--tx);background:#fff}
+.vx-txt:focus{outline:0;border-color:var(--g)}
+.vx-ex{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 4px}
+.vx-ex button{border:1.5px dashed #BFDDC8;background:#F6FBF7;border-radius:14px;padding:7px 11px;font-weight:700;font-size:12.5px;color:var(--g-dk);cursor:pointer;text-align:left}
+.vx-list{margin-top:12px}
+.vx-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.vx-row.off{opacity:.45}
+.vx-img{width:46px;height:46px;border-radius:12px;overflow:hidden;background:var(--grey);flex:none}
+.vx-img img,.vx-img svg{width:100%;height:100%;object-fit:cover}
+.vx-mid{flex:1;min-width:0}
+.vx-mid b{display:block;font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vx-mid span{display:block;font-size:12px;font-weight:700;color:var(--tx2);margin-top:1px}
+.vx-mid em{display:block;font-style:normal;font-size:11.5px;font-weight:700;color:#A15C00;margin-top:2px}
+.vx-mid .vx-sw{border:0;background:none;padding:0;margin-top:3px;color:var(--g-dk);font-weight:800;font-size:12px;cursor:pointer;text-decoration:underline}
+.vx-row .qstep{position:static;box-shadow:none;height:32px;flex:none}
+.vx-row .qstep button{height:32px;width:30px}
+.vx-amt{width:54px;text-align:right;font-weight:800;font-size:14.5px;flex:none}
+.vx-miss{margin-top:10px;padding:10px 12px;border-radius:12px;background:#FFF6E8;color:#7A4A00;font-size:13px;font-weight:700;line-height:1.5}
+.vx-miss.no{background:#FDECEA;color:#8C1D18}
+.vx-foot{padding:10px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff;display:flex;gap:10px}
+.vx-foot .bigbtn{flex:1 1 auto;min-width:0;margin:0;padding:14px 12px;font-size:15px}
+.vx-foot .bigbtn:disabled{opacity:.45}
+.vx-foot .ghostbtn{margin:0;width:auto;flex:0 0 auto;padding:14px 16px}
+.srch-in{min-width:0}
+.srch-in .sq-mic{margin:-6px -6px -6px 0}
+/* live tracking of the vendor */
+.trk{position:fixed;inset:0;z-index:170;background:#E9EEF2;display:none;flex-direction:column}
+.trk.on{display:flex}
+.trk-top{display:flex;align-items:center;gap:11px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;background:#fff;border-bottom:1px solid var(--line);z-index:2}
+.trk-top b{display:block;font-size:16px;font-weight:800}
+.trk-top span{display:block;font-size:12px;font-weight:700;color:var(--mut)}
+#trkMap{flex:1;min-height:200px}
+.trk-card{background:#fff;border-radius:22px 22px 0 0;margin-top:-18px;position:relative;z-index:2;padding:16px 16px calc(16px + env(safe-area-inset-bottom));
+  box-shadow:0 -8px 24px rgba(16,27,48,.12)}
+.trk-eta{display:flex;align-items:flex-end;gap:10px}
+.trk-eta b{font-size:34px;font-weight:800;letter-spacing:-1px;line-height:1;color:var(--g-dk)}
+.trk-eta span{font-size:14px;font-weight:800;color:var(--tx2);padding-bottom:4px}
+.trk-msg{font-size:14px;font-weight:700;color:var(--tx2);margin-top:8px;line-height:1.45}
+.trk-age{font-size:12px;font-weight:700;color:var(--mut);margin-top:6px}
+.trk-btns{display:flex;gap:10px;margin-top:14px}
+.trk-btns .bigbtn{margin:0;padding:14px}
+.trk-btns .ghostbtn{margin:0;width:auto;flex:1;padding:14px}
+.trk-v{width:44px;height:44px;border-radius:50%;background:var(--g);display:grid;place-items:center;color:#fff;border:3px solid #fff;box-shadow:0 6px 16px rgba(30,142,62,.45);position:relative}
+.trk-v::after{content:'';position:absolute;inset:-9px;border-radius:50%;border:3px solid rgba(30,142,62,.35);animation:vxring 1.8s ease-out infinite}
+.trk-v .ic{width:24px;height:24px}
+.trk-h{width:40px;height:40px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);background:var(--navy);display:grid;place-items:center;border:3px solid #fff;box-shadow:0 6px 14px rgba(16,27,48,.35)}
+.trk-h .ic{transform:rotate(45deg);color:#fff;width:20px;height:20px}
+.waybar{display:flex;align-items:center;gap:12px;width:calc(100% - 32px);margin:12px 16px 4px;padding:12px 14px;border-radius:16px;border:0;cursor:pointer;
+  background:linear-gradient(135deg,#0E5E2A,#1E8E3E);color:#fff;text-align:left;box-shadow:0 8px 20px rgba(30,142,62,.3)}
+.waybar[hidden]{display:none}
+.waybar .wb-ic{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none;font-size:20px}
+.waybar b{display:block;font-size:15px;font-weight:800}
+.waybar small{display:block;font-size:12.5px;font-weight:700;opacity:.85;margin-top:1px}
+.waybar .wb-go{margin-left:auto;background:#fff;color:var(--g-dk);border-radius:12px;padding:8px 11px;font-weight:800;font-size:13px;flex:none}
+/* today's rates card */
+.rates .rshare{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-top:1px solid var(--line);background:#E8F8EE;color:#0E7A3A;font-weight:800;font-size:14px;padding:12px;cursor:pointer}
+.rates .rshare .ic{width:18px;height:18px}
+.rc-prev{padding:0 16px;min-height:200px}
+.rc-prev img{display:block;width:100%;max-height:58vh;object-fit:contain;border-radius:14px;background:var(--grey);box-shadow:0 8px 24px rgba(16,27,48,.15)}
+.rc-wait{height:320px;display:grid;place-items:center;font-weight:800;color:var(--mut);background:var(--grey);border-radius:14px}
+.rc-btns{display:flex;gap:10px;padding:14px 16px calc(16px + env(safe-area-inset-bottom))}
+.rc-btns .ghostbtn{margin:0;width:auto;flex:0 0 auto;padding:14px 16px}
+.rc-btns .bigbtn{margin:0;background:#1FAF5A}
+/* gali group (neighbours in the same slot) */
+.gali-card{display:flex;align-items:center;gap:12px;width:calc(100% - 32px);margin:0 16px 14px;padding:12px 14px;border-radius:18px;cursor:pointer;
+  border:1.5px solid #F5D28A;background:linear-gradient(135deg,#FFF7E6,#fff 75%);text-align:left;color:var(--tx)}
+.gali-card[hidden]{display:none}
+.gali-card .gc-ic{width:46px;height:46px;border-radius:50%;background:#F2760D;color:#fff;display:grid;place-items:center;flex:none;font-size:21px;box-shadow:0 6px 16px rgba(242,118,13,.3)}
+.gali-card b{display:block;font-size:15px;font-weight:800}
+.gali-card small{display:block;font-size:12.5px;font-weight:700;color:var(--tx2);margin-top:2px}
+.gali-card .gc-go{margin-left:auto;background:#F2760D;color:#fff;border-radius:12px;padding:8px 11px;font-weight:800;font-size:13px;flex:none}
+.gali-hint{display:block;margin-top:4px;font-style:normal;font-size:12px;font-weight:800;color:#B35A00}
+.gali-box{width:100%;max-width:420px;margin-top:16px;padding:14px 15px;border-radius:16px;background:#FFF7E6;border:1.5px solid #F5D28A;text-align:left}
+.gali-box.done{background:#E8F8EE;border-color:#9ED9B2}
+.gali-box b{display:block;font-size:15px;font-weight:800;color:var(--tx)}
+.gali-box p{font-size:13px;font-weight:700;color:var(--tx2);margin-top:4px;line-height:1.45}
+.gali-dots{display:flex;gap:6px;margin-top:9px}
+.gali-dots i{width:22px;height:22px;border-radius:50%;background:#fff;border:2px dashed #F5B04F}
+.gali-dots i.on{background:#F2760D;border:2px solid #F2760D;color:#fff}
+.gali-box.done .gali-dots i.on{background:var(--g);border-color:var(--g)}
+.gali-box .pill{margin-top:11px;background:#1FAF5A;color:#fff;border:0}
+.gali-line{margin-top:10px;font-size:12.5px;font-weight:800;color:#B35A00}
+.gali-line.done{color:var(--g-dk)}
+.gali-line:empty{display:none}
+@media(min-width:900px){.waybar,.vx-card,.gali-card{width:calc(100% - 32px);max-width:calc(var(--shell) - 32px);margin-left:auto;margin-right:auto}}
 </style>
 </head>
 <body>
@@ -1167,6 +1282,7 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
     <div class="nav-search">
       <span>🔍</span>
       <input id="navQ" data-en-ph='Search "tomato", "apple"…' data-hi-ph='खोजें "टमाटर", "सेब"…' placeholder='Search "tomato", "apple"…' oninput="onSearchInput(this.value)">
+      <button class="nav-mic" onclick="openVoice(true)" aria-label="Order by voice">🎤</button>
     </div>
     <div class="nav-right">
       <button class="pill" onclick="openAreaPicker()">📍 <span class="area-name">Khandewla</span> ▾</button>
@@ -1261,7 +1377,7 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
       <div class="rot">
         <span data-en='Search "tomato"…' data-hi='खोजें "टमाटर"…'>Search "tomato"…</span><span data-en='Search "apple"…' data-hi='खोजें "सेब"…'>Search "apple"…</span><span data-en='Search "coriander"…' data-hi='खोजें "धनिया"…'>Search "coriander"…</span>
       </div>
-      <span onclick="event.stopPropagation();toast(T('Voice search — coming soon','वॉइस सर्च — जल्द आ रहा है'))">🎤</span>
+      <button class="h-mic" onclick="event.stopPropagation();openVoice(true)" aria-label="Order by voice">🎤</button>
     </div>
     <div class="h-tabs nosb">
       <button class="h-tab on" onclick="tab(this,'all')"><span class="ti">🧺</span><span data-en="All" data-hi="सब">All</span></button>
@@ -1283,6 +1399,25 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
     </div>
   </div>
   <div class="scallop bot"></div>
+
+  <button class="waybar" id="wayBar" hidden onclick="openTrack(this.dataset.code)">
+    <span class="wb-ic">🛵</span>
+    <span style="min-width:0"><b id="wayT"></b><small id="wayS"></small></span>
+    <span class="wb-go" data-en="Track" data-hi="देखें">Track</span>
+  </button>
+
+  <button class="vx-card" onclick="openVoice(true)">
+    <span class="vxc-ic">🎤</span>
+    <span><b data-en="Just say what you need" data-hi="बस बोलिए, क्या चाहिए">Just say what you need</b>
+    <small data-en="“2 kg tomato, 1 kg potato…” — we make the list" data-hi="“दो किलो टमाटर, एक किलो आलू…” — लिस्ट हम बना देंगे">“2 kg tomato, 1 kg potato…” — we make the list</small></span>
+    <span class="vxc-go">›</span>
+  </button>
+
+  <button class="gali-card" id="galiCard" hidden onclick="galiInvite(null)">
+    <span class="gc-ic">🏘</span>
+    <span style="min-width:0"><b data-en="Order with your neighbours" data-hi="पड़ोसियों के साथ मँगाएँ">Order with your neighbours</b><small id="galiCardSub"></small></span>
+    <span class="gc-go" data-en="Invite" data-hi="बुलाएँ">Invite</span>
+  </button>
 
   <div class="sec">
     <div class="sec-hd"><h2 data-en="Most bought" data-hi="सबसे ज़्यादा बिका">Most bought</h2><p data-en="in your area" data-hi="आपके इलाके में">in your area</p></div>
@@ -1476,6 +1611,7 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
              placeholder='Search "potato", "tomato", "banana"…'
              oninput="onSearchInput(this.value)" onkeydown="if(event.key==='Enter')this.blur()">
       <button class="sq-clear" id="sqClear" style="display:none" onclick="clearSearch()" aria-label="Clear search">✕</button>
+      <button class="sq-mic" onclick="openVoice(true)" aria-label="Order by voice">🎤</button>
     </div>
   </div>
   <div class="pg-search">
@@ -1594,6 +1730,7 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
     <div class="idpill" id="sucId">RB-104217</div>
     <div id="sucMulti" style="width:100%;max-width:420px"></div>
     <div id="sucFail" style="width:100%;max-width:420px"></div>
+    <div id="sucGali" style="width:100%;max-width:420px"></div>
     <div class="otp-card" id="sucOtpCard">
       <span data-en="DELIVERY CODE" data-hi="डिलीवरी कोड">DELIVERY CODE</span>
       <b id="sucOtp">4821</b>
@@ -2025,14 +2162,84 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
     </div>
   </div>
 </div>
+<!-- today's rates as a picture for WhatsApp -->
+<div class="sheet-wrap" id="rcSheet" style="z-index:168">
+  <div class="sheet-bg" onclick="closeRateCard()"></div>
+  <div class="sheet">
+    <div class="sheet-grab"></div>
+    <div class="sheet-hd">
+      <div><b data-en="Share today's rates" data-hi="आज के रेट शेयर करें">Share today's rates</b>
+      <span data-en="Send to family and village groups on WhatsApp" data-hi="परिवार और गाँव के WhatsApp ग्रुप में भेजें">Send to family and village groups on WhatsApp</span></div>
+      <button class="bk" onclick="closeRateCard()" aria-label="Close">✕</button>
+    </div>
+    <div class="rc-prev" id="rcPrev"></div>
+    <div class="rc-btns">
+      <button class="ghostbtn" onclick="rcDownload()" data-en="Download" data-hi="डाउनलोड">Download</button>
+      <button class="bigbtn" id="rcShare" onclick="rcShareNow()" data-en="Share on WhatsApp" data-hi="WhatsApp पर भेजें">Share on WhatsApp</button>
+    </div>
+  </div>
+</div>
+<!-- live map of the vendor coming (customer_track) -->
+<div class="trk" id="trackSheet">
+  <div class="trk-top">
+    <button class="bk" onclick="closeTrack()" aria-label="Back">←</button>
+    <div style="min-width:0"><b id="trkTitle" data-en="Your vendor is on the way" data-hi="सब्ज़ीवाला रास्ते में है">Your vendor is on the way</b><span id="trkSub"></span></div>
+  </div>
+  <div id="trkMap"></div>
+  <div class="trk-card">
+    <div class="trk-eta" id="trkEta"></div>
+    <div class="trk-msg" id="trkMsg"></div>
+    <div class="trk-age" id="trkAge"></div>
+    <div class="trk-btns">
+      <button class="ghostbtn" id="trkCall" onclick="trackCall()" data-en="📞 Call vendor" data-hi="📞 वेंडर को कॉल करें">📞 Call vendor</button>
+      <button class="bigbtn" onclick="closeTrack()" data-en="OK" data-hi="ठीक है">OK</button>
+    </div>
+  </div>
+</div>
+<!-- order by voice: speak (or type) a list → check it → basket -->
+<div class="sheet-wrap" id="voxSheet" style="z-index:167">
+  <div class="sheet-bg" onclick="closeVoice()"></div>
+  <div class="sheet">
+    <div class="sheet-grab"></div>
+    <div class="sheet-hd">
+      <div><b data-en="Order by voice" data-hi="बोलकर ऑर्डर करें">Order by voice</b>
+      <span id="vxSub" data-en="Say the items and how much — we make the list" data-hi="सामान और कितना चाहिए बोलिए — लिस्ट हम बना देंगे">Say the items and how much — we make the list</span></div>
+      <button class="bk" onclick="closeVoice()" aria-label="Close">✕</button>
+    </div>
+    <div class="vx-body">
+      <div class="vx-top" id="vxTop">
+        <button class="vx-mic" id="vxMic" onclick="vxToggle()" aria-label="Speak">🎤</button>
+        <div class="vx-hint" id="vxHint"></div>
+        <div class="vx-langs" id="vxLangs">
+          <button data-l="hi-IN" onclick="vxLang('hi-IN')">हिंदी</button><button data-l="en-IN" onclick="vxLang('en-IN')">English</button>
+        </div>
+      </div>
+      <div class="vx-heard" id="vxHeard"></div>
+      <div class="vx-lbl" id="vxLbl" data-en="WHAT WE HEARD — YOU CAN CHANGE IT" data-hi="हमने यह सुना — बदल भी सकते हैं">WHAT WE HEARD — YOU CAN CHANGE IT</div>
+      <textarea class="vx-txt" id="vxText" rows="2" oninput="vxTyped()" data-en-ph='e.g. 2 kg tomato, 1 kg potato, coriander' data-hi-ph='जैसे: दो किलो टमाटर, एक किलो आलू, धनिया' placeholder='e.g. 2 kg tomato, 1 kg potato, coriander'></textarea>
+      <div class="vx-ex" id="vxEx"></div>
+      <div class="vx-list" id="vxList"></div>
+    </div>
+    <div class="vx-foot">
+      <button class="ghostbtn" id="vxClearBtn" onclick="vxClear()" data-en="Clear" data-hi="साफ़ करें">Clear</button>
+      <button class="bigbtn" id="vxAddBtn" onclick="vxAdd()" disabled data-en="Add to basket" data-hi="टोकरी में डालें">Add to basket</button>
+    </div>
+  </div>
+</div>
 <div class="permbar" id="permBar" role="status"></div>
 <div class="toast" id="toast"></div>
 
 <script>
 /* links shared as rozbazaar.shop/?v=2 (to get a fresh WhatsApp preview) or with tracking tags show as plain
    rozbazaar.shop in the address bar. Only these share-tags are removed — ?get=app, ?source=pwa, ?code= stay. */
+var RB_LINK={};
 (function(){ try{
-  const u=new URL(location.href), drop=[...u.searchParams.keys()].filter(k=>k==='v'||/^utm_/.test(k)||k==='fbclid'||k==='gclid');
+  const u0=new URL(location.href), a=u0.searchParams.get('a'), src=u0.searchParams.get('src');
+  if(a && /^[A-Za-z][A-Za-z .()-]{1,39}$/.test(a)) RB_LINK.a=a.trim();
+  if(src && /^[a-z_]{2,20}$/.test(src)) RB_LINK.src=src;
+}catch(e){} })();
+(function(){ try{
+  const u=new URL(location.href), drop=[...u.searchParams.keys()].filter(k=>k==='v'||k==='a'||k==='src'||/^utm_/.test(k)||k==='fbclid'||k==='gclid');
   if(drop.length){ drop.forEach(k=>u.searchParams.delete(k)); history.replaceState(history.state,'',u.pathname+(u.searchParams.toString()?'?'+u.searchParams:'')+u.hash); }
 }catch(e){} })();
 const RB_BUILD='2026.08.12-1';
@@ -3206,7 +3413,7 @@ function checkVendorOnTheWay(list){
     if(b.raw_status==='on_the_way' && !seen.has(b.code)){
       markWaySeen(b.code);
       toast('🛵 '+(b.vendorName||T('Your vendor','आपका वेंडर'))+' '+
-        T('is on the way!','रास्ते में है!'));
+        T('is on the way! Tap "Track" on Home to watch on the map','रास्ते में है! होम पर "देखें" दबाकर नक्शे पर देखें'));
     }
   });
 }
@@ -3252,6 +3459,7 @@ function startWayPolling(){
     if(r.ok && Array.isArray(r.data)){
       if(!DEMO) BOOKINGS=r.data.map(x=>mapBooking(x));
       checkVendorOnTheWay(BOOKINGS);
+      paintWayBar();
       checkForCompletedOrder();
     }
     if(AREA){
@@ -3698,7 +3906,8 @@ function renderRates(all){
     const ch = was && was!==p.price ? (p.price>was ? `<small class="up">▲ ₹${p.price-was}</small>` : `<small class="down">▼ ₹${was-p.price}</small>`) : `<small style="color:var(--mut)">${T('per','प्रति')} ${p.unit}</small>`;
     return `<div class="rrow"><span class="rimg">${art(p)}</span><span class="rn">${pname(p)}</span>
       <span class="rp">₹${p.price}${ch}</span><span class="addw" data-pid="${p.id}" style="position:relative;width:96px;height:36px">${addBtn(p.id)}</span></div>`;
-  }).join('') + (list.length>8 ? `<button class="rmore" onclick="RATES_ALL=!RATES_ALL;renderRates()">${RATES_ALL?T('Show less','कम दिखाएँ'):T('All '+list.length+' rates','सभी '+list.length+' रेट देखें')}</button>` : '');
+  }).join('') + (list.length>8 ? `<button class="rmore" onclick="RATES_ALL=!RATES_ALL;renderRates()">${RATES_ALL?T('Show less','कम दिखाएँ'):T('All '+list.length+' rates','सभी '+list.length+' रेट देखें')}</button>` : '')
+    + `<button class="rshare" onclick="openRateCard()">📤 ${T("Send today's rates on WhatsApp",'आज के रेट WhatsApp पर भेजें')}</button>`;
   sec.style.display='';
 }
 function refreshRepeat(){
@@ -4372,7 +4581,7 @@ async function paintSlotList(){
                       : T('vendor comes in this window','वेंडर इसी समय में आएगा');
     const tag  = past ? T('CLOSED','समय निकला') : shut ? T('OFF','बंद') : full ? T('FULL','भरा')
                       : T(s.left+(s.left===1?' order left':' orders left'), s.left+' ऑर्डर की जगह बाकी');
-    return `<button class="slot ${off?'full':''} ${sel.slot===s.id?'sel':''}" ${off?'disabled':''}
+    return `<button class="slot ${off?'full':''} ${sel.slot===s.id?'sel':''}" data-sid="${s.id}" ${off?'disabled':''}
       onclick="${off?'':`pickSlot('${s.id}')`}">
       <span class="se">${s.em}</span>
       <div style="min-width:0"><b>${LANG==='en'?s.en:s.hi}</b><span>${why}</span></div>
@@ -4385,6 +4594,7 @@ async function paintSlotList(){
   /* if the chosen slot just became unbookable, drop it */
   if(sel.slot && !rows.some(s=>s.id===sel.slot && !s.past && s.left>0)) sel.slot=null;
   checkSlot();
+  paintGaliSlots();
 }
 setInterval(()=>{
   const on=document.getElementById('s-slot'); if(on && on.classList.contains('on') && document.visibilityState==='visible') paintSlotList();
@@ -4994,6 +5204,7 @@ async function loadAppConfig(){
     const r=await rpc('public_app_config');
     const m=r.ok && r.data ? Number(r.data.min_order) : NaN;
     if(m>=0 && m!==MIN_BASKET){ MIN_BASKET=m; syncCart(); if(document.getElementById('s-basket').classList.contains('on')) renderBasket(); }
+    if(r.ok && r.data && r.data.gali){ GALI=r.data.gali; paintGaliCard(); }
   }catch(e){}
 }
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') loadAppConfig(); });
@@ -5301,7 +5512,7 @@ async function phoneLogin(){
        customers used to get none of these until they reloaded the page */
     rpc('set_language',{p_lang:LANG});
     syncPush(); loadCustNotifs(true); clearInterval(window.__nPoll); window.__nPoll=setInterval(()=>loadCustNotifs(true), 60000);
-    mockApi('getBookings').then(res=>{ if(res.ok){ if(!DEMO) BOOKINGS=res.data; checkForCompletedOrder(); } });
+    mockApi('getBookings').then(res=>{ if(res.ok){ if(!DEMO) BOOKINGS=res.data; checkForCompletedOrder(); paintWayBar(); } });
     startWayPolling();
     btn.style.pointerEvents='auto'; btn.style.opacity='1';
     toast(T('Hello, '+n.split(' ')[0]+' 🙏','नमस्ते, '+n.split(' ')[0]+' 🙏'));
@@ -5395,6 +5606,7 @@ function paintSuccess(done, failed, slot){
       <div class="so-items">${g.ids.map(id=>esc(pname(prod(id)))).join(', ')} · ₹${g.total}</div>
       <div class="so-otp"><span>${T('Delivery code for '+g.name,g.name+' के लिए डिलीवरी कोड')}</span><b>${esc(d.otp)}</b></div>
     </div>`).join('');
+  paintGaliSuccess(done.map(x=>x.d.code));
   document.getElementById('sucFail').innerHTML = failed.map(({g,res})=>`
     <div class="ord-warn" style="margin-top:12px;text-align:left">${T(g.name+'’s order was not placed: ',g.name+' का ऑर्डर नहीं हुआ: ')}${esc(res.msg||'')}
       ${T(' — its items are still in your basket.',' — उसका सामान टोकरी में ही है।')}
@@ -5492,7 +5704,7 @@ async function adoptSession(session){
     /* silent background check — a customer whose order finished while
        the app was closed should see the celebration the moment they
        open it again, not only if they happen to tap "My bookings" */
-    mockApi('getBookings').then(r=>{ if(r.ok){ if(!DEMO) BOOKINGS=r.data; checkForCompletedOrder(); } });
+    mockApi('getBookings').then(r=>{ if(r.ok){ if(!DEMO) BOOKINGS=r.data; checkForCompletedOrder(); paintWayBar(); } });
     startWayPolling();
     if(needsProfile()){
       /* still missing something even after the combined flow (e.g. an old
@@ -5546,7 +5758,7 @@ function paintHeaderIdentity(){
 async function logout(){
   cartLogout(); SESSION=null; sessionReady=false;
   if(!DEMO){ try{ const c=await getSb(); await c.auth.signOut(); }catch(e){} }
-  user=null; addr=null; ADDRS=[]; ADDR_PICKED=false; cart={}; BOOKINGS=[]; FAVS.clear();
+  user=null; addr=null; ADDRS=[]; ADDR_PICKED=false; cart={}; BOOKINGS=[]; FAVS.clear(); paintWayBar();
   try{ localStorage.removeItem('rb_addr_draft'); }catch(e){}
   syncCart(); renderAcct(); paintHeaderIdentity(); go('home');
   toast(T('Logged out','लॉगआउट हो गया'));
@@ -5730,7 +5942,7 @@ function showIosTip(){
 function hideIosTip(){ const t=document.getElementById('iosTip'); if(t) t.classList.remove('on'); }
 function closeGetApp(){ document.getElementById('appSheet').classList.remove('on'); }
 function unblockHow(kind){
-  const en=kind==='notif'?'Notifications':'Location', hi=kind==='notif'?'सूचनाएँ':'लोकेशन';
+  const en=kind==='notif'?'Notifications':kind==='mic'?'Microphone':'Location', hi=kind==='notif'?'सूचनाएँ':kind==='mic'?'माइक्रोफ़ोन':'लोकेशन';
   return IN_APP
     ? T('Phone Settings → Apps → RozBazaar → '+en+' → Allow','फ़ोन सेटिंग्स → ऐप्स → RozBazaar → '+hi+' → अनुमति दें')
     : T('Tap 🔒 next to the website address → Permissions → '+en+' → Allow','वेबसाइट के पते के पास 🔒 दबाएँ → अनुमतियाँ → '+hi+' → अनुमति दें');
@@ -5820,6 +6032,784 @@ async function saveProfileEdit(){
   try{ localStorage.setItem('rb_vox_name', String(user.name).split(/\s+/)[0]); }catch(e){}
   renderAcct(); paintHeaderIdentity(); closeProfileEdit();
   toast(T('Saved','सेव हो गया'));
+}
+/* VOICE-PARSER-START */
+/* Order by voice — words → basket. Pure (no DOM), unit-tested with node (scratch vox/test.js).
+   VORDER.parse(text, products, preferVendorIds) → {items:[{pid,key,q,approx,noQty,heard,alts}], oos:[name], notSold:[name], unknown:[text], score}
+   products = the app's PRODUCTS rows ({id,en,hi,roman,unit,price,fresh,vendorId,ckey}).
+   Understands Hindi (Devanagari, as the phone's speech engine writes it), Roman Hindi and English:
+   numbers (एक…सौ, आधा, डेढ़, ढाई, सवा, साढ़े, पौने, digits, 1/2), units (किलो, ग्राम, पाव, पीस, दर्जन, गड्डी,
+   रुपये / "20 का"), local names (घीया = lauki, गंठा = pyaaz, बताऊं = baingan, मिरच = mirch …).
+   A quantity is turned into whole packs of the vendor's unit (1 kg asked, 500 g pack → 2); "approx" when it
+   could not be exact. Nothing here touches the basket — the customer checks the list first. */
+const VORDER=(()=>{
+  const DIG={'०':0,'१':1,'२':2,'३':3,'४':4,'५':5,'६':6,'७':7,'८':8,'९':9};
+  function norm(s){
+    s=String(s||'').normalize('NFD').replace(/़/g,'').normalize('NFC')       /* nukta: प्याज़ = प्याज */
+      .replace(/ँ/g,'ं')                                                 /* chandrabindu ँ = ं */
+      .replace(/[०-९]/g,d=>DIG[d]).toLowerCase();
+    s=s.replace(/(\d),(\d{3})/g,'$1$2').replace(/(\d)\.(\d)/g,'$1․$2');      /* keep 1.5 */
+    s=s.replace(/(\d)([^\d\s․\/])/g,'$1 $2').replace(/([^\d\s․\/₹])(\d)/g,'$1 $2');   /* 2kg → 2 kg */
+    s=s.replace(/₹/g,' ₹ ').replace(/[-–—_]/g,' ')
+      .replace(/[.!?"“”'‘’()\[\]{}:;।॥|*+=&]+/g,' , ').replace(/,/g,' , ').replace(/․/g,'.');
+    return s.replace(/\s+/g,' ').trim();
+  }
+  const NUM={'एक':1,'ek':1,'one':1,'इक':1,'दो':2,'do':2,'two':2,'तीन':3,'teen':3,'three':3,'चार':4,'char':4,'chaar':4,'four':4,
+    'पांच':5,'पाच':5,'panch':5,'paanch':5,'paach':5,'five':5,'छह':6,'छः':6,'छे':6,'छै':6,'chhe':6,'chhah':6,'six':6,
+    'सात':7,'saat':7,'seven':7,'आठ':8,'aath':8,'eight':8,'नौ':9,'nau':9,'nine':9,'दस':10,'das':10,'ten':10,
+    'ग्यारह':11,'gyarah':11,'eleven':11,'बारह':12,'barah':12,'twelve':12,'पंद्रह':15,'pandrah':15,'fifteen':15,
+    'बीस':20,'bees':20,'twenty':20,'पच्चीस':25,'pachchis':25,'तीस':30,'tees':30,'thirty':30,'चालीस':40,'chalis':40,'forty':40,
+    'पचास':50,'pachas':50,'fifty':50,'साठ':60,'sixty':60,'सत्तर':70,'seventy':70,'अस्सी':80,'eighty':80,'नब्बे':90,'ninety':90};
+  const FRAC={'आधा':.5,'आधी':.5,'आधे':.5,'अद्धा':.5,'aadha':.5,'adha':.5,'aadhi':.5,'adhi':.5,'half':.5,
+    'डेढ':1.5,'डेड':1.5,'dedh':1.5,'dhedh':1.5,'ढाई':2.5,'अढाई':2.5,'dhai':2.5,'dhaai':2.5,'adhai':2.5};
+  const PRE={'सवा':.25,'sawa':.25,'sava':.25,'साढे':.5,'साडे':.5,'sadhe':.5,'saadhe':.5,'पौने':-.25,'paune':-.25};
+  const HUNDRED={'सौ':1,'sau':1,'hundred':1};
+  const UNIT={'किलो':'kg','कीलो':'kg','किल्लो':'kg','केजी':'kg','किलोग्राम':'kg','kilo':'kg','kilos':'kg','kg':'kg','kgs':'kg','kilogram':'kg','kilograms':'kg','killo':'kg','kelo':'kg',
+    'ग्राम':'g','gram':'g','grams':'g','gm':'g','gms':'g','g':'g','gr':'g',
+    'पाव':'paav','pav':'paav','paav':'paav','pao':'paav','pau':'paav','quarter':'paav',
+    'पीस':'pc','piece':'pc','pieces':'pc','pc':'pc','pcs':'pc','नग':'pc','दाना':'pc','दाने':'pc','ठो':'pc',
+    'दर्जन':'dozen','darjan':'dozen','dozen':'dozen','dozens':'dozen','darjen':'dozen',
+    'गड्डी':'bunch','गड्डियां':'bunch','गड्डियों':'bunch','गडी':'bunch','गठ्ठी':'bunch','गट्ठी':'bunch','गठ्ठा':'bunch','गुच्छा':'bunch','गुच्छी':'bunch',
+    'जूडी':'bunch','जुडी':'bunch','पूली':'bunch','पुली':'bunch','gaddi':'bunch','gaddiyan':'bunch','gadi':'bunch','bunch':'bunch','bunches':'bunch','guchha':'bunch','judi':'bunch',
+    'पैकेट':'pack','पैक':'pack','packet':'pack','packets':'pack','pack':'pack','बोरी':'pack','bori':'pack',
+    'रुपये':'rs','रुपए':'rs','रुपया':'rs','रूपये':'rs','रूपए':'rs','रुपयों':'rs','रुपयो':'rs','रु':'rs','rupaye':'rs','rupay':'rs','rupees':'rs','rupee':'rs','rs':'rs','₹':'rs','inr':'rs'};
+  const SEP=new Set([',','और','aur','or','and','तथा','फिर','phir','plus','प्लस','साथ','saath','also','व']);
+  const VERB=new Set(['दे','भेज','ला','कर','डाल','रख','पहुंचा','भिजवा','मंगवा','दिलवा','दिला','de','bhej','la','kar','daal','dal','rakh']);
+  const OF=new Set(['का','की','के','ka','ki','ke','worth']);
+  const FILL=new Set(['मुझे','मुझको','हमें','हमको','मेरे','मेरा','लिए','चाहिए','चाहिये','चाहिऐ','चाहिएं','दीजिए','दीजिये','दीजिएगा','देना','देदो','दो',
+    'भेजो','भेजना','भेजिए','भेजिये','लाना','लाओ','लाइए','लेकर','ले','लो','आना','मंगाना','मंगवाना','मंगाओ','मंगवा','कर','करो','करना','करें','करिए','डालो','रखो','लगाओ','लगा','दे','भेज','ला','डाल','रख',
+    'please','प्लीज','plz','pls','भैया','भईया','भाई','भाइया','जी','सर','बहन','दीदी','अंकल','ji','bhaiya','bhai',
+    'को','से','में','मे','पर','वाला','वाले','वाली','भी','वो','ये','यह','वह','थोडा','थोडी','थोडे','ताजा','ताजी','ताजे','अच्छा','अच्छे','अच्छी','बढिया','एकदम',
+    'हरा','हरी','हरे','भर','करीब','लगभग','सिर्फ','बस','सब','कुल','है','हैं','था','थे','हो','होगा','चलेगा','कुछ','और','आज','कल','सुबह','शाम','अभी','जल्दी','अपना','अपने',
+    'mujhe','chahiye','chahie','dedo','dena','bhejo','lana','karo','order','ऑर्डर','आर्डर','बुक','book','add','टोकरी','basket','cart',
+    'i','want','need','give','me','some','of','the','a','an','please','send','get','bring','my','for','to','is','it','also','only','about','around','thoda','taaza','fresh','wala','wale','wali',
+    'ka','ki','ke','ko','se','me','mein','bhi','hai','aur','and']);
+  /* local / other names for common items (one group = one item). A group joins a product when one of its words
+     is the product's own name (Hindi, Roman or English) — so vendor-typed products still match. */
+  const SYN=[
+    {hi:'आलू',en:'Potato',w:['आलू','आलु','aloo','alu','aaloo','potato','potatoes','आलूं']},
+    {hi:'प्याज़',en:'Onion',w:['प्याज','पियाज','प्याजा','गंठा','गंठे','गण्ठा','कांदा','pyaz','pyaaz','piyaz','piyaaz','onion','onions','gantha','kanda']},
+    {hi:'लहसुन',en:'Garlic',w:['लहसुन','लसुन','लहसन','लसन','lehsun','lahsun','lasun','garlic']},
+    {hi:'टमाटर',en:'Tomato',w:['टमाटर','टमाटा','टिमाटर','tamatar','tamater','tomato','tomatoes','tomatos']},
+    {hi:'भिंडी',en:'Okra',w:['भिंडी','भिन्डी','bhindi','bhindee','okra','lady finger','ladyfinger','ladies finger']},
+    {hi:'बैंगन',en:'Brinjal',w:['बैंगन','बेंगन','बताऊं','बताऊ','बतऊं','भंटा','baingan','bengan','baigan','batau','brinjal','eggplant']},
+    {hi:'लौकी',en:'Bottle gourd',w:['लौकी','लोकी','घीया','घिया','दूधी','lauki','loki','ghiya','ghia','dudhi','bottle gourd']},
+    {hi:'गोभी',en:'Cauliflower',w:['गोभी','फूलगोभी','फूल गोभी','गोबी','gobhi','gobi','phool gobhi','cauliflower']},
+    {hi:'पत्ता गोभी',en:'Cabbage',w:['पत्ता गोभी','पत्तागोभी','बंद गोभी','बंदगोभी','बन्द गोभी','patta gobhi','band gobhi','bandh gobhi','cabbage']},
+    {hi:'पालक',en:'Spinach',w:['पालक','palak','spinach']},
+    {hi:'धनिया',en:'Coriander',w:['धनिया','धनियां','धनिये','हरा धनिया','dhaniya','dhania','dhaniyan','coriander','hara dhaniya']},
+    {hi:'हरी मिर्च',en:'Green chilli',w:['हरी मिर्च','मिर्च','मिर्ची','मिरच','मिर्चा','hari mirch','mirch','mirchi','chilli','chillies','chili','green chilli','green chili']},
+    {hi:'शिमला मिर्च',en:'Capsicum',w:['शिमला मिर्च','शिमला','shimla mirch','shimla','capsicum','bell pepper']},
+    {hi:'गाजर',en:'Carrot',w:['गाजर','gajar','carrot','carrots']},
+    {hi:'खीरा',en:'Cucumber',w:['खीरा','खीरे','kheera','khira','cucumber','cucumbers']},
+    {hi:'ककड़ी',en:'Snake cucumber',w:['ककडी','kakdi','kakri']},
+    {hi:'मटर',en:'Peas',w:['मटर','matar','mattar','peas','green peas']},
+    {hi:'करेला',en:'Bitter gourd',w:['करेला','करेले','karela','karele','bitter gourd']},
+    {hi:'तोरई',en:'Ridge gourd',w:['तोरई','तोरी','तुरई','torai','tori','turai','ridge gourd']},
+    {hi:'टिंडा',en:'Round gourd',w:['टिंडा','टिंडे','tinda','tinde','round gourd']},
+    {hi:'कद्दू',en:'Pumpkin',w:['कद्दू','काशीफल','kaddu','pumpkin']},
+    {hi:'अरबी',en:'Colocasia',w:['अरबी','arbi','arvi','colocasia']},
+    {hi:'मूली',en:'Radish',w:['मूली','मूळी','muli','mooli','radish']},
+    {hi:'चुकंदर',en:'Beetroot',w:['चुकंदर','चकुंदर','chukandar','beetroot','beet']},
+    {hi:'शकरकंदी',en:'Sweet potato',w:['शकरकंदी','शकरकंद','shakarkandi','sweet potato']},
+    {hi:'अदरक',en:'Ginger',w:['अदरक','अद्रक','adrak','ginger','कच्ची अदरक','fresh ginger']},
+    {hi:'पुदीना',en:'Mint',w:['पुदीना','पोदीना','pudina','podina','mint']},
+    {hi:'हरा प्याज़',en:'Spring onion',w:['हरा प्याज','हरी प्याज','hara pyaz','spring onion']},
+    {hi:'मेथी',en:'Fenugreek',w:['मेथी','methi','fenugreek']},
+    {hi:'सरसों का साग',en:'Mustard greens',w:['सरसों','सरसों का साग','साग','sarson','saag','mustard greens']},
+    {hi:'बथुआ',en:'Bathua',w:['बथुआ','bathua']},
+    {hi:'सेम',en:'Flat beans',w:['सेम','सेम फली','sem','sem phali']},
+    {hi:'ग्वार फली',en:'Cluster beans',w:['ग्वार','ग्वार फली','guar','gawar','cluster beans']},
+    {hi:'नींबू',en:'Lemon',w:['नींबू','निम्बू','नीम्बू','निंबू','nimbu','neembu','lemon','lemons']},
+    {hi:'केला',en:'Banana',w:['केला','केले','kela','kele','banana','bananas']},
+    {hi:'सेब',en:'Apple',w:['सेब','seb','apple','apples']},
+    {hi:'संतरा',en:'Orange',w:['संतरा','संतरे','santra','santre','orange','oranges']},
+    {hi:'किन्नू',en:'Kinnow',w:['किन्नू','kinnu','kinnow']},
+    {hi:'मौसमी',en:'Sweet lime',w:['मौसमी','मोसमी','mosambi','mausami','sweet lime']},
+    {hi:'पपीता',en:'Papaya',w:['पपीता','papita','papaya']},
+    {hi:'अंगूर',en:'Grapes',w:['अंगूर','angoor','angur','grapes']},
+    {hi:'अमरूद',en:'Guava',w:['अमरूद','अमरूत','amrood','amrud','guava']},
+    {hi:'अनार',en:'Pomegranate',w:['अनार','anaar','anar','pomegranate']},
+    {hi:'तरबूज',en:'Watermelon',w:['तरबूज','तरबूजा','tarbooj','tarbuj','watermelon']},
+    {hi:'खरबूजा',en:'Muskmelon',w:['खरबूजा','खरबूज','kharbuja','kharbooja','muskmelon']},
+    {hi:'आम',en:'Mango',w:['आम','aam','mango','mangoes']},
+    {hi:'चीकू',en:'Sapota',w:['चीकू','chikoo','chiku','sapota']},
+    {hi:'नाशपाती',en:'Pear',w:['नाशपाती','nashpati','pear']},
+    {hi:'भुट्टा',en:'Corn',w:['भुट्टा','भुट्टे','bhutta','corn','makka','मक्का']},
+    {hi:'कटहल',en:'Jackfruit',w:['कटहल','kathal','jackfruit']},
+    {hi:'परवल',en:'Pointed gourd',w:['परवल','parwal','parval','pointed gourd']},
+    {hi:'मशरूम',en:'Mushroom',w:['मशरूम','खुंब','mushroom','khumb']}
+  ];
+  const lc=s=>norm(s);
+  const ED=(a,b)=>{ const m=a.length,n=b.length; if(!m) return n; if(!n) return m; let p=Array.from({length:n+1},(_,j)=>j);
+    for(let i=1;i<=m;i++){ const c=[i]; for(let j=1;j<=n;j++) c[j]=a[i-1]===b[j-1]?p[j-1]:1+Math.min(p[j-1],p[j],c[j-1]); p=c; } return p[n]; };
+  const stem=w=>w.replace(/(ियों|ियां|ओं|ों|ें|ाएं|ाओं)$/,'').replace(/(ies)$/,'y').replace(/(es|s)$/,'');
+  function names(p){
+    const out=new Set();
+    [p.hi,p.roman,p.en].forEach(x=>{ if(!x) return; const s=String(x); out.add(lc(s.replace(/\(.*?\)/g,'')));
+      (s.match(/\(([^)]*)\)/g)||[]).forEach(m=>m.slice(1,-1).split(/[\/,]/).forEach(y=>out.add(lc(y)))); s.split('/').forEach(y=>out.add(lc(y.replace(/\(.*?\)/g,'')))); });
+    out.delete(''); return out;
+  }
+  /* lexicon: phrase → item key; key = catalogue key, else the English/Roman name; SYN groups nobody sells → 'syn:N' */
+  function lexicon(products){
+    const keyOf=p=>p.ckey?('c:'+p.ckey):('n:'+lc(p.en||p.roman||p.hi));
+    const items=new Map(), phrases=new Map();
+    const add=(ph,key,score)=>{ if(!ph) return; const cur=phrases.get(ph); if(!cur || cur.score<score) phrases.set(ph,{key,score}); };
+    products.forEach(p=>{ const k=keyOf(p); if(!items.has(k)) items.set(k,{key:k,products:[],hi:p.hi,en:p.en}); items.get(k).products.push(p); });
+    const synN=SYN.map(g=>new Set(g.w.map(lc)));
+    items.forEach(it=>{ const own=new Set(); it.products.forEach(p=>names(p).forEach(n=>own.add(n)));
+      own.forEach(n=>add(n,it.key,3));
+      synN.forEach(g=>{ if([...own].some(n=>g.has(n))) g.forEach(w=>add(w,it.key,2)); });
+      own.forEach(n=>{ const t=n.split(' '); if(t.length>1){ const head=t[t.length-1]; if(head.length>=3 && !FILL.has(head)) add(head,it.key,0); } });
+    });
+    SYN.forEach((g,i)=>{ const k='syn:'+i; if(![...synN[i]].some(w=>phrases.has(w))){ items.set(k,{key:k,products:[],hi:g.hi,en:g.en}); synN[i].forEach(w=>add(w,k,1)); } });
+    const byLen=new Map(); phrases.forEach((v,ph)=>{ const n=ph.split(' ').length; if(!byLen.has(n)) byLen.set(n,[]); byLen.get(n).push([ph,v]); });
+    return {items,phrases,byLen};
+  }
+  function tokens(text){
+    const raw=norm(text).split(' ').filter(Boolean), out=[];
+    for(let i=0;i<raw.length;i++){
+      const w=raw[i], prev=out[out.length-1];
+      if(SEP.has(w)){ out.push({t:'sep',w}); continue; }
+      if((w==='दो'||w==='do') && prev && prev.t==='word' && VERB.has(prev.w)){ prev.t='fill'; out.push({t:'fill',w}); continue; }
+      if(/^\d+(\.\d+)?$/.test(w)){ out.push({t:'num',w,v:parseFloat(w)}); continue; }
+      if(/^\d+\/\d+$/.test(w)){ const [a,b]=w.split('/').map(Number); out.push({t:'num',w,v:b?a/b:a}); continue; }
+      if(NUM[w]!=null){ out.push({t:'num',w,v:NUM[w]}); continue; }
+      if(FRAC[w]!=null){ out.push({t:'num',w,v:FRAC[w],frac:1}); continue; }
+      if(PRE[w]!=null){ out.push({t:'pre',w,v:PRE[w]}); continue; }
+      if(HUNDRED[w]){ out.push({t:'hund',w}); continue; }
+      if(UNIT[w]){ out.push({t:'unit',w,u:UNIT[w]}); continue; }
+      if(OF.has(w)){ out.push({t:'of',w}); continue; }
+      out.push({t:'word',w});
+    }
+    return out;
+  }
+  /* quantity groups: [₹] [सवा/साढ़े/पौने] number [सौ] [unit] [का]  — or a unit alone ("किलो टमाटर" = 1 kg) */
+  function groups(tk){
+    const ev=[]; let i=0;
+    while(i<tk.length){
+      const a=tk[i];
+      if(a.t==='num'||a.t==='pre'||a.t==='hund'||a.t==='unit'||(a.t==='unit'&&a.u==='rs')){
+        const start=i; let v=null, u=null, add=0, rsFirst=false, each=false;
+        if(a.t==='unit'&&a.u==='rs'&&tk[i+1]&&tk[i+1].t==='num'){ rsFirst=true; i++; }
+        if(tk[i].t==='pre'){ add=tk[i].v; i++; }
+        if(tk[i]&&tk[i].t==='num'){ v=tk[i].v; i++;
+          if(tk[i]&&tk[i].t==='num'&&tk[i].v===v&&!tk[i].frac){ each=true; i++; }            /* एक एक किलो = each */
+          else if(tk[i]&&tk[i].t==='num'&&v>=20&&tk[i].v<10&&v%10===0){ v+=tk[i].v; i++; }   /* twenty five */
+        }
+        if(tk[i]&&tk[i].t==='hund'){ v=(v==null?1:v)*100; i++; }
+        if(v!=null) v+=add; else if(add) v=1+add;
+        if(tk[i]&&tk[i].t==='unit'){ u=tk[i].u; i++; }
+        if(rsFirst) u='rs';
+        if(tk[i]&&tk[i].t==='of'){ if(!u && v!=null) u='rs'; i++; }                          /* "बीस का धनिया" = ₹20 */
+        if(i===start){ i++; continue; }
+        if(u==='rs' && v==null){ continue; }
+        ev.push({t:'q',v:v==null?1:v,u,each,a:start,b:i,unitOnly:v==null});
+        continue;
+      }
+      ev.push(Object.assign({},a,{a:i,b:i+1})); i++;
+    }
+    return ev;
+  }
+  function tol(s){ const n=s.replace(/ /g,'').length; return n<=3?0:n<=6?1:2; }
+  function match(ev,lex){
+    const out=[]; let i=0;
+    while(i<ev.length){
+      if(ev[i].t!=='word'){ out.push(ev[i]); i++; continue; }
+      let best=null;
+      for(let n=Math.min(4,ev.length-i);n>=1;n--){
+        const run=ev.slice(i,i+n); if(run.some(e=>e.t!=='word')) continue;
+        const ph=run.map(e=>e.w).join(' ');
+        const hit=lex.phrases.get(ph)||lex.phrases.get(run.map(e=>stem(e.w)).join(' '));
+        if(hit){ best={key:hit.key,n,score:10+n*3+hit.score}; break; }
+      }
+      if(!best){
+        for(let n=Math.min(3,ev.length-i);n>=1;n--){
+          const run=ev.slice(i,i+n); if(run.some(e=>e.t!=='word')) continue;
+          const ph=run.map(e=>e.w).join(' '); if(n===1 && (FILL.has(ph)||ph.length<3)) continue;
+          const t=tol(ph); if(!t) continue;
+          for(const [cand,v] of (lex.byLen.get(n)||[])){
+            if(Math.abs(cand.length-ph.length)>t || v.score===0) continue;
+            const d=ED(ph,cand); if(d<=t && (!best || d<best.d || (d===best.d && v.score>best.s))) best={key:v.key,n,d,s:v.score};
+          }
+          if(best) break;
+        }
+      }
+      if(best){ out.push({t:'item',key:best.key,a:ev[i].a,b:ev[i+best.n-1].b,fuzzy:best.d!=null}); i+=best.n; }
+      else { out.push(ev[i]); i++; }
+    }
+    return out;
+  }
+  /* which quantity belongs to which item: "दो किलो टमाटर" (before) or "टमाटर दो किलो" (after) — decided by the first item */
+  function assign(ev){
+    const its=ev.filter(e=>e.t==='item'); if(!its.length) return its;
+    const clause=[]; let c=0; ev.forEach(e=>{ if(e.t==='sep') c++; e.c=c; clause.push(e); });
+    const fi=ev.indexOf(its[0]); const pre=ev.slice(0,fi).some(e=>e.t==='q'&&e.c===its[0].c);
+    ev.forEach((e,idx)=>{
+      if(e.t!=='q') return;
+      const nextItem=ev.slice(idx+1).find(x=>x.t==='item'||x.t==='q');
+      const prevItem=[...ev.slice(0,idx)].reverse().find(x=>x.t==='item'||x.t==='q');
+      const nxt=nextItem&&nextItem.t==='item'&&nextItem.c===e.c&&!nextItem.qty?nextItem:null;
+      const prv=prevItem&&prevItem.t==='item'&&prevItem.c===e.c&&!prevItem.qty?prevItem:null;
+      const target=pre?(nxt||prv):(prv||nxt);
+      if(target) target.qty=e;
+    });
+    if(ev.some(e=>e.t==='q'&&e.each)){            /* "एक एक किलो टमाटर और प्याज" = 1 kg of each */
+      let carry=null; ev.forEach(e=>{ if(e.t==='item'){ if(e.qty) carry=e.qty.each?e.qty:null; else if(carry) e.qty=carry; } });
+    }
+    return its;
+  }
+  function packOf(unit){
+    const u=lc(unit||''); let m;
+    if((m=u.match(/^([\d.]+)?\s*(kg|kilo|किलो)/))) return {k:'w',g:(parseFloat(m[1])||1)*1000};
+    if((m=u.match(/^([\d.]+)\s*(g|gm|gms|gram|grams|ग्राम)\b/))) return {k:'w',g:parseFloat(m[1])};
+    if((m=u.match(/^([\d.]+)?\s*(dozen|darjan|दर्जन)/))) return {k:'pc',n:(parseFloat(m[1])||1)*12};
+    if((m=u.match(/^([\d.]+)?\s*(pc|pcs|piece|pieces|पीस|nag)/))) return {k:'pc',n:parseFloat(m[1])||1};
+    if((m=u.match(/^([\d.]+)?\s*(bunch|gaddi|गड्डी|guchha)/))) return {k:'bunch',n:parseFloat(m[1])||1};
+    return {k:'pack',n:1};
+  }
+  function packs(q,p){
+    if(!q) return {q:1,noQty:true};
+    const pk=packOf(p.unit), price=Number(p.price)||0; let v=q.v, r, exact=true;
+    if(q.u==='rs'){ if(!price) return {q:1,approx:true}; r=v/price; }
+    else if(q.u==='kg'||q.u==='g'||q.u==='paav'){ const g=v*({kg:1000,g:1,paav:250}[q.u]);
+      if(pk.k==='w') r=g/pk.g; else { r=Math.max(1,g/1000); exact=false; } }
+    else if(q.u==='dozen'){ if(pk.k==='pc') r=v*12/pk.n; else { r=v; exact=false; } }
+    else if(q.u==='pc'){ if(pk.k==='pc') r=v/pk.n; else { r=1; exact=false; } }
+    else if(q.u==='bunch'){ if(pk.k==='bunch') r=v/pk.n; else { r=v; exact=false; } }
+    else if(q.u==='pack') r=v;
+    else { /* a bare number: packs — except for items sold by the dozen / in 3s, where "6 केले" means pieces */
+      if(pk.k==='pc'&&pk.n>1&&v>=3) r=v/pk.n; else if(pk.k==='w'&&v>=100) r=v/pk.g; else r=v; }
+    const n=Math.min(50,Math.max(1,Math.round(r)));
+    return {q:n,approx:!exact||Math.abs(r-n)>0.02};
+  }
+  function choose(found,lex,prefer){
+    const want=[...new Set(found.map(f=>f.key))];
+    const cover=new Map();
+    want.forEach(k=>{ const it=lex.items.get(k); new Set(it.products.filter(p=>p.fresh!==false).map(p=>p.vendorId)).forEach(v=>cover.set(v,(cover.get(v)||0)+1)); });
+    const pref=new Set((prefer||[]).filter(Boolean));
+    const pick={};
+    want.forEach(k=>{ const ok=lex.items.get(k).products.filter(p=>p.fresh!==false); if(!ok.length) return;
+      ok.sort((a,b)=>(pref.has(b.vendorId)-pref.has(a.vendorId)) || ((cover.get(b.vendorId)||0)-(cover.get(a.vendorId)||0)) || (a.price-b.price));
+      pick[k]=ok; });
+    return pick;
+  }
+  function parse(text,products,prefer){
+    const lex=lexicon(products||[]), tk=tokens(text), ev=match(groups(tk),lex), its=assign(ev);
+    const pick=choose(its,lex,prefer), byKey=new Map(), oos=[], notSold=[];
+    its.forEach(e=>{
+      const it=lex.items.get(e.key);
+      const nm=it.hi+'|'+it.en;
+      if(!it.products.length){ if(!notSold.includes(nm)) notSold.push(nm); return; }
+      const ok=pick[e.key]; if(!ok){ if(!oos.includes(nm)) oos.push(nm); return; }
+      const p=ok[0], pk=packs(e.qty,p);
+      const heard=tk.slice(Math.min(e.a,e.qty?e.qty.a:e.a),Math.max(e.b,e.qty?e.qty.b:e.b)).map(x=>x.w).join(' ');
+      if(byKey.has(e.key)){ const r=byKey.get(e.key); r.q=Math.min(50,r.q+pk.q); r.approx=r.approx||pk.approx; r.noQty=r.noQty&&pk.noQty; r.heard+=' + '+heard; }
+      else byKey.set(e.key,{pid:p.id,key:e.key,q:pk.q,approx:!!pk.approx,noQty:!!pk.noQty,fuzzy:!!e.fuzzy,heard,alts:ok.map(x=>x.id)});
+    });
+    /* words that were not understood (leftovers that are not filler) */
+    const used=new Set(); ev.forEach(e=>{ if(e.t==='item'||e.t==='q'){ for(let i=e.a;i<e.b;i++) used.add(i); } });
+    its.forEach(e=>{ if(e.qty) for(let i=e.qty.a;i<e.qty.b;i++) used.add(i); });
+    const unknown=[]; let run=[];
+    const flush=()=>{ const real=run.filter(w=>!FILL.has(w)&&w.length>1); if(real.length) unknown.push(run.join(' ')); run=[]; };
+    tk.forEach((t,i)=>{ if(used.has(i)||t.t==='sep'||t.t==='num'||t.t==='unit'||t.t==='of'||t.t==='pre'||t.t==='hund') flush(); else if(t.t==='word') run.push(t.w); });
+    flush();
+    const items=[...byKey.values()];
+    return {items,oos,notSold,unknown,score:items.length*10+oos.length*6+notSold.length*4-unknown.length*3};
+  }
+  return {parse,norm,packOf,packs,tokens};
+})();
+/* VOICE-PARSER-END */
+
+
+/* ---------------- GALI GROUP ----------------
+   Neighbours (houses within ~150 m, admin setting) who book the SAME vendor in the SAME slot form a gali group;
+   at 3 houses (admin setting) every house gets a bonus the vendor brings (default free coriander & chillies).
+   customer_gali_slots → "2 neighbours booked this slot" on the slot list; customer_gali_status → progress on the
+   success screen and on My bookings; the database tells everyone when a group completes. Only counts are shown. */
+var GALI={on:false, min:3, bonus_hi:'मुफ़्त धनिया-मिर्च', bonus_en:'Free coriander & green chillies'}, GALI_ST=null, GALI_SLOT_KEY='';
+function galiBonus(g){ g=g||GALI; return LANG==='en' ? (g.bonus_en||'') : (g.bonus_hi||''); }
+function paintGaliCard(){
+  const c=document.getElementById('galiCard'); if(!c) return;
+  c.hidden = !GALI.on || DEMO;
+  const sub=document.getElementById('galiCardSub');
+  if(sub) sub.textContent = T(GALI.min+' houses in the same slot = '+galiBonus()+' for everyone',
+    'एक ही स्लॉट में '+GALI.min+' घर = सबको '+galiBonus());
+}
+function galiSlotName(id){ const s=SLOTS.find(x=>x.id===id); return s ? (LANG==='en'?s.en:s.hi) : ''; }
+/* WhatsApp invite: for a booking (code) it names the day + slot + vendor, otherwise a general invite */
+function galiInvite(code){
+  const b=code ? (BOOKINGS||[]).find(x=>x.code===code) : null;
+  const link='https://rozbazaar.shop/?a='+encodeURIComponent(AREA)+'&src=gali', bonus=galiBonus();
+  const text = b
+    ? T(`I've booked fresh vegetables on RozBazaar for ${b.slot}${b.vendorName?' from '+b.vendorName:''}. Book the same time too — when ${GALI.min} houses in our lane book, everyone gets ${bonus}! ${link}`,
+        `मैंने RozBazaar पर ${b.slot}${b.vendorName?' '+b.vendorName+' से':''} सब्ज़ी मँगाई है। आप भी इसी समय बुक करो — हमारी गली के ${GALI.min} घर होते ही सबको ${bonus}! ${link}`)
+    : T(`Fresh vegetables come home in our village with RozBazaar — book a slot, the vendor weighs in front of you. When ${GALI.min} houses in our lane book the same slot, everyone gets ${bonus}! ${link}`,
+        `हमारे गाँव में RozBazaar से घर बैठे ताज़ा सब्ज़ी आती है — स्लॉट बुक करो, सामने तौल। एक ही समय पर हमारी गली के ${GALI.min} घर बुक करें तो सबको ${bonus}! ${link}`);
+  if(!DEMO) rpc('log_visit',{p_page:'gali_invite'}).catch(()=>{});
+  if(navigator.share){ navigator.share({text}).catch(()=>{}); return; }
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+async function paintGaliSlots(){
+  if(DEMO || !GALI.on || !user || !addr || !addr.id) return;
+  const vid=(basketGroups().find(g=>g.vendorId)||{}).vendorId || sel.vendorId || null;
+  const key=istISO(sel.day)+'|'+vid+'|'+addr.id;
+  let d=GALI_SLOT_KEY===key && window.__galiSlots;
+  if(!d){ const r=await rpc('customer_gali_slots',{p_date:istISO(sel.day), p_vendor:vid, p_address:addr.id});
+    if(!r.ok || !r.data || !r.data.on) return; d=r.data; window.__galiSlots=d; GALI_SLOT_KEY=key; setTimeout(()=>{ if(GALI_SLOT_KEY===key) GALI_SLOT_KEY=''; }, 25000); }
+  document.querySelectorAll('#slotList .slot[data-sid]').forEach(b=>{
+    const n=Number((d.slots||{})[b.dataset.sid]||0), box=b.querySelector('div'); if(!box) return;
+    let h=box.querySelector('.gali-hint'); if(h) h.remove();
+    if(n<1 || b.disabled) return;
+    const need=Math.max(0,(d.min||GALI.min)-1-n);
+    h=document.createElement('em'); h.className='gali-hint';
+    h.textContent = '🏘 '+(need>0
+      ? T(n+' neighbour'+(n>1?'s':'')+' booked this time — '+need+' more house'+(need>1?'s':'')+' = '+galiBonus(d)+' for all',
+          n+' पड़ोसी ने यह समय बुक किया — '+need+' घर और = सबको '+galiBonus(d))
+      : T(n+' neighbours booked this time — book it and get '+galiBonus(d),
+          n+' पड़ोसियों ने यह समय बुक किया — आप भी बुक करें, मिलेगा '+galiBonus(d)));
+    box.appendChild(h);
+  });
+}
+async function loadGaliStatus(){
+  if(DEMO || !GALI.on || !user) return null;
+  const r=await rpc('customer_gali_status'); if(!r.ok || !r.data) return null;
+  GALI_ST=r.data; return GALI_ST;
+}
+function galiDots(n,min){ return '<div class="gali-dots">'+Array.from({length:Math.max(min,n)},(_,i)=>`<i class="${i<n?'on':''}"></i>`).join('')+'</div>'; }
+async function paintGaliSuccess(codes){
+  const box=document.getElementById('sucGali'); if(!box) return; box.innerHTML='';
+  const st=await loadGaliStatus(); if(!st || !st.on) return;
+  if(!DEMO){ try{ const rb=await mockApi('getBookings'); if(rb.ok) BOOKINGS=rb.data; }catch(e){} }   /* the invite names the new order's slot + vendor */
+  box.innerHTML=(st.items||[]).filter(x=>codes.includes(x.code)).map(x=>{
+    const need=Math.max(0,st.min-x.houses);
+    return x.complete
+      ? `<div class="gali-box done"><b>🏘 ${T('Gali group complete!','गली ग्रुप पूरा!')}</b>
+          <p>${T(x.houses+' houses in your lane booked this time — you get '+galiBonus(st)+'. The vendor brings it with your order.',
+                 'आपकी गली के '+x.houses+' घरों ने यही समय बुक किया — आपको मिलेगा '+galiBonus(st)+'। सब्ज़ीवाला ऑर्डर के साथ लाएगा।')}</p>${galiDots(x.houses,st.min)}</div>`
+      : `<div class="gali-box"><b>🏘 ${T('Gali group: '+x.houses+' of '+st.min+' houses','गली ग्रुप: '+st.min+' में से '+x.houses+' घर')}</b>
+          <p>${T('If '+need+' more house'+(need>1?'s':'')+' near you book'+(need>1?'':'s')+' this vendor at this time, everyone gets '+galiBonus(st)+'.',
+                 'आपके पास के '+need+' और घर इसी वेंडर को इसी समय बुक करें तो सबको मिलेगा '+galiBonus(st)+'।')}</p>${galiDots(x.houses,st.min)}
+          <button class="pill" onclick="galiInvite('${esc(x.code)}')">💬 ${T('Invite neighbours on WhatsApp','पड़ोसियों को WhatsApp करें')}</button></div>`;
+  }).join('');
+}
+async function paintGaliLines(){
+  const els=document.querySelectorAll('#bookBody .gali-line[data-gcode]'); if(!els.length) return;
+  const st=await loadGaliStatus(); if(!st || !st.on) return;
+  els.forEach(el=>{
+    const x=(st.items||[]).find(i=>i.code===el.dataset.gcode); if(!x || x.houses<1){ el.textContent=''; return; }
+    el.classList.toggle('done', !!x.complete);
+    el.textContent = '🏘 '+(x.complete
+      ? T('Gali group complete — you get '+galiBonus(st),'गली ग्रुप पूरा — आपको मिलेगा '+galiBonus(st))
+      : T('Gali group: '+x.houses+' of '+st.min+' houses — invite neighbours from the success screen or Home','गली ग्रुप: '+st.min+' में से '+x.houses+' घर — होम से पड़ोसियों को बुलाएँ'));
+  });
+}
+
+/* ---------------- TODAY'S RATES CARD (share on WhatsApp) ----------------
+   A 1080×1350 picture of today's rates (logo, date, village, up to 12 items with photos, link + QR code) made on
+   a canvas in the phone. Shared with the phone's own share sheet (WhatsApp, Status, groups); where a browser
+   can't share pictures it is downloaded and the text goes to WhatsApp instead. The link carries
+   ?a=<village>&src=<wa_rates|wa_vendor> so the site opens on that village and counts the visit. */
+const RC_QR='1fddee7f,105b9541,1749165d,17506d5d,1747565d,1042bf41,1fd5557f,1b3e00,16e3ac4b,6bbe3f1,f759136,f1116c1,77c6a0c,a1d5ec7,1546bb17,72356c2,14f649a,517512e,13e0eca4,1fde94,851d9fc,18191f,1fd14f5a,1058f719,174f39f6,175bb8b9,175d0a25,1048238a,1fd687aa'
+  .split(',').map(h=>parseInt(h,16).toString(2).padStart(29,'0'));          /* https://rozbazaar.shop/?src=card */
+const RC_FONT="'Noto Sans Devanagari','Noto Sans','Mukta','Hind',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif";
+function rcLoad(src){
+  return new Promise(res=>{
+    if(!src) return res(null);
+    let done=false; const fin=v=>{ if(!done){ done=true; res(v); } };
+    const go=(u,retry)=>{ const i=new Image(); if(!/^data:/.test(u)) i.crossOrigin='anonymous';
+      i.onload=()=>fin(i); i.onerror=()=>{ if(retry && !/^data:/.test(u)) go(u+(u.includes('?')?'&':'?')+'rc=1', false); else fin(null); }; i.src=u; };
+    go(src, true); setTimeout(()=>fin(null), 7000);
+  });
+}
+function rcUnit(u, hi){
+  const s=String(u||'').trim().toLowerCase(); let m;
+  if(/^(1\s*)?(kg|kilo)$/.test(s)) return hi?'किलो':'kg';
+  if((m=s.match(/^([\d.]+)\s*kg$/))) return m[1]+(hi?' किलो':' kg');
+  if((m=s.match(/^([\d.]+)\s*(g|gm|gram)s?$/))) return m[1]+(hi?' ग्राम':' g');
+  if(/^(1\s*)?(pc|pcs|piece)$/.test(s)) return hi?'पीस':'piece';
+  if((m=s.match(/^([\d.]+)\s*(pc|pcs|piece)s?$/))) return m[1]+(hi?' पीस':' pcs');
+  if(/dozen|darjan/.test(s)) return hi?'दर्जन':'dozen';
+  if(/bunch|gaddi/.test(s)) return hi?'गड्डी':'bunch';
+  if(/bori/.test(s)) return hi?'बोरी':'sack';
+  return u||'';
+}
+function rcRound(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+function rcFit(g,text,max,size,weight){ let s=size; g.font=`${weight} ${s}px ${RC_FONT}`; while(g.measureText(text).width>max && s>18){ s-=2; g.font=`${weight} ${s}px ${RC_FONT}`; } return s; }
+/* opt: {hi:boolean, title, sub, items:[{name,sub,price,unit,photo,fallback}], who:{name,photo}|null, link, more} */
+async function rcDraw(opt){
+  const W=1080, H=1350, c=document.createElement('canvas'); c.width=W; c.height=H;
+  const g=c.getContext('2d'); g.textBaseline='alphabetic';
+  try{ if(document.fonts && document.fonts.load) await Promise.race([document.fonts.load(`800 40px ${RC_FONT}`,'आज के रेट'), new Promise(r=>setTimeout(r,1500))]); }catch(e){}
+  const logo=await rcLoad((document.querySelector('.nav-logo')||document.querySelector('.sp-logo')||{}).src);
+  const pics=await Promise.all(opt.items.map(it=>rcLoad(it.photo).then(im=>im||rcLoad(it.fallback))));
+  const whoPic=opt.who && opt.who.photo ? await rcLoad(opt.who.photo) : null;
+  /* background + header */
+  g.fillStyle='#FCF8F0'; g.fillRect(0,0,W,H);
+  const hg=g.createLinearGradient(0,0,W,330); hg.addColorStop(0,'#2FA850'); hg.addColorStop(1,'#14682c');
+  g.fillStyle=hg; rcRound(g,0,-40,W,370,48); g.fill();
+  g.globalAlpha=.08; g.fillStyle='#fff'; g.beginPath(); g.arc(W-90,40,190,0,7); g.fill(); g.beginPath(); g.arc(W-260,300,90,0,7); g.fill(); g.globalAlpha=1;
+  /* logo pill */
+  g.fillStyle='#fff'; rcRound(g,56,44,330,96,48); g.fill();
+  if(logo){ const lh=62, lw=logo.width*lh/logo.height; g.drawImage(logo, 56+(330-Math.min(lw,290))/2, 44+(96-lh)/2, Math.min(lw,290), lh*Math.min(lw,290)/lw); }
+  else { g.fillStyle='#1E8E3E'; g.font=`800 44px ${RC_FONT}`; g.fillText('RozBazaar',86,108); }
+  /* vendor photo or date chip on the right */
+  if(opt.who){
+    const cx=W-120, cy=92, r=56;
+    g.save(); g.beginPath(); g.arc(cx,cy,r,0,7); g.closePath(); g.fillStyle='#fff'; g.fill(); g.clip();
+    if(whoPic){ const s=Math.min(whoPic.width,whoPic.height); g.drawImage(whoPic,(whoPic.width-s)/2,(whoPic.height-s)/2,s,s,cx-r,cy-r,2*r,2*r); }
+    else { g.fillStyle='#E7F5DD'; g.fillRect(cx-r,cy-r,2*r,2*r); g.fillStyle='#14682c'; g.font=`800 54px ${RC_FONT}`; g.textAlign='center'; g.fillText((opt.who.name||'R').trim().charAt(0).toUpperCase(),cx,cy+19); g.textAlign='left'; }
+    g.restore(); g.lineWidth=6; g.strokeStyle='#fff'; g.beginPath(); g.arc(cx,cy,r,0,7); g.stroke();
+  }
+  g.fillStyle='#fff'; rcFit(g,opt.title,W-120,74,800); g.fillText(opt.title,60,232);
+  g.globalAlpha=.9; rcFit(g,opt.sub,W-120,34,700); g.fillText(opt.sub,60,286); g.globalAlpha=1;
+  /* rate cells: 2 columns (1 wide column for a short list), rows shrink to fit above the footer */
+  const n=opt.items.length, cols=n<=5?1:2, rows=Math.ceil(n/cols), gap=24, x0=60, rg=14;
+  const colW=cols===1 ? W-120 : (W-120-gap)/2, avail=1080-350-(opt.more?48:0);
+  const rowH=Math.max(84, Math.min(cols===1?136:124, Math.floor((avail-(rows-1)*rg)/rows)));
+  const top=350+(cols===1 ? Math.max(0, Math.floor((avail-rows*rowH-(rows-1)*rg)/2)) : 0);   /* a short list sits in the middle */
+  opt.items.forEach((it,i)=>{
+    const col=i%cols, row=Math.floor(i/cols), x=x0+col*(colW+gap), y=top+row*(rowH+rg);
+    g.save(); g.shadowColor='rgba(16,27,48,.08)'; g.shadowBlur=18; g.shadowOffsetY=6; g.fillStyle='#fff'; rcRound(g,x,y,colW,rowH,26); g.fill(); g.restore();
+    const pr=Math.min(cols===1?52:44, Math.floor(rowH/2)-10), pcx=x+16+pr, pcy=y+rowH/2;
+    g.save(); g.beginPath(); g.arc(pcx,pcy,pr,0,7); g.closePath(); g.fillStyle='#F3F2EF'; g.fill(); g.clip();
+    const im=pics[i];
+    if(im){ const s=Math.min(im.width,im.height), tr=/\.webp$/.test(String(im.src).split('?')[0]);
+      if(tr) g.drawImage(im, pcx-pr*.82, pcy-pr*.82, pr*1.64, pr*1.64); else g.drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,pcx-pr,pcy-pr,2*pr,2*pr); }
+    else { g.fillStyle='#1E8E3E'; g.font=`800 ${Math.round(pr*.86)}px ${RC_FONT}`; g.textAlign='center'; g.fillText(String(it.name).charAt(0),pcx,pcy+pr*.3); g.textAlign='left'; }
+    g.restore();
+    const tx=pcx+pr+18, priceW=cols===1?220:150, big=cols===1?44:38;
+    g.fillStyle='#16150F'; rcFit(g,it.name,colW-(tx-x)-priceW,big,800); g.fillText(it.name,tx,y+rowH*.47);
+    if(it.sub){ g.fillStyle='#918B7E'; rcFit(g,it.sub,colW-(tx-x)-priceW,cols===1?28:24,700); g.fillText(it.sub,tx,y+rowH*.76); }
+    g.textAlign='right'; g.fillStyle='#14682c'; g.font=`800 ${cols===1?52:46}px ${RC_FONT}`; g.fillText('₹'+it.price, x+colW-22, y+rowH*.5);
+    g.fillStyle='#5B564C'; rcFit(g,'/'+it.unit,priceW,cols===1?28:24,700); g.fillText('/'+it.unit, x+colW-22, y+rowH*.77); g.textAlign='left';
+  });
+  if(opt.more){ g.fillStyle='#5B564C'; g.font=`700 30px ${RC_FONT}`; g.textAlign='center';
+    g.fillText(opt.more, W/2, top+rows*(rowH+rg)+26); g.textAlign='left'; }
+  /* footer */
+  const fy=H-250;
+  g.fillStyle='#101B30'; rcRound(g,0,fy,W,300,48); g.fill();
+  g.fillStyle='#fff'; rcFit(g,opt.cta,W-400,50,800); g.fillText(opt.cta,60,fy+86);
+  g.fillStyle='#7ECB53'; g.font=`800 44px ${RC_FONT}`; g.fillText('rozbazaar.shop',60,fy+148);
+  g.globalAlpha=.75; g.fillStyle='#fff'; rcFit(g,opt.trust,W-400,27,700); g.fillText(opt.trust,60,fy+198); g.globalAlpha=1;
+  const qs=190, qx=W-60-qs, qy=fy+30, qn=RC_QR.length, m=(qs-24)/qn;
+  g.fillStyle='#fff'; rcRound(g,qx,qy,qs,qs,18); g.fill(); g.fillStyle='#101B30';
+  RC_QR.forEach((row,r)=>{ for(let k=0;k<qn;k++) if(row[k]==='1') g.fillRect(qx+12+k*m, qy+12+r*m, m+.4, m+.4); });
+  return c;
+}
+/* customer: cheapest rate of every item in this village */
+function rcCustomerItems(){
+  const m={};
+  PRODUCTS.filter(p=>p.fresh!==false && p.price>0).forEach(p=>{ const k=String(p.ckey||p.roman||p.en).toLowerCase(); if(!m[k]||p.price<m[k].price) m[k]=p; });
+  const order={vegetable:0,onion_potato:1,fruit:2}, STAPLE=['p1','p2','p6','p13','p12','p3','p38','p9','p7','p10'];  /* aloo, pyaaz, tamatar, mirch, dhaniya… first */
+  const st=p=>{ const i=STAPLE.indexOf(p.ckey); return i<0?99:i; };
+  return Object.values(m).sort((a,b)=>st(a)-st(b) || (order[a.cat]??3)-(order[b.cat]??3) || a.price-b.price);
+}
+function rcEmojiPhoto(p){ const e=p.em && EMO_PHOTO[p.em] ? p.em : (p.cat==='fruit'?'🍎':p.cat==='onion_potato'?'🧅':'🥬'); return EMO_PHOTO[e]||null; }
+var RC={blob:null, url:null, text:'', name:''};
+async function openRateCard(){
+  if(!PRODUCTS.length){ try{ await mockApi('getCatalogue',{type:'all'}); }catch(e){} }
+  const all=rcCustomerItems();
+  if(!all.length) return toast(T('No rates in your village yet','आपके गाँव में अभी कोई रेट नहीं'));
+  const hi=LANG!=='en', items=all.slice(0,12);
+  const d=new Date(), date=d.toLocaleDateString(hi?'hi-IN':'en-IN',{weekday:'long',day:'numeric',month:'long'});
+  const link='https://rozbazaar.shop/?a='+encodeURIComponent(AREA)+'&src=wa_rates';
+  document.getElementById('rcSheet').classList.add('on');
+  document.getElementById('rcPrev').innerHTML=`<div class="rc-wait">${T('Making the picture…','फ़ोटो बन रही है…')}</div>`;
+  const c=await rcDraw({hi, title: hi?'आज के सब्ज़ी-फल रेट':"Today's vegetable & fruit rates",
+    sub: AREA+' · '+date,
+    items: items.map(p=>({name:hi?p.hi:p.en.replace(/\s*\(.*\)/,''), sub:hi?p.en.replace(/\s*\(.*\)/,''):p.hi, price:p.price, unit:rcUnit(p.unit,hi), photo:p.photo, fallback:rcEmojiPhoto(p)})),
+    who:null, more: all.length>12 ? (hi?`+ ${all.length-12} और सामान ऐप में`:`+ ${all.length-12} more items in the app`) : '',
+    cta: hi?'घर बैठे मँगाएँ — स्लॉट बुक करें':'Order from home — book a slot',
+    trust: hi?'कोई डिलीवरी चार्ज नहीं · सामने तौल · कैश या UPI':'No delivery charge · weighed at your door · cash or UPI'});
+  RC.name='RozBazaar-rates-'+d.toISOString().slice(0,10)+'.jpg';
+  RC.text=(hi?`आज के सब्ज़ी रेट — ${AREA}\n`:`Today's rates — ${AREA}\n`)
+    + items.slice(0,8).map(p=>`${hi?p.hi:p.en.replace(/\s*\(.*\)/,'')} ₹${p.price}/${rcUnit(p.unit,hi)}`).join(', ')
+    + (hi?`\nघर बैठे मँगाएँ: ${link}`:`\nOrder from home: ${link}`);
+  await rcShow(c);
+  if(!DEMO) rpc('log_visit',{p_page:'rates_card'}).catch(()=>{});
+}
+function rcShow(c){
+  return new Promise(res=>c.toBlob(b=>{
+    RC.blob=b; if(RC.url) URL.revokeObjectURL(RC.url); RC.url=b?URL.createObjectURL(b):null;
+    document.getElementById('rcPrev').innerHTML = RC.url ? `<img src="${RC.url}" alt="">` : `<div class="rc-wait">${T('Could not make the picture','फ़ोटो नहीं बनी')}</div>`;
+    const can = !!(RC.blob && navigator.canShare && navigator.canShare({files:[new File([RC.blob],RC.name,{type:'image/jpeg'})]}));
+    document.getElementById('rcShare').textContent = can ? T('Share on WhatsApp','WhatsApp पर भेजें') : T('Send on WhatsApp','WhatsApp पर भेजें');
+    res();
+  },'image/jpeg',.9));
+}
+async function rcShareNow(){
+  if(!RC.blob) return;
+  const file=new File([RC.blob],RC.name,{type:'image/jpeg'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file], text:RC.text}); if(!DEMO) rpc('log_visit',{p_page:'rates_card_share'}).catch(()=>{}); return; }
+    catch(e){ if(e && e.name==='AbortError') return; }
+  }
+  /* no picture sharing here (computer / old browser): save the picture, then open WhatsApp with the text */
+  window.open('https://wa.me/?text='+encodeURIComponent(RC.text),'_blank');   /* straight from the tap, or it is blocked as a pop-up */
+  rcDownload();
+  toast(T('Picture saved — attach it in WhatsApp','फ़ोटो सेव हो गई — WhatsApp में लगाएँ'));
+}
+function rcDownload(){ if(!RC.url) return; const a=document.createElement('a'); a.href=RC.url; a.download=RC.name; document.body.appendChild(a); a.click(); a.remove(); }
+function closeRateCard(){ document.getElementById('rcSheet').classList.remove('on'); }
+
+/* ---------------- LIVE TRACKING ----------------
+   While an order is on the way, the vendor app sends its GPS (vendor_share_location). customer_track(booking)
+   gives this customer — only for their own order — the vendor's last position (< 5 min old), the house pin,
+   the distance and an ETA. The map refreshes every 10 s; the thela slides to each new position. */
+var TRK={code:null, id:null, map:null, vm:null, hm:null, line:null, timer:null, last:null, fit:false, anim:null, data:null};
+function wayOrders(){ return (BOOKINGS||[]).filter(b=>b.raw_status==='on_the_way'); }
+function paintWayBar(){
+  const bar=document.getElementById('wayBar'); if(!bar) return;
+  const b=wayOrders()[0];
+  if(!b || DEMO){ bar.hidden=true; return; }
+  bar.hidden=false; bar.dataset.code=b.code;
+  document.getElementById('wayT').textContent = (b.vendorName||T('Your vendor','आपका वेंडर'))+' '+T('is on the way','रास्ते में है');
+  const d=TRK.code===b.code && TRK.data;
+  document.getElementById('wayS').textContent = d && d.eta_min ? T('About '+d.eta_min+' min away · see on the map','लगभग '+d.eta_min+' मिनट दूर · नक्शे पर देखें')
+    : T('Watch the thela come on the map','नक्शे पर सब्ज़ीवाले को आते देखें');
+}
+async function openTrack(code){
+  const b=(BOOKINGS||[]).find(x=>x.code===code) || wayOrders()[0];
+  if(!b) return toast(T('Order not found — open My bookings','ऑर्डर नहीं मिला — मेरी बुकिंग खोलें'));
+  TRK.code=b.code; TRK.id=b.id; TRK.fit=false; TRK.data=null;
+  document.getElementById('trackSheet').classList.add('on');
+  document.getElementById('trkSub').textContent = b.code+(b.vendorName?' · '+b.vendorName:'');
+  document.getElementById('trkCall').hidden = !b.vendorPhone;
+  document.getElementById('trkEta').innerHTML=''; document.getElementById('trkMsg').textContent=T('Finding your vendor…','वेंडर को ढूँढ रहे हैं…');
+  document.getElementById('trkAge').textContent='';
+  try{ await loadLeaflet(); }catch(e){ document.getElementById('trkMsg').textContent=T('Map could not load — check the internet','नक्शा नहीं खुला — इंटरनेट देखें'); }
+  if(window.L && !TRK.map){
+    TRK.map=L.map('trkMap',{zoomControl:false, attributionControl:true}).setView([28.38,76.79], 14);
+    L.control.zoom({position:'topright'}).addTo(TRK.map);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'© OpenStreetMap'}).addTo(TRK.map);
+  }
+  setTimeout(()=>TRK.map && TRK.map.invalidateSize(), 250);
+  trackTick();
+  clearInterval(TRK.timer); TRK.timer=setInterval(()=>{ if(!document.hidden) trackTick(); }, 10000);
+  if(!DEMO) rpc('log_visit',{p_page:'track_open'}).catch(()=>{});
+}
+function closeTrack(){
+  clearInterval(TRK.timer); TRK.timer=null;
+  document.getElementById('trackSheet').classList.remove('on');
+}
+function trackCall(){ if(TRK.code) callVendor(TRK.code); }
+function trkIcon(kind){
+  return L.divIcon({className:'', html: kind==='v' ? `<div class="trk-v">${ic('truck')}</div>` : `<div class="trk-h">${ic('home')}</div>`,
+    iconSize: kind==='v'?[44,44]:[40,40], iconAnchor: kind==='v'?[22,22]:[20,40]});
+}
+function trkSlide(to){
+  if(!TRK.vm){ TRK.vm=L.marker(to,{icon:trkIcon('v'), zIndexOffset:500}).addTo(TRK.map); return; }
+  const from=TRK.vm.getLatLng(), t0=performance.now(), dur=1200;
+  cancelAnimationFrame(TRK.anim);
+  const step=t=>{ const k=Math.min(1,(t-t0)/dur), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+    TRK.vm.setLatLng([from.lat+(to[0]-from.lat)*e, from.lng+(to[1]-from.lng)*e]); if(k<1) TRK.anim=requestAnimationFrame(step); };
+  TRK.anim=requestAnimationFrame(step);
+}
+async function trackTick(){
+  if(!TRK.id) return;
+  const r=DEMO ? {ok:false} : await rpc('customer_track',{p_booking:TRK.id});
+  const eta=document.getElementById('trkEta'), msg=document.getElementById('trkMsg'), age=document.getElementById('trkAge');
+  if(!r.ok){ msg.textContent=r.msg||T('Could not load — trying again','लोड नहीं हुआ — फिर कोशिश कर रहे हैं'); return; }
+  const d=r.data||{}; TRK.data=d;
+  const vn=d.vendor_name||T('Your vendor','आपका वेंडर');
+  if(window.L && TRK.map){
+    if(d.dest){ const h=[d.dest.lat,d.dest.lng]; if(!TRK.hm) TRK.hm=L.marker(h,{icon:trkIcon('h')}).addTo(TRK.map); else TRK.hm.setLatLng(h); }
+    if(d.vendor){ trkSlide([d.vendor.lat,d.vendor.lng]); }
+    if(d.vendor && d.dest){
+      const pts=[[d.vendor.lat,d.vendor.lng],[d.dest.lat,d.dest.lng]];
+      if(!TRK.line) TRK.line=L.polyline(pts,{color:'#1E8E3E', weight:4, dashArray:'2 9', lineCap:'round', opacity:.85}).addTo(TRK.map); else TRK.line.setLatLngs(pts);
+      if(!TRK.fit){ TRK.map.fitBounds(L.latLngBounds(pts).pad(.35),{maxZoom:17}); TRK.fit=true; }
+    } else if(!TRK.fit && (d.vendor||d.dest)){ const p=d.vendor||d.dest; TRK.map.setView([p.lat,p.lng], 16); TRK.fit=true; }
+  }
+  document.getElementById('trkTitle').textContent = d.status==='on_the_way' ? T(vn+' is on the way',vn+' रास्ते में है')
+    : ['reached','bill_final','bill_approved'].includes(d.status) ? T(vn+' has reached your door',vn+' आपके दरवाज़े पर पहुँच गए')
+    : T('Order '+(d.code||''),'ऑर्डर '+(d.code||''));
+  if(d.status!=='on_the_way'){
+    eta.innerHTML = ['reached','bill_final','bill_approved'].includes(d.status) ? `<b>${T('Arrived','पहुँच गए')}</b>` : '';
+    msg.textContent = ['reached','bill_final','bill_approved'].includes(d.status) ? T('Your vendor is at the door — the bill comes next.','वेंडर दरवाज़े पर हैं — अब बिल आएगा।')
+      : T('Live location shows only while the vendor is on the way.','लाइव लोकेशन सिर्फ़ तब दिखती है जब वेंडर रास्ते में हो।');
+    age.textContent=''; clearInterval(TRK.timer); TRK.timer=null;
+    BOOKINGS.forEach(x=>{ if(x.code===d.code) x.raw_status=d.status; }); paintWayBar();
+    return;
+  }
+  if(!d.live){
+    eta.innerHTML='';
+    msg.textContent=T(vn+' has left, but their phone isn’t sharing location right now. You’ll get a notification when they reach.',
+      vn+' निकल चुके हैं, पर उनका फ़ोन अभी लोकेशन नहीं भेज रहा। पहुँचते ही आपको सूचना मिलेगी।');
+    age.textContent=''; paintWayBar(); return;
+  }
+  const km=d.dist_km, near=km!=null && km<0.15;
+  eta.innerHTML = near ? `<b>${T('Almost there','बस पहुँचने वाले हैं')}</b>`
+    : d.eta_min ? `<b>~${d.eta_min} ${T('min','मिनट')}</b><span>${km<1?Math.round(km*1000)+' '+T('m away','मीटर दूर'):km.toFixed(1)+' km '+T('away','दूर')}</span>`
+    : '';
+  msg.textContent = d.dest && d.dest.approx ? T('Your address has no map pin, so the distance is to the village centre.','आपके पते पर नक्शे का पिन नहीं है, इसलिए दूरी गाँव के बीच से है।')
+    : T('The green thela is '+vn+'. Time is an estimate — they may stop at other houses on the way.','हरा ठेला '+vn+' हैं। समय अंदाज़ा है — रास्ते में दूसरे घरों पर भी रुक सकते हैं।');
+  const a=d.vendor.age_s||0;
+  age.textContent = a<20 ? T('Updated just now','अभी अपडेट हुआ') : a<90 ? T('Updated '+a+' s ago','अपडेट '+a+' सेकंड पहले') : T('Updated '+Math.round(a/60)+' min ago','अपडेट '+Math.round(a/60)+' मिनट पहले');
+  paintWayBar();
+}
+
+/* ---------------- ORDER BY VOICE ----------------
+   🎤 in the home search bar / the home card / the search screen opens #voxSheet. The phone's own speech engine
+   (SpeechRecognition — Chrome, the Android app, Safari) writes down what is said in Hindi (hi-IN) or English
+   (en-IN); the text can also be typed or corrected in the box. VORDER.parse() makes the list, the customer checks
+   quantities, and only "Add to basket" changes the basket. Permissions-Policy in .htaccess must allow microphone=(self). */
+const VX_SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+var VX={rec:null, on:false, err:'', interim:'', rows:[], res:null, edits:{}, vend:{}, typeT:null,
+  lang:(()=>{ try{ return localStorage.getItem('rb_vox_lang')||'hi-IN'; }catch(e){ return 'hi-IN'; } })()};
+function vxSrc(){ return DEMO ? (PRODUCTS.length ? PRODUCTS : MOCK_PRODUCTS) : PRODUCTS; }   /* never the demo items on the live site */
+function vxPrefer(){ const v=new Set(); Object.keys(cart).forEach(id=>{ const p=prod(id); if(p && p.vendorId) v.add(p.vendorId); }); if(sel.vendorId) v.add(sel.vendorId); return [...v]; }
+function openVoice(listen){
+  const w=document.getElementById('voxSheet'); if(!w) return;
+  w.classList.add('on');
+  if(listen && VX_SR) vxStart();            /* straight from the tap — browsers want the mic started inside the tap */
+  paintVxTop(); vxExamples(); renderVx();
+  if(!VX_SR) setTimeout(()=>{ try{ document.getElementById('vxText').focus(); }catch(e){} }, 250);
+  if(!PRODUCTS.length && !DEMO) mockApi('getCatalogue',{type:'all'}).then(()=>{ vxExamples(); vxParse(); }).catch(()=>{});
+  if(!DEMO) rpc('log_visit',{p_page:'voice_open'}).catch(()=>{});
+}
+function closeVoice(){
+  vxStop(true);
+  document.getElementById('voxSheet').classList.remove('on');
+}
+function vxLang(l){
+  VX.lang=l; try{ localStorage.setItem('rb_vox_lang', l); }catch(e){}
+  paintVxTop(); vxExamples();
+  if(VX.on){ vxStop(true); vxStart(); }
+}
+function vxToggle(){ if(VX.on) vxStop(false); else vxStart(); }
+function vxStart(){
+  if(!VX_SR){ paintVxTop(); return; }
+  try{ if(VX.rec) VX.rec.abort(); }catch(e){}
+  let r; try{ r=new VX_SR(); }catch(e){ VX.err='start'; paintVxTop(); return; }
+  VX.rec=r; VX.err=''; VX.interim='';
+  r.lang=VX.lang; r.interimResults=true; r.maxAlternatives=3; r.continuous=false;
+  const finals=[];
+  r.onstart=()=>{ VX.on=true; paintVxTop(); };
+  r.onresult=e=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const res=e.results[i];
+      if(res.isFinal){ const alts=[]; for(let j=0;j<res.length;j++) alts.push(res[j].transcript); finals.push(alts); }
+      else interim+=res[0].transcript;
+    }
+    VX.interim=interim; paintVxHeard();
+  };
+  r.onerror=e=>{ if(e.error!=='aborted') VX.err=e.error||'error'; };
+  r.onend=()=>{
+    if(VX.rec!==r) return;
+    VX.on=false; VX.interim='';
+    if(finals.length){
+      /* the engine gives up to 3 guesses per sentence — keep the one we understand best */
+      const said=finals.map(alts=>alts.map(a=>[a, VORDER.parse(a, vxSrc(), vxPrefer()).score]).sort((a,b)=>b[1]-a[1])[0][0]).join(', ');
+      const box=document.getElementById('vxText');
+      box.value = box.value.trim() ? box.value.trim().replace(/[,،]\s*$/,'')+', '+said : said;
+      VX.err='';
+      vxParse();
+    } else if(!VX.err) VX.err='no-speech';
+    paintVxTop(); paintVxHeard();
+  };
+  try{ r.start(); VX.on=true; }catch(e){ VX.err='start'; VX.on=false; }
+  paintVxTop(); paintVxHeard();
+}
+function vxStop(abort){
+  const r=VX.rec; if(!r) return;
+  try{ abort ? r.abort() : r.stop(); }catch(e){}
+  if(abort){ VX.rec=null; VX.on=false; VX.interim=''; }
+}
+function paintVxTop(){
+  const mic=document.getElementById('vxMic'), hint=document.getElementById('vxHint'), langs=document.getElementById('vxLangs');
+  if(!mic) return;
+  document.getElementById('vxTop').style.display = VX_SR ? '' : 'none';
+  mic.classList.toggle('on', VX.on);
+  langs.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.l===VX.lang));
+  const E={ 'not-allowed':1, 'service-not-allowed':1 };
+  let h, err=true;
+  if(VX.on){ h=T('Listening… speak now','सुन रहे हैं… अब बोलिए'); err=false; }
+  else if(E[VX.err]) h=T('The microphone is blocked. ','माइक बंद है। ')+unblockHow('mic')+T(' — or type the list below.',' — या नीचे लिखकर बताइए।');
+  else if(VX.err==='no-speech') h=T('Didn’t hear anything — tap the mic and speak','कुछ सुनाई नहीं दिया — माइक दबाकर बोलिए');
+  else if(VX.err==='audio-capture') h=T('No microphone found — type the list below','माइक नहीं मिला — नीचे लिखकर बताइए');
+  else if(VX.err==='network') h=T('Voice needs internet — check the connection, or type below','आवाज़ के लिए इंटरनेट चाहिए — नेट देखें या नीचे लिखें');
+  else if(VX.err==='language-not-supported') h=T('This phone can’t do Hindi voice — tap English, or type below','इस फ़ोन में हिंदी आवाज़ नहीं — English दबाएँ या नीचे लिखें');
+  else if(VX.err) h=T('Voice didn’t start — tap the mic again, or type below','आवाज़ शुरू नहीं हुई — माइक फिर दबाएँ या नीचे लिखें');
+  else { h=document.getElementById('vxText').value.trim() ? T('Tap the mic to add more','और जोड़ने के लिए माइक दबाएँ') : T('Tap the mic and speak','माइक दबाएँ और बोलिए'); err=false; }
+  hint.textContent=h; hint.classList.toggle('err', err);
+}
+function paintVxHeard(){ const el=document.getElementById('vxHeard'); if(el) el.textContent = VX.on && VX.interim ? '“'+VX.interim+'”' : ''; }
+/* example sentences made from what is really sold here today */
+function vxExamples(){
+  const el=document.getElementById('vxEx'); if(!el) return;
+  const hi=VX.lang==='hi-IN', seen=new Set(), pick=[];
+  for(const p of vxSrc()){ if(p.fresh===false) continue; const k=p.ckey||p.en; if(seen.has(k)) continue; seen.add(k); pick.push(p); if(pick.length>=3) break; }
+  if(!pick.length){ el.innerHTML=''; return; }
+  const say=(p,n)=>{ const pk=VORDER.packOf(p.unit), nm=hi?p.hi:(p.en||'').replace(/\s*\(.*\)/,'').toLowerCase();
+    if(pk.k==='w') return hi ? (n===2?'दो':'एक')+' किलो '+nm : n+' kg '+nm;
+    if(pk.k==='bunch') return hi ? (n===2?'दो':'एक')+' गड्डी '+nm : n+' bunch '+nm;
+    return hi ? (n===2?'दो':'एक')+' '+nm : n+' '+nm; };
+  const ex=[pick.map((p,i)=>say(p,i===0?2:1)).join(hi?' और ':' and ')];
+  const w=pick.slice(1).find(p=>VORDER.packOf(p.unit).k==='w');
+  if(w) ex.push(hi ? w.hi+' आधा किलो' : 'half kg '+(w.en||'').replace(/\s*\(.*\)/,'').toLowerCase());
+  el.innerHTML='<span class="vx-lbl" style="width:100%;margin:0">'+T('TRY SAYING','ऐसे बोलिए')+'</span>'
+    + ex.map(s=>`<button onclick="vxTry(this)">“${esc(s)}”</button>`).join('');
+}
+function vxTry(b){ const box=document.getElementById('vxText'); box.value=b.textContent.replace(/[“”]/g,''); vxParse(); paintVxTop(); }
+function vxTyped(){ clearTimeout(VX.typeT); VX.typeT=setTimeout(()=>{ vxParse(); paintVxTop(); }, 350); }
+function vxParse(){
+  const text=document.getElementById('vxText').value;
+  VX.res=VORDER.parse(text, vxSrc(), vxPrefer());
+  VX.rows=VX.res.items.map(it=>{
+    const r=Object.assign({}, it);
+    if(VX.vend[r.key] && r.alts.includes(VX.vend[r.key])) r.pid=VX.vend[r.key];
+    if(VX.edits[r.key]!=null) r.q=VX.edits[r.key];
+    return r;
+  });
+  renderVx();
+}
+function vxQty(i,d){ const r=VX.rows[i]; if(!r) return; r.q=Math.max(0, Math.min(50, r.q+d)); VX.edits[r.key]=r.q; renderVx(); }
+function vxSwitch(i){ const r=VX.rows[i]; if(!r || r.alts.length<2) return; r.pid=r.alts[(r.alts.indexOf(r.pid)+1)%r.alts.length]; VX.vend[r.key]=r.pid; renderVx(); }
+function vxClear(){ document.getElementById('vxText').value=''; VX.edits={}; VX.vend={}; VX.err=''; vxParse(); paintVxTop(); }
+function renderVx(){
+  const el=document.getElementById('vxList'); if(!el) return;
+  const res=VX.res||{items:[],oos:[],notSold:[],unknown:[]}, rows=VX.rows;
+  const nm=s=>{ const [h,e]=String(s).split('|'); return LANG==='en' ? (e||h) : h; };
+  const vendors=new Set(rows.filter(r=>r.q>0).map(r=>(prod(r.pid)||{}).vendorId));
+  let h=rows.map((r,i)=>{ const p=prod(r.pid); if(!p) return '';
+    const other=r.alts.length>1 ? prod(r.alts[(r.alts.indexOf(r.pid)+1)%r.alts.length]) : null;
+    return `<div class="vx-row${r.q?'':' off'}">
+      <div class="vx-img">${art(p)}</div>
+      <div class="vx-mid"><b>${esc(pname(p))}</b>
+        <span>${esc(p.unit)} × ${r.q} · ₹${p.price} ${T('each','प्रति')}${p.vendorName?' · '+esc(p.vendorName):''}</span>
+        ${r.noQty?`<em>${T('No amount heard — 1 pack, change with + −','मात्रा नहीं सुनी — 1 पैक रखा, + − से बदलें')}</em>`
+          : r.approx?`<em>${T('Heard “'+esc(r.heard)+'” — nearest pack','सुना “'+esc(r.heard)+'” — सबसे पास वाला पैक')}</em>`
+          : r.fuzzy?`<em>${T('Heard “'+esc(r.heard)+'”','सुना “'+esc(r.heard)+'”')}</em>`:''}
+        ${other?`<button class="vx-sw" onclick="vxSwitch(${i})">${T('From '+esc(other.vendorName||'other vendor')+' · ₹'+other.price,esc(other.vendorName||'दूसरे वेंडर')+' से लें · ₹'+other.price)}</button>`:''}
+      </div>
+      <div class="qstep"><button aria-label="less" onclick="vxQty(${i},-1)">−</button><b>${r.q}</b><button aria-label="more" onclick="vxQty(${i},1)">+</button></div>
+      <div class="vx-amt">₹${p.price*r.q}</div>
+    </div>`; }).join('');
+  if(res.oos.length) h+=`<div class="vx-miss">${T('Out of stock today: ','आज स्टॉक में नहीं: ')}<b>${res.oos.map(nm).map(esc).join(', ')}</b></div>`;
+  if(res.notSold.length) h+=`<div class="vx-miss">${T('Not sold in '+esc(AREA||'your village')+' yet: ',esc(AREA||'आपके गाँव')+' में अभी नहीं मिलता: ')}<b>${res.notSold.map(nm).map(esc).join(', ')}</b></div>`;
+  if(res.unknown.length) h+=`<div class="vx-miss no">${T('Didn’t understand: ','समझ नहीं आया: ')}<b>${res.unknown.slice(0,4).map(s=>'“'+esc(s)+'”').join(', ')}</b><br>${T('Say the item name clearly, e.g. “2 kg tomato”','सामान का नाम साफ़ बोलिए, जैसे “दो किलो टमाटर”')}</div>`;
+  if(vendors.size>1) h+=`<div class="vx-miss" style="background:var(--lime-s);color:var(--g-dk)">${T(vendors.size+' vendors — these become '+vendors.size+' separate orders, each with its own bill','ये '+vendors.size+' वेंडर से आएगा — '+vendors.size+' अलग ऑर्डर, अलग बिल')}</div>`;
+  el.innerHTML=h;
+  const live=rows.filter(r=>r.q>0 && prod(r.pid)), n=live.reduce((s,r)=>s+r.q,0), t=live.reduce((s,r)=>s+prod(r.pid).price*r.q,0);
+  const add=document.getElementById('vxAddBtn');
+  add.disabled=!live.length;
+  add.textContent = live.length ? T(`Add ${live.length} item${live.length>1?'s':''} to basket · ₹${t}`, `${live.length} सामान टोकरी में डालें · ₹${t}`) : T('Add to basket','टोकरी में डालें');
+  add.dataset.n=n;
+}
+function vxAdd(){
+  const live=VX.rows.filter(r=>r.q>0 && prod(r.pid)); if(!live.length) return;
+  const wasEmpty=count()===0;
+  live.forEach(r=>{ cart[r.pid]=(cart[r.pid]||0)+r.q; });
+  if(wasEmpty || !sel.vendorId){ const by={}; live.forEach(r=>{ const v=prod(r.pid).vendorId; if(v) by[v]=(by[v]||0)+r.q; });
+    const top=Object.keys(by).sort((a,b)=>by[b]-by[a])[0]; if(top) sel.vendorId=top; }
+  syncCart(); paintAllAdds();
+  if(!DEMO) rpc('log_visit',{p_page:'voice_order'}).catch(()=>{});
+  toast(T(`${live.length} item${live.length>1?'s':''} added to your basket`, `${live.length} सामान टोकरी में डाल दिया`));
+  document.getElementById('vxText').value=''; VX.edits={}; VX.vend={}; VX.rows=[]; VX.res=null;
+  closeVoice(); go('basket');
 }
 /* Saved items = the products the customer tapped ♥ on (customer_toggle_favourite; loaded with customer_home) */
 async function openSaved(){
@@ -5939,8 +6929,8 @@ function when(d){
   const dd=Math.round(m/1440); return dd+T(dd===1?' day ago':' days ago',' दिन पहले');
 }
 let CNOTIFS=[], CN_SEEN=null;
-const CN_ICON={booking_confirmed:'✅',booking_on_the_way:'🚚',booking_reached:'📍',bill_final:'🧾',booking_paid:'💵',booking_delivered:'🎉',
-  booking_missed:'😔',booking_pending_review:'🔍',cancelled:'❌',slot_reminder:'⏰',tomorrow_reminder:'🗓️',broadcast:'📣',booking_status:'🛒'};
+const CN_ICON={gali_complete:'🏘',booking_confirmed:'✅',booking_on_the_way:'🚚',booking_reached:'📍',bill_final:'🧾',booking_paid:'💵',booking_delivered:'🎉',
+  booking_missed:'😔',booking_pending_review:'🔍',booking_near:'🛵',cancelled:'❌',slot_reminder:'⏰',tomorrow_reminder:'🗓️',broadcast:'📣',booking_status:'🛒'};
 async function loadCustNotifs(silent){
   if(DEMO || !SESSION) return;
   const r=await rpc('customer_notifications',{p_limit:40});
@@ -5996,6 +6986,8 @@ async function renderBookings(){
   }
   const list=res.data;
   if(!DEMO) BOOKINGS=list;          /* keep local state in step with the server */
+  paintWayBar();
+  setTimeout(paintGaliLines, 0);
   checkForCompletedOrder();
   document.getElementById('bkSub').textContent = list.length+' '+T('bookings','बुकिंग');
   document.getElementById('acctBk').textContent = list.length+' '+T('bookings','बुकिंग');
@@ -6028,7 +7020,9 @@ async function renderBookings(){
         <div style="font-family:var(--disp);font-size:26px;font-weight:800;letter-spacing:6px">${bk.otp}</div></div>
         <div style="font-size:11px;font-weight:700;opacity:.6;max-width:118px;line-height:1.35">${T('show at the door','दरवाज़े पर दिखाएँ')}</div>
       </div>
+      <div class="gali-line" data-gcode="${esc(bk.code)}"></div>
       <div style="display:flex;gap:9px;margin-top:13px;flex-wrap:wrap">
+        ${bk.raw_status==='on_the_way'?`<button class="btn-g" onclick="openTrack('${bk.code}')">🛵 ${T('Track live on map','नक्शे पर लाइव देखें')}</button>`:''}
         ${(DEMO && bk.status==='confirmed')?`<button class="pill" onclick="advance('${bk.code}')">${T('Vendor arrived (demo)','वेंडर आ गया (डेमो)')}</button>`:''}
         ${(bk.billReady||(DEMO&&bk.status==='reached'))?`<button class="btn-g" onclick="openBill('${bk.code}')">${T('See final bill','फ़ाइनल बिल देखें')}</button>`:''}
         ${(bk.raw_status==='delivered'||bk.status==='completed')&&!bk.rated?`<button class="btn-g" onclick="openRate('${bk.code}')">${T('Rate the vendor','वेंडर को रेटिंग दें')}</button>`:''}
@@ -6550,7 +7544,7 @@ const EMO_ICON=(()=>{ const m={}, set=(list,n)=>[...list].forEach(c=>m[c]=n);
   set('🏪','store'); set('🗑','trash'); set('🔒','lock'); set('🔥','flame'); set('⚠','alert'); set('🔊','vol'); set('🔇','volx'); set('⚖','scale');
   set('🔤🌐','globe'); set('📱','mobile'); set('📞☎','phone'); set('🟤🟢🔴','dot'); set('😕😔','frown'); set('📩📨✉','mail'); set('💵💰','cash');
   set('🎤','mic'); set('🔁🔄','repeat'); set('💡','bulb'); set('🔑','key'); set('⏻','power'); set('🎬','video'); set('💬','chat'); set('🩺','pulse');
-  set('🌅','sunrise'); set('☀','sun'); set('🌇','sunset'); set('🛵🚚','truck'); set('🗓📅','cal'); set('📣','mega'); set('🧾','receipt'); set('📷','camera');
+  set('📤','send'); set('🏘','home'); set('🌅','sunrise'); set('☀','sun'); set('🌇','sunset'); set('🛵🚚','truck'); set('🗓📅','cal'); set('📣','mega'); set('🧾','receipt'); set('📷','camera');
   return m; })();
 const EMO_RE=/(?:[\u{1F1E6}-\u{1F1FF}]{2})|[\u{1F300}-\u{1FAFF}☀-➿⭐⭕⌚-⏿★♡♥✓✔✕✖]️?(?:‍[\u{1F300}-\u{1FAFF}☀-➿]️?)*/gu;
 /* food emojis → clean cut-out photos (transparent background), shipped with the site in img/items/ */
@@ -6593,6 +7587,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('footAreas').innerHTML = MOCK_AREAS.map(a=>`<li>${a}</li>`).join('');
   restoreCartLocal();
+  /* a shared link (rates card, neighbour invite) names the village: open on it, don't ask for location first */
+  if(RB_LINK.a){ AREA=RB_LINK.a; locAsked=true; }
   renderHome(); renderAcct(); syncCart(); paintHeroArt();
   /* apply the saved (or default English) language to every data-en/data-hi text on load */
   { let l='en'; try{ l=localStorage.getItem('rb_lang')||'en'; }catch(e){} setLang(l, true); }
@@ -6601,7 +7597,13 @@ window.addEventListener('DOMContentLoaded',()=>{
   if(!DEMO){ rpc('log_visit',{p_page:'customer'}).catch(()=>{}); }
   checkAppInstalled();
   if(/[?&]get=app/.test(location.search) && !appInstalled()) setTimeout(getApp, 2300);   /* QR code on the computer */
-  loadAreas();
+  loadAreas().then(list=>{
+    if(!RB_LINK.a || !Array.isArray(list) || !list.length) return;
+    const hit=list.find(x=>x && String(x.name||x).toLowerCase()===RB_LINK.a.toLowerCase());
+    const name=hit ? (hit.name||hit) : 'Khandewla';             /* unknown village in the link → the usual default */
+    if(name!==AREA){ AREA=name; PRODUCTS=[]; document.querySelectorAll('.area-name').forEach(el=>el.textContent=AREA); renderHome(); }
+  }).catch(()=>{});
+  if(RB_LINK.src && !DEMO) rpc('log_visit',{p_page:RB_LINK.src}).catch(()=>{});
   loadAppConfig();
   rememberRates();               /* store today's rates for the ▲/▼ board on the next visit (voice welcome removed 8 Oct) */
   setTimeout(showLocAsk, 2600);

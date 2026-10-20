@@ -14,7 +14,7 @@ Options -Indexes
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set Strict-Transport-Security "max-age=31536000"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
-  Header always set Permissions-Policy "geolocation=(self), camera=(self), microphone=(), payment=()"
+  Header always set Permissions-Policy "geolocation=(self), camera=(self), microphone=(self), payment=()"
   # The app files keep the same names, so phones must always check for a newer copy.
   <FilesMatch "(\.html|sw\.js|app\.js|styles\.css|manifest\.webmanifest)$">
     Header set Cache-Control "no-cache"

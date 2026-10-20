@@ -72,6 +72,9 @@ admin/             → Node/Express app on Render
 database/
   SCHEMA.md          every table, enum, cron job and all 124 RPC signatures
   DUMP_FULL_SCHEMA.md  how to pull the real .sql with function bodies
+scripts/
+  site-csp.py        re-pins the inline-script hash of admin-site / staff-site (run after editing them)
+  test-voice-parser.js  node scripts/test-voice-parser.js — tests the customer site's voice-order parser
 docs/              business context
 platform/          NEW (30 Sep 2026): TypeScript/Express API + React customer & vendor apps
                    (npm workspaces). Replaces customer/index.html + vendor-site/ once deployed.
@@ -638,6 +641,44 @@ Still open by choice: phone login has no OTP until an SMS provider is set (anyon
   would be less private). Existing data was converted on 19 Oct (15 product/vendor photos + 35 booked-item copies → 16 files).
 - `send-push` (19 Oct): reads its secret / VAPID key with retries and remembers only a successful read — two copies booting
   at once sometimes got a 401 on the first read and refused that push (one of the two 05:00 price reminders was lost every day).
+
+### Four "crazy" features (20 Oct 2026 — migrations `20261020a_live_tracking.sql`, `20261020b_gali_groups.sql`)
+- **Order by voice (customer site).** 🎤 in the home search bar, the search screen and the desktop nav, plus a home card
+  ("Just say what you need") → `openVoice(true)` → `#voxSheet`. The phone's own `SpeechRecognition` (hi-IN default, en-IN toggle,
+  `localStorage.rb_vox_lang`, 3 guesses per sentence → the best-understood one) writes into a text box the customer can also type
+  in/correct; `VORDER.parse(text, PRODUCTS, preferVendors)` (pure, between `VOICE-PARSER-START/END`) turns it into packs:
+  Hindi/Roman/English numbers (आधा, डेढ़, ढाई, सवा, साढ़े, पौने, सौ, digits), units (किलो, ग्राम, पाव, पीस, दर्जन, गड्डी, रुपये / "बीस का"),
+  local names (`SYN`: घीया, गंठा, बताऊं, मिरच …), typos (edit distance). Quantity → whole packs of the vendor's unit
+  ("approx" note when not exact). Same item at 2 vendors → the basket's vendor, else the vendor covering most of the list, else cheapest.
+  Nothing enters the basket until "Add to basket". Out of stock / not sold here / not understood are listed. Functions are `vx*`
+  (the old welcome-voice engine already owns `VOX` and `voxStop`). **`customer/.htaccess` Permissions-Policy must say
+  `microphone=(self)`** (it said `microphone=()`, which silently blocks the mic). Test: `node scripts/test-voice-parser.js` (52 phrases).
+  Logged as `log_visit('voice_open' / 'voice_order')`.
+- **Live sabzi-wala tracking.** Vendor taps "I'm on the way" → vendor site `liveSync()` starts `watchPosition` + screen Wake Lock and
+  sends `vendor_share_location` (every 15 s, or 6 s after moving 40 m, a 20 s heartbeat while standing still; a reading that came too
+  soon is sent later, never dropped). A green bar ("Live location on — N customers can see you") sits on Home and the order screen
+  (`.live-slot`); it stops when no order is on the way (server answers `sharing:false`). Customer site: Home banner `#wayBar`
+  ("Sanjiv is on the way · ~8 min · Track"), "Track live on map" on My bookings → `#trackSheet` (Leaflet + OSM, house pin, moving
+  thela, dashed line, ETA/distance, "updated N s ago", call) polling `customer_track` every 10 s; at ~700 m the DB sends
+  "🛵 almost there" (`booking_near`) once. Phones stop GPS for background pages — the vendor must keep the app open (the bar says so).
+- **Today's rates card for WhatsApp.** `rcDraw()` paints a 1080×1350 JPEG on a canvas: logo, date, village, up to 12 items with
+  photos (Supabase Storage sends `Access-Control-Allow-Origin: *`; a failed photo falls back to the cut-out / a letter), link,
+  QR (`RC_QR` = https://rozbazaar.shop/?src=card). Customer: "Send today's rates on WhatsApp" at the bottom of the rates board
+  (cheapest rate per item, staples first). Vendor: green button on Stock & rates (pulses "Rates changed — tell your customers"
+  after the first rate change of the day; `rb_rc_day`). Phones share the picture + caption with `navigator.share({files})`;
+  elsewhere WhatsApp (wa.me) opens with the text and the picture downloads. Links carry `?a=<village>&src=wa_rates|wa_vendor|gali|card`:
+  `RB_LINK` (read before the share-tag stripper, which now also removes `a` and `src`) opens that village (unknown name → default),
+  skips the location prompt and logs the visit.
+- **Gali group order.** Houses close together (default ≤150 m by GPS pin, or same village + same street text) that book the same
+  vendor, day and slot form a group; at 3 houses (admin) every house gets a bonus the vendor brings (admin text, default
+  "मुफ़्त धनिया-मिर्च" — no money changes in the app). Customer: home card "Order with your neighbours" (WhatsApp invite),
+  slot list hint "2 neighbours booked this time — 1 more house = …" (`customer_gali_slots`, counts only), success screen
+  "Gali group: 2 of 3 houses" + invite naming the slot/vendor, My bookings line (`customer_gali_status`). DB trigger
+  `trg_gali_check` notifies every house + the vendor once when a group completes (`gali_complete`). Vendor: badge on order cards
+  ("गली ग्रुप · 3 घर — दो मुफ़्त धनिया-मिर्च") + note on the order screen (`vendor_gali_groups`). Admin → Settings → "Gali group"
+  (on/off, houses 2–10, metres 50–1000, bonus Hindi + English; `admin_set_gali`) shows how many orders are in complete groups.
+- Not testable here without a real phone: speech recognition inside the Play-Store app (TWA), GPS while walking, Wake Lock,
+  the Android share sheet. Everything else was tested in the browser with fakes, and the DB parts with rolled-back transactions.
 
 ### Key business logic in the DB
 - `match_vendor()` — auto-assigns least-loaded, best-rated vendor for a slot.

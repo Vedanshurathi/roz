@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-KkK/fcjQ3fFoM7WLjYBOH7JCMog1kVGCPjvnGB8TV0k=' https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co https://server.arcgisonline.com https://tile.openstreetmap.org; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Jq6sPcf0BhXY3JkayYfvfReXsqNmT27TtpKjRwSKcMo=' https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co https://server.arcgisonline.com https://tile.openstreetmap.org; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -1857,6 +1857,7 @@ function vSettings(el, rv) {
         <input class="fld" id="minOrder" inputmode="numeric" value="${D.settings.min_order ?? 50}" style="padding-left:30px;font-size:20px;font-weight:800"></div>
         <button class="btn btn-g" data-act="saveMinOrder">Save</button>
         <span class="mu">${D.settings.min_order_updated_at ? 'Aakhri badlav ' + when(D.settings.min_order_updated_at) : 'Abhi default ₹50'}</span></div></div>
+    ${galiCard(rv)}
     <div class="card ${rv} d2" style="margin-top:14px"><b style="font-size:16px">🔑 Customer login: SMS OTP</b>
       <p class="mu" style="margin:4px 0 12px;line-height:1.55">Abhi: <b>${D.settings.customer_otp ? 'ON — phone login pe SMS code lagta hai' : 'OFF — sirf naam + number (koi bhi number daal ke login kar sakta hai)'}</b>.<br>
         ON karne se pehle Supabase → Authentication → Sign In / Providers → <b>Phone</b> me SMS provider (MSG91 / Twilio) set karo aur khud ek baar test karo —
@@ -1878,6 +1879,32 @@ async function saveMinOrder() {
   if (!(v >= 0 && v <= 5000)) return toast('₹0 se ₹5000 ke beech daalo');
   const m = await modal({ title: `Minimum order ₹${v} karein?`, sub: `Abhi ₹${D.settings.min_order ?? 50} hai. Customers ko turant naya minimum dikhega.`, ok: 'Haan, badlo' });
   if (m) await act('admin_set_min_order', { p_amount: v });
+}
+function galiCard(rv) {
+  const g = D.settings.gali || { on: true, min: 3, radius_m: 150, bonus_hi: 'मुफ़्त धनिया-मिर्च', bonus_en: 'Free coriander & green chillies' };
+  return `<div class="card ${rv} d2" style="margin-top:14px"><b style="font-size:16px">🏘️ Gali group — padosi saath mangaayen</b>
+      <p class="mu" style="margin:4px 0 12px;line-height:1.55">Ek hi vendor ko, ek hi din aur slot me, paas-paas ke ghar book karein to group banta hai.
+        Itne ghar hote hi <b>har ghar ko inaam</b> — vendor order ke saath laata hai (app me paisa nahi badalta). Customer ko slot list pe
+        "2 padosi ne ye time book kiya" dikhta hai, success screen pe WhatsApp invite, aur group poora hote hi sabko + vendor ko notification.</p>
+      <label class="row" style="gap:10px;cursor:pointer;margin-bottom:12px"><input type="checkbox" id="galiOn" ${g.on ? 'checked' : ''} style="width:20px;height:20px">
+        <b>${g.on ? 'Chalu hai' : 'Band hai'}</b></label>
+      <div class="row" style="gap:10px;flex-wrap:wrap">
+        <label style="flex:1 1 140px"><span class="mu">Kitne ghar (2–10)</span><input class="fld" id="galiMin" inputmode="numeric" value="${esc(g.min)}"></label>
+        <label style="flex:1 1 140px"><span class="mu">Paas = kitne meter (50–1000)</span><input class="fld" id="galiRad" inputmode="numeric" value="${esc(g.radius_m)}"></label></div>
+      <div class="row" style="gap:10px;flex-wrap:wrap;margin-top:10px">
+        <label style="flex:1 1 220px"><span class="mu">Inaam (Hindi)</span><input class="fld" id="galiHi" maxlength="60" value="${esc(g.bonus_hi)}"></label>
+        <label style="flex:1 1 220px"><span class="mu">Inaam (English)</span><input class="fld" id="galiEn" maxlength="60" value="${esc(g.bonus_en)}"></label></div>
+      <div class="row" style="margin-top:12px;gap:12px;flex-wrap:wrap"><button class="btn btn-g" data-act="saveGali">Save</button>
+        <span class="mu">Aane wale orders jo poore group me hain: <b>${Number(D.settings.gali_orders || 0)}</b> · ab tak: <b>${Number(D.settings.gali_orders_all || 0)}</b>
+        ${D.settings.gali_updated_at ? ' · aakhri badlav ' + when(D.settings.gali_updated_at) : ''}</span></div></div>`;
+}
+async function saveGali() {
+  const on = $('galiOn').checked, mn = Math.round(Number($('galiMin').value)), rad = Math.round(Number($('galiRad').value));
+  const hi = $('galiHi').value.trim(), en = $('galiEn').value.trim();
+  if (!(mn >= 2 && mn <= 10)) return toast('Ghar 2 se 10 ke beech daalo');
+  if (!(rad >= 50 && rad <= 1000)) return toast('Doori 50 se 1000 meter ke beech daalo');
+  if (hi.length < 2 || en.length < 2) return toast('Inaam Hindi aur English dono me likho');
+  await act('admin_set_gali', { p_on: on, p_min: mn, p_radius: rad, p_bonus_hi: hi, p_bonus_en: en });
 }
 async function toggleOtp() {
   const on = !D.settings.customer_otp;
@@ -2464,6 +2491,7 @@ document.addEventListener('click', e => {
     case 'saveComm': saveComm(); break;
     case 'toggleOtp': toggleOtp(); break;
     case 'saveMinOrder': saveMinOrder(); break;
+    case 'saveGali': saveGali(); break;
     case 'customer': openCustomer(a); break;
     case 'staffActive': act('admin_set_staff_active', { p_staff: a, p_active: a2 === 'true' }); break;
     case 'markRead': act('admin_mark_message_read', { p_message: a, p_read: a2 === 'true' }, a2 === 'true' ? 'Padh liya ✓' : 'Unread'); break;

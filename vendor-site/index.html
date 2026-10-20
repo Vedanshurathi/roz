@@ -785,6 +785,31 @@ body.has-nav .scr{padding-bottom:200px}
 @keyframes gcBar{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1.3)}}
 @media (prefers-reduced-motion:reduce){#greetCard,#greetCard .gc-wave i{animation:none!important;transition:none!important}}
 .cav{width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:-5px;margin-right:6px;border:1.5px solid var(--line)}
+.live-slot:empty{display:none}
+.livebar{display:flex;align-items:center;gap:10px;width:100%;margin:0 0 12px;padding:11px 14px;border-radius:14px;border:0;
+  background:#0E5E2A;color:#fff;font:800 13px/1.35 inherit;font-family:inherit;box-shadow:0 6px 16px rgba(14,94,42,.25);text-align:left;cursor:pointer}
+.livebar.err{background:#B3261E}
+.livebar .ld{width:10px;height:10px;border-radius:50%;background:#7CFC9A;flex:none;box-shadow:0 0 0 0 rgba(124,252,154,.7);animation:ldp 1.6s infinite}
+.livebar.err .ld{background:#fff;animation:none}
+@keyframes ldp{0%{box-shadow:0 0 0 0 rgba(124,252,154,.7)}70%{box-shadow:0 0 0 9px rgba(124,252,154,0)}100%{box-shadow:0 0 0 0 rgba(124,252,154,0)}}
+@media (prefers-reduced-motion:reduce){.livebar .ld{animation:none}}
+.rcbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:12px 0 4px;padding:14px;border-radius:14px;border:0;
+  background:#1FAF5A;color:#fff;font:800 15px/1.3 inherit;font-family:inherit;box-shadow:0 6px 16px rgba(31,175,90,.3);cursor:pointer}
+.rcbtn.nudge{animation:rcn 1.4s ease-in-out infinite}
+@keyframes rcn{0%,100%{box-shadow:0 6px 16px rgba(31,175,90,.3)}50%{box-shadow:0 0 0 7px rgba(31,175,90,.25)}}
+@media (prefers-reduced-motion:reduce){.rcbtn.nudge{animation:none}}
+.rc-wrap{position:fixed;inset:0;z-index:260;display:none;align-items:flex-end;justify-content:center;background:rgba(16,21,15,.5)}
+.rc-wrap.on{display:flex}
+.rc-box{background:#fff;width:100%;max-width:520px;border-radius:22px 22px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:94vh;overflow-y:auto}
+.rc-box h3{font-family:var(--disp);font-size:19px;font-weight:800;display:flex;align-items:center;gap:10px}
+.rc-box h3 button{margin-left:auto;width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:16px}
+.rc-box p{font-size:13px;font-weight:700;color:var(--mut);margin:2px 0 12px}
+.rc-prev img{display:block;width:100%;max-height:58vh;object-fit:contain;border-radius:14px;background:#f3f2ef;box-shadow:0 8px 24px rgba(16,27,48,.15)}
+.rc-wait{height:300px;display:grid;place-items:center;font-weight:800;color:var(--mut);background:#f3f2ef;border-radius:14px}
+.rc-btns{display:flex;gap:10px;margin-top:14px}
+.rc-btns .btn{margin:0}
+.gali-tag{display:inline-flex;align-items:center;gap:5px;margin-top:5px;padding:3px 9px;border-radius:10px;background:#FFF1DE;color:#A04A00;font-size:11.5px;font-weight:800}
+.gali-tag.done{background:#E3F6E9;color:#0E6B32}
 </style>
 </head>
 <body>
@@ -1117,6 +1142,7 @@ body.has-nav .scr{padding-bottom:200px}
           <button class="btn btn-g btn-sm" onclick="askNotifVendor()" data-en="Yes, alert me" data-hi="हाँ, बताओ">Yes, alert me</button>
         </div>
       </div>
+      <div class="live-slot"></div>
       <div id="nextWrap"></div>
       <div id="runList"></div>
       <button class="btn btn-out" style="width:100%;margin-top:12px" onclick="go('orders')">📋 <span data-en="All orders — done, cancelled, earlier days" data-hi="सारे ऑर्डर — पूरे, कैंसल, पिछले दिन">All orders — done, cancelled, earlier days</span></button>
@@ -1131,6 +1157,7 @@ body.has-nav .scr{padding-bottom:200px}
     <button class="bk" onclick="go('home')" aria-label="Back">←</button>
     <div><h1 id="runTitle">Booking</h1><div class="sub" id="runSub"></div></div>
   </div>
+  <div class="wrap live-slot" style="padding-top:14px"></div>
   <div class="wrap" id="runBody" style="padding-top:16px"></div>
   <div class="bar"><div class="bar-in" id="runBar"></div></div>
 </div>
@@ -1206,6 +1233,7 @@ body.has-nav .scr{padding-bottom:200px}
     <div class="note blue"><span>📣</span>
       <span data-en="Customers see these rates before booking. Change them when the mandi rate changes."
             data-hi="ग्राहक बुकिंग से पहले यही रेट देखते हैं। मंडी का रेट बदले तो यहाँ भी बदल दो।">Customers see these rates before booking.</span></div>
+    <button class="rcbtn" id="rcBtn" onclick="openRateCard()">📤 <span data-en="Send today's rates on WhatsApp" data-hi="आज के रेट WhatsApp पर भेजो">Send today's rates on WhatsApp</span></button>
     <div id="pendBox"></div>
     <div class="sec-hd"><h2 data-en="Your items" data-hi="आपका सामान">Your items</h2>
       <span class="r" id="stockCount"></span></div>
@@ -1320,6 +1348,17 @@ body.has-nav .scr{padding-bottom:200px}
     <circle cx="12" cy="10" r="1.1" fill="#1F8A3D"/>
     <circle cx="15.5" cy="10" r="1.1" fill="#1F8A3D"/></svg>
 </button>
+<div class="rc-wrap" id="rcWrap" onclick="if(event.target===this)closeRateCard()">
+  <div class="rc-box">
+    <h3><span data-en="Your rates card" data-hi="आपका रेट कार्ड">Your rates card</span><button onclick="closeRateCard()" aria-label="Close">✕</button></h3>
+    <p data-en="Send it to your customers' WhatsApp groups and put it on Status" data-hi="ग्राहकों के WhatsApp ग्रुप में भेजो और Status पर लगाओ">Send it to your customers' WhatsApp groups and put it on Status</p>
+    <div class="rc-prev" id="rcPrev"></div>
+    <div class="rc-btns">
+      <button class="btn btn-out" style="flex:0 0 auto;width:auto;padding:0 18px" onclick="rcDownload()" data-en="Download" data-hi="डाउनलोड">Download</button>
+      <button class="btn btn-g" style="flex:1;background:#1FAF5A" onclick="rcShareNow()" data-en="Share on WhatsApp" data-hi="WhatsApp पर भेजो">Share on WhatsApp</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1549,6 +1588,244 @@ const ST_IN  = {placed:'new',on_the_way:'way',reached:'way',bill_final:'bill',
 const ACTIVE_ST = ['new','way','bill','paidwait','disp'];
 const ST_OUT = {way:'on_the_way', bill:'bill_final', paidwait:'paid', done:'delivered'};
 
+
+/* ---------------- MY RATES CARD (share on WhatsApp) ----------------
+   Same picture as the customer site's "Send today's rates", with the vendor's own name, photo and items.
+   A 1080×1350 picture of today's rates (logo, date, village, up to 12 items with photos, link + QR code) made on
+   a canvas in the phone. Shared with the phone's own share sheet (WhatsApp, Status, groups); where a browser
+   can't share pictures it is downloaded and the text goes to WhatsApp instead. The link carries
+   ?a=<village>&src=<wa_rates|wa_vendor> so the site opens on that village and counts the visit. */
+const RC_QR='1fddee7f,105b9541,1749165d,17506d5d,1747565d,1042bf41,1fd5557f,1b3e00,16e3ac4b,6bbe3f1,f759136,f1116c1,77c6a0c,a1d5ec7,1546bb17,72356c2,14f649a,517512e,13e0eca4,1fde94,851d9fc,18191f,1fd14f5a,1058f719,174f39f6,175bb8b9,175d0a25,1048238a,1fd687aa'
+  .split(',').map(h=>parseInt(h,16).toString(2).padStart(29,'0'));          /* https://rozbazaar.shop/?src=card */
+const RC_FONT="'Noto Sans Devanagari','Noto Sans','Mukta','Hind',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif";
+function rcLoad(src){
+  return new Promise(res=>{
+    if(!src) return res(null);
+    let done=false; const fin=v=>{ if(!done){ done=true; res(v); } };
+    const go=(u,retry)=>{ const i=new Image(); if(!/^data:/.test(u)) i.crossOrigin='anonymous';
+      i.onload=()=>fin(i); i.onerror=()=>{ if(retry && !/^data:/.test(u)) go(u+(u.includes('?')?'&':'?')+'rc=1', false); else fin(null); }; i.src=u; };
+    go(src, true); setTimeout(()=>fin(null), 7000);
+  });
+}
+function rcUnit(u, hi){
+  const s=String(u||'').trim().toLowerCase(); let m;
+  if(/^(1\s*)?(kg|kilo)$/.test(s)) return hi?'किलो':'kg';
+  if((m=s.match(/^([\d.]+)\s*kg$/))) return m[1]+(hi?' किलो':' kg');
+  if((m=s.match(/^([\d.]+)\s*(g|gm|gram)s?$/))) return m[1]+(hi?' ग्राम':' g');
+  if(/^(1\s*)?(pc|pcs|piece)$/.test(s)) return hi?'पीस':'piece';
+  if((m=s.match(/^([\d.]+)\s*(pc|pcs|piece)s?$/))) return m[1]+(hi?' पीस':' pcs');
+  if(/dozen|darjan/.test(s)) return hi?'दर्जन':'dozen';
+  if(/bunch|gaddi/.test(s)) return hi?'गड्डी':'bunch';
+  if(/bori/.test(s)) return hi?'बोरी':'sack';
+  return u||'';
+}
+function rcRound(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+function rcFit(g,text,max,size,weight){ let s=size; g.font=`${weight} ${s}px ${RC_FONT}`; while(g.measureText(text).width>max && s>18){ s-=2; g.font=`${weight} ${s}px ${RC_FONT}`; } return s; }
+/* opt: {hi:boolean, title, sub, items:[{name,sub,price,unit,photo,fallback}], who:{name,photo}|null, link, more} */
+async function rcDraw(opt){
+  const W=1080, H=1350, c=document.createElement('canvas'); c.width=W; c.height=H;
+  const g=c.getContext('2d'); g.textBaseline='alphabetic';
+  try{ if(document.fonts && document.fonts.load) await Promise.race([document.fonts.load(`800 40px ${RC_FONT}`,'आज के रेट'), new Promise(r=>setTimeout(r,1500))]); }catch(e){}
+  const logo=await rcLoad((document.querySelector('.duty-logo')||document.querySelector('.sp-logo')||{}).src);
+  const pics=await Promise.all(opt.items.map(it=>rcLoad(it.photo).then(im=>im||rcLoad(it.fallback))));
+  const whoPic=opt.who && opt.who.photo ? await rcLoad(opt.who.photo) : null;
+  /* background + header */
+  g.fillStyle='#FCF8F0'; g.fillRect(0,0,W,H);
+  const hg=g.createLinearGradient(0,0,W,330); hg.addColorStop(0,'#2FA850'); hg.addColorStop(1,'#14682c');
+  g.fillStyle=hg; rcRound(g,0,-40,W,370,48); g.fill();
+  g.globalAlpha=.08; g.fillStyle='#fff'; g.beginPath(); g.arc(W-90,40,190,0,7); g.fill(); g.beginPath(); g.arc(W-260,300,90,0,7); g.fill(); g.globalAlpha=1;
+  /* logo pill */
+  g.fillStyle='#fff'; rcRound(g,56,44,330,96,48); g.fill();
+  if(logo){ const lh=62, lw=logo.width*lh/logo.height; g.drawImage(logo, 56+(330-Math.min(lw,290))/2, 44+(96-lh)/2, Math.min(lw,290), lh*Math.min(lw,290)/lw); }
+  else { g.fillStyle='#1E8E3E'; g.font=`800 44px ${RC_FONT}`; g.fillText('RozBazaar',86,108); }
+  /* vendor photo or date chip on the right */
+  if(opt.who){
+    const cx=W-120, cy=92, r=56;
+    g.save(); g.beginPath(); g.arc(cx,cy,r,0,7); g.closePath(); g.fillStyle='#fff'; g.fill(); g.clip();
+    if(whoPic){ const s=Math.min(whoPic.width,whoPic.height); g.drawImage(whoPic,(whoPic.width-s)/2,(whoPic.height-s)/2,s,s,cx-r,cy-r,2*r,2*r); }
+    else { g.fillStyle='#E7F5DD'; g.fillRect(cx-r,cy-r,2*r,2*r); g.fillStyle='#14682c'; g.font=`800 54px ${RC_FONT}`; g.textAlign='center'; g.fillText((opt.who.name||'R').trim().charAt(0).toUpperCase(),cx,cy+19); g.textAlign='left'; }
+    g.restore(); g.lineWidth=6; g.strokeStyle='#fff'; g.beginPath(); g.arc(cx,cy,r,0,7); g.stroke();
+  }
+  g.fillStyle='#fff'; rcFit(g,opt.title,W-120,74,800); g.fillText(opt.title,60,232);
+  g.globalAlpha=.9; rcFit(g,opt.sub,W-120,34,700); g.fillText(opt.sub,60,286); g.globalAlpha=1;
+  /* rate cells: 2 columns (1 wide column for a short list), rows shrink to fit above the footer */
+  const n=opt.items.length, cols=n<=5?1:2, rows=Math.ceil(n/cols), gap=24, x0=60, rg=14;
+  const colW=cols===1 ? W-120 : (W-120-gap)/2, avail=1080-350-(opt.more?48:0);
+  const rowH=Math.max(84, Math.min(cols===1?136:124, Math.floor((avail-(rows-1)*rg)/rows)));
+  const top=350+(cols===1 ? Math.max(0, Math.floor((avail-rows*rowH-(rows-1)*rg)/2)) : 0);   /* a short list sits in the middle */
+  opt.items.forEach((it,i)=>{
+    const col=i%cols, row=Math.floor(i/cols), x=x0+col*(colW+gap), y=top+row*(rowH+rg);
+    g.save(); g.shadowColor='rgba(16,27,48,.08)'; g.shadowBlur=18; g.shadowOffsetY=6; g.fillStyle='#fff'; rcRound(g,x,y,colW,rowH,26); g.fill(); g.restore();
+    const pr=Math.min(cols===1?52:44, Math.floor(rowH/2)-10), pcx=x+16+pr, pcy=y+rowH/2;
+    g.save(); g.beginPath(); g.arc(pcx,pcy,pr,0,7); g.closePath(); g.fillStyle='#F3F2EF'; g.fill(); g.clip();
+    const im=pics[i];
+    if(im){ const s=Math.min(im.width,im.height), tr=/\.webp$/.test(String(im.src).split('?')[0]);
+      if(tr) g.drawImage(im, pcx-pr*.82, pcy-pr*.82, pr*1.64, pr*1.64); else g.drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,pcx-pr,pcy-pr,2*pr,2*pr); }
+    else { g.fillStyle='#1E8E3E'; g.font=`800 ${Math.round(pr*.86)}px ${RC_FONT}`; g.textAlign='center'; g.fillText(String(it.name).charAt(0),pcx,pcy+pr*.3); g.textAlign='left'; }
+    g.restore();
+    const tx=pcx+pr+18, priceW=cols===1?220:150, big=cols===1?44:38;
+    g.fillStyle='#16150F'; rcFit(g,it.name,colW-(tx-x)-priceW,big,800); g.fillText(it.name,tx,y+rowH*.47);
+    if(it.sub){ g.fillStyle='#918B7E'; rcFit(g,it.sub,colW-(tx-x)-priceW,cols===1?28:24,700); g.fillText(it.sub,tx,y+rowH*.76); }
+    g.textAlign='right'; g.fillStyle='#14682c'; g.font=`800 ${cols===1?52:46}px ${RC_FONT}`; g.fillText('₹'+it.price, x+colW-22, y+rowH*.5);
+    g.fillStyle='#5B564C'; rcFit(g,'/'+it.unit,priceW,cols===1?28:24,700); g.fillText('/'+it.unit, x+colW-22, y+rowH*.77); g.textAlign='left';
+  });
+  if(opt.more){ g.fillStyle='#5B564C'; g.font=`700 30px ${RC_FONT}`; g.textAlign='center';
+    g.fillText(opt.more, W/2, top+rows*(rowH+rg)+26); g.textAlign='left'; }
+  /* footer */
+  const fy=H-250;
+  g.fillStyle='#101B30'; rcRound(g,0,fy,W,300,48); g.fill();
+  g.fillStyle='#fff'; rcFit(g,opt.cta,W-400,50,800); g.fillText(opt.cta,60,fy+86);
+  g.fillStyle='#7ECB53'; g.font=`800 44px ${RC_FONT}`; g.fillText('rozbazaar.shop',60,fy+148);
+  g.globalAlpha=.75; g.fillStyle='#fff'; rcFit(g,opt.trust,W-400,27,700); g.fillText(opt.trust,60,fy+198); g.globalAlpha=1;
+  const qs=190, qx=W-60-qs, qy=fy+30, qn=RC_QR.length, m=(qs-24)/qn;
+  g.fillStyle='#fff'; rcRound(g,qx,qy,qs,qs,18); g.fill(); g.fillStyle='#101B30';
+  RC_QR.forEach((row,r)=>{ for(let k=0;k<qn;k++) if(row[k]==='1') g.fillRect(qx+12+k*m, qy+12+r*m, m+.4, m+.4); });
+  return c;
+}
+
+function rcToday(){ return istISO(0); }
+var RC={blob:null, url:null, text:'', name:''};
+async function openRateCard(){
+  await ensureProducts();
+  const list=liveProducts().filter(p=>p.stock && Number(p.price)>0).sort((a,b)=>Number(a.price)-Number(b.price));
+  if(!list.length) return toast(T('Add items with a rate first','पहले रेट के साथ सामान जोड़ो'));
+  const hi=LANG!=='en', items=list.slice(0,12), name=(vendorUser&&vendorUser.name)||(VENDOR&&VENDOR.name)||'RozBazaar';
+  const areas=((VENDOR&&VENDOR.areas_served)||[]).slice(0,3);
+  const d=new Date(), date=d.toLocaleDateString(hi?'hi-IN':'en-IN',{weekday:'long',day:'numeric',month:'long'});
+  const link='https://rozbazaar.shop/?'+(areas[0]?'a='+encodeURIComponent(areas[0])+'&':'')+'src=wa_vendor';
+  document.getElementById('rcWrap').classList.add('on');
+  document.getElementById('rcPrev').innerHTML=`<div class="rc-wait">${T('Making the picture…','फ़ोटो बन रही है…')}</div>`;
+  const c=await rcDraw({hi, title: hi?`${name} के आज के रेट`:`${name}'s rates today`,
+    sub: (areas.length?areas.join(', ')+' · ':'')+date,
+    items: items.map(p=>({name:hi?p.hi:(p.enName||p.en), sub:hi?(p.enName||''):p.hi, price:Number(p.price), unit:rcUnit(p.unit,hi), photo:p.img||p.stockImg, fallback:null})),
+    who:{name, photo:PHOTO}, more: list.length>12 ? (hi?`+ ${list.length-12} और सामान ऐप में`:`+ ${list.length-12} more items in the app`) : '',
+    cta: hi?'घर बैठे ऑर्डर करें — स्लॉट बुक करें':'Order from home — book a slot',
+    trust: hi?'मैं आपके घर आकर सामने तौलूँगा · कैश या UPI':'I come to your door and weigh in front of you · cash or UPI'});
+  RC.name='RozBazaar-'+name.replace(/[^A-Za-z0-9]+/g,'-')+'-'+rcToday()+'.jpg';
+  RC.text=(hi?`${name} — आज के रेट\n`:`${name} — today's rates\n`)
+    + items.slice(0,8).map(p=>`${hi?p.hi:(p.enName||p.en)} ₹${Number(p.price)}/${rcUnit(p.unit,hi)}`).join(', ')
+    + (hi?`\nघर बैठे ऑर्डर करें: ${link}`:`\nOrder from home: ${link}`);
+  await new Promise(res=>c.toBlob(b=>{
+    RC.blob=b; if(RC.url) URL.revokeObjectURL(RC.url); RC.url=b?URL.createObjectURL(b):null;
+    document.getElementById('rcPrev').innerHTML = RC.url ? `<img src="${RC.url}" alt="">` : `<div class="rc-wait">${T('Could not make the picture','फ़ोटो नहीं बनी')}</div>`;
+    res(); },'image/jpeg',.9));
+  try{ localStorage.setItem('rb_rc_day', rcToday()); }catch(e){}
+  paintRcBtn();
+  if(!DEMO) rpc('log_visit',{p_page:'vendor_rates_card'}).catch(()=>{});
+}
+async function rcShareNow(){
+  if(!RC.blob) return;
+  const file=new File([RC.blob],RC.name,{type:'image/jpeg'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file], text:RC.text}); return; }catch(e){ if(e && e.name==='AbortError') return; }
+  }
+  window.open('https://wa.me/?text='+encodeURIComponent(RC.text),'_blank');   /* straight from the tap, or it is blocked as a pop-up */
+  rcDownload();
+  toast(T('Picture saved — attach it in WhatsApp','फ़ोटो सेव हो गई — WhatsApp में लगाओ'));
+}
+function rcDownload(){ if(!RC.url) return; const a=document.createElement('a'); a.href=RC.url; a.download=RC.name; document.body.appendChild(a); a.click(); a.remove(); }
+function closeRateCard(){ document.getElementById('rcWrap').classList.remove('on'); }
+/* after the first rate change of the day the button asks to be used */
+function paintRcBtn(){
+  const b=document.getElementById('rcBtn'); if(!b) return;
+  let shared=''; try{ shared=localStorage.getItem('rb_rc_day')||''; }catch(e){}
+  const nudge = RC_CHANGED && shared!==rcToday();
+  b.classList.toggle('nudge', nudge);
+  b.innerHTML = nudge ? '📤 '+T('Rates changed — tell your customers on WhatsApp','रेट बदले — ग्राहकों को WhatsApp पर बताओ')
+                      : '📤 '+T("Send today's rates on WhatsApp",'आज के रेट WhatsApp पर भेजो');
+}
+var RC_CHANGED=false;
+
+
+/* gali group badge on an order (vendor_gali_groups, loaded with the day's orders) */
+var GALI_V={bonus_hi:'',bonus_en:''};
+function galiTag(r){
+  if(!r || !r.gali) return '';
+  return r.gali.complete
+    ? `<span class="gali-tag done">🏘️ ${T('Gali group · '+r.gali.houses+' houses — give '+GALI_V.bonus_en,'गली ग्रुप · '+r.gali.houses+' घर — दो '+GALI_V.bonus_hi)}</span>`
+    : `<span class="gali-tag">🏘️ ${T(r.gali.houses+' houses close together','पास-पास '+r.gali.houses+' घर')}</span>`;
+}
+
+/* ---------------- LIVE LOCATION while "on the way" ----------------
+   20 Oct 2026: when the vendor taps "I'm on the way", this phone's GPS is sent every ~15 s
+   (vendor_share_location) so that customer can watch the thela come on a map with an ETA.
+   Runs only while today has an order in on_the_way; stops by itself after "Reached" / when nothing is on
+   the way. The screen is kept awake (Wake Lock) because phones stop GPS for pages in the background.
+   Only the customer of that order can see it (customer_track checks). */
+var LIVE={watch:null, wake:null, last:null, sentAt:0, sentPos:null, err:'', orders:0, busy:false, later:null, hb:null};
+function liveWanted(){ return !DEMO && RUN_DAY===0 && RUNS.some(r=>r.raw==='on_the_way'); }
+function liveSync(){
+  if(liveWanted()) liveStart(); else liveStop();
+}
+function liveStart(){
+  LIVE.orders=RUNS.filter(r=>r.raw==='on_the_way').length;
+  if(!navigator.geolocation){ LIVE.err='nogps'; return paintLive(); }
+  if(LIVE.watch==null){
+    LIVE.err='';
+    LIVE.watch=navigator.geolocation.watchPosition(livePos, e=>{ LIVE.err = e.code===1 ? 'denied' : 'nofix'; paintLive(); },
+      {enableHighAccuracy:true, maximumAge:5000, timeout:30000});
+  }
+  /* a phone standing still sends no new GPS readings — repeat the last one every 20 s so the customer's map stays "live" */
+  if(!LIVE.hb) LIVE.hb=setInterval(()=>{ if(LIVE.last && Date.now()-LIVE.sentAt>=20000) livePos(LIVE.last, true); }, 5000);
+  liveWake(); paintLive();
+}
+function liveStop(){
+  if(LIVE.watch!=null){ try{ navigator.geolocation.clearWatch(LIVE.watch); }catch(e){} LIVE.watch=null; }
+  if(LIVE.wake){ try{ LIVE.wake.release(); }catch(e){} LIVE.wake=null; }
+  clearInterval(LIVE.hb); LIVE.hb=null; clearTimeout(LIVE.later); LIVE.later=null;
+  LIVE.err=''; LIVE.orders=0; LIVE.last=null; paintLive();
+}
+async function liveWake(){
+  if(LIVE.wake || !('wakeLock' in navigator) || document.hidden) return;
+  try{ LIVE.wake=await navigator.wakeLock.request('screen'); LIVE.wake.addEventListener('release',()=>{ LIVE.wake=null; }); }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden && LIVE.watch!=null){ liveWake(); if(LIVE.last) livePos(LIVE.last, true); } });
+function liveMoved(a,b){ if(!a||!b) return 1e9; const R=6371000, t=x=>x*Math.PI/180;
+  const dLa=t(b.lat-a.lat), dLo=t(b.lng-a.lng), h=Math.sin(dLa/2)**2+Math.cos(t(a.lat))*Math.cos(t(b.lat))*Math.sin(dLo/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h)); }
+async function livePos(pos, force){
+  LIVE.last=pos; LIVE.err='';
+  const c=pos.coords, now=Date.now(), here={lat:c.latitude, lng:c.longitude};
+  const far = liveMoved(LIVE.sentPos, here)>40;
+  const due = force || !LIVE.sentAt || now-LIVE.sentAt>=15000 || (now-LIVE.sentAt>=6000 && far);
+  paintLive();
+  if(!due || LIVE.busy){
+    /* too soon after the last send: send this reading when it is due, instead of dropping it */
+    clearTimeout(LIVE.later);
+    LIVE.later=setTimeout(()=>{ if(LIVE.watch!=null && LIVE.last) livePos(LIVE.last, true); }, Math.max(500, (far?6000:15000)-(now-LIVE.sentAt)));
+    return;
+  }
+  clearTimeout(LIVE.later); LIVE.later=null;
+  LIVE.busy=true;
+  try{
+    const r=await rpc('vendor_share_location',{p_lat:c.latitude, p_lng:c.longitude, p_acc:c.accuracy||null,
+      p_heading:(c.heading==null||isNaN(c.heading))?null:c.heading, p_speed:(c.speed==null||isNaN(c.speed))?null:c.speed});
+    if(r.ok){ LIVE.sentAt=now; LIVE.sentPos=here;
+      if(r.data && r.data.sharing===false){ RUNS.forEach(x=>{ if(x.raw==='on_the_way') x.raw='reached'; }); liveStop(); } }
+  }catch(e){}
+  LIVE.busy=false; paintLive();
+}
+function paintLive(){
+  const on = !!VENDOR && (LIVE.watch!=null || LIVE.err==='nogps');
+  let html='';
+  if(on){
+    const n=LIVE.orders||1, bad = !!LIVE.err && LIVE.err!=='nofix';
+    const t = LIVE.err==='denied' ? T('Location blocked — customers can’t see you coming. Tap to fix','लोकेशन बंद है — ग्राहक आपको आते नहीं देख पा रहे। ठीक करने के लिए दबाओ')
+      : LIVE.err==='nogps' ? T('This phone can’t share location','ये फ़ोन लोकेशन नहीं भेज सकता')
+      : !LIVE.last || LIVE.err==='nofix' ? T('Finding your location…','आपकी लोकेशन ढूँढ रहे हैं…')
+      : T(`Live location on — ${n} customer${n>1?'s':''} can see you coming. Keep the app open`,
+          `लाइव लोकेशन चालू — ${n} ग्राहक आपको आते देख रहे हैं। ऐप खुला रखो`);
+    html=`<button class="livebar${bad?' err':''}" onclick="liveBarTap()"><i class="ld"></i><span class="lt">${t}</span></button>`;
+  }
+  document.querySelectorAll('.live-slot').forEach(el=>{ if(el.innerHTML!==html) el.innerHTML=html; });
+}
+function liveBarTap(){
+  if(LIVE.err==='denied') toast(T('Phone Settings → Apps → Chrome (or RozBazaar Vendor) → Permissions → Location → Allow. Or tap 🔒 next to the website address.',
+    'फ़ोन सेटिंग्स → ऐप्स → Chrome → परमिशन → लोकेशन → Allow। या वेबसाइट के पते के पास 🔒 दबाओ।'));
+  else toast(T('Your location is shown only to customers whose order is on the way, and stops when you reach.',
+    'आपकी लोकेशन सिर्फ़ उन ग्राहकों को दिखती है जिनका ऑर्डर रास्ते में है, पहुँचते ही बंद हो जाती है।'));
+}
+
 /* ---------------- NEW-ORDER NOTIFICATION ----------------
    There was no polling at all before this — a vendor only ever found
    out about a new booking by manually reopening the home screen. This
@@ -1729,6 +2006,10 @@ async function api(fn, args={}){
       const r=await rpc('vendor_bookings',{p_date:istISO(RUN_DAY)});
       if(!r.ok) return r;
       RUNS=(r.data||[]).map(mapBooking);
+      /* gali groups: neighbours in the same slot — bring the bonus to every house of a complete group */
+      try{ const g=await rpc('vendor_gali_groups',{p_date:istISO(RUN_DAY)});
+        if(g.ok && g.data && g.data.on){ GALI_V=g.data; RUNS.forEach(x=>{ x.gali=(g.data.groups||{})[x.id]||null; }); } }catch(e){}
+      if(RUN_DAY===0) liveSync();
       return {ok:true, data:RUNS};
     }
     case 'getProducts': {
@@ -3617,6 +3898,7 @@ async function renderHome(){
             <span class="rslot">${s.em} ${LANG==='en'?s.en:s.hi}</span></span>
           <b>${r.photo?`<img class="cav" src="${r.photo}" alt="">`:''}${r.name}</b>
           <span class="addr">${r.house}, ${r.street} · 📍 ${r.landmark}</span>
+          ${galiTag(r)}
         </span>
         <span class="amt"><b>₹${r.final||runTotal(r)}</b>
           <span class="st ${stClass(r.status)}">${stName(r.status)}</span></span>
@@ -3678,6 +3960,7 @@ function renderRun(){
 
     <div class="card">${timeline(r.status)}</div>
 
+    ${r.gali&&r.gali.complete?`<div class="note" style="background:#E3F6E9"><span>🏘️</span><span>${T('Gali group — '+r.gali.houses+' houses close together in this slot. Give this house: ','गली ग्रुप — इस स्लॉट में '+r.gali.houses+' घर पास-पास। इस घर को दो: ')}<b>${LANG==='en'?GALI_V.bonus_en:GALI_V.bonus_hi}</b></span></div>`:''}
     ${r.note?`<div class="note blue"><span>📝</span><span>${T('Customer note: ','ग्राहक का नोट: ')}${r.note}</span></div>`:''}
 
     <div class="sec-hd"><h2>${r.bill?T('Final items','आख़िरी सामान'):T('What they ordered','क्या मंगाया है')}</h2>
@@ -3739,7 +4022,8 @@ async function setStatus(st){
   const res=await api('setStatus',{id:r.id, code:r.code, status:st});
   if(!res.ok && !res.offline) return toast(res.msg||T('Could not update','अपडेट नहीं हुआ'));
   r.status=st;
-  toast(st==='way'?T('Customer told you are coming','ग्राहक को बता दिया कि आप आ रहे हो'):'');
+  if(st==='way'){ r.raw='on_the_way'; liveSync(); }
+  toast(st==='way'?T('Customer told you are coming — they can see you on the map','ग्राहक को बता दिया — वो आपको नक्शे पर आते देख सकते हैं'):'');
   renderRun();
 }
 
@@ -4142,6 +4426,7 @@ async function renderStock(){
       <b>${T('You have not added anything yet','अभी कुछ नहीं जोड़ा')}</b>
       <p>${T('Tap "Add a new item" above to list your first item.','ऊपर "नया सामान जोड़ो" दबाओ और पहला सामान जोड़ो।')}</p></div>`;
   stagger('#stockList .card', 45);
+  paintRcBtn();
 }
 async function toggleStock(id){
   const p=prod(id); const newVal=!p.stock;
@@ -4160,6 +4445,7 @@ async function setStockPrice(id,v){
   const r=await api('saveStock',{prices:[{id, price:n}]});
   if(!r.ok){ p.price=old; renderStock(); return toast(r.msg||T('Could not save the rate — try again','रेट सेव नहीं हुआ — दोबारा कोशिश करो')); }
   toast(T(`${pname(p)}: ₹${n} saved — customers see it now`,`${pname(p)}: ₹${n} सेव — ग्राहक अब यही देखेंगे`));
+  RC_CHANGED=true; paintRcBtn();
 }
 async function saveStock(){
   const prices = PRODUCTS.filter(p=>!p.pending).map(p=>({id:p.id, price:p.price}));

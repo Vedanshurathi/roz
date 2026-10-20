@@ -439,3 +439,32 @@ tg_photo_to_file()  triggers: trg_products_photo_file (products.image_url), trg_
 rb_valid_photo(p)   also accepts https://srvpfyjmwaruebbkqkdj.supabase.co/storage/v1/object/public/item-photos/u/<32 hex>.(jpg|png|webp)
 ```
 Edge function `item-photos` mode `own` {token, table, id}: data URL → `item-photos/u/<sha256>.<ext>` → `photo_link_set`.
+
+### Live tracking (20 Oct 2026 — `20261020a_live_tracking.sql`)
+```
+vendor_live_location(vendor_id pk → vendors, lat, lng, acc, heading, speed, updated_at)   RLS on, no grants
+bookings.near_notified_at timestamptz        "almost there" sent (once per order)
+vendor_speed_kmh(p_vehicle text) → numeric   internal; thela 5 · cycle 10 · e-rickshaw/tempo 15 · bike 20 · unknown 12
+vendor_share_location(p_lat, p_lng, p_acc, p_heading, p_speed) → {sharing, orders}
+    only while the vendor has an on_the_way order (today/yesterday); 1 write per 4 s; India lat/lng only;
+    a fix ≤ 300 m within 0.7 km of a customer's pin → notify_person(… 'booking_near' …) once
+customer_track(p_booking) → {status, code, live, vendor{lat,lng,acc,heading,age_s}, dest{lat,lng,approx}, dist_km, eta_min, speed_kmh,
+    vendor_name, vendor_photo}   own booking only; position only while on_the_way and < 5 min old; ETA = km × 1.3 / speed
+```
+
+### Gali group (20 Oct 2026 — `20261020b_gali_groups.sql`)
+```
+app_settings.gali = {on, min, radius_m, bonus_hi, bonus_en}   defaults on / 3 houses / 150 m / मुफ़्त धनिया-मिर्च
+bookings.gali_notified_at timestamptz
+gali_cfg() → jsonb                         internal (settings merged over defaults)
+gali_members(p_booking) → (booking_id, customer_id)   internal; same vendor + date + slot, not cancelled/missed, address within
+                                           radius_m by GPS, or (no pin) same village + same street text; one row per customer
+customer_gali_status() → {on, min, bonus_hi, bonus_en, items[{booking_id, code, date, slot, houses, complete}]}   my next 14 days
+customer_gali_slots(p_date, p_vendor, p_address) → {on, min, bonus_*, slots{morning,afternoon,evening: neighbours}}   counts only
+vendor_gali_groups(p_date) → {on, min, bonus_*, groups{booking_id: {houses, complete}}}   orders with ≥ 2 houses
+admin_set_gali(p_on, p_min 2–10, p_radius 50–1000, p_bonus_hi, p_bonus_en) → logs 'gali_changed'
+trigger trg_gali_check (AFTER INSERT on bookings, not schedule spawns): group reaches min → notify_person 'gali_complete'
+    to every house not yet told (sets gali_notified_at) + the vendor
+admin_settings() also returns gali, gali_updated_at, gali_orders (upcoming), gali_orders_all
+public_app_config() also returns gali {on, min, bonus_hi, bonus_en}
+```
