@@ -735,6 +735,17 @@ select.field{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg 
   font-size:15px;font-weight:800;color:var(--tx2);transition:transform .17s var(--sp),border-color .2s}
 .ghostbtn:hover{border-color:var(--tx2)}
 .ghostbtn:active{transform:scale(.97)}
+/* outside the service area (admin → Settings → Service area) */
+.oos{padding:4px 20px 26px;text-align:center}
+.oos-ico{width:68px;height:68px;margin:2px auto 14px;border-radius:50%;background:var(--or-s);color:var(--or);display:grid;place-items:center;font-size:30px;animation:pop .35s var(--sp)}
+.oos-ico .ic{width:32px;height:32px}
+.oos .disp{display:block;font-size:20px;font-weight:800;letter-spacing:-.4px;line-height:1.25;color:var(--tx)}
+.oos p{font-size:14.5px;font-weight:600;color:var(--tx2);line-height:1.5;margin:8px auto 0;max-width:360px}
+.oos-vil{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:14px 0 2px}
+.oos-vil span{display:inline-flex;align-items:center;gap:4px;background:var(--lime-s);color:var(--g-dk);border-radius:99px;padding:6px 12px;font-size:12.5px;font-weight:800}
+.oos .oos-tip{font-size:12.5px;color:var(--mut);margin-top:12px}
+.oos .bigbtn{width:100%;margin-top:18px}
+.oos .ghostbtn{margin-top:10px}
 
 /* progress stepper */
 .step{display:flex;align-items:center;gap:0;margin:18px 0 6px}
@@ -1988,6 +1999,23 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
     </div>
     <div id="areaHint" style="padding:0 16px"></div>
     <div class="slots" id="areaList" style="padding:0 16px 26px"></div>
+  </div>
+</div>
+
+<!-- outside the delivery area -->
+<div class="sheet-wrap" id="oosSheet" style="z-index:175">
+  <div class="sheet-bg" onclick="closeOos()"></div>
+  <div class="sheet" role="dialog" aria-labelledby="oosH">
+    <div class="sheet-grab"></div>
+    <div class="oos">
+      <div class="oos-ico">📍</div>
+      <b class="disp" id="oosH">Thank you for using RozBazaar!</b>
+      <p id="oosMsg"></p>
+      <div class="oos-vil" id="oosVil"></div>
+      <p class="oos-tip" id="oosTip"></p>
+      <button class="bigbtn" id="oosMain" onclick="oosMain()">OK</button>
+      <button class="ghostbtn" id="oosOk" onclick="closeOos()">OK</button>
+    </div>
   </div>
 </div>
 
@@ -3651,7 +3679,7 @@ function showLocAsk(){
                   document.getElementById('locAsk').classList.add('on');};
   if(navigator.permissions){
     navigator.permissions.query({name:'geolocation'}).then(st=>{
-      if(st.state==='granted') return detectArea();
+      if(st.state==='granted') return detectArea(true);
       if(st.state==='denied')  return;
       open();
     }).catch(open);
@@ -3665,7 +3693,7 @@ function dismissLocAsk(){
 function allowLoc(){ dismissLocAsk(); detectArea(); }
 function chooseLocManually(){ dismissLocAsk(); openAreaPicker(); }
 
-async function detectArea(){
+async function detectArea(auto){
   if(!navigator.geolocation)
     return toast(T('This phone cannot share location','यह फ़ोन लोकेशन नहीं दे सकता'));
   if(navigator.permissions){
@@ -3687,9 +3715,14 @@ async function detectArea(){
       return toast(T('Could not match an area — pick from the list','इलाका मेल नहीं खाया — सूची में से चुनें'));
     const d=r.data;
     if(!d.in_range){
-      closeAreaPicker();
-      return toast(T('You are about '+d.distance+' km from '+d.area+' — we do not reach there yet',
-                     'आप '+d.area+' से ~'+d.distance+' किमी दूर हैं — अभी हम वहाँ नहीं पहुँचते'));
+      /* Outside the service area (default 8 km around the live villages) → the "not in your area yet"
+         sheet. The fix's own error margin counts in the person's favour, so a rough reading near the edge
+         doesn't turn someone away; the saved address pin is checked exactly by the server. */
+      const far = d.distance - Math.min(pos.coords.accuracy||0, 2000)/1000 > SERVICE_KM;
+      if(far){ closeAreaPicker(); return openOos({km:d.distance, nearest:d.area}, 'loc', auto); }
+      /* inside the service area but between villages → ask which one, nearest first */
+      GUESS = d; openAreaPicker();
+      return toast(T('You are near '+d.area+' — please pick your village','आप '+d.area+' के पास हैं — अपना गाँव चुनें'));
     }
     /* Only switch silently when the backend is sure. Village coordinates
        start out approximate, and two villages can sit 100 m apart in the
@@ -4960,6 +4993,13 @@ async function matchAreaFromCoords(lat,lng){
   if(DEMO) return;
   const fb=document.getElementById('areaDetected');
   const r=await rpc('area_from_point',{p_lat:lat, p_lng:lng});
+  if(r.ok && r.data && !r.data.in_range && r.data.distance > SERVICE_KM){
+    if(fb){ fb.style.display='block'; fb.style.color='var(--red,#E14B4B)';
+      fb.textContent=T(`This spot is outside our delivery area (about ${fmtKm(r.data.distance)} km from ${r.data.area}). Move the pin onto the house — we deliver within ${SERVICE_KM} km of ${listJoin(serviceNames())}.`,
+                        `यह जगह हमारे इलाके से बाहर है (${r.data.area} से लगभग ${fmtKm(r.data.distance)} किमी)। पिन को घर पर रखें — हम ${listJoin(serviceNames())} के ${SERVICE_KM} किमी के अंदर ही पहुँचाते हैं।`); }
+    if(Date.now()-OOS_ADDR_AT>60000){ OOS_ADDR_AT=Date.now(); openOos({km:r.data.distance, nearest:r.data.area}, 'addr'); }
+    return;
+  }
   if(!r.ok || !r.data || !r.data.in_range){
     if(fb){ fb.style.display='block'; fb.style.color='var(--mut)';
       fb.textContent=T("Couldn't match a village automatically — please pick yours below",
@@ -5073,6 +5113,11 @@ async function saveAddress(){
     label=document.getElementById('aLabel').value.trim();
     if(!label) return focusErr('aLabel', T('Give this address a name — e.g. Office','इस पते का नाम लिखें — जैसे: ऑफ़िस'));
   }
+  if(addrCoords && !DEMO){
+    await loadAreas();
+    const sc=serviceCheck(addrCoords.lat, addrCoords.lng);
+    if(sc && !sc.inside) return openOos(sc, 'addr');
+  }
   const was=EDIT_ID?ADDRS.find(a=>a.id===EDIT_ID):null;
   addr={id:EDIT_ID||null, is_default:!!(was&&was.is_default), house:h, street:st, area:ar, land:ld,
         note:document.getElementById('aNote').value.trim(),
@@ -5086,6 +5131,7 @@ async function saveAddress(){
     if(btn){ btn.disabled=true; btn.style.opacity='.6'; }
     const r=await saveAddressToDb();
     if(btn){ btn.disabled=false; btn.style.opacity=''; }
+    if(!r.ok && r.code==='OUT_OF_AREA'){ if(was) addr=was; return openOos(r.data, 'addr'); }
     if(!r.ok) return toast(T('Could not save the address — ','पता सेव नहीं हुआ — ')+(r.msg||T('check your internet','इंटरनेट देखें')));
   }else{
     /* not logged in yet: keep it on this phone so it survives the Google login redirect */
@@ -5197,6 +5243,59 @@ function addrLine(){
 }
 
 
+/* ---------- service area ----------
+   RozBazaar delivers only within SERVICE_KM (admin → Settings → "Service area", default 8 km) of the live
+   villages. Outside it the customer gets a thank-you + "not in your area yet" sheet instead of an error.
+   The server refuses saving such an address pin and booking to it (code OUT_OF_AREA); this is the friendly face. */
+let SERVICE_KM=8, OOS_FROM=null, OOS_ADDR_AT=0;
+function kmTo(lat1,lng1,lat2,lng2){ const r=Math.PI/180, dLa=(lat2-lat1)*r, dLo=(lng2-lng1)*r;
+  const a=Math.sin(dLa/2)**2+Math.cos(lat1*r)*Math.cos(lat2*r)*Math.sin(dLo/2)**2; return 12742*Math.asin(Math.min(1,Math.sqrt(a))); }
+function serviceVillages(){ return (AREAS||[]).filter(a=>a && typeof a==='object' && a.lat!=null && a.lng!=null); }
+function serviceNames(){ const v=serviceVillages().map(a=>a.name); return v.length ? v : (AREAS||[]).map(a=>typeof a==='string'?a:a.name); }
+/* null = can't tell yet (village points not loaded) → the server decides */
+function serviceCheck(lat,lng){
+  const v=serviceVillages(); if(!v.length || lat==null || lng==null) return null;
+  let best=null; v.forEach(a=>{ const k=kmTo(+lat,+lng,+a.lat,+a.lng); if(!best || k<best.km) best={km:k, nearest:a.name}; });
+  return {inside: best.km<=SERVICE_KM, km:Math.round(best.km*10)/10, nearest:best.nearest, service_km:SERVICE_KM, villages:v.map(a=>a.name)};
+}
+function fmtKm(k){ k=Number(k)||0; return k>=10 ? Math.round(k) : Math.round(k*10)/10; }
+function listJoin(a){ a=(a||[]).filter(Boolean); return a.length<2 ? (a[0]||'') : a.slice(0,-1).join(', ')+T(' and ',' और ')+a[a.length-1]; }
+function openOos(d, from, auto){
+  d=d||{}; OOS_FROM=from||'loc';
+  const today=istISO(0);
+  if(auto){ let seen=''; try{ seen=localStorage.getItem('rb_oos_day')||''; }catch(e){}
+    if(seen===today) return; }                       /* shown by itself once a day at most; a tap always shows it */
+  try{ localStorage.setItem('rb_oos_day', today); }catch(e){}
+  const km=Number(d.service_km)||SERVICE_KM, vil=(d.villages&&d.villages.length) ? d.villages : serviceNames();
+  const away = d.km!=null && d.nearest
+    ? T(` You are about ${fmtKm(d.km)} km from ${d.nearest}.`, ` आप ${d.nearest} से लगभग ${fmtKm(d.km)} किमी दूर हैं।`) : '';
+  const pinAway = d.km!=null && d.nearest
+    ? T(` This pin is about ${fmtKm(d.km)} km from ${d.nearest}.`, ` यह पिन ${d.nearest} से लगभग ${fmtKm(d.km)} किमी दूर है।`) : '';
+  document.getElementById('oosH').textContent=T('Thank you for using RozBazaar!','RozBazaar इस्तेमाल करने के लिए धन्यवाद!');
+  document.getElementById('oosMsg').textContent =
+    T(`We're not in your area yet — we deliver within ${km} km of ${listJoin(vil)}.`, `अभी हम आपके इलाके में नहीं पहुँचते — हम ${listJoin(vil)} के ${km} किमी के अंदर ही सामान पहुँचाते हैं।`)
+    + (OOS_FROM==='loc' ? away : pinAway);
+  document.getElementById('oosVil').innerHTML = vil.map(n=>`<span>📍 ${esc(n)}</span>`).join('');
+  document.getElementById('oosTip').textContent = OOS_FROM==='loc'
+    ? T('Ordering for family in one of these villages? Pick the village, then put the pin on their house.','इन गाँवों में किसी अपने के लिए मँगाना है? गाँव चुनें, फिर पिन उनके घर पर लगाएँ।')
+    : T('If the pin is in the wrong place, move it onto the house in the village.','अगर पिन गलत जगह लगा है, तो उसे गाँव में घर पर रखें।');
+  const main=document.getElementById('oosMain'), ok=document.getElementById('oosOk');
+  main.textContent = OOS_FROM==='loc' ? T('Pick a village','गाँव चुनें')
+                   : OOS_FROM==='book' ? T('Change the address pin','पते का पिन बदलें')
+                   : T('OK — move the pin','ठीक है — पिन सही जगह रखें');
+  ok.textContent = T('OK','ठीक है'); ok.style.display = OOS_FROM==='addr' ? 'none' : '';
+  const tt=document.getElementById('toast'); if(tt) tt.classList.remove('show');   /* "Booking…" would sit on top of it */
+  document.getElementById('oosSheet').classList.add('on');
+  if(!DEMO) rpc('log_visit',{p_page:'out_of_area'}).catch(()=>{});
+}
+function closeOos(){ document.getElementById('oosSheet').classList.remove('on'); }
+function oosMain(){
+  const from=OOS_FROM; closeOos();
+  if(from==='loc') return openAreaPicker();
+  if(from==='book') return openAddrEditor(addr && addr.id);
+  const m=document.getElementById('pinWrap'); if(m && !m.hidden) m.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
 /* admin-set values the page needs (minimum order) — public_app_config() works before login */
 async function loadAppConfig(){
   if(DEMO) return;
@@ -5205,6 +5304,7 @@ async function loadAppConfig(){
     const m=r.ok && r.data ? Number(r.data.min_order) : NaN;
     if(m>=0 && m!==MIN_BASKET){ MIN_BASKET=m; syncCart(); if(document.getElementById('s-basket').classList.contains('on')) renderBasket(); }
     if(r.ok && r.data && r.data.gali){ GALI=r.data.gali; paintGaliCard(); }
+    if(r.ok && r.data && Number(r.data.service_km)>0) SERVICE_KM=Number(r.data.service_km);
   }catch(e){}
 }
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') loadAppConfig(); });
@@ -5574,6 +5674,7 @@ async function createBooking(){
   }
   if(!done.length){
     const res=failed[0].res;
+    if(res.code==='OUT_OF_AREA') return openOos(res.data, 'book');
     if(res.code==='OUT_OF_STOCK' || res.code==='OTHER_VENDOR'){ await refreshCatalogue(true); if(!document.getElementById('s-basket').classList.contains('on')) go('basket'); else renderBasket(); }
     if(res.code==='VENDOR_FULL' || res.code==='NO_VENDOR' || res.code==='SLOT_PAST'){ sel.slot=null; go('slot'); }
     if(res.code==='BELOW_MIN'){ await loadAppConfig(); go('basket'); }

@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Jq6sPcf0BhXY3JkayYfvfReXsqNmT27TtpKjRwSKcMo=' https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co https://server.arcgisonline.com https://tile.openstreetmap.org; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Ts7BN5sfivMhSOv/Kt/63yiY64yVk8UsYyuCIQYILGk=' https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co https://server.arcgisonline.com https://tile.openstreetmap.org; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -1857,6 +1857,7 @@ function vSettings(el, rv) {
         <input class="fld" id="minOrder" inputmode="numeric" value="${D.settings.min_order ?? 50}" style="padding-left:30px;font-size:20px;font-weight:800"></div>
         <button class="btn btn-g" data-act="saveMinOrder">Save</button>
         <span class="mu">${D.settings.min_order_updated_at ? 'Aakhri badlav ' + when(D.settings.min_order_updated_at) : 'Abhi default ₹50'}</span></div></div>
+    ${serviceCard(rv)}
     ${galiCard(rv)}
     <div class="card ${rv} d2" style="margin-top:14px"><b style="font-size:16px">🔑 Customer login: SMS OTP</b>
       <p class="mu" style="margin:4px 0 12px;line-height:1.55">Abhi: <b>${D.settings.customer_otp ? 'ON — phone login pe SMS code lagta hai' : 'OFF — sirf naam + number (koi bhi number daal ke login kar sakta hai)'}</b>.<br>
@@ -1879,6 +1880,25 @@ async function saveMinOrder() {
   if (!(v >= 0 && v <= 5000)) return toast('₹0 se ₹5000 ke beech daalo');
   const m = await modal({ title: `Minimum order ₹${v} karein?`, sub: `Abhi ₹${D.settings.min_order ?? 50} hai. Customers ko turant naya minimum dikhega.`, ok: 'Haan, badlo' });
   if (m) await act('admin_set_min_order', { p_amount: v });
+}
+function serviceCard(rv) {
+  const km = Number(D.settings.service_km ?? 8), vil = D.settings.service_villages || [], out = Number(D.settings.service_outside_addresses || 0);
+  return `<div class="card ${rv} d2" style="margin-top:14px"><b style="font-size:16px">📍 Service area — kitni door tak delivery</b>
+      <p class="mu" style="margin:4px 0 12px;line-height:1.55">Live gaon (${vil.length ? vil.map(esc).join(', ') : 'koi gaon location ke saath nahi'}) se itne km ke andar hi
+        delivery. Bahar ki location pe customer ko dikhta hai: <b>"RozBazaar use karne ke liye dhanyavaad! Abhi hum aapke ilaake me nahi pahunchte"</b>.
+        Bahar ke pin wala pata save nahi hota aur us pate pe booking nahi hoti. Gaon list me chun ke (bina pin) koi bhi apne gaon ke liye order kar sakta hai.
+        Naya gaon Villages tab me location ke saath jodo — wo apne aap service area me aa jaata hai.</p>
+      <div class="row"><div style="position:relative;flex:0 0 140px"><input class="fld" id="serviceKm" inputmode="decimal" value="${esc(km)}" style="padding-right:40px;font-size:20px;font-weight:800">
+        <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-weight:800;color:var(--mut)">km</span></div>
+        <button class="btn btn-g" data-act="saveServiceKm">Save</button>
+        <span class="mu">${D.settings.service_km_updated_at ? 'Aakhri badlav ' + when(D.settings.service_km_updated_at) : 'Abhi default 8 km'}</span></div>
+      <div class="mu" style="margin-top:10px">${out ? `⚠️ <b>${out}</b> saved pate ka pin abhi bahar hai — un pate pe booking nahi hogi (customer ko pin badalne ko kaha jaata hai).` : 'Saare saved pate andar hain ✓'}</div></div>`;
+}
+async function saveServiceKm() {
+  const v = Math.round(parseFloat(String($('serviceKm').value).replace(',', '.')) * 10) / 10;
+  if (!(v >= 1 && v <= 50)) return toast('1 se 50 km ke beech daalo');
+  const m = await modal({ title: `Service area ${v} km karein?`, sub: `Abhi ${D.settings.service_km ?? 8} km hai. Website aur app pe turant lagu.`, ok: 'Haan, badlo' });
+  if (m) await act('admin_set_service_km', { p_km: v });
 }
 function galiCard(rv) {
   const g = D.settings.gali || { on: true, min: 3, radius_m: 150, bonus_hi: 'मुफ़्त धनिया-मिर्च', bonus_en: 'Free coriander & green chillies' };
@@ -2492,6 +2512,7 @@ document.addEventListener('click', e => {
     case 'toggleOtp': toggleOtp(); break;
     case 'saveMinOrder': saveMinOrder(); break;
     case 'saveGali': saveGali(); break;
+    case 'saveServiceKm': saveServiceKm(); break;
     case 'customer': openCustomer(a); break;
     case 'staffActive': act('admin_set_staff_active', { p_staff: a, p_active: a2 === 'true' }); break;
     case 'markRead': act('admin_mark_message_read', { p_message: a, p_read: a2 === 'true' }, a2 === 'true' ? 'Padh liya ✓' : 'Unread'); break;

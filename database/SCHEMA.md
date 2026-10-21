@@ -280,7 +280,7 @@ customer_last_order() [definer]
 customer_my_addresses() [definer]
 customer_my_bookings(p_limit=30) [definer]
 customer_phone_login(p_name, p_phone) [definer]        ← phone-only login, no OTP (deliberate); a 2nd device is LINKED (customer_logins), not moved
-public_app_config() [definer, anon]                     ← {min_order, otp} for the customer site
+public_app_config() [definer, anon]                     ← {min_order, otp, gali, service_km} for the customer site
 customer_cart_get() [definer]                          ← shared basket {items:{product:qty}, vendor_id, rev} (16 Oct 2026)
 customer_cart_apply(p_changes jsonb, p_vendor uuid, p_clear bool) [definer]   ← absolute qty per product, 0 = remove
 customer_rate(p_booking, p_stars, p_comment) [definer]
@@ -469,4 +469,18 @@ trigger trg_gali_check (AFTER INSERT on bookings, not schedule spawns): group re
     to every house not yet told (sets gali_notified_at) + the vendor
 admin_settings() also returns gali, gali_updated_at, gali_orders (upcoming), gali_orders_all
 public_app_config() also returns gali {on, min, bonus_hi, bonus_en}
+```
+
+### Service area (21 Oct 2026 — `20261021b_service_area.sql`)
+```
+app_settings.service_km = number (default 8)   delivery only within this many km of an active village that has lat/lng
+service_km() → numeric                     internal
+service_area_check(p_lat, p_lng) → {inside, km, nearest, service_km, villages[]}   [anon] distance to the nearest such village
+service_area_msg() → text                  internal; "Thank you for using RozBazaar! We don't deliver to your area yet — …" (tr_dev)
+customer_save_address(…)                   pin outside → {ok:false, code:'OUT_OF_AREA', msg, data: check}; no pin = allowed
+                                           (ordering for family by picking the village); lat without lng (or the reverse) → both null
+customer_create_booking(…)                 address pin outside → OUT_OF_AREA (same shape). Existing far pins were NOT changed.
+admin_set_service_km(p_km 1–50) → logs 'service_km_changed'
+admin_settings() also returns service_km, service_km_updated_at, service_villages[], service_outside_addresses (saved pins outside)
+public_app_config() also returns service_km
 ```

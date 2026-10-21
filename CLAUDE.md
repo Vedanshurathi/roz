@@ -684,6 +684,23 @@ Still open by choice: phone login has no OTP until an SMS provider is set (anyon
 - Not testable here without a real phone: speech recognition inside the Play-Store app (TWA), GPS while walking, Wake Lock,
   the Android share sheet. Everything else was tested in the browser with fakes, and the DB parts with rolled-back transactions.
 
+### Service area — "not in your area yet" (21 Oct 2026, migration `20261021b_service_area.sql`)
+- Vedanshu: anyone more than 8–10 km from Khandewla / Jatola gets "Thank you for using RozBazaar, but it's not available in your
+  area". `app_settings.service_km` (default **8**, admin → Settings → "Service area", `admin_set_service_km` 1–50) = distance from the
+  nearest active village that has a location. A new village added with a location in admin → Villages joins the area by itself.
+- Server: `customer_save_address` refuses a pin outside (code `OUT_OF_AREA`, `data` = `service_area_check()`), `customer_create_booking`
+  refuses an address whose pin is outside. An address with NO pin (village picked from the list) is allowed — that is how someone
+  orders for family in a village. The 4 old far-away pins were left as they are (Vedanshu said no to clearing them); those
+  customers see the sheet with "Change the address pin" when they book. Admin Settings shows how many saved pins are outside.
+- Customer site: `#oosSheet` (`openOos(d, from)`; from = `loc` → "Pick a village", `addr` → stay and move the pin, `book` →
+  "Change the address pin" = `openAddrEditor(addr.id)`). Shown by `detectArea()` when the GPS fix minus its error margin is beyond
+  `SERVICE_KM` (on its own once a day, `rb_oos_day`; a tap on "Use my location" always shows it), by the address screen when the pin
+  lands outside (`matchAreaFromCoords`, red line under the village + the sheet at most once a minute), before saving
+  (`serviceCheck()` against `AREAS` lat/lng — also covers guests, whose address is only kept on the phone) and on the server codes.
+  Between a village's own radius and `SERVICE_KM` the village list opens with "You are near X — please pick your village"
+  (it used to say "we do not reach there" for anyone beyond the 2 km village radius). Logged as `log_visit('out_of_area')`.
+- The platform/ API is not updated for this (not deployed); it passes the server's message through.
+
 ### Key business logic in the DB
 - `match_vendor()` — auto-assigns least-loaded, best-rated vendor for a slot.
 - `vendor_covers_area_in_slot(vendor, area, slot)` — the single source of truth
