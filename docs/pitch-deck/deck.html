@@ -16,8 +16,9 @@
 @page{size:1920px 1080px;margin:0}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:#555}
-body{font-family:var(--ui);color:var(--tx);-webkit-font-smoothing:antialiased}
-.slide{width:1920px;height:1080px;position:relative;overflow:hidden;background:var(--cream);break-after:page;page-break-after:always}
+body{font-family:var(--ui);color:var(--tx);-webkit-font-smoothing:antialiased;counter-reset:slide}
+.slide{width:1920px;height:1080px;position:relative;overflow:hidden;background:var(--cream);break-after:page;page-break-after:always;counter-increment:slide}
+.ft .pg::before{content:counter(slide, decimal-leading-zero)}
 .slide.white{background:#fff}
 .slide.dark{background:var(--navy);color:#fff}
 .slide.dark .glow{position:absolute;right:-300px;top:-420px;width:1400px;height:1400px;border-radius:50%;
@@ -146,8 +147,18 @@ b,strong{font-weight:700;color:var(--tx)}
 .s7 .it i{position:absolute;left:0;top:28px;width:22px;height:22px;border-radius:50%}
 .s7 .big{font-family:var(--disp);font-weight:800;font-size:58px;letter-spacing:-.04em;line-height:1}
 .s7 .big small{font-size:25px;color:var(--or-lt);letter-spacing:0;margin-left:6px}
-.s7 .it p{margin-top:10px;font-size:23px;color:#C6CBD5;line-height:1.4;max-width:960px}
-.s7 .src{color:#7E8695}
+.s7 .it p{margin-top:10px;font-size:22px;color:#C6CBD5;line-height:1.4;max-width:990px}
+.s7 .src{color:#7E8695;line-height:1.5;bottom:70px}
+
+/* ---------- why now (after market) ---------- */
+.s7b .stats{position:absolute;left:120px;right:120px;top:401px;display:grid;grid-template-columns:repeat(4,1fr);gap:29px}
+.s7b .st{height:300px;padding:38px 32px}
+.s7b .n{font-family:var(--disp);font-weight:800;font-size:58px;letter-spacing:-.045em;line-height:1;white-space:nowrap}
+.s7b .grn{color:var(--g)} .s7b .org{color:var(--or)}
+.s7b .st p{margin-top:24px;font-size:22px;line-height:1.45;color:var(--tx2)}
+.s7b .bn{position:absolute;left:120px;right:120px;top:735px;height:96px;border-radius:26px;background:var(--navy);display:flex;align-items:center;gap:24px;padding:0 38px;font-size:24px;color:#D6DAE2;line-height:1.35}
+.s7b .bn .ic{color:var(--or);font-size:34px}
+.s7b .bn b{color:#fff}
 
 /* ---------- 8 business model ---------- */
 .s8 .flow{position:absolute;left:120px;right:120px;top:400px;height:210px}
@@ -304,7 +315,7 @@ b,strong{font-weight:700;color:var(--tx)}
   <div class="t">Your village vendor.<br><span class="o">In your time slot.</span></div>
   <div class="hl">आपका गाँव का सब्ज़ीवाला — आपके टाइम पर</div>
   <div class="p">Slot-based doorstep delivery of fresh vegetables, fruit and onion-potato by trusted local vendors — built for India's villages.</div>
-  <div class="chips"><span>Pitch Deck · Eureka! Junior 2026</span><span>Team ID <em>EJ26T161683</em></span><span>Founder · Vedanshu Rathi</span></div>
+  <div class="chips"><span>Pitch Deck · October 2026</span><span><em>Live</em> in Khandewla &amp; Jatola</span><span>Founder · Vedanshu Rathi</span></div>
 </section>
 
 <!-- 2 PROBLEM -->
@@ -335,7 +346,7 @@ b,strong{font-weight:700;color:var(--tx)}
   <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05" />
 </svg></span><span><b>Vendors lose too.</b> Carts full of stock walk empty lanes — no idea who wants what, or when. No digital way to reach customers.</span></div>
   <div class="src">Source: RozBazaar primary survey, residents of the Pataudi–Haileymandi belt, Haryana (n = 10), Sept 2026.</div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">02</span></div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 <!-- 3 ALTERNATIVES -->
@@ -406,7 +417,7 @@ b,strong{font-weight:700;color:var(--tx)}
 </svg></span></div><h3>Quick-commerce apps</h3><p>Built for metro dark stores — they don't reach villages.</p><span class="chip">100% not served</span></div>
   </div>
   <div class="gap"><span class="pill">THE GAP</span><span>Trusted <b>local vendors</b> + the <b>convenience</b> of a booking app. Nobody offers both.</span></div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">03</span></div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 <!-- 4 SOLUTION -->
@@ -526,7 +537,7 @@ b,strong{font-weight:700;color:var(--tx)}
   <div class="ph" style="left:1528px;top:142px;width:336px;transform:perspective(2000px) rotateY(-10deg) rotateZ(3deg)"><img src="assets/s-booked.jpg" alt=""></div>
   <div class="cap" style="left:1250px;top:908px;transform:rotate(-4deg)">Pick a slot</div>
   <div class="cap" style="left:1600px;top:874px;transform:rotate(3deg)">Booked · code</div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">04</span></div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 <!-- 5 PRODUCT -->
@@ -621,7 +632,7 @@ b,strong{font-weight:700;color:var(--tx)}
   <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
 </svg></span><div><b>Push alerts</b><span>Hindi &amp; English</span></div></div>
   </div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">05</span></div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 <!-- 6 NEW SINCE LAUNCH -->
@@ -698,7 +709,7 @@ b,strong{font-weight:700;color:var(--tx)}
   <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
 </svg></span>Gali group order</h3><p>3 neighbours book the same vendor and slot → every house gets free dhaniya-mirch. Neighbours bring neighbours.</p></div></div>
   </div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">06</span></div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 <!-- 7 MARKET -->
@@ -712,12 +723,43 @@ b,strong{font-weight:700;color:var(--tx)}
   <div class="lbl" style="top:563px;color:var(--or-lt)">SAM</div>
   <div class="lbl" style="top:776px;color:var(--navy)">SOM</div>
   <div class="list">
-    <div class="it"><i style="background:#5FA572"></i><div class="big">₹3.3 lakh cr<small>/ year</small></div><p><b>Rural India</b> — fresh vegetable &amp; fruit spend of ~17.9 crore rural households</p></div>
-    <div class="it"><i style="background:#B98A4F"></i><div class="big">₹5,600 cr<small>/ year</small></div><p><b>Rural Haryana</b> — 30.4 lakh households in 6,841 villages</p></div>
-    <div class="it"><i style="background:var(--or-lt)"></i><div class="big">₹7.8 cr GMV<small>→ ₹78 L revenue</small></div><p><b>Our 3-year target</b> — 5,000 homes in the Pataudi–Haileymandi belt, 2 orders a week of ₹150</p></div>
+    <div class="it"><i style="background:#5FA572"></i><div class="big">₹3.9 lakh cr<small>/ year</small></div><p><b>Rural India</b> — ~91 crore people × ₹358 a month on vegetables &amp; fresh fruit</p></div>
+    <div class="it"><i style="background:#B98A4F"></i><div class="big">₹9,900 cr<small>/ year</small></div><p><b>Rural Haryana</b> — 1.76 crore people at ₹467 a month; Haryana's villages spend 30% more than India's rural average</p></div>
+    <div class="it"><i style="background:var(--or-lt)"></i><div class="big">₹7.8 cr GMV<small>→ ₹78 L revenue</small></div><p><b>Our 3-year target</b> — 5,000 homes (about 1 in 10) in the Pataudi–Farrukhnagar belt, 2 orders a week of ₹150 — about 5% of the belt's ₹140 cr+ yearly sabzi &amp; fruit spend</p></div>
   </div>
-  <div class="src">Basis: HCES 2023-24 (MoSPI) — rural MPCE ₹4,122, of which vegetables 6.03% + fresh fruit 2.54% ≈ ₹18,600 per household per year (household of 4.4). Households: Jal Jeevan Mission (2019), Census 2011. Estimates, rounded.</div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">07</span></div>
+  <div class="src">Sources: MoSPI HCES 2023-24 — monthly spend per person in villages ₹4,122 (India), ₹5,377 (Haryana); vegetables 6.03% + fresh fruit 2.66% of it (same share assumed for Haryana).
+    Rural people: World Bank 2024 (63% of 145 crore). Haryana: Technical Group projection 2024 (3.07 crore, 42.7% urban). Belt: Census 2011, Pataudi + Farrukhnagar tehsils (2.55 lakh people, ~48,000 homes). 2023-24 prices, rounded.</div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
+</section>
+
+<!-- 8 WHY NOW -->
+<section class="slide s7b">
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">Why now</div></div>
+  <div class="ey">Why now</div>
+  <div class="h1">Villages are online and pay by phone.<br><span class="gr">Nobody delivers their sabzi.</span></div>
+  <div class="stats">
+    <div class="card st"><div class="n grn">548 M</div><p><b>rural internet users</b> — 57% of India's 958 M, growing ~4× faster than cities</p></div>
+    <div class="card st"><div class="n grn">24 bn</div><p><b>UPI payments</b> in September 2026 — over 800 million a day, cash-free at the door</p></div>
+    <div class="card st"><div class="n org">₹64,000 cr</div><p><b>quick-commerce orders</b> in FY25, heading to ₹2 lakh cr by FY28 — built on city dark stores</p></div>
+    <div class="card st"><div class="n org">+9.2%</div><p><b>village spending per person</b> in one year (₹3,773 → ₹4,122); vegetables' share up from 5.38% to 6.03%</p></div>
+  </div>
+  <div class="bn"><span class="ic"><svg
+  
+  xmlns="http://www.w3.org/2000/svg"
+ 
+ 
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+  <circle cx="12" cy="10" r="3" />
+</svg></span><span><b>The demand, the phones and the payments are already in the village.</b> What's missing is fresh food that comes in a time slot — that is RozBazaar.</span></div>
+  <div class="src">Sources: IAMAI–Kantar, Internet in India 2025 (Jan 2026) · NPCI UPI statistics, Sept 2026 · CareEdge Advisory, India's Q-commerce Market (Jul 2025) · MoSPI HCES 2022-23 &amp; 2023-24.</div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 <!-- 8 BUSINESS MODEL -->
@@ -769,7 +811,7 @@ b,strong{font-weight:700;color:var(--tx)}
     <div class="col"><div class="n">0</div><p>warehouses, riders or inventory — asset-light by design</p></div>
   </div>
   <div class="next"><span>NEXT REVENUE STREAMS</span>Featured vendor listing · Premium vendor plan · Bulk &amp; event orders (weddings, functions) · Local brand promotions</div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">08</span></div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 <!-- 9 COMPETITION -->
@@ -1176,7 +1218,7 @@ b,strong{font-weight:700;color:var(--tx)}
 </svg></span></span></td></tr>
   </table>
   <div class="src">~ = partly. Quick-commerce apps are great in metros; they run on central dark stores, which is why villages are left out.</div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">09</span></div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 <!-- 10 ADVANTAGE -->
@@ -1251,7 +1293,7 @@ b,strong{font-weight:700;color:var(--tx)}
 </svg></span></div><div><h3>Village-level data</h3><p>GPS village boundaries, an 8 km service area and slot-wise vendor coverage — a growing moat.</p></div></div>
   </div>
   <div class="q">We don't replace the thela-wala. <span>We make him bookable.</span></div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">10</span></div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 <!-- 11 GO TO MARKET -->
@@ -1386,7 +1428,7 @@ b,strong{font-weight:700;color:var(--tx)}
     <div class="nd" style="left:669px;top:534px"><i></i>Jatauli</div>
     <div class="lg"><span><i style="background:var(--g-lt)"></i>Live: Khandewla &amp; Jatola (8 km service area)</span><span><i style="background:var(--or)"></i>Next: rest of the belt</span></div>
   </div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">11</span></div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 <!-- 12 TRACTION -->
@@ -1501,7 +1543,7 @@ b,strong{font-weight:700;color:var(--tx)}
       <div class="nu"><b>10</b><span>households ordered</span></div>
       <div class="nu"><b>7</b><span>orders delivered &amp; paid</span></div>
     </div></div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">12</span></div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 <!-- 13 ROADMAP -->
@@ -1520,7 +1562,7 @@ b,strong{font-weight:700;color:var(--tx)}
   </div>
   <div class="dots"><i></i><i></i><i></i><i></i><i class="last"></i></div>
   <div class="q">“Fresh vegetables from the local vendor, in a time slot — for every home.”</div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">13</span></div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 <!-- 14 TEAM -->
@@ -1606,7 +1648,7 @@ b,strong{font-weight:700;color:var(--tx)}
     <div class="st"><b>2</b><span>languages · Hindi &amp; English</span></div>
     <div class="st"><b>1</b><span>Android app</span></div>
     <div class="st"><b>₹0</b><span>outside funding — self-funded</span></div></div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">14</span></div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 <!-- 15 THANK YOU -->
@@ -1634,7 +1676,7 @@ b,strong{font-weight:700;color:var(--tx)}
   <path d="m21 3 1 11h-2" />
   <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" />
   <path d="M3 4h8" />
-</svg></span><b>Mentorship</b><span>E-Cell IIT Bombay network</span></div>
+</svg></span><b>Mentorship</b><span>Rural retail, logistics &amp; fundraising</span></div>
     <div class="ask"><span class="ic"><svg
   
   xmlns="http://www.w3.org/2000/svg"
@@ -1711,7 +1753,7 @@ b,strong{font-weight:700;color:var(--tx)}
   <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" />
 </svg></span>@roz.bzaar</span></div>
   <div class="ty">Thank you · <span class="hi">धन्यवाद</span></div>
-  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">15</span></div>
+  <div class="ft"><span>RozBazaar · Pitch deck · October 2026 · rozbazaar.shop</span><span class="pg"></span></div>
 </section>
 
 </body>
