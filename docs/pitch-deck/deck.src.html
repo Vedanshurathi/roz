@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RozBazaar Pitch Deck</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+:root{
+  --g:#1E8E3E; --g-dk:#14682c; --g-lt:#7ED492; --g-soft:#E7F5EA;
+  --or:#F28C28; --or-lt:#F9A94B; --or-soft:#FFF1E4;
+  --red:#E0483E; --red-soft:#FDECEA;
+  --navy:#101B30; --navy2:#192338; --navy3:#202B3E;
+  --cream:#FCF8F0; --tx:#101B30; --tx2:#5B6170; --mut:#8A8F99; --line:#E6E1D6;
+  --disp:'Sora',sans-serif; --ui:'Plus Jakarta Sans',sans-serif; --hi:'Noto Sans Devanagari','Plus Jakarta Sans',sans-serif;
+}
+@page{size:1920px 1080px;margin:0}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#555}
+body{font-family:var(--ui);color:var(--tx);-webkit-font-smoothing:antialiased}
+.slide{width:1920px;height:1080px;position:relative;overflow:hidden;background:var(--cream);break-after:page;page-break-after:always}
+.slide.white{background:#fff}
+.slide.dark{background:var(--navy);color:#fff}
+.slide.dark .glow{position:absolute;right:-300px;top:-420px;width:1400px;height:1400px;border-radius:50%;
+  background:radial-gradient(circle, rgba(30,142,62,.22) 0%, rgba(30,142,62,.08) 38%, rgba(16,27,48,0) 68%)}
+.slide.mint{background:linear-gradient(180deg,#F3FBF4 0%,#E6F5E9 100%)}
+.ic{display:inline-block;width:1em;height:1em;flex:none}
+.ic svg{width:100%;height:100%;display:block;stroke-width:2}
+.hi{font-family:var(--hi)}
+b,strong{font-weight:700;color:var(--tx)}
+.dark b,.dark strong{color:#fff}
+
+/* header + footer */
+.hd{position:absolute;top:50px;left:120px;right:120px;display:flex;align-items:center;justify-content:space-between;z-index:3}
+.brand{display:flex;align-items:center;gap:14px;font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:-.3px;color:var(--navy)}
+.brand img{width:50px;height:42px;object-fit:contain}
+.dark .brand{color:#fff}
+.tag{font-weight:700;font-size:15px;letter-spacing:.25em;color:var(--g);text-transform:uppercase}
+.dark .tag{color:#3FB862}
+.ft{position:absolute;left:120px;right:120px;bottom:36px;display:flex;justify-content:space-between;align-items:baseline;font-size:16px;color:var(--mut);z-index:3}
+.dark .ft{color:#7E8695}
+.ft .pg{font-family:var(--disp);font-weight:700;font-size:17px;color:#5E6472}
+.dark .ft .pg{color:#9AA1AE}
+.src{position:absolute;left:120px;bottom:74px;font-size:15px;color:var(--mut)}
+
+/* eyebrow + titles */
+.ey{position:absolute;left:120px;top:152px;font-weight:700;font-size:20px;letter-spacing:.22em;color:var(--g);text-transform:uppercase}
+.dark .ey{color:#3FB862}
+.h1{position:absolute;left:120px;top:190px;font-family:var(--disp);font-weight:800;font-size:72px;line-height:1.04;letter-spacing:-.035em;color:var(--navy)}
+.dark .h1{color:#fff}
+.h1 .gr{color:var(--g)} .dark .h1 .gr{color:var(--g-lt)}
+
+/* cards */
+.card{background:#fff;border-radius:26px;box-shadow:0 10px 30px rgba(16,27,48,.06),0 2px 6px rgba(16,27,48,.04)}
+
+/* ---------- 1 cover ---------- */
+.s1 .photo{position:absolute;right:0;top:0;height:1080px;width:1192px;background:url(assets/cover.jpg) right center/cover no-repeat}
+.s1 .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#101B30 0%,rgba(16,27,48,.92) 18%,rgba(16,27,48,.55) 34%,rgba(16,27,48,0) 52%)}
+.s1 .logo{position:absolute;left:120px;top:110px;display:flex;align-items:center;gap:24px}
+.s1 .tile{width:96px;height:96px;border-radius:22px;background:#fff;display:grid;place-items:center}
+.s1 .tile img{width:70px}
+.s1 .wm{font-family:var(--disp);font-weight:800;font-size:50px;letter-spacing:-1.5px;line-height:1}
+.s1 .wm span{color:#71BE86}
+.s1 .url{font-size:20px;color:#A6ADBB;margin-top:8px}
+.s1 .t{position:absolute;left:120px;top:296px;font-family:var(--disp);font-weight:800;font-size:96px;line-height:1.02;letter-spacing:-.045em;z-index:2}
+.s1 .t .o{color:var(--or-lt)}
+.s1 .hl{position:absolute;left:120px;top:516px;font-family:var(--hi);font-weight:600;font-size:31px;color:#71BE86;z-index:2}
+.s1 .p{position:absolute;left:120px;top:592px;width:800px;font-size:25px;line-height:1.5;color:#C6CBD5;z-index:2}
+.s1 .chips{position:absolute;left:120px;top:950px;display:flex;gap:16px;z-index:2}
+.s1 .chips span{border:1.5px solid rgba(255,255,255,.28);border-radius:999px;padding:11px 20px;font-size:19px;color:#D7DBE3;background:rgba(16,27,48,.35)}
+.s1 .chips em{font-style:normal;font-weight:700;color:var(--or-lt)}
+
+/* ---------- 2 problem ---------- */
+.s2 .stats{position:absolute;left:120px;right:120px;top:401px;display:grid;grid-template-columns:repeat(4,1fr);gap:29px}
+.s2 .st{height:276px;padding:38px 32px}
+.s2 .n{font-family:var(--disp);font-weight:800;font-size:96px;letter-spacing:-.05em;line-height:1}
+.s2 .n small{font-size:42px;color:#5B6170;letter-spacing:-.02em}
+.s2 .red{color:var(--red)} .s2 .org{color:var(--or)}
+.s2 .st p{margin-top:18px;font-size:23px;line-height:1.45;color:var(--tx2)}
+.s2 .bn{position:absolute;left:120px;right:120px;top:715px;height:88px;border-radius:26px;background:var(--navy);display:flex;align-items:center;gap:24px;padding:0 38px;font-size:25px;color:#D6DAE2}
+.s2 .bn .ic{color:var(--or);font-size:34px}
+.s2 .bn b{color:#fff}
+
+/* ---------- 3 alternatives ---------- */
+.s3 .cols{position:absolute;left:120px;right:120px;top:331px;display:grid;grid-template-columns:repeat(4,1fr);gap:29px}
+.s3 .al{height:377px;padding:38px 34px;position:relative}
+.s3 .sq{width:84px;height:84px;border-radius:18px;background:var(--or-soft);display:grid;place-items:center;color:var(--or);font-size:40px}
+.s3 h3{margin-top:30px;font-family:var(--disp);font-weight:700;font-size:31px;letter-spacing:-.5px;line-height:1.15}
+.s3 .al p{margin-top:10px;font-size:22px;line-height:1.45;color:var(--tx2)}
+.s3 .chip{position:absolute;left:34px;bottom:34px;background:var(--red-soft);color:var(--red);font-weight:700;font-size:19px;padding:8px 15px;border-radius:999px}
+.s3 .gap{position:absolute;left:120px;right:120px;top:751px;height:90px;border-radius:26px;background:var(--g-soft);display:flex;align-items:center;gap:22px;padding:0 36px;font-size:29px;color:var(--tx)}
+.s3 .gap .pill{background:var(--g);color:#fff;font-weight:700;font-size:18px;letter-spacing:.2em;padding:9px 15px;border-radius:8px}
+
+/* phones */
+.ph{position:absolute;border:13px solid #0E1424;border-radius:50px;background:#fff;overflow:hidden;box-shadow:0 30px 60px rgba(16,27,48,.22),0 6px 16px rgba(16,27,48,.12)}
+.ph img{display:block;width:100%}
+.cap{position:absolute;font-family:var(--disp);font-weight:700;font-size:21px;color:var(--navy);text-align:center}
+
+/* ---------- 4 solution ---------- */
+.s4 .h1{top:188px}
+.s4 .steps{position:absolute;left:120px;top:461px;width:878px;display:flex;flex-direction:column;gap:23px}
+.s4 .stp{background:var(--cream);border-radius:24px;display:flex;align-items:center;gap:20px;padding:0 30px;height:105px}
+.s4 .stp.tall{height:134px}
+.s4 .num{width:52px;height:52px;border-radius:50%;background:var(--g);color:#fff;font-family:var(--disp);font-weight:800;font-size:26px;display:grid;place-items:center;flex:none}
+.s4 .si{color:var(--g);font-size:38px}
+.s4 h3{font-family:var(--disp);font-weight:700;font-size:28px;letter-spacing:-.4px}
+.s4 .stp p{margin-top:3px;font-size:19.5px;line-height:1.4;color:var(--tx2)}
+.s4 .chips{position:absolute;left:120px;top:880px;display:flex;gap:15px}
+.s4 .chips > span{display:flex;align-items:center;gap:12px;border:1.5px solid #E7E3DA;border-radius:999px;padding:11px 20px;font-size:20px;font-weight:600;color:var(--tx)}
+.s4 .chips .ic{color:var(--g);font-size:24px}
+
+/* ---------- 5 product ---------- */
+.s5 .row{position:absolute;left:120px;right:120px;top:302px;display:grid;grid-template-columns:repeat(5,1fr);gap:34px}
+.s5 .pc{position:relative}
+.s5 .frame{height:560px;border:13px solid #0E1424;border-bottom:none;border-radius:46px 46px 0 0;overflow:hidden;background:#fff;box-shadow:0 26px 50px rgba(16,27,48,.16)}
+.s5 .frame img{width:100%;display:block}
+.s5 .pc .lb{margin-top:24px;text-align:center;font-family:var(--disp);font-weight:700;font-size:21px}
+.s5 .apps{position:absolute;left:120px;right:120px;top:935px;display:grid;grid-template-columns:repeat(5,1fr);gap:20px}
+.s5 .app{height:80px;border-radius:18px;background:#fff;display:flex;align-items:center;gap:18px;padding:0 24px;box-shadow:0 6px 18px rgba(16,27,48,.05)}
+.s5 .app .ic{color:var(--g);font-size:32px}
+.s5 .app b{display:block;font-family:var(--disp);font-size:23px;letter-spacing:-.3px}
+.s5 .app div > span{font-size:18px;color:var(--tx2)}
+.s5 .ft{bottom:22px}
+
+/* ---------- 6 new features ---------- */
+.s6 .sub{position:absolute;left:120px;top:278px;font-size:23px;color:var(--tx2)}
+.s6 .feats{position:absolute;left:120px;right:120px;top:338px;display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.s6 .fe{position:relative;height:636px;border-radius:28px;background:#fff;box-shadow:0 10px 30px rgba(16,27,48,.06);overflow:hidden}
+.s6 .fe .shot{position:absolute;left:50%;transform:translateX(-50%);top:34px;width:262px;height:396px;border:11px solid #0E1424;border-bottom:none;border-radius:38px 38px 0 0;overflow:hidden;background:#fff;box-shadow:0 18px 36px rgba(16,27,48,.18)}
+.s6 .fe .shot img{width:100%;display:block}
+.s6 .fe .shot.card{width:300px;height:auto;border:none;border-radius:18px;top:40px}
+.s6 .fe .txt{position:absolute;left:0;right:0;bottom:0;height:206px;padding:22px 26px 0;background:#fff;border-top:1px solid #EFEBE3}
+.s6 .fe .new{position:absolute;right:16px;top:16px;z-index:2;background:var(--or);color:#fff;font-weight:800;font-size:13px;letter-spacing:.16em;padding:6px 10px;border-radius:7px}
+.s6 h3{display:flex;align-items:center;gap:12px;font-family:var(--disp);font-weight:700;font-size:26px;letter-spacing:-.4px}
+.s6 h3 .ic{color:var(--g);font-size:28px}
+.s6 .fe p{margin-top:10px;font-size:19px;line-height:1.42;color:var(--tx2)}
+.s6 .fe .hi{font-weight:600;color:var(--tx)}
+
+/* ---------- 7 market ---------- */
+.s7 .cir{position:absolute;border-radius:50%}
+.s7 .tam{left:120px;top:351px;width:556px;height:556px;background:#1F353D;border:2px solid #4E8468}
+.s7 .sam{left:210px;top:532px;width:376px;height:376px;background:#46493F;border:2px solid #A47A47}
+.s7 .som{left:293px;top:699px;width:210px;height:210px;background:var(--or-lt)}
+.s7 .lbl{position:absolute;width:556px;left:120px;text-align:center;font-family:var(--disp);font-weight:800;font-size:27px;letter-spacing:.08em}
+.s7 .list{position:absolute;left:770px;top:440px;display:flex;flex-direction:column;gap:26px}
+.s7 .it{position:relative;padding-left:46px}
+.s7 .it i{position:absolute;left:0;top:28px;width:22px;height:22px;border-radius:50%}
+.s7 .big{font-family:var(--disp);font-weight:800;font-size:58px;letter-spacing:-.04em;line-height:1}
+.s7 .big small{font-size:25px;color:var(--or-lt);letter-spacing:0;margin-left:6px}
+.s7 .it p{margin-top:10px;font-size:23px;color:#C6CBD5;line-height:1.4;max-width:960px}
+.s7 .src{color:#7E8695}
+
+/* ---------- 8 business model ---------- */
+.s8 .flow{position:absolute;left:120px;right:120px;top:400px;height:210px}
+.s8 .box{position:absolute;top:0;width:250px;height:210px;border-radius:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.s8 .box .ic{font-size:44px;margin:0;color:inherit}
+.s8 .box b{display:block;margin-top:10px;font-family:var(--disp);font-size:27px;letter-spacing:-.4px}
+.s8 .box > span:not(.ic){margin-top:8px;font-size:19px;color:var(--tx2)}
+.s8 .arr{position:absolute;top:0;height:210px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.s8 .arr .amt{font-family:var(--disp);font-weight:800;font-size:50px;letter-spacing:-.03em;margin-bottom:12px}
+.s8 .arr .ln{height:3px;width:100%;position:relative}
+.s8 .arr .ln::after{content:"";position:absolute;right:-2px;top:-8px;border-left:16px solid currentColor;border-top:9.5px solid transparent;border-bottom:9.5px solid transparent}
+.s8 .arr .lt{margin-top:12px;font-size:19px;color:var(--tx2)}
+.s8 .three{position:absolute;left:120px;right:120px;top:662px;display:grid;grid-template-columns:repeat(3,1fr);gap:65px}
+.s8 .col{border-left:4px solid var(--g);padding:6px 0 4px 30px;height:160px}
+.s8 .col .n{font-family:var(--disp);font-weight:800;font-size:70px;letter-spacing:-.04em;line-height:1;padding-left:26px;border-left:4px solid var(--g)}
+.s8 .col p{margin-top:24px;font-size:24px;line-height:1.4;color:var(--tx2)}
+.s8 .next{position:absolute;left:120px;top:864px;display:flex;align-items:center;gap:20px;font-size:24px;color:var(--tx)}
+.s8 .next span{background:var(--or);color:#fff;font-weight:700;font-size:17px;letter-spacing:.2em;padding:9px 15px;border-radius:7px}
+
+/* ---------- 9 competition ---------- */
+.s9 table{position:absolute;left:120px;top:312px;width:1680px;border-collapse:collapse;table-layout:fixed}
+.s9 th{font-weight:600;font-size:19px;color:var(--tx2);padding:0 6px 20px;text-align:center;vertical-align:bottom;line-height:1.3}
+.s9 th:first-child{width:470px}
+.s9 td{height:103px;border-top:1px solid var(--line);text-align:center}
+.s9 td:first-child{text-align:left;padding-left:12px;font-family:var(--disp);font-weight:700;font-size:26px;letter-spacing:-.3px}
+.s9 .m{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:50%;font-size:22px}
+.s9 .y{background:var(--g-soft);color:var(--g)} .s9 .x{background:var(--red-soft);color:var(--red)} .s9 .p{background:var(--or-soft);color:var(--or);font-weight:800;font-size:24px}
+.s9 tr.us td{background:var(--g);color:#fff;border-top:none}
+.s9 tr.us td:first-child{border-radius:24px 0 0 24px} .s9 tr.us td:last-child{border-radius:0 24px 24px 0}
+.s9 tr.us .m{background:#fff;color:var(--g)}
+.s9 tr.sp td{height:14px;border:none}
+.s9 th .nw{display:inline-block;margin-left:6px;background:var(--or);color:#fff;font-size:11px;font-weight:800;letter-spacing:.12em;padding:3px 6px;border-radius:5px;vertical-align:middle}
+
+/* ---------- 10 advantage ---------- */
+.s10 .photo{position:absolute;left:0;top:0;width:760px;height:1080px;background:url(assets/tempo.jpg) center/cover}
+.s10 .photo span{position:absolute;left:28px;bottom:26px;background:rgba(16,27,48,.72);color:#fff;font-size:16px;padding:8px 14px;border-radius:8px}
+.s10 .hd{left:881px}
+.s10 .ey,.s10 .h1{left:840px}
+.s10 .h1{font-size:66px}
+.s10 .grid{position:absolute;left:840px;right:120px;top:368px;display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.s10 .ad{background:var(--cream);border-radius:24px;height:205px;padding:34px 30px;display:flex;gap:22px}
+.s10 .sq{width:62px;height:62px;border-radius:16px;background:var(--g);color:#fff;display:grid;place-items:center;font-size:30px;flex:none}
+.s10 h3{font-family:var(--disp);font-weight:700;font-size:29px;letter-spacing:-.4px}
+.s10 .ad p{margin-top:8px;font-size:21px;line-height:1.45;color:var(--tx2)}
+.s10 .q{position:absolute;left:843px;top:845px;border-left:5px solid var(--or);padding-left:28px;font-family:var(--disp);font-weight:700;font-size:35px;line-height:1.25;letter-spacing:-.5px;width:900px}
+.s10 .q span{color:var(--g)}
+.s10 .ft{left:840px}
+
+/* ---------- 11 go to market ---------- */
+.s11 .list{position:absolute;left:120px;top:370px;width:820px;display:flex;flex-direction:column;gap:13px}
+.s11 .gi{height:84px;background:#fff;border-radius:18px;display:flex;align-items:center;gap:22px;padding:0 28px;position:relative}
+.s11 .gi .ic{color:var(--or);font-size:30px}
+.s11 .gi b{display:block;font-family:var(--disp);font-size:22px;letter-spacing:-.3px}
+.s11 .gi div > span{display:block;font-size:18px;color:var(--tx2);margin-top:3px}
+.s11 .gi .nw{position:absolute;right:20px;top:50%;transform:translateY(-50%);background:var(--g-soft);color:var(--g);font-weight:800;font-size:13px;letter-spacing:.14em;padding:6px 10px;border-radius:7px}
+.s11 .map{position:absolute;left:960px;top:150px;width:840px;height:686px;border-radius:30px;background:var(--navy);overflow:hidden}
+.s11 .map .tt{position:absolute;left:34px;top:34px;font-family:var(--disp);font-weight:700;font-size:23px;color:#fff}
+.s11 .map svg.lines{position:absolute;inset:0}
+.s11 .nd{position:absolute;display:flex;align-items:center;gap:14px;color:#fff;font-size:25px;font-weight:600;transform:translate(-11px,-50%)}
+.s11 .nd i{width:24px;height:24px;border-radius:50%;background:var(--or)}
+.s11 .nd.big{font-family:var(--disp);font-weight:800;font-size:31px;transform:translate(-38px,-50%)}
+.s11 .nd.big i{width:42px;height:42px;background:var(--g-lt);box-shadow:0 0 0 12px var(--navy),0 0 0 14px #3C7F55}
+.s11 .lg{position:absolute;left:34px;bottom:28px;display:flex;gap:30px;font-size:18px;color:#AEB4C0}
+.s11 .lg span{display:flex;align-items:center;gap:10px}
+.s11 .lg i{width:14px;height:14px;border-radius:50%}
+.s11 .ring{position:absolute;border:2px dashed rgba(126,212,146,.35);border-radius:50%}
+
+/* ---------- 12 traction ---------- */
+.s12 .donut{position:absolute;left:143px;top:359px;width:372px;height:372px}
+.s12 .dn{position:absolute;left:143px;top:359px;width:372px;height:372px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.s12 .dn b{font-family:var(--disp);font-weight:800;font-size:84px;letter-spacing:-.04em;line-height:1}
+.s12 .dn span{margin-top:8px;font-size:21px;color:var(--tx2);text-align:center;line-height:1.3}
+.s12 .dsub{position:absolute;left:143px;width:372px;top:760px;text-align:center;font-size:24px;color:var(--tx2)}
+.s12 .dsub b{color:var(--g)}
+.s12 .tg{position:absolute;left:581px;top:346px;width:588px;height:468px;background:var(--cream);border-radius:28px;padding:40px 42px}
+.s12 .k{font-weight:700;font-size:17px;letter-spacing:.2em;color:var(--g)}
+.s12 .tg .gr{display:grid;grid-template-columns:1fr 1fr;gap:18px 30px;margin-top:22px}
+.s12 .tg .gr b{display:block;font-family:var(--disp);font-weight:800;font-size:64px;letter-spacing:-.04em;line-height:1}
+.s12 .tg .gr span{font-size:20px;color:var(--tx2)}
+.s12 .tg .th{margin-top:24px;padding-top:18px;border-top:1px solid #E5E0D5;font-size:18px;color:var(--tx2);line-height:1.4}
+.s12 .dn2{position:absolute;left:1210px;top:346px;width:590px;height:468px;background:var(--navy);border-radius:28px;padding:40px 42px;color:#fff}
+.s12 .dn2 .k{color:#3FB862}
+.s12 .dn2 ul{list-style:none;margin-top:14px}
+.s12 .dn2 li{display:flex;align-items:center;gap:16px;font-size:21px;line-height:1.3;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.1);color:#E6E9EF}
+.s12 .dn2 li .ic{color:#3FB862;font-size:25px}
+.s12 .live{position:absolute;left:120px;right:120px;top:846px;height:120px;border-radius:24px;background:var(--g-soft);display:flex;align-items:center;padding:0 34px;gap:30px}
+.s12 .live .pl{display:flex;flex-direction:column;gap:6px;flex:none}
+.s12 .live .pl span{background:var(--g);color:#fff;font-weight:800;font-size:16px;letter-spacing:.18em;padding:8px 13px;border-radius:7px;display:flex;align-items:center;gap:8px}
+.s12 .live .pl span i{width:9px;height:9px;border-radius:50%;background:#B9F5C8;box-shadow:0 0 0 3px rgba(185,245,200,.35)}
+.s12 .live .pl small{font-size:14px;color:var(--tx2);text-align:center}
+.s12 .live .nums{display:flex;flex:1;justify-content:space-between}
+.s12 .live .nu b{display:block;font-family:var(--disp);font-weight:800;font-size:40px;letter-spacing:-.03em;line-height:1;color:var(--g-dk)}
+.s12 .live .nu span{font-size:17px;color:var(--tx2)}
+
+/* ---------- 13 roadmap ---------- */
+.s13 .h1{width:1680px}
+.s13 .tl{position:absolute;left:120px;right:120px;top:452px;display:grid;grid-template-columns:repeat(5,1fr);gap:27px}
+.s13 .line{position:absolute;left:138px;right:120px;top:467px;height:4px;background:linear-gradient(90deg,#8ED18F 0%,#8ED18F 45%,#E9C26B 75%,#F9A94B 100%)}
+.s13 .yr{height:266px;border-radius:20px;background:var(--navy2);padding:62px 0 0;position:relative}
+.s13 .line{z-index:2}
+.s13 .dots{position:absolute;left:120px;right:120px;top:452px;display:grid;grid-template-columns:repeat(5,1fr);gap:27px;z-index:3}
+.s13 .dots i{display:block;margin-left:3px;width:30px;height:30px;border-radius:50%;background:var(--navy);border:4px solid #8ED18F}
+.s13 .dots i.last{background:var(--or-lt);border-color:var(--or-lt);box-shadow:0 0 0 10px rgba(249,169,75,.18)}
+.s13 .yr b{display:block;font-family:var(--disp);font-weight:800;font-size:40px;letter-spacing:-.02em;color:var(--g-lt)}
+.s13 .yr.last b{color:var(--or-lt)}
+.s13 .yr h3{margin-top:10px;font-family:var(--disp);font-weight:700;font-size:26px;color:#fff}
+.s13 .yr p{margin-top:12px;font-size:20px;line-height:1.42;color:#AEB4C0;padding-right:16px}
+.s13 .q{position:absolute;left:120px;top:778px;border-left:5px solid var(--or);padding-left:30px;font-family:var(--disp);font-weight:700;font-size:33px;color:#fff}
+
+/* ---------- 14 team ---------- */
+.s14 .main{position:absolute;left:120px;top:307px;width:912px;height:421px;padding:44px 40px;display:flex;gap:34px}
+.s14 .av{width:169px;height:169px;border-radius:50%;background:linear-gradient(135deg,#1E8E3E,#78C98A);color:#fff;font-family:var(--disp);font-weight:800;font-size:66px;display:grid;place-items:center;flex:none}
+.s14 h2{font-family:var(--disp);font-weight:800;font-size:42px;letter-spacing:-.5px;margin-top:6px}
+.s14 .role{margin-top:6px;font-weight:700;font-size:22px;color:var(--or)}
+.s14 ul{list-style:none;margin-top:22px}
+.s14 li{position:relative;padding-left:30px;font-size:20.5px;color:var(--tx2);line-height:1.35;margin-bottom:14px}
+.s14 li::before{content:"";position:absolute;left:0;top:10px;width:12px;height:12px;border-radius:50%;background:var(--g)}
+.s14 .side{position:absolute;left:1070px;right:120px;top:307px;display:flex;flex-direction:column;gap:17px}
+.s14 .sc{height:93px;display:flex;align-items:center;gap:22px;padding:0 30px}
+.s14 .sc .ic{color:var(--g);font-size:34px}
+.s14 .sc b{display:block;font-family:var(--disp);font-size:26px;letter-spacing:-.3px}
+.s14 .sc div > span{font-size:20px;color:var(--tx2)}
+.s14 .strip{position:absolute;left:120px;right:120px;top:758px;height:118px;border-radius:26px;background:var(--navy);display:flex;align-items:center;padding:0 36px}
+.s14 .strip .k{font-weight:700;font-size:16px;letter-spacing:.2em;color:#3FB862;line-height:1.5;width:170px;flex:none}
+.s14 .strip .st{flex:1;border-left:1px solid rgba(255,255,255,.14);padding-left:26px;height:70px;display:flex;flex-direction:column;justify-content:center}
+.s14 .strip .st b{font-family:var(--disp);font-weight:800;font-size:44px;color:var(--or-lt);line-height:1}
+.s14 .strip .st span{margin-top:8px;font-size:18px;color:#C6CBD5}
+
+/* ---------- 15 thank you ---------- */
+.s15 .tile{position:absolute;left:885px;top:190px;width:150px;height:150px;border-radius:32px;background:#fff;display:grid;place-items:center}
+.s15 .tile img{width:110px}
+.s15 .wm{position:absolute;left:0;right:0;top:362px;text-align:center;font-family:var(--disp);font-weight:800;font-size:124px;letter-spacing:-.045em;line-height:1}
+.s15 .wm span{color:var(--g-lt)}
+.s15 .tl{position:absolute;left:0;right:0;top:490px;text-align:center;font-family:var(--disp);font-weight:700;font-size:42px;color:var(--or-lt);letter-spacing:-.5px}
+.s15 .asks{position:absolute;left:334px;top:607px;display:grid;grid-template-columns:repeat(3,399px);gap:27px}
+.s15 .ask{height:207px;border-radius:26px;background:var(--navy3);border:1.5px solid #2B3649;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px}
+.s15 .ask .ic{color:var(--g-lt);font-size:34px}
+.s15 .ask b{margin-top:14px;font-family:var(--disp);font-size:29px;color:#fff}
+.s15 .ask > span:not(.ic){margin-top:10px;font-size:20px;color:#AEB4C0;line-height:1.35}
+.s15 .ct{position:absolute;left:0;right:0;top:872px;display:flex;justify-content:center;gap:40px;font-size:26px;color:#DDE1E8}
+.s15 .ct > span{display:flex;align-items:center;gap:12px}
+.s15 .ct .ic{color:var(--g-lt);font-size:26px}
+.s15 .ty{position:absolute;left:0;right:0;top:952px;text-align:center;font-family:var(--disp);font-weight:800;font-size:36px}
+.s15 .ty .hi{font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- 1 COVER -->
+<section class="slide dark s1">
+  <div class="photo"></div>
+  <div class="logo"><div class="tile"><img src="assets/logo-mark.png" alt=""></div>
+    <div><div class="wm"><span>Roz</span>Bazaar</div><div class="url">rozbazaar.shop</div></div></div>
+  <div class="t">Your village vendor.<br><span class="o">In your time slot.</span></div>
+  <div class="hl">आपका गाँव का सब्ज़ीवाला — आपके टाइम पर</div>
+  <div class="p">Slot-based doorstep delivery of fresh vegetables, fruit and onion-potato by trusted local vendors — built for India's villages.</div>
+  <div class="chips"><span>Pitch Deck · Eureka! Junior 2026</span><span>Team ID <em>EJ26T161683</em></span><span>Founder · Vedanshu Rathi</span></div>
+</section>
+
+<!-- 2 PROBLEM -->
+<section class="slide s2">
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">Problem</div></div>
+  <div class="ey">The problem</div>
+  <div class="h1">In our villages, fresh sabzi<br>still runs on <span class="gr">luck</span>.</div>
+  <div class="stats">
+    <div class="card st"><div class="n red">100%</div><p>say quick-commerce apps <b>don't deliver</b> to their village</p></div>
+    <div class="card st"><div class="n org">70%</div><p>say the thela-wala comes at <b>random times</b> — or not at all</p></div>
+    <div class="card st"><div class="n red">1.4<small>/5</small></div><p>satisfaction with today's options — and still <b>2–3 mandi trips</b> a week</p></div>
+    <div class="card st"><div class="n org">90%</div><p>name <b>no / unreliable delivery</b> as their biggest pain</p></div>
+  </div>
+  <div class="bn">{{i:store}}<span><b>Vendors lose too.</b> Carts full of stock walk empty lanes — no idea who wants what, or when. No digital way to reach customers.</span></div>
+  <div class="src">Source: RozBazaar primary survey, residents of the Pataudi–Haileymandi belt, Haryana (n = 10), Sept 2026.</div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">02</span></div>
+</section>
+
+<!-- 3 ALTERNATIVES -->
+<section class="slide s3">
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">Alternatives</div></div>
+  <div class="ey">Why today's options fail</div>
+  <div class="h1">Every option solves <span class="gr">half</span> the problem.</div>
+  <div class="cols">
+    <div class="card al"><div class="sq">{{i:route}}</div><h3>Mandi trip</h3><p>A 2–3× weekly trip that costs time, fuel and a working day.</p><span class="chip">70% buy here</span></div>
+    <div class="card al"><div class="sq">{{i:clock}}</div><h3>Random thela-wala</h3><p>Fresh and trusted — but you never know when he comes.</p><span class="chip">70% say random</span></div>
+    <div class="card al"><div class="sq">{{i:message-circle}}</div><h3>Phone / WhatsApp</h3><p>Works for one seller; no slots, no bill, no record.</p><span class="chip">Does not scale</span></div>
+    <div class="card al"><div class="sq">{{i:smartphone}}</div><h3>Quick-commerce apps</h3><p>Built for metro dark stores — they don't reach villages.</p><span class="chip">100% not served</span></div>
+  </div>
+  <div class="gap"><span class="pill">THE GAP</span><span>Trusted <b>local vendors</b> + the <b>convenience</b> of a booking app. Nobody offers both.</span></div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">03</span></div>
+</section>
+
+<!-- 4 SOLUTION -->
+<section class="slide white s4">
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">Solution</div></div>
+  <div class="ey">The solution</div>
+  <div class="h1">Book the slot.<br>The vendor comes.<br><span class="gr">Weigh, pay, done.</span></div>
+  <div class="steps">
+    <div class="stp"><div class="num">1</div><span class="si">{{i:calendar-clock}}</span><div><h3>Book a slot</h3><p>Pick items + Morning 7–11, Afternoon 12–4 or Evening 5–8. Hindi or English.</p></div></div>
+    <div class="stp"><div class="num">2</div><span class="si">{{i:truck}}</span><div><h3>Vendor comes</h3><p>A verified local vendor, auto-matched by village, load and rating — live on the map.</p></div></div>
+    <div class="stp tall"><div class="num">3</div><span class="si">{{i:scale}}</span><div><h3>Weigh · pay · confirm</h3><p>Weighed at your door, live bill, pay cash or UPI directly. 4-digit code confirms.</p></div></div>
+  </div>
+  <div class="chips"><span>{{i:indian-rupee}}₹0 delivery fee for customers</span><span>{{i:languages}}Hindi-first</span><span>{{i:mic}}Order by voice</span></div>
+  <div class="ph" style="left:1140px;top:196px;width:336px;transform:perspective(2000px) rotateY(10deg) rotateZ(-4deg)"><img src="assets/s-slot.jpg" alt=""></div>
+  <div class="ph" style="left:1528px;top:142px;width:336px;transform:perspective(2000px) rotateY(-10deg) rotateZ(3deg)"><img src="assets/s-booked.jpg" alt=""></div>
+  <div class="cap" style="left:1250px;top:908px;transform:rotate(-4deg)">Pick a slot</div>
+  <div class="cap" style="left:1600px;top:874px;transform:rotate(3deg)">Booked · code</div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">04</span></div>
+</section>
+
+<!-- 5 PRODUCT -->
+<section class="slide mint s5">
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">Product</div></div>
+  <div class="ey">Product</div>
+  <div class="h1">Not a mock-up. <span class="gr">Built and running.</span></div>
+  <div class="row">
+    <div class="pc"><div class="frame"><img src="assets/p-home.jpg" alt=""></div><div class="lb">Customer · home</div></div>
+    <div class="pc"><div class="frame"><img src="assets/p-basket.jpg" alt=""></div><div class="lb">Customer · basket</div></div>
+    <div class="pc"><div class="frame"><img src="assets/p-vruns.jpg" alt=""></div><div class="lb">Vendor · today's runs</div></div>
+    <div class="pc"><div class="frame"><img src="assets/p-vbill.jpg" alt=""></div><div class="lb">Vendor · weigh &amp; bill</div></div>
+    <div class="pc"><div class="frame"><img src="assets/p-vdash.jpg" alt=""></div><div class="lb">Vendor · earnings</div></div>
+  </div>
+  <div class="apps">
+    <div class="app">{{i:smartphone}}<div><b>Customer app</b><span>Web + Android app</span></div></div>
+    <div class="app">{{i:store}}<div><b>Vendor app</b><span>Orders, stock, bills</span></div></div>
+    <div class="app">{{i:shield-check}}<div><b>Admin console</b><span>Ops &amp; finance</span></div></div>
+    <div class="app">{{i:users}}<div><b>Team app</b><span>Sales &amp; interns</span></div></div>
+    <div class="app">{{i:bell}}<div><b>Push alerts</b><span>Hindi &amp; English</span></div></div>
+  </div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">05</span></div>
+</section>
+
+<!-- 6 NEW SINCE LAUNCH -->
+<section class="slide s6">
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">New since launch</div></div>
+  <div class="ey">Shipped in October 2026</div>
+  <div class="h1">Built for how <span class="gr">villages</span> really shop.</div>
+  <div class="feats">
+    <div class="fe"><span class="new">NEW</span><div class="shot"><img src="assets/f-voice.jpg" alt="" style="margin-top:-170px"></div>
+      <div class="txt"><h3>{{i:mic}}Order by voice</h3><p>Say <span class="hi">“दो किलो आलू, एक किलो टमाटर”</span> — the app writes the list with prices. Hindi or English, no typing needed.</p></div></div>
+    <div class="fe"><span class="new">NEW</span><div class="shot"><img src="assets/f-track.jpg" alt="" style="margin-top:-140px"></div>
+      <div class="txt"><h3>{{i:navigation}}Track the thela live</h3><p>See the vendor coming on the map with minutes to arrive. An “almost there” alert comes at 700 m.</p></div></div>
+    <div class="fe"><span class="new">NEW</span><div class="shot card"><img src="assets/f-card-hi.jpg" alt=""></div>
+      <div class="txt"><h3>{{i:share-2}}WhatsApp rates card</h3><p>One tap makes today's rates picture with a QR code. Vendors and customers post it in village groups.</p></div></div>
+    <div class="fe"><span class="new">NEW</span><div class="shot"><img src="assets/f-gali.jpg" alt="" style="margin-top:-20px"></div>
+      <div class="txt"><h3>{{i:house}}Gali group order</h3><p>3 neighbours book the same vendor and slot → every house gets free dhaniya-mirch. Neighbours bring neighbours.</p></div></div>
+  </div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">06</span></div>
+</section>
+
+<!-- 7 MARKET -->
+<section class="slide dark s7">
+  <div class="glow"></div>
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">Market</div></div>
+  <div class="ey">Market opportunity</div>
+  <div class="h1">A huge market that<br>the big apps <span class="gr">skip</span>.</div>
+  <div class="cir tam"></div><div class="cir sam"></div><div class="cir som"></div>
+  <div class="lbl" style="top:383px;color:var(--g-lt)">TAM</div>
+  <div class="lbl" style="top:563px;color:var(--or-lt)">SAM</div>
+  <div class="lbl" style="top:776px;color:var(--navy)">SOM</div>
+  <div class="list">
+    <div class="it"><i style="background:#5FA572"></i><div class="big">₹3.3 lakh cr<small>/ year</small></div><p><b>Rural India</b> — fresh vegetable &amp; fruit spend of ~17.9 crore rural households</p></div>
+    <div class="it"><i style="background:#B98A4F"></i><div class="big">₹5,600 cr<small>/ year</small></div><p><b>Rural Haryana</b> — 30.4 lakh households in 6,841 villages</p></div>
+    <div class="it"><i style="background:var(--or-lt)"></i><div class="big">₹7.8 cr GMV<small>→ ₹78 L revenue</small></div><p><b>Our 3-year target</b> — 5,000 homes in the Pataudi–Haileymandi belt, 2 orders a week of ₹150</p></div>
+  </div>
+  <div class="src">Basis: HCES 2023-24 (MoSPI) — rural MPCE ₹4,122, of which vegetables 6.03% + fresh fruit 2.54% ≈ ₹18,600 per household per year (household of 4.4). Households: Jal Jeevan Mission (2019), Census 2011. Estimates, rounded.</div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">07</span></div>
+</section>
+
+<!-- 8 BUSINESS MODEL -->
+<section class="slide s8">
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">Business model</div></div>
+  <div class="ey">Business model</div>
+  <div class="h1">Customers pay <span class="gr">₹0 extra</span>.<br>Vendors share 10% of new sales.</div>
+  <div class="flow">
+    <div class="box card" style="left:0">{{i:users}}<b>Customer</b><span>pays the vendor directly</span></div>
+    <div class="arr" style="left:268px;width:450px;color:var(--g)"><div class="amt">₹200</div><div class="ln" style="background:var(--g)"></div><div class="lt">cash / UPI</div></div>
+    <div class="box" style="left:715px;background:var(--g);color:#fff">{{i:store}}<b style="color:#fff">Vendor</b><span style="color:#D9F2DF">keeps ₹180</span></div>
+    <div class="arr" style="left:982px;width:450px;color:var(--or)"><div class="amt">₹20</div><div class="ln" style="background:var(--or)"></div><div class="lt">10% commission</div></div>
+    <div class="box" style="left:1430px;background:var(--navy);color:#fff"><img src="assets/logo-mark.png" alt="" style="width:62px"><b style="color:#fff">RozBazaar</b><span style="color:#AEB4C0">revenue</span></div>
+  </div>
+  <div class="three">
+    <div class="col"><div class="n">0%</div><p>for the first 30 days — easy onboarding for vendors</p></div>
+    <div class="col"><div class="n">10%</div><p>only on <b>completed</b> sales — rate adjustable from admin</p></div>
+    <div class="col"><div class="n">0</div><p>warehouses, riders or inventory — asset-light by design</p></div>
+  </div>
+  <div class="next"><span>NEXT REVENUE STREAMS</span>Featured vendor listing · Premium vendor plan · Bulk &amp; event orders (weddings, functions) · Local brand promotions</div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">08</span></div>
+</section>
+
+<!-- 9 COMPETITION -->
+<section class="slide white s9">
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">Competition</div></div>
+  <div class="ey">Competition</div>
+  <div class="h1">The only option that ticks <span class="gr">every box</span>.</div>
+  <table>
+    <tr><th></th><th>Choose your<br>time slot</th><th>Inspect &amp; weigh<br>at door</th><th>Comes to<br>your home</th><th>Digital bill<br>&amp; record</th><th>Works in<br>villages</th><th>Track the vendor<br>live <span class="nw">NEW</span></th></tr>
+    <tr><td>Mandi / kirana</td><td><span class="m x">{{i:x}}</span></td><td><span class="m y">{{i:check}}</span></td><td><span class="m x">{{i:x}}</span></td><td><span class="m x">{{i:x}}</span></td><td><span class="m y">{{i:check}}</span></td><td><span class="m x">{{i:x}}</span></td></tr>
+    <tr><td>Random thela-wala</td><td><span class="m x">{{i:x}}</span></td><td><span class="m y">{{i:check}}</span></td><td><span class="m y">{{i:check}}</span></td><td><span class="m x">{{i:x}}</span></td><td><span class="m y">{{i:check}}</span></td><td><span class="m x">{{i:x}}</span></td></tr>
+    <tr><td>Phone / WhatsApp</td><td><span class="m p">~</span></td><td><span class="m y">{{i:check}}</span></td><td><span class="m y">{{i:check}}</span></td><td><span class="m x">{{i:x}}</span></td><td><span class="m x">{{i:x}}</span></td><td><span class="m x">{{i:x}}</span></td></tr>
+    <tr><td>Blinkit · Zepto · Instamart</td><td><span class="m y">{{i:check}}</span></td><td><span class="m x">{{i:x}}</span></td><td><span class="m y">{{i:check}}</span></td><td><span class="m y">{{i:check}}</span></td><td><span class="m x">{{i:x}}</span></td><td><span class="m y">{{i:check}}</span></td></tr>
+    <tr class="sp"><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr class="us"><td>RozBazaar</td><td><span class="m">{{i:check}}</span></td><td><span class="m">{{i:check}}</span></td><td><span class="m">{{i:check}}</span></td><td><span class="m">{{i:check}}</span></td><td><span class="m">{{i:check}}</span></td><td><span class="m">{{i:check}}</span></td></tr>
+  </table>
+  <div class="src">~ = partly. Quick-commerce apps are great in metros; they run on central dark stores, which is why villages are left out.</div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">09</span></div>
+</section>
+
+<!-- 10 ADVANTAGE -->
+<section class="slide white s10">
+  <div class="photo"><span>Concept · branded RozBazaar vendor tempo</span></div>
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">Advantage</div></div>
+  <div class="ey">Why we stand out</div>
+  <div class="h1">Blinkit for villages —<br><span class="gr">powered by the thela-wala.</span></div>
+  <div class="grid">
+    <div class="ad"><div class="sq">{{i:heart-handshake}}</div><div><h3>Local trust</h3><p>A local founder who knows the vendors and families face to face.</p></div></div>
+    <div class="ad"><div class="sq">{{i:warehouse}}</div><div><h3>Asset-light</h3><p>Vendors already own carts and stock — no warehouse, no riders, no inventory risk.</p></div></div>
+    <div class="ad"><div class="sq">{{i:rocket}}</div><div><h3>Product already built</h3><p>Four live apps, 290+ backend functions, Android app, voice ordering and live tracking.</p></div></div>
+    <div class="ad"><div class="sq">{{i:map-pin}}</div><div><h3>Village-level data</h3><p>GPS village boundaries, an 8 km service area and slot-wise vendor coverage — a growing moat.</p></div></div>
+  </div>
+  <div class="q">We don't replace the thela-wala. <span>We make him bookable.</span></div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">10</span></div>
+</section>
+
+<!-- 11 GO TO MARKET -->
+<section class="slide s11">
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">Go-to-market</div></div>
+  <div class="ey">Go-to-market</div>
+  <div class="h1">Village by village,<br><span class="gr">vendor by vendor.</span></div>
+  <div class="list">
+    <div class="gi">{{i:store}}<div><b>Vendors as the channel</b><span>Each thela-wala invites his regular customers at the door</span></div></div>
+    <div class="gi">{{i:qr-code}}<div><b>QR on carts &amp; pamphlets</b><span>Scan → app, right where people already buy</span></div></div>
+    <div class="gi">{{i:share-2}}<div><b>Daily rates card on WhatsApp</b><span>Rates picture + QR, posted in village groups every morning</span></div><em class="nw">NEW</em></div>
+    <div class="gi">{{i:house}}<div><b>Gali groups</b><span>3 houses in a lane, same slot → a free bonus for each</span></div><em class="nw">NEW</em></div>
+    <div class="gi">{{i:megaphone}}<div><b>Panchayat demo days</b><span>Sarpanch-backed launch in each village</span></div></div>
+    <div class="gi">{{i:bell}}<div><b>Push reminders</b><span>Night-before &amp; 30-min slot alerts drive repeat orders</span></div></div>
+  </div>
+  <div class="map">
+    <div class="tt">Pilot · 8 villages · live since 23 Aug 2026</div>
+    <svg class="lines" viewBox="0 0 840 686" width="840" height="686">
+      <g stroke="#3E6E57" stroke-width="2.4" stroke-dasharray="7 7" fill="none">
+        <line x1="221" y1="134" x2="346" y2="321"/><line x1="121" y1="210" x2="346" y2="321"/><line x1="196" y1="272" x2="346" y2="321"/>
+        <line x1="632" y1="260" x2="346" y2="321"/><line x1="458" y1="372" x2="346" y2="321"/><line x1="133" y1="421" x2="346" y2="321"/>
+        <line x1="519" y1="469" x2="346" y2="321"/><line x1="669" y1="534" x2="519" y2="469"/>
+      </g>
+    </svg>
+    <div class="nd big" style="left:221px;top:134px"><i></i>Khandewla</div>
+    <div class="nd" style="left:121px;top:210px"><i></i>Basunda</div>
+    <div class="nd" style="left:196px;top:272px"><i></i>Rampur</div>
+    <div class="nd" style="left:346px;top:321px"><i></i>Pataudi</div>
+    <div class="nd" style="left:632px;top:260px"><i></i>Todapur</div>
+    <div class="nd" style="left:458px;top:372px"><i></i>Haileymandi</div>
+    <div class="nd" style="left:133px;top:421px"><i></i>Tirpari</div>
+    <div class="nd big" style="left:519px;top:469px"><i></i>Jatola</div>
+    <div class="nd" style="left:669px;top:534px"><i></i>Jatauli</div>
+    <div class="lg"><span><i style="background:var(--g-lt)"></i>Live: Khandewla &amp; Jatola (8 km service area)</span><span><i style="background:var(--or)"></i>Next: rest of the belt</span></div>
+  </div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">11</span></div>
+</section>
+
+<!-- 12 TRACTION -->
+<section class="slide white s12">
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">Traction</div></div>
+  <div class="ey">Validation &amp; pilot</div>
+  <div class="h1">Villagers said <span class="gr">yes</span>. Now we prove it.</div>
+  <svg class="donut" viewBox="0 0 372 372"><circle cx="186" cy="186" r="161" fill="none" stroke="#EEF1EC" stroke-width="50"/>
+    <circle cx="186" cy="186" r="161" fill="none" stroke="#1E8E3E" stroke-width="50" stroke-linecap="round" stroke-dasharray="809.2 1011.6" transform="rotate(-90 186 186)"/></svg>
+  <div class="dn"><b>80%</b><span>would use a<br>slot-based app</span></div>
+  <div class="dsub">20% maybe · <b>0% no</b></div>
+  <div class="tg"><div class="k">PILOT TARGETS</div>
+    <div class="gr"><div><b>10</b><span>active vendors</span></div><div><b>200</b><span>registered customers</span></div>
+      <div><b>100–150</b><span>bookings</span></div><div><b>95%</b><span>vendors still active</span></div></div>
+    <div class="th">Then: validate 10% commission from month 2 · measure repeat rate &amp; on-time-in-slot %</div></div>
+  <div class="dn2"><div class="k">ALREADY DONE</div><ul>
+    <li>{{i:circle-check}}Customer survey — problem validated</li>
+    <li>{{i:circle-check}}Live since 23 Aug in Khandewla &amp; Jatola</li>
+    <li>{{i:circle-check}}4 apps live + Android app</li>
+    <li>{{i:circle-check}}Real orders weighed, billed &amp; paid at the door</li>
+    <li>{{i:circle-check}}Voice ordering, live tracking, WhatsApp rates card</li>
+    <li>{{i:circle-check}}Pvt Ltd name approved · registration in process</li></ul></div>
+  <div class="live"><div class="pl"><span><i></i>LIVE NOW</span><small>27 Oct 2026</small></div>
+    <div class="nums">
+      <div class="nu"><b>2</b><span>villages live</span></div>
+      <div class="nu"><b>2</b><span>vendors on the app</span></div>
+      <div class="nu"><b>31</b><span>customer sign-ups</span></div>
+      <div class="nu"><b>10</b><span>households ordered</span></div>
+      <div class="nu"><b>7</b><span>orders delivered &amp; paid</span></div>
+    </div></div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">12</span></div>
+</section>
+
+<!-- 13 ROADMAP -->
+<section class="slide dark s13">
+  <div class="glow"></div>
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">Roadmap</div></div>
+  <div class="ey">Roadmap · 7-year vision</div>
+  <div class="h1">From two villages to <span class="gr">every small-town home</span> in<br>India.</div>
+  <div class="line"></div>
+  <div class="tl">
+    <div class="yr"><b>2026</b><h3>Pilot</h3><p>Live in Khandewla &amp; Jatola → 8 villages of the Pataudi–Haileymandi belt</p></div>
+    <div class="yr"><b>2027</b><h3>The whole belt</h3><p>Every village of the belt · commission live · apply for Startup Haryana seed grant</p></div>
+    <div class="yr"><b>2028</b><h3>Gurugram rural</h3><p>Villages of Gurugram, Rewari &amp; Jhajjar districts</p></div>
+    <div class="yr"><b>2029–30</b><h3>All Haryana</h3><p>Tier-3 towns and their villages across the state</p></div>
+    <div class="yr last"><b>2031–33</b><h3>Tier-2 &amp; 3 India</h3><p>Every tier-2 and tier-3 city in India — and the villages around them</p></div>
+  </div>
+  <div class="dots"><i></i><i></i><i></i><i></i><i class="last"></i></div>
+  <div class="q">“Fresh vegetables from the local vendor, in a time slot — for every home.”</div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">13</span></div>
+</section>
+
+<!-- 14 TEAM -->
+<section class="slide s14">
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div class="tag">Team</div></div>
+  <div class="ey">Team</div>
+  <div class="h1">Small team. <span class="gr">Big build.</span></div>
+  <div class="card main"><div class="av">VR</div><div>
+    <h2>Vedanshu Rathi</h2><div class="role">Founder · 15 years old</div>
+    <ul><li>Designed and built all four RozBazaar apps and the backend</li><li>Ran the customer survey in the Pataudi–Haileymandi belt</li>
+      <li>Previous venture: <b>Kishan Suraksha AI</b></li><li>Local founder — face to face with vendors and families</li></ul></div></div>
+  <div class="side">
+    <div class="card sc">{{i:users}}<div><b>Interns &amp; sales</b><span>3 interns + 1 sales · development &amp; online marketing</span></div></div>
+    <div class="card sc">{{i:store}}<div><b>Vendor partners</b><span>Local thela-walas onboarded in person</span></div></div>
+    <div class="card sc">{{i:handshake}}<div><b>Looking for mentors</b><span>Operations, rural distribution, fundraising</span></div></div>
+    <div class="card sc">{{i:shield-check}}<div><b>Private limited company</b><span>Name approved · registration in process</span></div></div>
+  </div>
+  <div class="strip"><div class="k">SHIPPED BY THE FOUNDER</div>
+    <div class="st"><b>4</b><span>live apps</span></div>
+    <div class="st"><b>290+</b><span>backend functions</span></div>
+    <div class="st"><b>2</b><span>languages · Hindi &amp; English</span></div>
+    <div class="st"><b>1</b><span>Android app</span></div>
+    <div class="st"><b>₹0</b><span>outside funding — self-funded</span></div></div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">14</span></div>
+</section>
+
+<!-- 15 THANK YOU -->
+<section class="slide dark s15">
+  <div class="glow"></div>
+  <div class="hd"><div class="brand"><img src="assets/logo-mark.png" alt="">RozBazaar</div><div></div></div>
+  <div class="tile"><img src="assets/logo-mark.png" alt=""></div>
+  <div class="wm"><span>Roz</span>Bazaar</div>
+  <div class="tl">Your village vendor. In your time slot.</div>
+  <div class="asks">
+    <div class="ask">{{i:handshake}}<b>Mentorship</b><span>E-Cell IIT Bombay network</span></div>
+    <div class="ask">{{i:map-pin}}<b>Pilot partners</b><span>Panchayats &amp; vendors</span></div>
+    <div class="ask">{{i:sprout}}<b>First funding</b><span>Self-funded so far · applying for Startup Haryana seed (up to ₹10 L)</span></div>
+  </div>
+  <div class="ct"><span>{{i:globe}}rozbazaar.shop</span><span>{{i:mail}}vedanshurathi@gmail.com</span><span>{{i:message-circle}}@roz.bzaar</span></div>
+  <div class="ty">Thank you · <span class="hi">धन्यवाद</span></div>
+  <div class="ft"><span>Team ID EJ26T161683 · Eureka! Junior, E-Cell IIT Bombay</span><span class="pg">15</span></div>
+</section>
+
+</body>
+</html>

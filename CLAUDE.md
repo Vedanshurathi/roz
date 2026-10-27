@@ -76,6 +76,7 @@ scripts/
   site-csp.py        re-pins the inline-script hash of admin-site / staff-site (run after editing them)
   test-voice-parser.js  node scripts/test-voice-parser.js — tests the customer site's voice-order parser
 docs/              business context
+  pitch-deck/        the pitch deck: deck.src.html → `npm run build` → RozBazaar_Pitch_Deck.pdf (see its README)
 platform/          NEW (30 Sep 2026): TypeScript/Express API + React customer & vendor apps
                    (npm workspaces). Replaces customer/index.html + vendor-site/ once deployed.
                    Read platform/README.md and platform/docs/* before touching it.
