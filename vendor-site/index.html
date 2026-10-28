@@ -810,6 +810,56 @@ body.has-nav .scr{padding-bottom:200px}
 .rc-btns .btn{margin:0}
 .gali-tag{display:inline-flex;align-items:center;gap:5px;margin-top:5px;padding:3px 9px;border-radius:10px;background:#FFF1DE;color:#A04A00;font-size:11.5px;font-weight:800}
 .gali-tag.done{background:#E3F6E9;color:#0E6B32}
+/* rates by voice */
+.vrbtn{display:flex;align-items:center;gap:12px;width:100%;margin:12px 0 0;padding:14px 16px;border-radius:16px;border:2px solid var(--g);background:var(--lime-s);
+  color:var(--g-dk);font-family:inherit;text-align:left;cursor:pointer}
+.vrbtn .mi{width:44px;height:44px;border-radius:50%;background:var(--g);color:#fff;display:grid;place-items:center;font-size:21px;flex:none;box-shadow:0 6px 14px rgba(30,142,62,.3)}
+.vrbtn b{display:block;font-size:15.5px;font-weight:800}
+.vrbtn small{display:block;font-size:12.5px;font-weight:700;color:var(--tx2);margin-top:2px}
+.vr-top{text-align:center;padding:4px 0 6px}
+.vr-mic{width:86px;height:86px;border-radius:50%;border:0;background:var(--g);color:#fff;font-size:38px;box-shadow:0 10px 24px rgba(30,142,62,.35);cursor:pointer;transition:transform .15s}
+.vr-mic:active{transform:scale(.94)}
+.vr-mic.on{background:#D93025;box-shadow:0 0 0 0 rgba(217,48,37,.5);animation:vrp 1.3s infinite}
+.vr-mic:disabled{background:#C9C5BC;box-shadow:none}
+@keyframes vrp{0%{box-shadow:0 0 0 0 rgba(217,48,37,.45)}70%{box-shadow:0 0 0 18px rgba(217,48,37,0)}100%{box-shadow:0 0 0 0 rgba(217,48,37,0)}}
+@media (prefers-reduced-motion:reduce){.vr-mic.on{animation:none}}
+.vr-st{font-size:14px;font-weight:800;margin-top:10px}
+.vr-st.err{color:var(--red)}
+.vr-int{min-height:18px;font-size:13px;font-weight:700;color:var(--mut);margin-top:4px}
+.vr-langs{display:flex;gap:8px;justify-content:center;margin-top:8px}
+.vr-langs button{padding:6px 14px;border-radius:99px;border:1.5px solid var(--line);background:#fff;font-weight:800;font-size:13px}
+.vr-langs button.on{border-color:var(--g);background:var(--lime-s);color:var(--g-dk)}
+.vr-lbl{font-size:11.5px;font-weight:800;letter-spacing:.06em;color:var(--mut);margin:12px 0 6px;text-transform:uppercase}
+.vr-txt{width:100%;min-height:62px;border:1.5px solid var(--line);border-radius:14px;padding:11px 13px;font:700 15px/1.45 inherit;font-family:inherit;resize:vertical}
+.vr-ex{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.vr-ex button{padding:6px 10px;border-radius:10px;border:1.5px dashed #B9DDB9;background:#F6FBF4;color:var(--g-dk);font-weight:700;font-size:12.5px}
+.vr-hd{font-size:13px;font-weight:800;color:var(--tx2);margin:14px 0 8px}
+.vr-row{display:flex;gap:11px;align-items:flex-start;padding:11px;border:1.5px solid var(--line);border-radius:14px;margin-bottom:8px;background:#fff}
+.vr-row.drop{opacity:.42}
+.vr-row.drop .vr-mid b{text-decoration:line-through}
+.vr-row .pthumb{flex:none}
+.vr-mid{flex:1;min-width:0}
+.vr-mid b{font-size:15px;display:block}
+.vr-pr{display:flex;align-items:center;gap:7px;margin-top:6px;flex-wrap:wrap}
+.vr-pr s{color:var(--mut);font-weight:800;font-size:13.5px}
+.vr-ar{font-weight:900;font-size:15px}.vr-ar.dn{color:var(--g)}.vr-ar.up{color:var(--or)}
+.vr-pr .rupee input{width:72px}
+.vr-u{font-size:12.5px;font-weight:800;color:var(--mut)}
+.vr-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.vr-tag{font-size:11.5px;font-weight:800;padding:3px 8px;border-radius:8px;background:#EEF;color:#334}
+.vr-tag.out{background:var(--red-s);color:var(--red)}.vr-tag.in{background:#E3F6E9;color:#0E6B32}
+.vr-tag.new{background:#E8F1FF;color:#1F55B3}.vr-tag.warn{background:var(--or-s);color:#A04A00}
+.vr-said{font-size:12px;font-weight:700;color:var(--tx2);margin-top:5px}
+.vr-heard{font-size:11.5px;font-weight:600;color:var(--mut);margin-top:3px}
+.vr-x{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:14px;flex:none}
+.vr-note{font-size:12.5px;font-weight:700;color:var(--tx2);background:#F3F2EF;border-radius:12px;padding:9px 11px;margin-top:8px}
+.vr-note.warn{background:var(--or-s);color:#8A4300}
+.vr-foot{display:flex;gap:10px;margin-top:12px;position:sticky;bottom:0;background:#fff;padding:8px 0 2px}
+.vr-foot .btn{margin:0}.vr-foot .vr-say{flex:0 0 58px;width:58px;padding:0;font-size:22px}
+.vr-done{text-align:center;padding:18px 6px 4px}
+.vr-ok{width:64px;height:64px;border-radius:50%;background:var(--g);color:#fff;font-size:32px;font-weight:900;display:grid;place-items:center;margin:0 auto 10px}
+.vr-done b{font-size:18px;display:block}.vr-done p{font-size:13.5px;font-weight:700;color:var(--tx2);margin:6px 0 4px}
+
 </style>
 </head>
 <body>
@@ -1233,6 +1283,8 @@ body.has-nav .scr{padding-bottom:200px}
     <div class="note blue"><span>📣</span>
       <span data-en="Customers see these rates before booking. Change them when the mandi rate changes."
             data-hi="ग्राहक बुकिंग से पहले यही रेट देखते हैं। मंडी का रेट बदले तो यहाँ भी बदल दो।">Customers see these rates before booking.</span></div>
+    <button class="vrbtn" onclick="openVoiceRates(true)"><span class="mi">🎤</span><span><b data-en="Speak your rates" data-hi="बोलकर रेट बदलो">Speak your rates</b>
+      <small data-en="“tomato 40, potato 30, okra finished” — all items at once" data-hi="“टमाटर चालीस, आलू तीस, भिंडी खत्म” — सारे सामान एक बार में">“tomato 40, potato 30, okra finished”</small></span></button>
     <button class="rcbtn" id="rcBtn" onclick="openRateCard()">📤 <span data-en="Send today's rates on WhatsApp" data-hi="आज के रेट WhatsApp पर भेजो">Send today's rates on WhatsApp</span></button>
     <div id="pendBox"></div>
     <div class="sec-hd"><h2 data-en="Your items" data-hi="आपका सामान">Your items</h2>
@@ -1357,6 +1409,23 @@ body.has-nav .scr{padding-bottom:200px}
       <button class="btn btn-out" style="flex:0 0 auto;width:auto;padding:0 18px" onclick="rcDownload()" data-en="Download" data-hi="डाउनलोड">Download</button>
       <button class="btn btn-g" style="flex:1;background:#1FAF5A" onclick="rcShareNow()" data-en="Share on WhatsApp" data-hi="WhatsApp पर भेजो">Share on WhatsApp</button>
     </div>
+  </div>
+</div>
+<div class="rc-wrap" id="vrWrap" onclick="if(event.target===this)closeVoiceRates()">
+  <div class="rc-box">
+    <h3><span data-en="Speak your rates" data-hi="बोलकर रेट बदलो">Speak your rates</span><button onclick="closeVoiceRates()" aria-label="Close">✕</button></h3>
+    <p data-en="Say the item and its rate — “tomato 40, potato 30, okra finished”. Nothing changes until you tap Save." data-hi="सामान और उसका रेट बोलो — “टमाटर चालीस, आलू तीस, भिंडी खत्म”। सेव दबाने तक कुछ नहीं बदलेगा।">Say the item and its rate. Nothing changes until you tap Save.</p>
+    <div class="vr-top">
+      <button class="vr-mic" id="vrMic" onclick="vrToggle()" aria-label="microphone">🎤</button>
+      <div class="vr-st" id="vrState"></div><div class="vr-int" id="vrInterim"></div>
+      <div class="vr-langs" id="vrLangs"><button data-l="hi-IN" onclick="vrLang('hi-IN')">हिंदी</button><button data-l="en-IN" onclick="vrLang('en-IN')">English</button></div>
+    </div>
+    <div class="vr-lbl" data-en="What we heard — you can change it" data-hi="जो सुना — आप बदल सकते हो">What we heard — you can change it</div>
+    <textarea class="vr-txt" id="vrText" rows="2" oninput="vrTyped()" data-en-ph="e.g. tomato 40, potato 30, okra finished" data-hi-ph="जैसे: टमाटर चालीस, आलू तीस, भिंडी खत्म" placeholder="टमाटर चालीस, आलू तीस, भिंडी खत्म"></textarea>
+    <div class="vr-lbl" data-en="Try saying" data-hi="ऐसे बोलो">Try saying</div>
+    <div class="vr-ex" id="vrEx"></div>
+    <div id="vrList"></div>
+    <div class="vr-foot" id="vrFoot"></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -3933,6 +4002,7 @@ async function renderHome(){
   document.getElementById('deskSide').innerHTML = `
     <div class="card">
       <div class="sec-hd" style="padding-top:0"><h2>${T('Quick actions','जल्दी वाले काम')}</h2></div>
+      <button class="btn btn-out" style="margin-bottom:10px;border-color:var(--g);color:var(--g-dk);background:var(--lime-s)" onclick="openVoiceRates(true)">🎤 ${T("Speak today's rates",'बोलकर आज के रेट बदलो')}</button>
       <button class="btn btn-out" style="margin-bottom:10px" onclick="go('stock')">🥬 ${T('Update stock & rates','स्टॉक और रेट बदलो')}</button>
       <button class="btn btn-out" style="margin-bottom:10px" onclick="go('slots')">🕖 ${T('Change slots','स्लॉट बदलो')}</button>
       <button class="btn btn-out" onclick="go('earn')">📊 ${T('Open dashboard','डैशबोर्ड खोलो')}</button>
@@ -4404,6 +4474,498 @@ function showDone(mode, amt){
     </div>`;
   burst(document.getElementById('okHost'));
   setTimeout(()=>toast(T('Well done. On to the next one.','बढ़िया। अब अगला।')), 900);
+}
+
+/* VENDOR-RATE-PARSER-START */
+/* Rates by voice (vendor app) — the vendor says "टमाटर चालीस, आलू तीस, भिंडी खत्म, मटर आ गया साठ" and his own items change.
+   Pure (no DOM); tested by `node scripts/test-vendor-rate-parser.js`, which reads this block straight out of index.html.
+   VRATE.parse(text, products, catalog) → {rows, unknown}
+     products: [{id, hi, roman, en, unit, price, stock}]  — the vendor's own items
+     catalog:  [{key, hi, roman, en, unit}]               — items he does not sell yet (offered as "add new")
+     rows: [{kind:'own'|'cat', pid|key, hi, en, unit, old, price, stock, said, conv, mismatch, many, fuzzy, heard}]
+   A bare number is the rate for the item's own unit ("टमाटर चालीस" → ₹40 for its 1 kg or its 500 g pack). With a unit it is
+   converted to the item's unit: "चालीस किलो" / "40 रुपये किलो" on a 500 g item → ₹20, "पाव बीस" on a 1 kg item → ₹80.
+   "खत्म / नहीं है / बंद" = sold out, "आ गया / चालू / फिर से" = back in stock. Nothing is saved here — the vendor checks the list. */
+const VRATE=(()=>{
+  const DIG={'०':0,'१':1,'२':2,'३':3,'४':4,'५':5,'६':6,'७':7,'८':8,'९':9};
+  function norm(s){
+    s=String(s||'').normalize('NFD').replace(/़/g,'').normalize('NFC')       /* nukta: ख़त्म = खत्म */
+      .replace(/ँ/g,'ं').replace(/[०-९]/g,d=>DIG[d]).toLowerCase();    /* chandrabindu = anusvara */
+    s=s.replace(/\/-/g,' ').replace(/(\d),(\d{3})/g,'$1$2').replace(/(\d)\.(\d)/g,'$1․$2');
+    s=s.replace(/(\d)([^\d\s․\/])/g,'$1 $2').replace(/([^\d\s․\/₹])(\d)/g,'$1 $2');
+    s=s.replace(/₹/g,' ₹ ').replace(/\//g,' / ').replace(/[-–—_]/g,' ')
+      .replace(/[.!?"“”'‘’()\[\]{}:;।॥|*+=&]+/g,' , ').replace(/,/g,' , ').replace(/․/g,'.');
+    return s.replace(/\s+/g,' ').trim();
+  }
+  /* numbers 1–99 as the phone's Hindi speech engine writes them, plus common other spellings */
+  const NUM={};
+  ('एक दो तीन चार पांच छह सात आठ नौ दस ग्यारह बारह तेरह चौदह पंद्रह सोलह सत्रह अठारह उन्नीस बीस इक्कीस बाईस तेईस चौबीस पच्चीस '+
+   'छब्बीस सत्ताईस अट्ठाईस उनतीस तीस इकतीस बत्तीस तैंतीस चौंतीस पैंतीस छत्तीस सैंतीस अड़तीस उनतालीस चालीस इकतालीस बयालीस तैंतालीस '+
+   'चवालीस पैंतालीस छियालीस सैंतालीस अड़तालीस उनचास पचास इक्यावन बावन तिरेपन चौवन पचपन छप्पन सत्तावन अट्ठावन उनसठ साठ इकसठ बासठ '+
+   'तिरेसठ चौंसठ पैंसठ छियासठ सड़सठ अड़सठ उनहत्तर सत्तर इकहत्तर बहत्तर तिहत्तर चौहत्तर पचहत्तर छिहत्तर सतहत्तर अठहत्तर उन्यासी अस्सी '+
+   'इक्यासी बयासी तिरासी चौरासी पचासी छियासी सत्तासी अट्ठासी नवासी नब्बे इक्यानवे बानवे तिरानवे चौरानवे पचानवे छियानवे सत्तानवे अट्ठानवे निन्यानवे')
+   .split(' ').forEach((w,i)=>{ NUM[norm(w)]=i+1; });
+  const ALT={'छः':6,'छे':6,'छै':6,'इक':1,'पाँच':5,'पांच':5,'पाच':5,'पन्द्रह':15,'पंदरह':15,'चालिस':40,'पच्चिस':25,'पचीस':25,'पैंतालिस':45,'पैतालीस':45,
+    'पैंतीस':35,'पैतीस':35,'तैतीस':33,'चौवालीस':44,'चव्वालीस':44,'पैसठ':65,'उनचालीस':39,'अठावन':58,'अड़तीस':38,'अडतीस':38,'उन्नासी':79,'नवासी':89,
+    'ek':1,'do':2,'teen':3,'tin':3,'char':4,'chaar':4,'panch':5,'paanch':5,'paach':5,'chhe':6,'che':6,'saat':7,'sat':7,'aath':8,'ath':8,'nau':9,'das':10,
+    'gyarah':11,'barah':12,'baarah':12,'terah':13,'chaudah':14,'pandrah':15,'solah':16,'satrah':17,'atharah':18,'unnees':19,'unnis':19,'bees':20,'bis':20,
+    'ikkees':21,'baees':22,'bais':22,'teis':23,'chaubees':24,'pachees':25,'pachchees':25,'pachis':25,'chhabbees':26,'sattaees':27,'atthaees':28,'untees':29,
+    'tees':30,'tis':30,'ikattees':31,'battees':32,'taintees':33,'chauntees':34,'paintees':35,'paintis':35,'chhattees':36,'saintees':37,'adtees':38,'untalees':39,
+    'chalees':40,'chalis':40,'chaalis':40,'iktalees':41,'bayalees':42,'taintalees':43,'chavalees':44,'paintalees':45,'paintalis':45,'chhiyalees':46,
+    'saintalees':47,'adtalees':48,'unchas':49,'pachas':50,'pachaas':50,'ikyavan':51,'bavan':52,'tirepan':53,'chauvan':54,'pachpan':55,'chhappan':56,
+    'sattavan':57,'atthavan':58,'unsath':59,'saath':60,'sath':60,'iksath':61,'basath':62,'tiresath':63,'chaunsath':64,'painsath':65,'chhiyasath':66,
+    'sadsath':67,'adsath':68,'unhattar':69,'sattar':70,'ikhattar':71,'bahattar':72,'tihattar':73,'chauhattar':74,'pachattar':75,'pachhattar':75,
+    'chhihattar':76,'sathattar':77,'athhattar':78,'unyasi':79,'assi':80,'ikyasi':81,'bayasi':82,'tirasi':83,'chaurasi':84,'pachasi':85,'chhiyasi':86,
+    'sattasi':87,'atthasi':88,'navasi':89,'nabbe':90,'nabbey':90,
+    'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,'nine':9,'ten':10,'eleven':11,'twelve':12,'thirteen':13,'fourteen':14,
+    'fifteen':15,'sixteen':16,'seventeen':17,'eighteen':18,'nineteen':19,'twenty':20,'thirty':30,'forty':40,'fourty':40,'fifty':50,'sixty':60,
+    'seventy':70,'eighty':80,'ninety':90};
+  Object.keys(ALT).forEach(k=>{ NUM[norm(k)]=ALT[k]; });
+  const FRAC={'आधा':.5,'आधी':.5,'आधे':.5,'aadha':.5,'adha':.5,'half':.5,'डेढ':1.5,'डेड':1.5,'dedh':1.5,'ढाई':2.5,'अढाई':2.5,'dhai':2.5,'dhaai':2.5};
+  const PRE={'सवा':.25,'sawa':.25,'sava':.25,'साढे':.5,'साडे':.5,'sadhe':.5,'saadhe':.5,'पौने':-.25,'paune':-.25};
+  const HUND=new Set(['सौ','sau','so','hundred']), THOU=new Set(['हजार','hazar','hajar','hazaar','thousand']);
+  const UNIT={'किलो':'kg','कीलो':'kg','किल्लो':'kg','केजी':'kg','किलोग्राम':'kg','kilo':'kg','kilos':'kg','kg':'kg','kgs':'kg','kilogram':'kg','killo':'kg',
+    'ग्राम':'g','gram':'g','grams':'g','gm':'g','gms':'g','g':'g',
+    'पाव':'paav','pav':'paav','paav':'paav','pao':'paav','pau':'paav','quarter':'paav',
+    'पीस':'pc','piece':'pc','pieces':'pc','pc':'pc','pcs':'pc','नग':'pc','दाना':'pc','ठो':'pc',
+    'दर्जन':'dozen','darjan':'dozen','dozen':'dozen','darjen':'dozen',
+    'गड्डी':'bunch','गड्डियां':'bunch','गडी':'bunch','गठ्ठी':'bunch','गट्ठी':'bunch','गुच्छा':'bunch','जूडी':'bunch','पूली':'bunch',
+    'gaddi':'bunch','gadi':'bunch','bunch':'bunch','guchha':'bunch','judi':'bunch',
+    'रुपये':'rs','रुपए':'rs','रुपया':'rs','रूपये':'rs','रूपए':'rs','रुपय':'rs','रु':'rs','rupaye':'rs','rupay':'rs','rupees':'rs','rupee':'rs','rs':'rs','₹':'rs','inr':'rs'};
+  const PER=new Set(['प्रति','per','/','पर']), OF=new Set(['का','की','के','ka','ki','ke']);
+  const FROM=new Set(['से','se','to','टू']);
+  const SEP=new Set([',','और','aur','or','and','तथा','फिर','then','plus','प्लस']);
+  const VERB=new Set(['कर','रख','लगा','बना','बदल','kar','rakh','laga','bana','badal']);
+  /* stock words: [phrase, value, strength]; longer phrases are matched first */
+  const STOCK=[
+    ['नहीं है',false,2],['नहीं हैं',false,2],['नही है',false,2],['नहीं आया',false,2],['नहीं आई',false,2],['नहीं आए',false,2],['नहीं मिला',false,2],
+    ['खत्म हो गया',false,2],['खत्म हो गई',false,2],['खत्म हो गए',false,2],['खत्म है',false,2],['स्टॉक आउट',false,2],['आउट ऑफ स्टॉक',false,2],
+    ['sold out',false,2],['out of stock',false,2],['nahi hai',false,2],['nahin hai',false,2],['khatam ho gaya',false,2],['khatam hai',false,2],
+    ['खत्म',false,2],['खतम',false,2],['खतम',false,2],['समाप्त',false,2],['खलास',false,2],['नहीं',false,2],['नही',false,2],['बंद',false,2],['बन्द',false,2],
+    ['आउट',false,2],['khatam',false,2],['khatm',false,2],['khtm',false,2],['khalas',false,2],['nahi',false,2],['nahin',false,2],['nai',false,2],
+    ['band',false,2],['out',false,2],['finished',false,2],['finish',false,2],['over',false,2],['soldout',false,2],
+    ['आ गया',true,2],['आ गई',true,2],['आ गए',true,2],['आ गये',true,2],['आ गयी',true,2],['आ गया है',true,2],['फिर से',true,2],['वापस आ गया',true,2],
+    ['मिल रहा',true,2],['मिल रही',true,2],['मिल रहे',true,2],['in stock',true,2],['back in stock',true,2],['aa gaya',true,2],['aa gayi',true,2],['aa gaye',true,2],
+    ['phir se',true,2],['आया',true,2],['आई',true,2],['आए',true,2],['आये',true,2],['चालू',true,2],['उपलब्ध',true,2],['वापस',true,2],['दोबारा',true,2],
+    ['available',true,2],['back',true,2],['chalu',true,2],['wapas',true,2],['aaya',true,2],['instock',true,2],
+    ['है',true,1],['हैं',true,1],['hai',true,1],['hain',true,1]
+  ].map(([p,v,s])=>[norm(p),v,s]).sort((a,b)=>b[0].split(' ').length-a[0].split(' ').length);
+  const FILL=new Set(['रेट','भाव','दाम','कीमत','rate','rates','bhav','bhaav','daam','price','prices','कर','करो','करना','करें','कर दो','दो','दे','दीजिए','रखो','रख',
+    'लगाओ','लगा','लगा दो','बदलो','बदल','बदलकर','बना','बनाओ','आज','अभी','तक','वाला','वाली','वाले','भैया','भाई','जी','ok','okay','ओके','हां','हाँ','हा','बस','सिर्फ','भी',
+    'तो','सब','मेरा','मेरी','मेरे','अपना','अपने','हो','गया','गई','गए','गये','था','थी','थे','भर','लगभग','करीब','set','update','change','make','is','the','now',
+    'today','of','for','at','it','please','kar','karo','do','de','rakho','lagao','badlo','aaj','abhi','wala','wali','bhaiya','ji','bas','bhi','to','sab','mera',
+    'ho','gaya','gayi','ka','ki','ke','ko','को','में','मे','me','mein','वो','ये','यह','वह','ताजा','ताजे','ताजी','fresh','अच्छा','अच्छी','अच्छे','badhiya','बढिया'].map(norm));
+  const SYN=[
+    ['आलू','aloo','alu','aaloo','potato','potatoes'],['प्याज','पियाज','गंठा','गंठे','कांदा','pyaz','pyaaz','piyaz','onion','onions','gantha','kanda'],
+    ['लहसुन','लसुन','लहसन','lehsun','lahsun','lasun','garlic'],['टमाटर','टमाटा','टिमाटर','tamatar','tamater','tomato','tomatoes'],
+    ['भिंडी','भिन्डी','bhindi','okra','lady finger','ladyfinger'],['बैंगन','बेंगन','बताऊं','बताऊ','भंटा','baingan','bengan','baigan','brinjal','eggplant'],
+    ['लौकी','लोकी','घीया','घिया','दूधी','lauki','loki','ghiya','ghia','bottle gourd'],['गोभी','फूलगोभी','फूल गोभी','गोबी','gobhi','gobi','phool gobhi','cauliflower'],
+    ['पत्ता गोभी','पत्तागोभी','बंद गोभी','बंदगोभी','patta gobhi','band gobhi','cabbage'],['पालक','palak','spinach'],
+    ['धनिया','धनियां','हरा धनिया','dhaniya','dhania','coriander'],['हरी मिर्च','मिर्च','मिर्ची','मिरच','hari mirch','mirch','mirchi','chilli','green chilli','chili'],
+    ['शिमला मिर्च','शिमला','shimla mirch','shimla','capsicum'],['गाजर','gajar','carrot','carrots'],['खीरा','खीरे','kheera','khira','cucumber'],
+    ['मटर','matar','mattar','peas','green peas'],['करेला','करेले','karela','bitter gourd'],['तोरई','तोरी','तुरई','torai','tori','turai','ridge gourd'],
+    ['टिंडा','टिंडे','tinda','round gourd'],['कद्दू','काशीफल','kaddu','pumpkin'],['अरबी','arbi','arvi','colocasia'],['मूली','muli','mooli','radish'],
+    ['अदरक','अद्रक','कच्ची अदरक','adrak','ginger'],['पुदीना','pudina','mint'],['मेथी','methi'],['नींबू','निम्बू','निंबू','nimbu','lemon'],
+    ['केला','केले','kela','banana','bananas'],['सेब','seb','apple','apples'],['संतरा','संतरे','santra','orange'],['पपीता','papita','papaya'],
+    ['अंगूर','angoor','angur','grapes'],['अमरूद','amrood','amrud','guava'],['अनार','anaar','anar','pomegranate'],['परवल','parwal','parval','pointed gourd'],
+    ['मोटी मिर्च','moti mirch'],['चुकंदर','chukandar','beetroot'],['शकरकंदी','शकरकंद','shakarkandi','sweet potato']
+  ].map(g=>new Set(g.map(norm)));
+  const ED=(a,b)=>{ const m=a.length,n=b.length; if(!m) return n; if(!n) return m; let p=Array.from({length:n+1},(_,j)=>j);
+    for(let i=1;i<=m;i++){ const c=[i]; for(let j=1;j<=n;j++) c[j]=a[i-1]===b[j-1]?p[j-1]:1+Math.min(p[j-1],p[j],c[j-1]); p=c; } return p[n]; };
+  const stem=w=>w.replace(/(ियों|ियां|ओं|ों|ें)$/,'').replace(/(ies)$/,'y').replace(/(es|s)$/,'');
+  function names(x){
+    const out=new Set();
+    [x.hi,x.roman,x.en].forEach(v=>{ if(!v) return; const s=String(v); out.add(norm(s.replace(/\(.*?\)/g,'')));
+      (s.match(/\(([^)]*)\)/g)||[]).forEach(m=>m.slice(1,-1).split(/[\/,]/).forEach(y=>out.add(norm(y)))); });
+    out.delete(''); return out;
+  }
+  function lexicon(products,catalog){
+    const refs=[], phrases=new Map();
+    const add=(ph,ri,score)=>{ if(!ph||NUM[ph]!=null||UNIT[ph]||FILL.has(ph)) return; const cur=phrases.get(ph);
+      if(!cur||cur.score<score) phrases.set(ph,{ri:[ri],score}); else if(cur.score===score && !cur.ri.includes(ri)) cur.ri.push(ri); };
+    /* scores: own name 30 > own local name 20 > catalogue name 15 > catalogue local name 12 > last word of an own name 5 > of a catalogue name 1
+       (so "गोभी" means cauliflower from the catalogue, not his पत्ता गोभी) */
+    const put=(ref,own,sc)=>{ const ri=refs.length; refs.push(ref);
+      own.forEach(n=>add(n,ri,sc[0])); SYN.forEach(g=>{ if([...own].some(n=>g.has(n))) g.forEach(w=>add(w,ri,sc[1])); });
+      own.forEach(n=>{ const t=n.split(' '); if(t.length>1){ const head=t[t.length-1]; if(head.length>=3) add(head,ri,sc[2]); } }); };
+    (products||[]).forEach(p=>put({kind:'own',p},names(p),[30,20,5]));
+    const have=new Set(); refs.forEach(r=>names(r.p).forEach(n=>have.add(n)));
+    (catalog||[]).forEach(c=>{ const nm=names(c); if([...nm].some(n=>have.has(n)||SYN.some(g=>g.has(n)&&[...g].some(w=>have.has(w))))) return; put({kind:'cat',c},nm,[15,12,1]); });
+    const byLen=new Map(); phrases.forEach((v,ph)=>{ const n=ph.split(' ').length; if(!byLen.has(n)) byLen.set(n,[]); byLen.get(n).push([ph,v]); });
+    return {refs,phrases,byLen};
+  }
+  function tokens(text){
+    const raw=norm(text).split(' ').filter(Boolean), out=[];
+    for(let i=0;i<raw.length;i++){
+      const w=raw[i], prev=out[out.length-1];
+      let st=null;                                                   /* multi-word stock phrases first */
+      for(const [ph,v,s] of STOCK){ const k=ph.split(' '); if(raw.slice(i,i+k.length).join(' ')===ph){ st={ph,v,s,n:k.length}; break; } }
+      if(st){ out.push({t:'stock',w:st.ph,v:st.v,s:st.s}); i+=st.n-1; continue; }
+      if(SEP.has(w)){ out.push({t:'sep',w}); continue; }
+      if((w==='दो'||w==='do') && prev && prev.t==='word' && VERB.has(prev.w)){ prev.t='fill'; out.push({t:'fill',w}); continue; }
+      if(/^\d+(\.\d+)?$/.test(w)){ out.push({t:'num',w,v:parseFloat(w)}); continue; }
+      if(NUM[w]!=null){ out.push({t:'num',w,v:NUM[w]}); continue; }
+      if(FRAC[w]!=null){ out.push({t:'num',w,v:FRAC[w]}); continue; }
+      if(PRE[w]!=null){ out.push({t:'pre',w,v:PRE[w]}); continue; }
+      if(HUND.has(w)){ out.push({t:'hund',w}); continue; }
+      if(THOU.has(w)){ out.push({t:'thou',w}); continue; }
+      if(UNIT[w]){ out.push({t:'unit',w,u:UNIT[w]}); continue; }
+      if(PER.has(w)){ out.push({t:'per',w}); continue; }
+      if(OF.has(w)){ out.push({t:'of',w}); continue; }
+      if(FROM.has(w)){ out.push({t:'from',w}); continue; }
+      out.push({t:'word',w});
+    }
+    return out;
+  }
+  const RUN=new Set(['num','pre','hund','thou','unit','per','of','from']);
+  function numExpr(tk,i){
+    let j=i, pre=0, v=null;
+    if(tk[j]&&tk[j].t==='pre'){ pre=tk[j].v; j++; }
+    if(tk[j]&&tk[j].t==='num'){ v=tk[j].v; j++;
+      if(tk[j]&&tk[j].t==='num'&&v>=20&&v<100&&v%10===0&&tk[j].v<10&&tk[j].v%1===0){ v+=tk[j].v; j++; } }    /* forty five */
+    let base=(v==null?1:v)+pre;
+    if(tk[j]&&tk[j].t==='hund'){ base*=100; j++; if(tk[j]&&tk[j].t==='num'&&tk[j].v<100){ base+=tk[j].v; j++; } }
+    else if(tk[j]&&tk[j].t==='thou'){ base*=1000; j++; if(tk[j]&&tk[j].t==='num'){ const e=numExpr(tk,j); if(e){ base+=e.v; j=e.j; } } }
+    else if(v==null) return null;
+    return {v:Math.round(base*100)/100,j};
+  }
+  /* one run of number/unit words → {price, basis} (basis = what the price is for: {u,q}) */
+  function readRun(run){
+    const pieces=[]; let lead=null, money=false, i=0;
+    while(i<run.length){
+      const t=run[i];
+      if(t.t==='unit' && t.u==='rs'){ money=true; i++; continue; }
+      if(t.t==='unit'){ lead={u:t.u,q:1}; i++; continue; }
+      const e=(t.t==='num'||t.t==='pre'||t.t==='hund'||t.t==='thou')?numExpr(run,i):null;
+      if(!e){ i++; continue; }
+      const pc={v:e.v,rs:money,m:null}; money=false; i=e.j;
+      while(i<run.length && (run[i].t==='unit'||run[i].t==='of'||run[i].t==='per')){
+        const u=run[i]; if(u.t==='unit'){ if(u.u==='rs') pc.rs=true; else if(!pc.m) pc.m={u:u.u,q:pc.rs?1:null}; } i++; }
+      if(lead && !pc.m){ pc.lead=lead; lead=null; }
+      pieces.push(pc);
+    }
+    const isBasis=p=>p.m && !p.rs && (p.m.u==='g' || pieces.some(o=>o!==p && (o.rs || !o.m)));
+    const money1=pieces.filter(p=>p.rs), plain=pieces.filter(p=>!p.rs && !p.m), meas=pieces.filter(p=>p.m && !p.rs && p.m.u!=='g');
+    let pr=null, basis=null;
+    if(money1.length) pr=money1[money1.length-1];
+    else if(plain.length) pr=plain[plain.length-1];
+    else if(meas.length){ pr=meas[meas.length-1]; basis={u:pr.m.u,q:1}; }
+    const bp=pieces.find(p=>p!==pr && p.m && isBasis(p));
+    if(pr && !basis) basis = bp ? {u:bp.m.u,q:bp.v} : (pr.m ? {u:pr.m.u,q:1} : (pr.lead || lead));
+    if(!pr) return {price:null, basis: bp?{u:bp.m.u,q:bp.v}:lead, many:false};
+    return {price:pr.v, basis:basis||null, many:(money1.length+plain.length)>1 && !run.some(t=>t.t==='from')};
+  }
+  function packOf(unit){
+    const u=norm(unit||''); let m;
+    if((m=u.match(/^([\d.]+)?\s*(kg|kilo|किलो)/))) return {k:'w',g:(parseFloat(m[1])||1)*1000};
+    if((m=u.match(/^([\d.]+)\s*(g|gm|gms|gram|grams|ग्राम)\b/))) return {k:'w',g:parseFloat(m[1])};
+    if((m=u.match(/^([\d.]+)?\s*(dozen|darjan|दर्जन)/))) return {k:'pc',n:(parseFloat(m[1])||1)*12};
+    if((m=u.match(/^([\d.]+)?\s*(pc|pcs|piece|pieces|पीस|nag)/))) return {k:'pc',n:parseFloat(m[1])||1};
+    if((m=u.match(/^([\d.]+)?\s*(bunch|gaddi|गड्डी|guchha)/))) return {k:'bunch',n:parseFloat(m[1])||1};
+    return {k:'pack',n:1};
+  }
+  /* the spoken price → the price of the item's own unit */
+  function convert(price,basis,unit){
+    if(!basis) return {price,conv:false,mismatch:false};
+    const pk=packOf(unit), G={kg:1000,g:1,paav:250};
+    let r=null;
+    if(G[basis.u]!=null && pk.k==='w') r=price*pk.g/(G[basis.u]*basis.q);
+    else if(basis.u==='dozen' && pk.k==='pc') r=price*pk.n/(12*basis.q);
+    else if(basis.u==='pc' && pk.k==='pc') r=price*pk.n/basis.q;
+    else if(basis.u==='bunch' && pk.k==='bunch') r=price*pk.n/basis.q;
+    if(r==null) return {price,conv:false,mismatch:true};
+    r=Math.round(r*2)/2;                                            /* nearest 50 paise */
+    return {price:r, conv:Math.abs(r-price)>0.001, mismatch:false};
+  }
+  function match(tk,lex){
+    const out=[]; let i=0;
+    while(i<tk.length){
+      if(tk[i].t!=='word'){ out.push(Object.assign({a:i,b:i+1},tk[i])); i++; continue; }
+      let best=null;
+      for(let n=Math.min(4,tk.length-i);n>=1;n--){
+        const run=tk.slice(i,i+n); if(run.some(e=>e.t!=='word')) continue;
+        const ph=run.map(e=>e.w).join(' ');
+        const hit=lex.phrases.get(ph)||lex.phrases.get(run.map(e=>stem(e.w)).join(' '));
+        if(hit){ best={hit,n}; break; }
+      }
+      if(!best){
+        for(let n=Math.min(3,tk.length-i);n>=1;n--){
+          const run=tk.slice(i,i+n); if(run.some(e=>e.t!=='word')) continue;
+          const ph=run.map(e=>e.w).join(' '); if(n===1 && (FILL.has(ph)||ph.length<3)) continue;
+          const len=ph.replace(/ /g,'').length, tol=len<=3?0:len<=6?1:2; if(!tol) continue;
+          let bd=9, bh=null;
+          for(const [cand,v] of (lex.byLen.get(n)||[])){
+            if(Math.abs(cand.length-ph.length)>tol || v.score<1) continue;
+            const d=ED(ph,cand); if(d<=tol && v.score>=5 && (d<bd || (d===bd && v.score>bh.score))){ bd=d; bh=v; }
+          }
+          if(bh){ best={hit:bh,n,fuzzy:true}; break; }
+        }
+      }
+      if(best){ out.push({t:'item',ri:best.hit.ri[0],many:best.hit.ri.length>1,fuzzy:!!best.fuzzy,a:i,b:i+best.n}); i+=best.n; }
+      else { out.push(Object.assign({a:i,b:i+1},tk[i])); i++; }
+    }
+    return out;
+  }
+  function parse(text,products,catalog){
+    const lex=lexicon(products,catalog), tk=tokens(text), ev=match(tk,lex);
+    /* group number/unit words into runs */
+    const evs=[]; let clause=0;
+    for(let i=0;i<ev.length;){
+      const e=ev[i];
+      if(e.t==='sep'){ clause++; i++; continue; }
+      if(RUN.has(e.t)){
+        let j=i; const run=[]; while(j<ev.length && RUN.has(ev[j].t)){ run.push(ev[j]); j++; }
+        if(run.some(t=>t.t==='num'||t.t==='pre'||t.t==='hund'||t.t==='thou'||(t.t==='unit'&&t.u!=='rs'))){
+          const r=readRun(run); evs.push({t:r.price!=null?'price':'basis',r,a:run[0].a,b:run[run.length-1].b,c:clause});
+        }
+        i=j; continue;
+      }
+      evs.push(Object.assign({c:clause},e)); i++;
+    }
+    const items=evs.filter(e=>e.t==='item');
+    items.forEach(it=>{ it.price=null; it.basis=null; it.stock=null; it.ss=0; it.many2=false; it.spans=[[it.a,it.b]]; });
+    const near=(idx,dir)=>{ for(let k=idx+dir;k>=0&&k<evs.length;k+=dir){ if(evs[k].c!==evs[idx].c) return null; if(evs[k].t==='item') return evs[k]; } return null; };
+    evs.forEach((e,idx)=>{
+      if(e.t==='price'){
+        const pv=near(idx,-1), nx=near(idx,1);
+        const tgt=(pv&&pv.price==null)?pv:(nx&&nx.price==null)?nx:pv||nx; if(!tgt) return;
+        tgt.price=e.r.price; tgt.basis=e.r.basis||tgt.basis; tgt.many2=tgt.many2||e.r.many; tgt.spans.push([e.a,e.b]);
+      } else if(e.t==='basis'){
+        const tgt=near(idx,-1)||near(idx,1); if(tgt && !tgt.basis){ tgt.basis=e.r.basis; tgt.spans.push([e.a,e.b]); }
+      } else if(e.t==='stock'){
+        const tgt=near(idx,-1)||near(idx,1); if(!tgt) return;
+        if(e.s>tgt.ss || (e.s===tgt.ss && e.s===2)){ tgt.stock=e.v; tgt.ss=e.s; } tgt.spans.push([e.a,e.b]);
+      }
+    });
+    /* "भिंडी और तोरई खत्म" — a bare item followed (joined by और / ,) by one that is sold out shares it */
+    for(let k=items.length-2;k>=0;k--){ const a=items[k], b=items[k+1];
+      if(a.price==null && a.stock==null && b.stock!=null && b.price==null && b.c===a.c+1){ a.stock=b.stock; a.ss=b.ss; } }
+    const rows=new Map(), used=new Set();
+    items.forEach(it=>{
+      it.spans.forEach(([a,b])=>{ for(let i=a;i<b;i++) used.add(i); });
+      if(it.price==null && it.stock==null) return;
+      const ref=lex.refs[it.ri];
+      const heard=it.spans.map(([a,b])=>tk.slice(a,b).map(x=>x.w).join(' ')).join(' · ');
+      const base=ref.kind==='own'
+        ? {kind:'own',pid:ref.p.id,hi:ref.p.hi,en:ref.p.en||ref.p.roman,unit:ref.p.unit,old:Number(ref.p.price),oldStock:ref.p.stock!==false}
+        : {kind:'cat',key:ref.c.key,hi:ref.c.hi,en:ref.c.en||ref.c.roman,unit:ref.c.unit,old:null,oldStock:false};
+      const k=base.kind+':'+(base.pid||base.key), row=rows.get(k)||Object.assign(base,{price:null,stock:null,said:null,conv:false,mismatch:false,many:false,fuzzy:false,heard:''});
+      if(it.price!=null){ const cv=convert(it.price,it.basis,base.unit); row.price=cv.price; row.conv=cv.conv; row.mismatch=cv.mismatch;
+        row.said={v:it.price,basis:it.basis}; }
+      if(it.stock!=null) row.stock=it.stock;
+      row.many=row.many||it.many||it.many2; row.fuzzy=row.fuzzy||it.fuzzy; row.heard=row.heard?row.heard+' + '+heard:heard;
+      if(base.kind==='cat' && row.price!=null) row.stock=true;
+      rows.set(k,row);
+    });
+    const unknown=[]; let run=[];
+    const flush=()=>{ const real=run.filter(w=>!FILL.has(w)&&w.length>1); if(real.length) unknown.push(run.join(' ')); run=[]; };
+    tk.forEach((t,i)=>{ if(used.has(i)||t.t!=='word') flush(); else run.push(t.w); }); flush();
+    const out=[...rows.values()].filter(r=>r.kind==='own' ? (r.price!=null && r.price!==r.old) || (r.stock!=null && r.stock!==r.oldStock) : r.price!=null);
+    const same=[...rows.values()].filter(r=>!out.includes(r));
+    return {rows:out, same, unknown, score:out.length*10-unknown.length*3};
+  }
+  return {parse,norm,packOf,convert,tokens};
+})();
+/* VENDOR-RATE-PARSER-END */
+
+/* ---------------- RATES BY VOICE ----------------
+   Stock & rates (and Home → quick actions) → "Speak your rates" → #vrWrap. The phone's own speech engine writes down what the
+   vendor says (Hindi by default, English toggle; each tap of the mic adds to the box, which he can also type in / correct).
+   VRATE.parse() turns it into a list of changes to HIS items — new rate (converted to the item's unit), sold out, back in stock,
+   or a catalogue item he does not sell yet. Nothing changes until "Save"; then the same paths as the Stock screen are used:
+   vendor_bulk_prices (one call), vendor_set_stock, vendor_activate_catalog_item. 🔊 reads the list back for vendors who
+   don't read much. .htaccess must allow microphone=(self). */
+const VR_SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+var VR={rec:null, on:false, err:'', interim:'', rows:[], same:[], unknown:[], typeT:null, saving:false, done:null,
+  lang:(()=>{ try{ return localStorage.getItem('rb_vr_lang')||'hi-IN'; }catch(e){ return 'hi-IN'; } })()};
+function vrProducts(){ return PRODUCTS.filter(p=>p.reviewStatus!=='rejected').map(p=>({id:p.id, hi:p.hi, roman:p.en, en:p.enName, unit:p.unit, price:Number(p.price), stock:p.stock!==false})); }
+function vrCatalog(){ return (CATALOG||[]).filter(c=>c.is_active!==false).map(c=>({key:c.key, hi:c.name_hi, roman:c.name_en, en:c.english_name, unit:c.default_unit||'1 kg'})); }
+async function openVoiceRates(listen){
+  VR.done=null; VR.err='';
+  document.getElementById('vrWrap').classList.add('on');
+  if(listen && VR_SR) vrStart();                       /* start inside the tap — browsers want that */
+  vrPaintTop(); vrExamples(); vrRender();
+  await ensureProducts();
+  if(!catalogLoaded){ try{ const r=await api('getCatalog'); if(r.ok){ CATALOG=r.data||[]; catalogLoaded=true; } }catch(e){} }
+  vrExamples(); vrParse();
+  if(!DEMO) rpc('log_visit',{p_page:'vendor_voice_rates_open'}).catch(()=>{});
+}
+function closeVoiceRates(){ vrStop(true); try{ speechSynthesis.cancel(); }catch(e){} document.getElementById('vrWrap').classList.remove('on'); }
+function vrLang(l){ VR.lang=l; try{ localStorage.setItem('rb_vr_lang',l); }catch(e){} vrPaintTop(); vrExamples(); if(VR.on){ vrStop(true); vrStart(); } }
+function vrToggle(){ if(VR.on) vrStop(false); else vrStart(); }
+function vrStart(){
+  if(!VR_SR){ vrPaintTop(); return; }
+  try{ if(VR.rec) VR.rec.abort(); }catch(e){}
+  let r; try{ r=new VR_SR(); }catch(e){ VR.err='start'; vrPaintTop(); return; }
+  VR.rec=r; VR.err=''; VR.interim=''; VR.done=null;
+  r.lang=VR.lang; r.interimResults=true; r.maxAlternatives=3; r.continuous=false;
+  const finals=[];
+  r.onstart=()=>{ VR.on=true; vrPaintTop(); };
+  r.onresult=e=>{ let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){ const res=e.results[i];
+      if(res.isFinal){ const alts=[]; for(let j=0;j<res.length;j++) alts.push(res[j].transcript); finals.push(alts); }
+      else interim+=res[0].transcript; }
+    VR.interim=interim; vrPaintHeard(); };
+  r.onerror=e=>{ if(e.error!=='aborted') VR.err=e.error||'error'; };
+  r.onend=()=>{
+    VR.on=false; VR.interim='';
+    if(finals.length){
+      /* each sentence came with up to 3 guesses — keep the one that makes the most sense with this vendor's items */
+      const box=document.getElementById('vrText'), before=box.value.trim();
+      const pick=finals.map(alts=>{ let best=alts[0], bs=-1e9;
+        alts.forEach(a=>{ const s=VRATE.parse(a, vrProducts(), vrCatalog()).score; if(s>bs){ bs=s; best=a; } }); return best; }).join(', ');
+      box.value=(before?before+', ':'')+pick;
+      vrParse();
+      if(!DEMO) rpc('log_visit',{p_page:'vendor_voice_rates_heard'}).catch(()=>{});
+    }
+    vrPaintTop(); vrPaintHeard();
+  };
+  try{ r.start(); }catch(e){ VR.err='start'; }
+  vrPaintTop();
+}
+function vrStop(abort){ const r=VR.rec; if(!r) return; try{ abort?r.abort():r.stop(); }catch(e){} if(abort){ VR.on=false; vrPaintTop(); } }
+function vrTyped(){ clearTimeout(VR.typeT); VR.typeT=setTimeout(vrParse, 350); }
+function vrParse(){
+  const txt=(document.getElementById('vrText')||{}).value||'';
+  const r=VRATE.parse(txt, vrProducts(), vrCatalog());
+  VR.rows=r.rows.map(x=>Object.assign(x,{drop:false})); VR.same=r.same||[]; VR.unknown=r.unknown||[];
+  vrRender();
+}
+function vrPaintTop(){
+  const mic=document.getElementById('vrMic'), st=document.getElementById('vrState');
+  if(!mic) return;
+  mic.classList.toggle('on', VR.on); mic.disabled=!VR_SR;
+  const ERR={'not-allowed':T('The microphone is blocked — allow it for this site in the browser settings (🔒 next to the address).','माइक बंद है — ब्राउज़र में इस साइट के लिए माइक की अनुमति दो (पते के पास 🔒)।'),
+    'service-not-allowed':T('The microphone is blocked — allow it in settings.','माइक बंद है — सेटिंग में अनुमति दो।'),
+    'no-speech':T('Did not hear anything — tap the mic and speak.','कुछ सुनाई नहीं दिया — माइक दबाकर बोलो।'),
+    'network':T('Voice needs internet — check the connection.','आवाज़ के लिए इंटरनेट चाहिए — कनेक्शन देखो।'),
+    'audio-capture':T('No microphone found on this phone.','इस फ़ोन में माइक नहीं मिला।')};
+  st.textContent = !VR_SR ? T('This browser cannot hear — type in the box below (Chrome can).','यह ब्राउज़र आवाज़ नहीं सुन सकता — नीचे लिख दो (Chrome में चलेगा)।')
+    : VR.on ? T('Listening… say the item and its rate','सुन रहे हैं… सामान और उसका रेट बोलो')
+    : VR.err ? (ERR[VR.err]||T('Could not hear — try again','सुन नहीं पाए — फिर से कोशिश करो'))
+    : (document.getElementById('vrText').value.trim() ? T('Tap the mic to add more','और बोलने के लिए माइक दबाओ') : T('Tap the mic and speak','माइक दबाओ और बोलो'));
+  st.classList.toggle('err', !!VR.err && !VR.on);
+  document.querySelectorAll('#vrLangs button').forEach(b=>b.classList.toggle('on', b.dataset.l===VR.lang));
+}
+function vrPaintHeard(){ const el=document.getElementById('vrInterim'); if(el) el.textContent=VR.interim?('“'+VR.interim+'”'):''; }
+function vrExamples(){
+  const el=document.getElementById('vrEx'); if(!el) return;
+  const hi=VR.lang==='hi-IN', live=liveProducts().filter(p=>Number(p.price)>0).slice(0,3);
+  const nm=p=>hi?p.hi:(p.enName||p.en).replace(/\s*\(.*\)/,'');
+  const ex=live.length>=2
+    ? [ `${nm(live[0])} ${Math.round(Number(live[0].price)*.9)}, ${nm(live[1])} ${Math.round(Number(live[1].price)*1.1)}`,
+        hi ? `${nm(live[live.length-1])} खत्म` : `${nm(live[live.length-1])} finished`,
+        hi ? 'मटर आ गया साठ रुपये किलो' : 'peas back, 60 per kg' ]
+    : (hi ? ['टमाटर चालीस, आलू तीस','भिंडी खत्म','मटर आ गया साठ रुपये किलो'] : ['tomato 40, potato 30','okra finished','peas back, 60 per kg']);
+  el.innerHTML=ex.map(s=>`<button onclick="vrUse(this.textContent.replace(/[“”]/g,''))">“${esc(s)}”</button>`).join('');
+}
+function vrUse(s){ const b=document.getElementById('vrText'); b.value=(b.value.trim()?b.value.trim()+', ':'')+s; vrParse(); vrPaintTop(); }
+function vrClear(){ document.getElementById('vrText').value=''; VR.done=null; vrParse(); vrPaintTop(); }
+function vrUnitWord(u){ return rcUnit(u, LANG!=='en'); }
+function vrRender(){
+  const list=document.getElementById('vrList'), foot=document.getElementById('vrFoot'); if(!list) return;
+  if(VR.done){
+    list.innerHTML=`<div class="vr-done"><div class="vr-ok">✓</div>
+      <b>${T(VR.done.n+' change'+(VR.done.n>1?'s':'')+' saved','बदलाव सेव हो गए: '+VR.done.n)}</b>
+      <p>${T('Customers see the new rates right now.','ग्राहक अभी से नए रेट देख रहे हैं।')}</p>
+      <button class="rcbtn" onclick="closeVoiceRates();openRateCard()">📤 ${T("Tell customers — send today's rates on WhatsApp",'ग्राहकों को बताओ — आज के रेट WhatsApp पर भेजो')}</button></div>`;
+    foot.innerHTML=`<button class="btn btn-out" onclick="vrClear()">${T('Speak more rates','और रेट बोलो')}</button><button class="btn btn-g" onclick="closeVoiceRates()">${T('Done','हो गया')}</button>`;
+    return;
+  }
+  const rows=VR.rows, n=rows.filter(r=>!r.drop && vrValid(r)).length;
+  const row=(r,i)=>{
+    const p=r.kind==='own'?prod(r.pid):null;
+    const img=p?pImg(p):pImg({catalogKey:r.key, en:r.en, em:(typeof CATALOG_EMOJI!=='undefined'&&CATALOG_EMOJI[r.key])||'🥬'});
+    const name=LANG==='en'?(r.en||r.hi):r.hi, unit=vrUnitWord(r.unit);
+    const bad=r.price!=null && !vrValid(r);
+    const big=r.kind==='own' && r.price!=null && r.old && (r.price>r.old*2 || r.price<r.old/2);
+    const said=r.said && r.conv ? T(`you said ₹${r.said.v} for ${vrBasisWord(r.said.basis,false)} → ₹${r.price} for ${unit}`,`आपने ₹${r.said.v} ${vrBasisWord(r.said.basis,true)} बोला → ${unit} का ₹${r.price}`) : '';
+    const price = r.price==null ? '' : `<div class="vr-pr">
+        ${r.kind==='own'&&r.old!=null&&r.old!==r.price?`<s>₹${r.old}</s><span class="vr-ar ${r.price<r.old?'dn':'up'}">${r.price<r.old?'↓':'↑'}</span>`:''}
+        <span class="rupee"><span>₹</span><input inputmode="decimal" value="${r.price}" onchange="vrSetPrice(${i},this.value)" aria-label="rate"></span>
+        <span class="vr-u">/${unit}</span></div>`;
+    const tags=[
+      r.kind==='cat' ? `<span class="vr-tag new">${T('New item — added to your list, customers see it','नया सामान — आपकी लिस्ट में जुड़ेगा, ग्राहकों को दिखेगा')}</span>` : '',
+      r.stock===false ? `<span class="vr-tag out">${T('Sold out','ख़त्म')}</span>` : '',
+      r.stock===true && r.kind==='own' && r.oldStock===false ? `<span class="vr-tag in">${T('Back in stock','फिर से उपलब्ध')}</span>` : '',
+      big ? `<span class="vr-tag warn">${T('Big change — check once','बहुत बड़ा बदलाव — एक बार देख लो')}</span>` : '',
+      bad ? `<span class="vr-tag out">${T('Rate must be ₹1 – ₹1,00,000','रेट ₹1 से ₹1,00,000 के बीच हो')}</span>` : '',
+      r.mismatch ? `<span class="vr-tag warn">${T('Unit did not match — this is the rate for '+unit,'इकाई नहीं मिली — यह '+unit+' का रेट है')}</span>` : '',
+      r.many ? `<span class="vr-tag warn">${T('Heard more than one rate — check','एक से ज़्यादा रेट सुना — देख लो')}</span>` : ''
+    ].join('');
+    return `<div class="vr-row ${r.drop?'drop':''}">
+      <div class="pthumb">${img}</div>
+      <div class="vr-mid"><b>${esc(name)}</b>${price}${tags?`<div class="vr-tags">${tags}</div>`:''}
+        ${said?`<div class="vr-said">${esc(said)}</div>`:''}<div class="vr-heard">“${esc(r.heard)}”</div></div>
+      <button class="vr-x" onclick="vrDrop(${i})" aria-label="remove">${r.drop?'↺':'✕'}</button></div>`;
+  };
+  const txt=document.getElementById('vrText').value.trim();
+  list.innerHTML =
+    (rows.length ? `<div class="vr-hd">${T('Changes to save — check once','ये बदलाव होंगे — एक बार देख लो')}</div>`+rows.map(row).join('') : '')
+    + (VR.same.length ? `<div class="vr-note">${T('Already the same: ','पहले से यही है: ')}${VR.same.map(r=>esc(LANG==='en'?(r.en||r.hi):r.hi)+(r.price!=null?' ₹'+r.price:'')).join(', ')}</div>` : '')
+    + (VR.unknown.length ? `<div class="vr-note warn">${T('Did not understand: ','समझ नहीं आया: ')}${VR.unknown.map(u=>'“'+esc(u)+'”').join(', ')}</div>` : '')
+    + (!rows.length && txt && !VR.same.length ? `<div class="vr-note warn">${T('No item from your list heard. Say the item name, then the rate — e.g. “tomato 40”.','आपकी लिस्ट का कोई सामान नहीं सुना। पहले सामान का नाम, फिर रेट बोलो — जैसे “टमाटर चालीस”।')}</div>` : '');
+  foot.innerHTML = `${('speechSynthesis' in window) && n ? `<button class="btn btn-out vr-say" onclick="vrSay()" aria-label="read aloud">🔊</button>` : ''}
+    <button class="btn btn-g" id="vrSaveBtn" onclick="vrSave()" ${n&&!VR.saving?'':'disabled'}>${VR.saving?T('Saving…','सेव हो रहा है…'):n?T('Save '+n+' change'+(n>1?'s':''),n+' बदलाव सेव करो'):T('Nothing to save yet','अभी कुछ सेव करने को नहीं')}</button>`;
+}
+function vrBasisWord(b,hi){ if(!b) return ''; const q=b.q;
+  const W=hi?{kg:'किलो',g:'ग्राम',paav:'पाव',dozen:'दर्जन',pc:'पीस',bunch:'गड्डी'}:{kg:'kg',g:'g',paav:'250 g',dozen:'dozen',pc:'piece',bunch:'bunch'};
+  if(b.u==='paav' && q===1) return hi?'पाव का':'250 g';
+  return (q===1?'':q+' ')+W[b.u]+(hi?' का':''); }
+function vrValid(r){ return r.price==null || (r.price>=1 && r.price<=100000); }
+function vrSetPrice(i,v){ const r=VR.rows[i]; const n=Math.round(parseFloat(String(v).replace(',','.'))*100)/100; if(!r) return;
+  if(!isNaN(n)) { r.price=n; r.conv=false; r.mismatch=false; } vrRender(); }
+function vrDrop(i){ const r=VR.rows[i]; if(r){ r.drop=!r.drop; vrRender(); } }
+function vrSay(){
+  try{
+    const hi=LANG!=='en', rows=VR.rows.filter(r=>!r.drop);
+    const lines=rows.map(r=>{ const nm=hi?r.hi:(r.en||r.hi), u=vrUnitWord(r.unit);
+      const parts=[];
+      if(r.price!=null) parts.push(hi?`${nm}, ${r.price} रुपये ${u}`:`${nm}, ${r.price} rupees per ${u}`);
+      if(r.stock===false) parts.push(hi?`${nm} ख़त्म`:`${nm} sold out`);
+      else if(r.stock===true && r.kind==='own' && r.oldStock===false) parts.push(hi?`${nm} फिर से मिल रहा है`:`${nm} back in stock`);
+      if(r.kind==='cat') parts.push(hi?'नया सामान':'new item');
+      return parts.join('. '); });
+    const u=new SpeechSynthesisUtterance((hi?'ये बदलाव होंगे। ':'These changes will be saved. ')+lines.join('. ')+'.');
+    const vs=speechSynthesis.getVoices(), want=hi?'hi':'en-IN';
+    const v=vs.find(x=>x.lang&&x.lang.toLowerCase().startsWith(want.toLowerCase()))||vs.find(x=>x.lang&&x.lang.startsWith(hi?'hi':'en'));
+    if(v) u.voice=v; u.lang=hi?'hi-IN':'en-IN'; u.rate=.95;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch(e){ toast(T('This phone cannot read aloud','यह फ़ोन पढ़कर नहीं सुना सकता')); }
+}
+async function vrSave(){
+  const rows=VR.rows.filter(r=>!r.drop && vrValid(r)); if(!rows.length || VR.saving) return;
+  VR.saving=true; vrRender();
+  /* count items, not server calls (new rate + back in stock on one item = 1 change); keep failed items on screen to retry */
+  const saved=new Set(), failed=new Map(), nm=r=>LANG==='en'?(r.en||r.hi):r.hi;
+  const prices=rows.filter(r=>r.kind==='own' && r.price!=null && r.price!==r.old);
+  if(prices.length){ const x=await api('saveStock',{prices:prices.map(r=>({id:r.pid, price:r.price}))});
+    if(x.ok) prices.forEach(r=>{ saved.add(r); const p=prod(r.pid); if(p) p.price=r.price; r.old=r.price; });
+    else prices.forEach(r=>failed.set(r, x.msg||T('Rate was not saved','रेट सेव नहीं हुआ'))); }
+  for(const r of rows.filter(r=>r.kind==='own' && r.stock!=null && r.stock!==r.oldStock)){
+    const x=await api('setStock',{id:r.pid, stock:r.stock});
+    if(x.ok){ saved.add(r); const p=prod(r.pid); if(p) p.stock=r.stock; r.oldStock=r.stock; } else failed.set(r, x.msg||T('not saved','सेव नहीं हुआ'));
+  }
+  for(const r of rows.filter(r=>r.kind==='cat' && r.price!=null)){
+    const x=await api('activateCatalog',{key:r.key, price:r.price, unit:r.unit});
+    if(x.ok) saved.add(r); else failed.set(r, x.msg||T('not added','नहीं जुड़ा'));
+  }
+  VR.saving=false;
+  try{ await ensureProducts(true); }catch(e){}
+  if(document.getElementById('s-stock').classList.contains('on')) renderStock();
+  if(saved.size){ RC_CHANGED=true; paintRcBtn(); }
+  if(!DEMO) rpc('log_visit',{p_page:'vendor_voice_rates_saved'}).catch(()=>{});
+  const n=[...saved].filter(r=>!failed.has(r)).length;
+  if(failed.size){
+    VR.rows=[...failed.keys()];
+    vrRender();
+    const [r0,m0]=[...failed.entries()][0];
+    return toast((n?T(n+' saved. ',n+' सेव हुए। '):'')+nm(r0)+': '+m0);
+  }
+  VR.done={n};
+  document.getElementById('vrText').value='';
+  VR.rows=[]; VR.same=[]; VR.unknown=[];
+  vrRender(); vrPaintTop();
 }
 
 /* ---------------- STOCK & RATES ---------------- */

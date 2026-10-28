@@ -75,6 +75,7 @@ database/
 scripts/
   site-csp.py        re-pins the inline-script hash of admin-site / staff-site (run after editing them)
   test-voice-parser.js  node scripts/test-voice-parser.js — tests the customer site's voice-order parser
+  test-vendor-rate-parser.js  node scripts/test-vendor-rate-parser.js — tests the vendor site's "speak your rates" parser
 docs/              business context
   pitch-deck/        the pitch deck: deck.src.html → `npm run build` → RozBazaar_Pitch_Deck.pdf (see its README)
 platform/          NEW (30 Sep 2026): TypeScript/Express API + React customer & vendor apps
@@ -684,6 +685,25 @@ Still open by choice: phone login has no OTP until an SMS provider is set (anyon
   (on/off, houses 2–10, metres 50–1000, bonus Hindi + English; `admin_set_gali`) shows how many orders are in complete groups.
 - Not testable here without a real phone: speech recognition inside the Play-Store app (TWA), GPS while walking, Wake Lock,
   the Android share sheet. Everything else was tested in the browser with fakes, and the DB parts with rolled-back transactions.
+
+### Vendor speaks, rates change (28 Oct 2026 — vendor site only, no DB change)
+- For vendors who can't type: Stock & rates has a big "🎤 बोलकर रेट बदलो / Speak your rates" button (`.vrbtn`), Home's quick actions
+  start with it too → `openVoiceRates(listen)` → sheet `#vrWrap`. The vendor says "टमाटर चालीस, आलू पच्चीस, भिंडी खत्म, मटर आ गया साठ
+  रुपये किलो"; the phone's `SpeechRecognition` (hi-IN default, en-IN toggle, `localStorage.rb_vr_lang`, 3 guesses per sentence → the one
+  `VRATE.score` likes best) writes into a text box he can also type in; every mic tap ADDS to the box.
+- Parser `VRATE.parse(text, products, catalog)` (pure, between `VENDOR-RATE-PARSER-START/END`): Hindi/Roman/English numbers 1–99, सौ,
+  हजार, सवा/साढ़े/पौने, "40 से 45" (last number wins); units (किलो, ग्राम, पाव, दर्जन, पीस, गड्डी) → the rate is converted to the item's own
+  unit (₹60/kg for a 500 g item → ₹30, rounded to ₹0.5, note shown); stock words (खत्म / नहीं है / आ गया / है); his own items first
+  (name, Hindi, English, synonyms, typos), then the 124-item catalog (an item he doesn't sell yet = "new item", added at that rate).
+- Nothing changes until **Save**: each row shows old rate struck through ↑/↓, an editable rate, tags (new item / sold out / back in stock /
+  big change > 2× or < ½ / unit mismatch / several rates heard), what was heard, ✕ to drop; "already the same" and "did not understand"
+  notes; 🔊 reads the list back (`speechSynthesis`). Save = existing RPCs only: one `vendor_bulk_prices`, `vendor_set_stock` per stock
+  change, `vendor_activate_catalog_item(key, price, unit)` per new item. The count is per item; if a call fails only those items stay in
+  the list to retry. Then "send today's rates on WhatsApp" (rate card) + the Stock button's "rates changed" nudge.
+- **`vendor-site/.htaccess` Permissions-Policy must say `microphone=(self)`** (it said `microphone=()`, which blocks the mic silently).
+- Logged as `log_visit('vendor_voice_rates_open' / '…_heard' / '…_saved')`. Test: `node scripts/test-vendor-rate-parser.js` (52 phrases).
+  Browsers without speech (Firefox, some in-app browsers) get the same sheet with "type below". Not testable here: real Hindi speech
+  recognition on a phone and inside the Play app.
 
 ### Service area — "not in your area yet" (21 Oct 2026, migration `20261021b_service_area.sql`)
 - Vedanshu: anyone more than 8–10 km from Khandewla / Jatola gets "Thank you for using RozBazaar, but it's not available in your
