@@ -188,6 +188,11 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   **Saving an address never books** (16 Oct 2026 — it used to place the order the moment an address added
   during checkout was saved): back to the basket with that address chosen, "Confirm booking" pulses. Auto-filled text = house no., road, mohalla/hamlet + OUR
   village — never OSM's display_name (it gave "Farrukhnagar, Gurgaon, Haryana, India").
+- **Home header slot line** ("RozBazaar comes — Today, Morning 7–11", `#hSlot` + desktop `#ftSlot`) = the picked slot, else
+  `paintNextSlotLine()`: the next slot still bookable by Indian time (cut-off 60 min before start; after 4 PM → tomorrow morning),
+  repainted every minute. It used to say "Today, Morning 7–11" all day. Desktop "N villages served" (`#hdVillages`) = served
+  villages from `public_areas` (it said 8 while 2 were live). The chat bubble is hidden on the success screen (it covered
+  "View bookings"). (30 Oct 2026)
 - Home ends with small social chips + a navy mini-footer ("Become a vendor" → `VENDOR_SITE`
   = https://vendor.rozbazaar.shop/). `#s-home` has bottom padding so nothing hides under the
   bottom nav / cart bar.

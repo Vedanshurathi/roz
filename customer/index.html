@@ -1335,7 +1335,7 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
           <button class="btn-out" onclick="scrollTo({top:document.getElementById('catRow').offsetTop-90,behavior:'smooth'})" data-en="Browse today's rates" data-hi="आज के रेट देखें">Browse today's rates</button>
         </div>
         <div class="hd-trust rv d6">
-          <div><b>8</b><span data-en="villages served" data-hi="गाँव कवर">villages served</span></div>
+          <div><b id="hdVillages">2</b><span data-en="villages served" data-hi="गाँव कवर">villages served</span></div>
           <div><b>3</b><span data-en="slots a day" data-hi="स्लॉट रोज़">slots a day</span></div>
           <div><b>₹0</b><span data-en="extra charge for you" data-hi="आपसे कोई अतिरिक्त शुल्क">extra charge for you</span></div>
         </div>
@@ -1346,7 +1346,7 @@ img.ic.ph{width:1.45em;height:1.45em;object-fit:contain;vertical-align:-.36em;di
         <div class="ft ft-2"><div class="em" data-art="p6"></div><div class="nm">Tamatar</div><div class="pr">₹36/kg</div><div class="cap" data-en="was ₹42 yesterday" data-hi="कल ₹42 था">kal ₹42 tha</div></div>
         <div class="ft ft-3"><div class="em" data-art="p2"></div><div class="nm">Pyaaz</div><div class="pr">₹31/kg</div><div class="cap" data-en="today's mandi rate" data-hi="आज का मंडी रेट">today's mandi rate</div></div>
         <div class="ft ft-4"><div class="em" data-art="p20"></div><div class="nm">Kela</div><div class="pr">₹44<span style="font-size:11px">/dozen</span></div><div class="cap" data-en="fresh this morning" data-hi="आज सुबह ताज़ा">fresh aaj subah</div></div>
-        <div class="ft-slot"><span data-en="ROZBAZAAR COMES" data-hi="RozBazaar आएगा">ROZBAZAAR COMES</span><b data-en="Today, Morning 7–11" data-hi="आज, सुबह 7–11">Today, Morning 7–11</b></div>
+        <div class="ft-slot"><span data-en="ROZBAZAAR COMES" data-hi="RozBazaar आएगा">ROZBAZAAR COMES</span><b id="ftSlot" data-en="Today, Morning 7–11" data-hi="आज, सुबह 7–11">Today, Morning 7–11</b></div>
       </div>
     </div>
   </section>
@@ -3561,7 +3561,7 @@ function go(s){
   document.querySelectorAll('.nav-links button').forEach(b=>b.classList.toggle('on', b.dataset.nl===s));
   document.getElementById('cart').classList.toggle('show', count()>0 && ['home','cat','search'].includes(s));
   const fab=document.getElementById('fabContact');
-  if(fab) fab.style.display = ['contact','login','loc','basket'].includes(s) ? 'none' : 'flex';
+  if(fab) fab.style.display = ['contact','login','loc','basket','success'].includes(s) ? 'none' : 'flex';   /* success: it covered "View bookings" */
   if(s==='basket'){  renderBasket(); pullCart(); if(SESSION && !ADDRS.length) setTimeout(warmMap, 1500); }
   if(s==='bookings') renderBookings();
   if(s==='bill')     renderBill();
@@ -3916,6 +3916,8 @@ async function renderHome(){
   document.getElementById('cc1').textContent=c.vegetable;
   document.getElementById('cc2').textContent=c.fruit;
   document.getElementById('cc3').textContent=c.onion_potato;
+  const hv=document.getElementById('hdVillages');   /* desktop hero said "8 villages served" while 2 were live */
+  if(hv && AREAS.length) hv.textContent = AREAS.filter(a=>typeof a==='string' || a.served!==false).length;
   const fa=document.getElementById('footAreas');
   if(fa) fa.innerHTML = AREAS.map(a=>{const nm=typeof a==='string'?a:a.name;
     return `<li onclick="setArea('${nm.replace(/'/g,"\\'")}')">${nm}</li>`;}).join('');
@@ -4715,6 +4717,22 @@ function renderSlotVendorList(){
 function pickSlotVendor(id){ sel.vendorId=id; renderSlotVendorList(); }
 function pickDay(d){sel.day=d; sel.slot=null; renderSlotScreen();}
 function pickSlot(s){sel.slot=s; renderSlotScreen();}
+/* Home header "RozBazaar comes — <day, slot>" (phone header + desktop hero). It used to say "Today, Morning 7–11"
+   all day until a slot was picked — at night that promised a slot already gone. Now: the picked slot, else the next
+   slot that can still be booked (cut-off 60 min before start, same rule as the server), by Indian time. */
+function setSlotLine(en, hi){
+  ['hSlot','ftSlot'].forEach(id=>{ const el=document.getElementById(id); if(!el) return;
+    el.setAttribute('data-en', en); el.setAttribute('data-hi', hi); el.textContent = LANG==='en' ? en : hi; });
+}
+function paintNextSlotLine(){
+  if(sel.slot) return;
+  const now=new Date(), ist=new Date(now.getTime()+(330+now.getTimezoneOffset())*60000), h=ist.getHours()+ist.getMinutes()/60;
+  const START={morning:7, afternoon:12, evening:17};
+  let day=0, s=SLOTS.find(x=>h < START[x.id]-1);
+  if(!s){ day=1; s=SLOTS[0]; }
+  const d=dayLabels()[day];
+  setSlotLine(`${d.en}, ${s.en}`, `${d.hi}, ${s.hi}`);
+}
 function checkSlot(){
   const ok = sel.type && sel.slot && sel.vendorId;
   document.getElementById('slotGo').disabled=!ok;
@@ -4729,9 +4747,9 @@ function checkSlot(){
   if(ok){
     const d=dayLabels()[sel.day], s=SLOTS.find(x=>x.id===sel.slot);
     const line=`${d.lbl}, ${LANG==='en'?s.en:s.hi}`;
-    document.getElementById('hSlot').textContent=line;
     const cb=document.getElementById('catBanSlot'); cb.textContent=line;
     const dl=dayLabels()[sel.day]; cb.setAttribute('data-en', `${dl.en||dl.lbl}, ${s.en}`); cb.setAttribute('data-hi', `${dl.hi||dl.lbl}, ${s.hi}`);
+    setSlotLine(`${dl.en||dl.lbl}, ${s.en}`, `${dl.hi||dl.lbl}, ${s.hi}`);
     document.querySelectorAll('.pslot').forEach(el=>el.textContent='🕖 '+slotBadge());
     /* This used to always send to category browsing, even when the
        cart already had items — meaning "add to cart, then pick a
@@ -7691,6 +7709,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   /* a shared link (rates card, neighbour invite) names the village: open on it, don't ask for location first */
   if(RB_LINK.a){ AREA=RB_LINK.a; locAsked=true; }
   renderHome(); renderAcct(); syncCart(); paintHeroArt();
+  paintNextSlotLine(); setInterval(paintNextSlotLine, 60000);
   /* apply the saved (or default English) language to every data-en/data-hi text on load */
   { let l='en'; try{ l=localStorage.getItem('rb_lang')||'en'; }catch(e){} setLang(l, true); }
   restoreSession();
