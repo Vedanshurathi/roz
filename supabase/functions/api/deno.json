@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "express": "npm:express@5.2.1",
+    "cookie-parser": "npm:cookie-parser@1.4.7",
+    "cors": "npm:cors@2.8.6",
+    "express-rate-limit": "npm:express-rate-limit@8.7.0",
+    "helmet": "npm:helmet@8.3.0",
+    "pino": "npm:pino@10.3.1",
+    "pino-http": "npm:pino-http@11.0.0",
+    "zod": "npm:zod@3.25.76"
+  }
+}
