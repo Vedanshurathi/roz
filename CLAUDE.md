@@ -753,8 +753,10 @@ Vedanshu's 13-point list before going live. All tested in the browser with fakes
   - **Village change with items in the basket** → `#areaSwSheet` (`setArea(a)` → `askAreaChange` reads the new village's `customer_home`):
     "basket stays" / "N items removed: …" / "basket will be emptied"; No = nothing changes. `setArea(a, keep)` = confirmed.
   - **Cancelled / missed orders** are no longer shown as completed: `STATUS_MAP` cancelled/missed, `cancelInfo(b)` (cancel_reason
-    "Admin: …" → RozBazaar, "Vendor: …" → vendor, else customer; missed = slot ended). My bookings card with the reason, no code, no
-    rating; Home + basket note `#cxNote/#cxNoteB` for today/yesterday until closed (`rb_cx_seen`).
+    "Admin: …" → RozBazaar, "Vendor: …" → vendor, "Vendor ab active nahi hai" (admin blocked the vendor) → RozBazaar, else the
+    customer — "Customer ne cancel kiya" = no reason given; missed = slot ended). My bookings card with the reason, no code, no
+    rating; Home + basket note `#cxNote/#cxNoteB` for today/yesterday until closed (`rb_cx_seen`), not for the customer's own
+    cancellations. Vendor All orders uses the same rules (`ordReason`).
   - **Slot screen**: today has no open slot → jumps to the next day that has one (`DAY_JUMP`, note "No slot left today — showing
     tomorrow"); a day the customer taps is never changed (`DAY_PICKED`).
   - **Map pin** = green SVG drop pin with an orange centre (`.rbpin`). **Move the map, not the pin** (Uber-style): the pin stays in

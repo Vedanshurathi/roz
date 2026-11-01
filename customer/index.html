@@ -3463,30 +3463,36 @@ function mapBooking(b){
     date:b.booking_date, cx:cancelInfo(b)
   };
 }
-/* who cancelled and why — cancel_reason starts "Admin: " (RozBazaar team) or "Vendor: "; missed = slot ended undelivered */
+/* who cancelled and why. What the database writes in cancel_reason: admin "Admin: …", vendor "Vendor: …", admin blocking a
+   vendor "Vendor ab active nahi hai", customer = their own words or "Customer ne cancel kiya" (skip / repeat-order texts are old). */
 function cancelInfo(b){
   if(b.status==='missed') return {by:'missed', text:String(b.admin_note||'').trim()};
   if(b.status!=='cancelled') return null;
-  let t=String(b.cancel_reason||'').trim(), by='other';
+  let t=String(b.cancel_reason||'').trim(), by='customer', key='';
   if(/^admin\s*:/i.test(t)){ by='team'; t=t.replace(/^admin\s*:\s*/i,''); }
   else if(/^vendor\s*:/i.test(t)){ by='vendor'; t=t.replace(/^vendor\s*:\s*/i,''); }
-  return {by, text:t};
+  else if(/^vendor ab active nahi hai$/i.test(t)){ by='team'; key='inactive'; t=''; }
+  else if(/^(customer ne (cancel|skip) kiya|schedule band kiya)$/i.test(t)) t='';
+  return {by, text:t, key};
 }
 function cxTitle(cx){
   return {team:T('Cancelled by RozBazaar','RozBazaar ने रद्द किया'), vendor:T('Cancelled by the vendor','वेंडर ने रद्द किया'),
-          other:T('Order cancelled','ऑर्डर रद्द हुआ'), missed:T('The vendor could not come in this slot','वेंडर इस स्लॉट में नहीं आ पाया')}[cx.by];
+          customer:T('You cancelled this order','आपने यह ऑर्डर रद्द किया'), missed:T('The vendor could not come in this slot','वेंडर इस स्लॉट में नहीं आ पाया')}[cx.by];
 }
 function cxLine(cx){
   if(cx.by==='missed') return T('The slot ended before the vendor reached you. You pay nothing — sorry! Please book again.',
                                  'वेंडर के पहुँचने से पहले स्लॉट खत्म हो गया। आपको कुछ नहीं देना है — माफ़ कीजिए! दोबारा बुक करें।')
                               + (cx.text ? ' '+T('Note: ','नोट: ')+cx.text : '');
+  if(cx.key==='inactive') return T('Reason: this vendor no longer delivers with RozBazaar. You pay nothing — please book with another vendor.',
+                                   'कारण: यह वेंडर अब RozBazaar से डिलीवरी नहीं करता। आपको कुछ नहीं देना है — किसी दूसरे वेंडर से बुक करें।');
+  if(cx.by==='customer') return cx.text ? T('Your reason: ','आपका कारण: ')+cx.text : T('You pay nothing.','आपको कुछ नहीं देना है।');
   return cx.text ? T('Reason: ','कारण: ')+cx.text : T('No reason was given. You pay nothing.','कोई कारण नहीं बताया गया। आपको कुछ नहीं देना है।');
 }
 /* Home + basket notice for an order cancelled / missed today or yesterday (until the customer closes it) */
 function cxSeen(){ try{ return JSON.parse(localStorage.getItem('rb_cx_seen')||'[]'); }catch(e){ return []; } }
 function paintCxNote(){
   const seen=cxSeen(), from=istISO(-1);
-  const b=(BOOKINGS||[]).find(x=>x.cx && x.date>=from && !seen.includes(x.id));
+  const b=(BOOKINGS||[]).find(x=>x.cx && x.cx.by!=='customer' && x.date>=from && !seen.includes(x.id));
   ['cxNote','cxNoteB'].forEach(id=>{ const el=document.getElementById(id); if(!el) return;
     if(!b || DEMO){ el.hidden=true; el.innerHTML=''; return; }
     el.hidden=false;

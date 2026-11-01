@@ -5266,6 +5266,9 @@ function ordReason(o){
   if(!t) return '';
   if(/^admin\s*:/i.test(t)) return T('Cancelled by RozBazaar: ','RozBazaar ने कैंसल किया: ')+t.replace(/^admin\s*:\s*/i,'');
   if(/^vendor\s*:/i.test(t)) return T('You cancelled: ','आपने कैंसल किया: ')+t.replace(/^vendor\s*:\s*/i,'');
+  /* fixed texts the database writes: admin blocked / removed the vendor; customer cancelled without a reason */
+  if(/^vendor ab active nahi hai$/i.test(t)) return T('Cancelled by RozBazaar: your account was not active','RozBazaar ने कैंसल किया: आपका खाता चालू नहीं था');
+  if(/^(customer ne (cancel|skip) kiya|schedule band kiya)$/i.test(t)) return T('Customer cancelled','ग्राहक ने कैंसल किया');
   return T('Customer cancelled: ','ग्राहक ने कैंसल किया: ')+t;
 }
 function paintOrders(){
