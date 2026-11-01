@@ -764,7 +764,7 @@ Vedanshu's 13-point list before going live. All tested in the browser with fakes
     still moves the pin there.
   - **Success screen** shows no RB order code (delivery code only).
   - **Shared basket**: "Basket updated from your other device — N items" + the basket icon/bar pulses (`.cbump`, `.cglow`).
-  - **Floating voice button** `#fabVoice` (orange circle above the chat bubble, Home / category / search only): tap → it grows into an
+  - **Floating voice button** `#fabVoice` (orange circle right above the chat bubble, on every screen that shows the bubble): tap → it grows into an
     oval showing what it hears; `longListen()` keeps the mic on through pauses (continuous mode, restarted when the phone stops it;
     ends after 5 s silence once something was said, 12 s with nothing, 45 s max, or a second tap); then the voice-order sheet opens
     with the list — nothing goes into the basket until "Add to basket". The voice sheet's own mic uses `longListen` too.

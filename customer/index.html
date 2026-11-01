@@ -3699,8 +3699,8 @@ function go(s){
   const fab=document.getElementById('fabContact');
   if(fab) fab.style.display = ['contact','login','loc','basket','success'].includes(s) ? 'none' : 'flex';
   const fv=document.getElementById('fabVoice');
-  /* voice ordering is for browsing — on the slot / bookings / account screens it only covered the content */
-  if(fv){ fv.style.display = ['home','cat','search'].includes(s) ? 'flex' : 'none'; if(fv.style.display==='none') fabVoiceStop(true); }
+  /* always right above the chat bubble — on every screen that shows the bubble (Vedanshu, 2 Nov 2026) */
+  if(fv){ fv.style.display = fab ? fab.style.display : 'flex'; if(fv.style.display==='none') fabVoiceStop(true); }
   if(s==='basket'){  renderBasket(); pullCart(); if(SESSION && !ADDRS.length) setTimeout(warmMap, 1500); }
   if(s==='bookings') renderBookings();
   if(s==='bill')     renderBill();
