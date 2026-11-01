@@ -3119,12 +3119,39 @@ function safeData(v){
   if(v && typeof v==='object'){ const o={}; for(const k in v) o[k]=safeData(v[k]); return o; }
   return v;
 }
+/* Item photos come from this website (/img/p/, copied 1 Nov 2026, 400 px WebP ≈ 17 KB) instead of Supabase Storage —
+   photos were most of the free plan's data. PHOTO_V = photo path → the version (?v=) it was copied at. A link with another
+   version (photo replaced later) or a photo not in the list keeps its Supabase link. If a copy fails to load, the error
+   listener below swaps in the Supabase link once (PHOTO_ORIG) before the usual drawing fallback. */
+const PHOTO_BASE='https://srvpfyjmwaruebbkqkdj.supabase.co/storage/v1/object/public/item-photos/';
+const PHOTO_V=/* PHOTO-V-START */{'catalog/p1.jpg':'mui8fmjn','catalog/p10.jpg':'mui8fqz0','catalog/p100.jpg':'mui8ou40','catalog/p101.jpg':'mui8ovaa','catalog/p102.jpg':'mui8owvz','catalog/p103.jpg':'mui8oxl4','catalog/p104.jpg':'mui8oy2l','catalog/p105.jpg':'mui8ogq1','catalog/p106.jpg':'mutngpjp','catalog/p107.jpg':'mutngqlv','catalog/p108.jpg':'mutngsda','catalog/p109.jpg':'mutngssx','catalog/p11.jpg':'mui8ojg7','catalog/p110.jpg':'mutngtfc','catalog/p111.jpg':'mutngueh','catalog/p112.jpg':'mutngv5q','catalog/p113.jpg':'mutngpkf','catalog/p114.jpg':'mutngqmb','catalog/p115.jpg':'mutngrgq','catalog/p116.jpg':'mutngs5r','catalog/p117.jpg':'mutngsnt','catalog/p118.jpg':'mutngtba','catalog/p119.jpg':'mutnguai','catalog/p12.jpg':'mutngpk4','catalog/p120.jpg':'mutngus0','catalog/p121.jpg':'mutngpjq','catalog/p122.jpg':'mutngq5a','catalog/p124.jpg':'mutngqtg','catalog/p125.jpg':'mutngrim','catalog/p126.jpg':'mutngsi7','catalog/p127.jpg':'mutngt5r','catalog/p13.jpg':'mutngs37','catalog/p14.jpg':'mui8ftew','catalog/p15.jpg':'mui8om43','catalog/p16.jpg':'mui8oni7','catalog/p17.jpg':'mui8ooj8','catalog/p18.jpg':'mutngqs0','catalog/p19.jpg':'mui8or6u','catalog/p2.jpg':'mui8fn3h','catalog/p20.jpg':'mui8osfl','catalog/p21.jpg':'mui8ot45','catalog/p22.jpg':'mui8otnl','catalog/p23.jpg':'mui8ouk7','catalog/p24.jpg':'mui8ove3','catalog/p25.jpg':'mui8owax','catalog/p26.jpg':'mutngsim','catalog/p27.jpg':'mui8ohi2','catalog/p28.jpg':'mui8opju','catalog/p29.jpg':'mui8oig7','catalog/p3.jpg':'mui8ogso','catalog/p30.jpg':'mutngtaq','catalog/p31.jpg':'mutngts2','catalog/p32.jpg':'mui9o35h','catalog/p33.jpg':'mui8orbk','catalog/p34.jpg':'mui8olz2','catalog/p35.jpg':'mui8omh7','catalog/p36.jpg':'mui8orsw','catalog/p37.jpg':'mui8on34','catalog/p38.png':'mui906f7','catalog/p39.jpg':'mui8oocq','catalog/p40.jpg':'mui8opim','catalog/p41.jpg':'mui8oq8q','catalog/p42.jpg':'mutngue8','catalog/p43.jpg':'mutnguuy','catalog/p44.jpg':'mui8osq4','catalog/p45.jpg':'mui8otdn','catalog/p46.jpg':'mui8ogm4','catalog/p47.jpg':'mui8ohhr','catalog/p48.jpg':'mui8oi1p','catalog/p49.jpg':'mui8ojg5','catalog/p50.jpg':'mui8ok9g','catalog/p51.jpg':'mutngpjt','catalog/p52.jpg':'mui8olue','catalog/p55.jpg':'mui8omjd','catalog/p56.jpg':'mutnguvj','catalog/p57.jpg':'mutngqb6','catalog/p58.jpg':'mui8onun','catalog/p59.jpg':'mutngqtq','catalog/p6.jpg':'mui8fojk','catalog/p60.jpg':'mutngs3x','catalog/p61.jpg':'mui8ot83','catalog/p62.jpg':'mui8oqrk','catalog/p63.jpg':'mui8ogls','catalog/p64.jpg':'mutngsm0','catalog/p65.jpg':'mutngth3','catalog/p66.jpg':'mutngu77','catalog/p67.jpg':'mui8oh3f','catalog/p68.jpg':'mui8oiuu','catalog/p69.jpg':'mui8ohp5','catalog/p7.jpg':'mui9o1cy','catalog/p70.jpg':'mui8ok4a','catalog/p71.jpg':'mui8okrh','catalog/p72.jpg':'mui8olqk','catalog/p73.jpg':'mui8omlg','catalog/p74.jpg':'mui8oniw','catalog/p75.jpg':'mui8oh65','catalog/p76.jpg':'mui8ooc8','catalog/p77.jpg':'mutngpv9','catalog/p78.jpg':'mui8oq0k','catalog/p79.jpg':'mutngqk2','catalog/p8.jpg':'mui8fpvb','catalog/p80.jpg':'mui8orvn','catalog/p81.jpg':'mui8osxs','catalog/p82.jpg':'mutngrky','catalog/p83.jpg':'mutngsxt','catalog/p84.jpg':'mui8ogmb','catalog/p85.jpg':'mui8ohym','catalog/p86.jpg':'mui8ojce','catalog/p87.jpg':'mui8okhn','catalog/p88.jpg':'mui8omdn','catalog/p9.jpg':'mui8oi4b','catalog/p90.jpg':'mutngtem','catalog/p91.jpg':'mutngu2b','catalog/p92.jpg':'mutnguj9','catalog/p93.jpg':'mui8olly','catalog/p94.jpg':'mui8ommr','catalog/p95.jpg':'mui8onqw','catalog/p96.jpg':'mutnguzs','catalog/p97.jpg':'mutngrr6','catalog/p98.jpg':'mui8orp4','catalog/p99.jpg':'mui8ot2r','products/5ffeccd1-5519-40e3-a44a-bc284ede299c.jpg':'mui96oal','products/a04e3f4d-faf0-4de8-8de8-9b7b91e14b9c.jpg':'mui96oki','u/270726507e2e9d16dfc58204eb2d7f7e.jpg':'','u/29547872abebda3abaa757f42e528981.jpg':'','u/55a01a3ab6d5f739f87a5184f09abecf.jpg':'','u/59102f6d0e54be01b5bbe9e549d9ed7f.jpg':'','u/5bbd24d45f47a45cfcff023937ca50c3.jpg':'','u/6849ea0eabbdd0c1f10140b4a4b9dbf1.jpg':'','u/6fb26348df82bec7d230a52a0d30a647.jpg':'','u/8b0f552593d98a7c620845363ac61b7b.jpg':'','u/8f3793c814b685278bdab7203e534ea9.jpg':'','u/95e87bc566524503cd9bd2043efd88a7.jpg':'','u/960bcb63e9b77d7f8ed06fed30ce5c35.jpg':'','u/9617c4f859452c984123561cfb1fb597.jpg':'','u/ae551244e460088d32b4ad94740eeaf6.jpg':'','u/b92cccb524696068c5a6722354f3a0c3.jpg':'','u/cbb9e1f718ba31a0eae7d8700c002643.jpg':'','u/f9ff56b8681586a4ea0a4ffc67db3098.jpg':''}/* PHOTO-V-END */;
+const PHOTO_ORIG={};
+function localPhoto(u){
+  if(typeof u!=='string' || u.indexOf(PHOTO_BASE)!==0) return u;
+  const rest=u.slice(PHOTO_BASE.length), q=rest.indexOf('?'), path=q<0?rest:rest.slice(0,q);
+  const v=q<0 ? '' : (new URLSearchParams(rest.slice(q+1)).get('v')||'');
+  if(!Object.prototype.hasOwnProperty.call(PHOTO_V,path) || PHOTO_V[path]!==v) return u;
+  const i=path.indexOf('/'), folder=path.slice(0,i), base=path.slice(i+1).replace(/\.[^.]+$/,'');
+  const loc='/img/p/'+({catalog:'c',products:'pr',u:'u'}[folder])+'-'+base+(v?'-'+v:'')+'.webp';
+  PHOTO_ORIG[loc]=u; return loc;
+}
+function localPhotos(v){
+  if(typeof v==='string') return localPhoto(v);
+  if(Array.isArray(v)) return v.map(localPhotos);
+  if(v && typeof v==='object'){ for(const k in v) v[k]=localPhotos(v[k]); }
+  return v;
+}
+document.addEventListener('error', e=>{
+  const t=e.target; if(!t || t.tagName!=='IMG' || t.dataset.fb) return;
+  const o=PHOTO_ORIG[t.getAttribute('src')]; if(!o) return;
+  t.dataset.fb='1'; e.stopImmediatePropagation(); t.src=o;      /* copy missing on this website → Supabase photo */
+}, true);
 async function rpc(fn, args={}){
   try{
     const c = await getSb();
     const {data, error} = await c.rpc(fn, args);
     if(error) return {ok:false, msg:safeStr(String(error.message||''))};
-    const d=safeData(data);
+    const d=localPhotos(safeData(data));
     if(d && typeof d==='object' && 'ok' in d) return d;
     return {ok:true, data:d};
   }catch(e){
@@ -6550,7 +6577,7 @@ function rcLoad(src){
     if(!src) return res(null);
     let done=false; const fin=v=>{ if(!done){ done=true; res(v); } };
     const go=(u,retry)=>{ const i=new Image(); if(!/^data:/.test(u)) i.crossOrigin='anonymous';
-      i.onload=()=>fin(i); i.onerror=()=>{ if(retry && !/^data:/.test(u)) go(u+(u.includes('?')?'&':'?')+'rc=1', false); else fin(null); }; i.src=u; };
+      i.onload=()=>fin(i); i.onerror=()=>{ if(retry && !/^data:/.test(u)) go(PHOTO_ORIG[u] || (u+(u.includes('?')?'&':'?')+'rc=1'), false); else fin(null); }; i.src=u; };   /* website copy missing → Supabase photo */
     go(src, true); setTimeout(()=>fin(null), 7000);
   });
 }

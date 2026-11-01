@@ -76,6 +76,7 @@ scripts/
   site-csp.py        re-pins the inline-script hash of admin-site / staff-site (run after editing them)
   test-voice-parser.js  node scripts/test-voice-parser.js — tests the customer site's voice-order parser
   test-vendor-rate-parser.js  node scripts/test-vendor-rate-parser.js — tests the vendor site's "speak your rates" parser
+  photos-to-site.py  copies item photos from Supabase Storage into customer/img/p/ (see "Item photos from the website")
 docs/              business context
   pitch-deck/        the pitch deck: deck.src.html → `npm run build` → RozBazaar_Pitch_Deck.pdf (see its README)
 platform/          NEW (30 Sep 2026): TypeScript/Express API + React customer & vendor apps
@@ -199,6 +200,18 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   `{same:true}` (69 bytes) unless the reply changed. A logged-in page used ~100 KB a minute (most of the free plan's 5 GB/month);
   10 minutes open now ≈ 2.5 KB. The 25 s orders check uses the same 30 orders as My bookings (it used 10, which shrank that list).
   The originals are unchanged — the platform/ API and older copies of the site still use them.
+- **Item photos from the website** (1 Nov 2026): the 139 item photos in use (catalog, vendor uploads `u/`, `products/`) are copied
+  to `customer/img/p/` as 400 px WebP (avg 17 KB; they were 66 KB JPEGs on Supabase Storage, which used the free plan's data).
+  `rpc()` runs every reply through `localPhotos()`: a Supabase `item-photos/` link whose path + `?v=` version is in `PHOTO_V`
+  (between `PHOTO-V-START/END`) becomes `/img/p/<c|pr|u>-<name>[-<v>].webp`; a new or replaced photo keeps its Supabase link.
+  If a copy fails to load, a capture-phase `error` listener swaps in the Supabase link once (`PHOTO_ORIG`), then the usual
+  drawing fallback; the rates card (`rcLoad`) does the same. `img/p/.htaccess` = 1-year cache (names carry the version).
+  **Upload `customer/img/p/` with the site.** To copy new vendor photos later: deploy `supabase/functions/rb-photo-export`
+  (source in the repo; deployed now as a 410 stub), `net.http_post` it ≤25 paths per call with `token` = app_settings
+  `item_photos_token`, read each reply with `select id, content from net._http_response where id in (…)` (too big for chat →
+  the tool saves it to a file), list links in use as `path|v` (query the item-photos URLs in catalog_items / products /
+  vendors / booking_items), run `python3 scripts/photos-to-site.py links.txt <files…>`, stub the function again. This was
+  needed because this cloud environment may not download from supabase.co.
 - Home ends with small social chips + a navy mini-footer ("Become a vendor" → `VENDOR_SITE`
   = https://vendor.rozbazaar.shop/). `#s-home` has bottom padding so nothing hides under the
   bottom nav / cart bar.
