@@ -193,6 +193,12 @@ Every `admin_*` RPC begins with `perform admin_guard();`.
   repainted every minute. It used to say "Today, Morning 7–11" all day. Desktop "N villages served" (`#hdVillages`) = served
   villages from `public_areas` (it said 8 while 2 were live). The chat bubble is hidden on the success screen (it covered
   "View bookings"). (30 Oct 2026)
+- **"Anything changed?" refreshes** (1 Nov 2026, migration `20261101a_poll_if_changed.sql`): the 25 s poll (item list + orders),
+  the 3-min catalogue refresh and the 60 s notifications call `customer_home_if_changed` / `customer_my_bookings_if_changed` /
+  `customer_notifications_if_changed` with the version they already have (`REV.home/bk/nt`, `homeIfChanged()`); the server answers
+  `{same:true}` (69 bytes) unless the reply changed. A logged-in page used ~100 KB a minute (most of the free plan's 5 GB/month);
+  10 minutes open now ≈ 2.5 KB. The 25 s orders check uses the same 30 orders as My bookings (it used 10, which shrank that list).
+  The originals are unchanged — the platform/ API and older copies of the site still use them.
 - Home ends with small social chips + a navy mini-footer ("Become a vendor" → `VENDOR_SITE`
   = https://vendor.rozbazaar.shop/). `#s-home` has bottom padding so nothing hides under the
   bottom nav / cart bar.

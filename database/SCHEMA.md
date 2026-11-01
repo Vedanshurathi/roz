@@ -275,6 +275,9 @@ customer_create_schedule(p_type, p_address_id, p_weekdays int[], p_slot, p_start
 customer_delete_address(p_id) [definer]
 customer_dispute_bill(p_booking, p_reason) [definer]
 customer_home(p_area) [definer]
+customer_home_if_changed(p_area, p_rev) [invoker]            — {ok,same:true,rev} when p_rev = md5 of the reply, else full reply + rev
+customer_my_bookings_if_changed(p_limit, p_rev) [invoker]    — same idea (logged in only)
+customer_notifications_if_changed(p_limit, p_rev) [invoker]  — same idea (logged in only); helper rb_if_changed(jsonb, rev)
 customer_join_waitlist(p_area, p_type, p_phone) [definer]
 customer_last_order() [definer]
 customer_my_addresses() [definer]

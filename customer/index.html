@@ -3250,8 +3250,9 @@ async function mockApi(fn, args={}){
 
     case 'getCatalogue': {
       if(!PRODUCTS.length){
-        const r = await rpc('customer_home',{p_area:AREA});
-        if(!r.ok) return {ok:false, msg:r.msg};
+        REV.homeArea=null;                         /* always the full list here */
+        const r = await homeIfChanged();
+        if(!r.ok || !r.data) return {ok:false, msg:r.msg};
         SERVED   = r.data.served;
         PRODUCTS = (r.data.products||[]).map(mapProduct);
         LIVE_TYPES = r.data.types || [];
@@ -3316,8 +3317,9 @@ async function mockApi(fn, args={}){
     }
 
     case 'getBookings': {
-      const r = await rpc('customer_my_bookings',{p_limit:30});
+      const r = await rpc('customer_my_bookings_if_changed',{p_limit:30, p_rev:null});   /* full list; its version lets the 25 s check answer "no change" */
       if(!r.ok) return r;
+      if(r.rev) REV.bk=r.rev;
       return {ok:true, data:(r.data||[]).map(mapBooking)};
     }
 
@@ -3483,16 +3485,17 @@ function startWayPolling(){
   clearInterval(wayPollTimer);
   wayPollTimer=setInterval(async ()=>{
     if(DEMO || !user || document.hidden) return;
-    const r=await rpc('customer_my_bookings',{p_limit:10});
-    if(r.ok && Array.isArray(r.data)){
-      if(!DEMO) BOOKINGS=r.data.map(x=>mapBooking(x));
+    const r=await rpc('customer_my_bookings_if_changed',{p_limit:30, p_rev:REV.bk});   /* same 30 as My bookings (10 used to shrink that list) */
+    if(r.ok && r.rev) REV.bk=r.rev;
+    if(r.ok && (r.same || Array.isArray(r.data))){
+      if(!r.same && !DEMO) BOOKINGS=r.data.map(x=>mapBooking(x));
       checkVendorOnTheWay(BOOKINGS);
       paintWayBar();
       checkForCompletedOrder();
     }
     if(AREA){
-      const pr=await rpc('customer_home',{p_area:AREA});
-      if(pr.ok && pr.data && Array.isArray(pr.data.products)){
+      const pr=await homeIfChanged();
+      if(pr.ok && !pr.same && pr.data && Array.isArray(pr.data.products)){
         checkPriceChanges(pr.data.products.map(mapProduct));
         if(PRODUCTS.length) applyCatalogue(pr.data);   /* stock / price changes show up without a reload */
       }
@@ -3853,13 +3856,23 @@ function skeletons(n){
    in stock (or a new rate) only showed after a full reload. Re-checked when the app comes back
    to the screen and every 3 minutes while it is open; the screen is redrawn only if something changed. */
 let CAT_T=Date.now(), CAT_BUSY=false;
+/* "Anything changed?" refreshes (1 Nov 2026): the page sends the version (rev) it already has and the server answers
+   {same:true} (~70 bytes) instead of the whole list when nothing changed. Re-sending the item list (16 KB) and the orders
+   (16 KB) every 25 s and notifications (15 KB) every minute used up most of the free Supabase data allowance. */
+const REV={home:null, homeArea:null, bk:null, nt:null};
+async function homeIfChanged(){
+  const r=await rpc('customer_home_if_changed',{p_area:AREA, p_rev: REV.homeArea===AREA ? REV.home : null});
+  if(r.ok && r.rev){ REV.home=r.rev; REV.homeArea=AREA; }
+  return r;                      /* r.same → nothing new since the last reply */
+}
 async function refreshCatalogue(force){
   if(DEMO || CAT_BUSY || !AREA || !PRODUCTS.length) return;
   if(!force && Date.now()-CAT_T < 60000) return;
   CAT_BUSY=true;
   try{
-    const r=await rpc('customer_home',{p_area:AREA});
-    if(r.ok) applyCatalogue(r.data);
+    const r=await homeIfChanged();
+    if(r.ok && r.same) CAT_T=Date.now();
+    else if(r.ok && r.data) applyCatalogue(r.data);
   }catch(e){} finally{ CAT_BUSY=false; }
 }
 function applyCatalogue(data){
@@ -5877,7 +5890,7 @@ function paintHeaderIdentity(){
 async function logout(){
   cartLogout(); SESSION=null; sessionReady=false;
   if(!DEMO){ try{ const c=await getSb(); await c.auth.signOut(); }catch(e){} }
-  user=null; addr=null; ADDRS=[]; ADDR_PICKED=false; cart={}; BOOKINGS=[]; FAVS.clear(); paintWayBar();
+  user=null; addr=null; ADDRS=[]; ADDR_PICKED=false; cart={}; BOOKINGS=[]; FAVS.clear(); REV.bk=REV.nt=null; paintWayBar();
   try{ localStorage.removeItem('rb_addr_draft'); }catch(e){}
   syncCart(); renderAcct(); paintHeaderIdentity(); go('home');
   toast(T('Logged out','लॉगआउट हो गया'));
@@ -7052,9 +7065,10 @@ const CN_ICON={gali_complete:'🏘',booking_confirmed:'✅',booking_on_the_way:'
   booking_missed:'😔',booking_pending_review:'🔍',booking_near:'🛵',cancelled:'❌',slot_reminder:'⏰',tomorrow_reminder:'🗓️',broadcast:'📣',booking_status:'🛒'};
 async function loadCustNotifs(silent){
   if(DEMO || !SESSION) return;
-  const r=await rpc('customer_notifications',{p_limit:40});
+  const r=await rpc('customer_notifications_if_changed',{p_limit:40, p_rev:REV.nt});
   if(!r.ok) return;
-  CNOTIFS=r.data||[];
+  if(r.rev) REV.nt=r.rev;
+  if(!r.same) CNOTIFS=r.data||[];
   const un=CNOTIFS.filter(n=>!n.is_read).length;
   document.querySelectorAll('.nbdg').forEach(b=>{ b.textContent=un>9?'9+':un; b.hidden=!un; });
   if(CN_SEEN && silent){
