@@ -374,9 +374,43 @@ function stPill(s) {
     cancelled:'p-m', missed:'p-r', disputed:'p-r' };
   return `<span class="pill ${m[s] || 'p-m'}">${esc(String(s || '').replace(/_/g, ' '))}</span>`;
 }
+let bookingsQ = '', bookingsStatusFilter = 'all';
 function vBookings() {
-  const b = D.bookings;
-  document.getElementById('v-bookings').innerHTML = banner() + (b.length ? `
+  const all = D.bookings;
+  const needsAttention = all.filter(x => ['disputed','missed'].includes(x.status)).length;
+  const today = new Date().toISOString().slice(0,10);
+  const todayCount = all.filter(x => (x.booking_date||'').slice(0,10) === today).length;
+  const completed = all.filter(x => x.status === 'completed').length;
+
+  const q = bookingsQ.trim().toLowerCase();
+  const b = all.filter(x => {
+    if (bookingsStatusFilter !== 'all') {
+      if (bookingsStatusFilter === 'attention') { if (!['disputed','missed'].includes(x.status)) return false; }
+      else if (x.status !== bookingsStatusFilter) return false;
+    }
+    if (!q) return true;
+    return [x.code, x.customer_name, x.vendor_name, x.area].some(f => (f||'').toLowerCase().includes(q));
+  });
+
+  document.getElementById('v-bookings').innerHTML = banner() + `
+    <div class="grid k4" style="margin-bottom:15px">
+      ${kpi('Total bookings', all.length, 'all time')}
+      ${kpi('Needs attention', needsAttention, 'disputed / missed', needsAttention > 0 ? 'bad' : '')}
+      ${kpi('Today', todayCount, 'placed today', todayCount ? 'good' : '')}
+      ${kpi('Completed', completed, 'delivered & paid')}
+    </div>
+    <div class="card" style="margin-bottom:15px;padding:14px 16px">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <input class="fld" id="bookSearch" placeholder="Search code, customer, vendor, area\u2026"
+          value="${esc(bookingsQ)}" style="flex:1;min-width:220px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${['all','attention','placed','on_the_way','completed','cancelled'].map(s => `
+            <button class="pill filter-pill ${bookingsStatusFilter===s?'on':''}" data-act="filterBookings" data-arg="${s}">
+              ${s==='all'?'All':s==='attention'?'Needs attention':s.replace('_',' ')}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+    ${b.length ? `
     <div class="tw"><table><thead><tr><th>Code</th><th>Customer</th><th>Area</th><th>Vendor</th>
       <th>Slot</th><th>Status</th><th>Est</th><th>Final</th><th></th></tr></thead><tbody>
       ${b.map(x => `<tr>
@@ -391,9 +425,13 @@ function vBookings() {
           ${!['completed','delivered','cancelled'].includes(x.status)
           ? `<button class="btn btn-r btn-sm" data-act="cancelBooking" data-arg="${x.id}" style="margin-left:6px">Cancel</button>` : ''}</td>
       </tr>`).join('')}</tbody></table></div>`
-    : `<div class="empty"><div class="e">\u{1F4CB}</div><b>No bookings yet</b>
-       <p>They appear the moment a customer confirms one.</p></div>`);
+    : `<div class="empty"><div class="e">\u{1F50D}</div><b>No bookings match</b>
+       <p>Try a different search or filter.</p></div>`}`;
+  const si = document.getElementById('bookSearch');
+  if (si) si.oninput = e => { bookingsQ = e.target.value; vBookings(); animateCounts();
+    requestAnimationFrame(()=>{ const f=document.getElementById('bookSearch'); if(f){f.focus(); f.selectionStart=f.selectionEnd=f.value.length;} }); };
 }
+function filterBookings(status) { bookingsStatusFilter = status; vBookings(); animateCounts(); }
 async function resolveBooking(id) {
   const r = await api('/bookings/' + id + '/resolve', {});
   toast(r.ok ? 'Marked completed' : (r.error || 'Failed'));
@@ -837,6 +875,7 @@ document.addEventListener('click', e => {
     case 'addVendor': addVendor(); break;
     case 'resolve':   resolveBooking(a); break;
     case 'cancelBooking': cancelBookingUI(a); break;
+    case 'filterBookings': filterBookings(a); break;
     case 'review':    reviewVendor(a, a2); break;
     case 'removeVendor': removeVendor(a, a2); break;
     case 'block':     blockCustomer(a, a2 === 'true'); break;

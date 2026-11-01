@@ -1,0 +1,8 @@
+# Item photos copied from Supabase Storage (1 Nov 2026). Each file name carries its version, so a changed
+# photo gets a new name — phones can keep these for a year.
+<IfModule mod_headers.c>
+  Header set Cache-Control "public, max-age=31536000, immutable"
+</IfModule>
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+</IfModule>

@@ -1,0 +1,43 @@
+/* Small additions on top of the original look (legacy.css). */
+
+/* inline drawings: let the original `.pimg svg` sizing apply to the svg itself */
+.artsvg {
+  display: contents;
+}
+
+/* phone number for "Notify me" when not logged in */
+.wl-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  width: 100%;
+  max-width: 340px;
+}
+.wl-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* screen readers only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* the Leaflet pin */
+.rbpin {
+  font-size: 34px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
+}
+
+/* vendor picker sort chips: one row (the original never defined .row, so they stacked) */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}

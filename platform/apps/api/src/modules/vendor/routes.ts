@@ -1,0 +1,284 @@
+/** Vendor app endpoints — every one needs a vendor session. */
+import { Router } from 'express';
+import { z } from 'zod';
+import {
+  activateCatalogBody,
+  activeBody,
+  bulkPricesBody,
+  capacityBody,
+  dateQuery,
+  finalizeBillBody,
+  isoDateSchema,
+  limitQuery,
+  paymentBody,
+  pushSubscriptionBody,
+  rangeQuery,
+  setStatusBody,
+  slotAreasBody,
+  stockBody,
+  upsertProductBody,
+  uuidSchema,
+  vendorProfileBody,
+  verifyOtpBody,
+  type TimeSlot,
+} from '@rozbazaar/shared';
+import type { Deps } from '../../deps.js';
+import { parse } from '../../middleware/validate.js';
+import { requireSession } from '../../middleware/auth.js';
+import { noStore } from '../../security/headers.js';
+import { ok } from '../../lib/respond.js';
+import type { RpcCaller } from '../../supabase/rpc.js';
+import {
+  mapBooking,
+  mapCatalogItem,
+  mapDashboard,
+  mapReview,
+  mapStats,
+  mapVendor,
+  mapVendorProduct,
+  mapVendorSlot,
+} from '../mappers.js';
+
+type Row = Record<string, unknown>;
+const idParam = z.object({ id: uuidSchema });
+const rows = (v: unknown): Row[] => (Array.isArray(v) ? (v as Row[]) : []);
+
+export function vendorRoutes(d: Deps): Router {
+  const r = Router();
+  r.use(requireSession(d.sessions, 'vendor'), noStore);
+  const me = (req: { auth?: { accessToken: string } }): RpcCaller => ({
+    kind: 'user',
+    token: req.auth!.accessToken,
+  });
+
+  /* ---------- profile ---------- */
+  r.get('/me', async (req, res) => {
+    const out = await d.rpc.call<Row>('vendor_me', {}, me(req));
+    ok(res, mapVendor(d.map, out.data));
+  });
+
+  r.patch('/profile', async (req, res) => {
+    const b = parse(vendorProfileBody, req.body);
+    const out = await d.rpc.call(
+      'vendor_update_profile',
+      {
+        p_name: b.name ?? null,
+        p_shop: b.shop ?? null,
+        p_vehicle: b.vehicle ?? null,
+        p_areas: b.areas ?? null,
+        p_capacity: b.capacity ?? null,
+        p_photo: b.photo ?? null,
+      },
+      me(req),
+    );
+    ok(res, { saved: true }, out.message);
+  });
+
+  r.post('/active', async (req, res) => {
+    const b = parse(activeBody, req.body);
+    const out = await d.rpc.call('vendor_set_active', { p_active: b.active }, me(req));
+    ok(res, { active: b.active }, out.message);
+  });
+
+  /* ---------- orders ---------- */
+  r.get('/orders', async (req, res) => {
+    const { date } = parse(dateQuery, req.query);
+    const out = await d.rpc.call<unknown>('vendor_bookings', { p_date: date }, me(req));
+    ok(
+      res,
+      rows(out.data).map((b) => mapBooking(d.map, b, 'vendor')),
+    );
+  });
+
+  r.post('/orders/:id/status', async (req, res) => {
+    const { id } = parse(idParam, req.params);
+    const b = parse(setStatusBody, req.body);
+    const out = await d.rpc.call('vendor_set_status', { p_booking: id, p_status: b.status }, me(req));
+    const maps =
+      typeof out.extra.maps_url === 'string' && out.extra.maps_url.startsWith('https://')
+        ? out.extra.maps_url
+        : null;
+    ok(res, { status: b.status, mapsUrl: maps }, out.message);
+  });
+
+  r.post('/orders/:id/bill', async (req, res) => {
+    const { id } = parse(idParam, req.params);
+    const b = parse(finalizeBillBody, req.body);
+    const out = await d.rpc.call<Row>(
+      'vendor_finalize_bill',
+      {
+        p_booking: id,
+        p_items: b.items.map((i) =>
+          i.itemId
+            ? {
+                item_id: i.itemId,
+                final_qty: i.finalQty,
+                final_price: i.finalPrice,
+                removed: Boolean(i.removed),
+              }
+            : { product_id: i.productId, final_qty: i.finalQty, final_price: i.finalPrice },
+        ),
+      },
+      me(req),
+    );
+    const total = Number((out.data as Row | null)?.final_total ?? NaN);
+    ok(res, { finalTotal: Number.isFinite(total) ? total : null }, out.message);
+  });
+
+  r.post('/orders/:id/payment', async (req, res) => {
+    const { id } = parse(idParam, req.params);
+    const b = parse(paymentBody, req.body);
+    const out = await d.rpc.call(
+      'vendor_record_payment',
+      { p_booking: id, p_method: b.method, p_amount: b.amount },
+      me(req),
+    );
+    ok(res, { paid: true }, out.message);
+  });
+
+  r.post('/orders/:id/verify', d.limiters.otpVerify, async (req, res) => {
+    const { id } = parse(idParam, req.params);
+    const b = parse(verifyOtpBody, req.body);
+    const out = await d.rpc.call('vendor_verify_otp', { p_booking: id, p_otp: b.otp }, me(req));
+    ok(res, { verified: true }, out.message);
+  });
+
+  /* ---------- products + catalogue ---------- */
+  r.get('/products', async (req, res) => {
+    const out = await d.rpc.call<unknown>('vendor_my_products', {}, me(req));
+    ok(
+      res,
+      rows(out.data).map((p) => mapVendorProduct(d.map, p)),
+    );
+  });
+
+  r.post('/products', async (req, res) => {
+    const b = parse(upsertProductBody, req.body);
+    const out = await d.rpc.call<Row>(
+      'vendor_upsert_product',
+      {
+        p_name: b.name,
+        p_unit: b.unit,
+        p_price: b.price,
+        p_category: b.category,
+        p_image: b.image ?? null, // null keeps the current photo (coalesce in the DB)
+        // p_sort only when given: passing null would overwrite the function's default of 0.
+        ...(b.sort !== undefined ? { p_sort: b.sort } : {}),
+        p_product_id: b.id ?? null,
+        p_name_hi: b.nameHi ?? null,
+      },
+      me(req),
+    );
+    const id = (out.data as Row | null)?.id ?? b.id ?? null;
+    ok(res, { id }, out.message, b.id ? 200 : 201);
+  });
+
+  r.delete('/products/:id', async (req, res) => {
+    const { id } = parse(idParam, req.params);
+    const out = await d.rpc.call('vendor_delete_product', { p_product: id }, me(req));
+    ok(res, { deleted: true }, out.message);
+  });
+
+  r.post('/products/:id/stock', async (req, res) => {
+    const { id } = parse(idParam, req.params);
+    const b = parse(stockBody, req.body);
+    const out = await d.rpc.call('vendor_set_stock', { p_product: id, p_in_stock: b.inStock }, me(req));
+    ok(res, { inStock: b.inStock }, out.message);
+  });
+
+  r.post('/products/prices', async (req, res) => {
+    const b = parse(bulkPricesBody, req.body);
+    const out = await d.rpc.call('vendor_bulk_prices', { p_prices: b.prices }, me(req));
+    ok(res, { saved: b.prices.length }, out.message);
+  });
+
+  r.get('/catalog', async (_req, res) => {
+    const out = await d.rpc.call<unknown>('catalog_items_list', {}, { kind: 'anon' });
+    ok(
+      res,
+      rows(out.data)
+        .filter((c) => c.is_active !== false)
+        .map((c) => mapCatalogItem(d.map, c)),
+    );
+  });
+
+  r.post('/catalog/activate', async (req, res) => {
+    const b = parse(activateCatalogBody, req.body);
+    const out = await d.rpc.call<Row>(
+      'vendor_activate_catalog_item',
+      { p_key: b.key, p_price: b.price, p_unit: b.unit ?? null },
+      me(req),
+    );
+    ok(res, { id: (out.data as Row | null)?.id ?? null }, out.message, 201);
+  });
+
+  /* ---------- slots ---------- */
+  const slotsQuery = z.object({
+    from: isoDateSchema,
+    days: z.coerce.number().int().min(0).max(30).default(0),
+  });
+  r.get('/slots', async (req, res) => {
+    const q = parse(slotsQuery, req.query);
+    const out = await d.rpc.call<unknown>('vendor_my_slots', { p_from: q.from, p_days: q.days }, me(req));
+    ok(res, rows(out.data).map(mapVendorSlot));
+  });
+
+  r.post('/slots/capacity', async (req, res) => {
+    const b = parse(capacityBody, req.body);
+    const out = await d.rpc.call(
+      'vendor_set_capacity',
+      { p_date: b.date, p_slot: b.slot, p_capacity: b.capacity, p_open: b.open },
+      me(req),
+    );
+    ok(res, { saved: true }, out.message);
+  });
+
+  r.get('/slots/areas', async (req, res) => {
+    const out = await d.rpc.call<Record<string, unknown>>('vendor_get_slot_areas', {}, me(req));
+    const raw = out.data ?? {};
+    const areas: Record<TimeSlot, string[] | null> = { morning: null, afternoon: null, evening: null };
+    for (const s of ['morning', 'afternoon', 'evening'] as const) {
+      const v = raw[s];
+      areas[s] = Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : null;
+    }
+    ok(res, areas);
+  });
+
+  r.put('/slots/areas', async (req, res) => {
+    const b = parse(slotAreasBody, req.body);
+    const out = await d.rpc.call('vendor_set_slot_areas', { p_slot: b.slot, p_areas: b.areas }, me(req));
+    ok(res, { saved: true }, out.message);
+  });
+
+  /* ---------- money + reviews ---------- */
+  const daysQuery = z.object({ days: z.coerce.number().int().min(1).max(365).default(7) });
+  r.get('/stats', async (req, res) => {
+    const { days } = parse(daysQuery, req.query);
+    const out = await d.rpc.call<Row>('vendor_stats', { p_days: days }, me(req));
+    ok(res, mapStats(out.data ?? {}));
+  });
+
+  r.get('/dashboard', async (req, res) => {
+    const q = parse(rangeQuery, req.query);
+    const out = await d.rpc.call<Row>('vendor_dashboard', { p_from: q.from, p_to: q.to }, me(req));
+    ok(res, mapDashboard(out.data ?? {}));
+  });
+
+  r.get('/reviews', async (req, res) => {
+    const { limit } = parse(limitQuery, req.query);
+    const out = await d.rpc.call<unknown>('vendor_my_reviews', { p_limit: limit }, me(req));
+    ok(res, rows(out.data).map(mapReview));
+  });
+
+  r.post('/push-subscriptions', async (req, res) => {
+    const b = parse(pushSubscriptionBody, req.body);
+    await d.rpc.call(
+      'vendor_save_push',
+      { p_endpoint: b.endpoint, p_p256dh: b.keys.p256dh, p_auth: b.keys.auth, p_agent: b.agent ?? null },
+      me(req),
+    );
+    res.status(204).end();
+  });
+
+  return r;
+}

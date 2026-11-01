@@ -1,0 +1,20 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "shop.rozbazaar.twa",
+      "sha256_cert_fingerprints": [
+        "9B:C3:66:5A:A4:ED:B1:46:0B:13:4A:DA:4A:3B:F6:43:D4:F7:85:21:7C:CB:9D:B6:44:95:E4:8A:18:C7:50:65",
+        "67:8E:1B:01:BD:34:57:47:5D:B9:38:18:BD:BE:05:FF:79:22:49:B6:5D:A9:96:76:63:8C:68:8A:A5:B1:07:E0",
+        "EE:A9:E1:8F:17:96:20:09:24:75:4A:2F:ED:86:CB:C6:73:20:88:A1:78:20:B2:E2:3A:8B:4E:C3:35:32:22:43",
+        "C4:D0:DF:D7:A0:6A:5E:DA:9F:E7:91:CD:1A:2B:9A:54:A2:10:DF:9A:D6:C2:4A:26:27:6A:B7:1C:B7:62:09:4F",
+        "60:AB:FF:F2:94:BB:51:E7:13:70:A6:12:23:73:8F:3A:2C:F5:7B:13:06:78:B1:10:9A:8A:1C:7B:A0:D9:F9:7B",
+        "15:67:4B:50:12:AA:25:56:FF:20:8D:9C:C8:DD:ED:D3:83:72:E8:CD:40:87:2F:53:31:B2:3D:FE:81:2C:D6:64"
+      ]
+    }
+  }
+]
