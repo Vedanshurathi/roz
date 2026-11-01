@@ -44,7 +44,8 @@ Business docs: `docs/` (pitch deck summary, problem validation, Haryana govt sch
 customer/          → deployed to Hostinger public_html (rozbazaar.shop)
   index.html         single-file customer app (~535 KB: HTML+CSS+JS, inline SVG art)
   sw.js              service worker for web push — MUST sit at public_html root
-  og-customer.jpg    link-preview image (1200×630) — og:image points here (?v=2); og.jpg is the same picture.
+  og-customer-v3.jpg link-preview image (1200×630) — og:image points here (2 Nov 2026: "पटौदी इलाका" removed);
+                     og-customer.jpg and og.jpg are the same picture (kept for old links).
                      After changing it, use a NEW file name (WhatsApp/Facebook cache by URL) and re-scrape.
   _headers _redirects  Netlify-style headers/redirects (kept for portability)
 vendor/            → OLD vendor app, NOT deployed any more (kept for reference). rozbazaar.shop/vendor.html is now
@@ -745,6 +746,11 @@ Still open by choice: phone login has no OTP until an SMS provider is set (anyon
   Between a village's own radius and `SERVICE_KM` the village list opens with "You are near X — please pick your village"
   (it used to say "we do not reach there" for anyone beyond the 2 km village radius). Logged as `log_visit('out_of_area')`.
 - The platform/ API is not updated for this (not deployed); it passes the server's message through.
+
+### No place names in the copy (2 Nov 2026)
+Vedanshu asked to remove "Pataudi" and "Haileymandi" everywhere they were written: splash, bottom of My account, footer blurb,
+FAQ "Which villages", meta description, manifest, privacy page (address = Gurugram, Haryana), link-preview picture, staff
+welcome text, admin map hint (`MAP_START`). Say "nearby villages" / "आस-पास के गाँव" instead; the served villages come from the DB.
 
 ### Launch polish (2 Nov 2026 — migrations `20261102a_village_boundary.sql`, `20261102b_poll_if_changed_vendor_admin.sql`)
 Vedanshu's 13-point list before going live. All tested in the browser with fakes (scratchpad tests, not in the repo).

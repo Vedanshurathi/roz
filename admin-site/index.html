@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-GAsXDrl2Ucsg4sGRjk3lRGOrNFCl7p9Mus7I4JyR2/4=' https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co https://server.arcgisonline.com https://tile.openstreetmap.org; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Ocn6Y6UqhtwdXvyrTAYp8bMbEvg0+4KJgzr7Eg7jvg4=' https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co https://server.arcgisonline.com https://tile.openstreetmap.org; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -2301,7 +2301,7 @@ function loadLeaflet() {
   });
   return leafletP;
 }
-const PATAUDI = [28.3256, 76.7795];
+const MAP_START = [28.3256, 76.7795];   /* where the map opens for a village with no location yet */
 const MP = { name: null, map: null, layers: null, pin: null, ring: null, acc: null, others: null, old: null,
              lat: null, lng: null, rad: 4, src: '', moved: false, watch: null, timer: null, best: null,
              mode: 'pin', pts: [], poly: null, vx: null, shapes: null };
@@ -2336,7 +2336,7 @@ function mapInfo() {
     return;
   }
   if (MP.lat == null) { el.textContent = ''; return; }
-  const from = { old: 'abhi saved jagah', hand: 'aapne pin rakha', gps: 'aapki GPS', coords: 'coordinates se', start: 'shuruaat (Pataudi) — sahi jagah chuno' }[MP.src] || '';
+  const from = { old: 'abhi saved jagah', hand: 'aapne pin rakha', gps: 'aapki GPS', coords: 'coordinates se', start: 'shuruaat ki jagah — sahi jagah chuno' }[MP.src] || '';
   const moved = MP.old ? kmBetween(MP.old[0], MP.old[1], MP.lat, MP.lng) : null;
   let gps = '';
   if (MP.best) gps = MP.best.acc <= 60
@@ -2358,7 +2358,7 @@ async function openPinMap(name) {
   MP.name = name; MP.old = a.lat != null ? [num(a.lat), num(a.lng)] : null;
   MP.rad = Math.min(10, Math.max(1, num(a.radius_km) || 4)); MP.moved = false; MP.best = null;
   MP.pts = Array.isArray(a.boundary) ? a.boundary.map(p => [num(p[0]), num(p[1])]) : [];
-  const start = MP.old || PATAUDI;
+  const start = MP.old || MAP_START;
   $('msTitle').textContent = '📍 ' + name + ' ki location';
   $('msRad').value = MP.rad; $('msRadV').textContent = MP.rad + ' km'; $('msCoords').value = '';
   $('mapSheet').classList.add('show'); $('mapSheet').setAttribute('aria-hidden', 'false');
