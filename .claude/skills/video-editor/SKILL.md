@@ -37,6 +37,29 @@ You are editing for retention. Every decision answers one question:
    captions stay inside the safe zone (see playbook), nothing is cut off,
    audio peaks below −1 dBTP (`vedit.py probe final.mp4`).
 
+## Toolbox (all free)
+
+Install everything with `bash scripts/setup-tools.sh` (cloud sandboxes reset, so run it
+at the start of a session). What each tool is for:
+
+| tool | use it for |
+|---|---|
+| FFmpeg | cutting, merging, filters, tonemapping HDR phone footage, final encode |
+| Remotion (`remotion/`) | React-based motion graphics: kinetic titles, data cards, animated UI. `npx remotion render src/index.ts Title out/title.mp4` |
+| Python + OpenCV | frame-by-frame compositing, tracking, masks |
+| Blender (headless) | 3D titles/objects: `blender -b --python script.py`. Set `scene.cycles.use_denoising=False` (this build has no OpenImageDenoise) |
+| Kdenlive / MLT `melt` | timeline projects; `melt` renders .mlt/.kdenlive files headlessly |
+| Audacity / SoX / pedalboard / noisereduce | audio cleanup, SFX synthesis, effects chains |
+| Whisper | transcripts + caption timing. Works offline via sherpa-onnx `whisper-turbo` (GitHub-hosted model). For Hindi, decode the token bytes yourself — `result.text` drops split UTF-8 characters |
+| Auto-Editor | silence removal / rough cuts: `auto-editor in.mp4 -o cut.mp4 --no-open` |
+| PySceneDetect | find cuts in long footage: `scenedetect -i in.mp4 detect-content list-scenes` |
+| rembg / u2net_human_seg | person cut-outs (background swap, text-behind-person) |
+| MoviePy, Manim, librosa | quick scripted edits, math/diagram animation, beat detection |
+| HandBrakeCLI, mediainfo, rubberband, frei0r (136 effects) | encoding presets, inspection, time-stretch, extra filters |
+
+Not installable in a headless sandbox: **DaVinci Resolve** (sign-up download, needs a GPU + display).
+Use it on a desktop for final colour if wanted; everything here exports Rec.709 H.264 it can open.
+
 ## Getting large footage in (> 25–30 MB)
 
 Chat uploads are size-limited, and this cloud sandbox blocks Google Drive / Dropbox
