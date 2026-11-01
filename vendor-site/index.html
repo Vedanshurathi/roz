@@ -188,6 +188,24 @@ img{display:block;max-width:100%}
   display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(47,168,80,.45),0 2px 6px rgba(0,0,0,.15);
   z-index:150;cursor:pointer;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s}
 .fab-contact:hover{transform:scale(1.08)}
+/* floating voice button (2 Nov 2026): circle above the chat bubble → oval while listening; speaks your rates */
+.fab-voice{position:fixed;right:16px;bottom:152px;height:56px;min-width:56px;max-width:56px;padding:0 16px;border:0;border-radius:28px;
+  background:linear-gradient(145deg,#FF9A3C,#F2760D);color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 6px 20px rgba(242,118,13,.42),0 2px 6px rgba(0,0,0,.15);z-index:150;cursor:pointer;overflow:hidden;font-family:inherit;
+  transition:max-width .38s cubic-bezier(.34,1.56,.64,1),transform .2s cubic-bezier(.34,1.56,.64,1),background .25s}
+.fab-voice .fv-mic{width:24px;height:24px;flex:none}
+.fab-voice .fv-txt{display:none;min-width:0;flex:1;font-size:13.5px;font-weight:800;text-align:left;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fab-voice .fv-bars{display:none;align-items:center;gap:3px;height:20px;flex:none}
+.fab-voice .fv-bars i{width:3.5px;border-radius:3px;background:#fff;height:6px;animation:fvBar .9s ease-in-out infinite}
+.fab-voice .fv-bars i:nth-child(2){animation-delay:.15s}.fab-voice .fv-bars i:nth-child(3){animation-delay:.3s}.fab-voice .fv-bars i:nth-child(4){animation-delay:.45s}
+@keyframes fvBar{0%,100%{height:6px}50%{height:19px}}
+.fab-voice:active{transform:scale(.94)}
+.fab-voice.on{max-width:min(320px,calc(100vw - 32px));justify-content:flex-start;background:linear-gradient(145deg,#E5484D,#C92A2A);
+  box-shadow:0 8px 26px rgba(201,42,42,.45),0 0 0 6px rgba(229,72,77,.18)}
+.fab-voice.on .fv-txt,.fab-voice.msg .fv-txt{display:block}.fab-voice.on .fv-bars{display:flex}
+.fab-voice.msg{max-width:min(300px,calc(100vw - 32px));justify-content:flex-start;background:#101B30}
+@media(min-width:900px){.fab-voice{bottom:104px;right:32px;height:60px;min-width:60px;max-width:60px;border-radius:30px}.fab-voice.on,.fab-voice.msg{max-width:340px}}
+@media (prefers-reduced-motion:reduce){.fab-voice .fv-bars i{animation:none;height:12px}}
 .fab-contact:active{transform:scale(.92)}
 .fab-contact svg{width:26px;height:26px}
 @media(min-width:900px){.fab-contact{bottom:32px;right:32px;width:60px;height:60px}}
@@ -723,6 +741,46 @@ body.has-nav .scr{padding-bottom:200px}
 .dh-amt{font-family:var(--disp);font-size:clamp(34px,11vw,46px);font-weight:800;line-height:1.1;margin-top:6px;word-break:break-all}
 .dh-sub{font-size:13px;font-weight:700;color:rgba(255,255,255,.65);margin-top:2px}
 .dh-split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.dh-cmp{display:inline-block;margin-top:6px;padding:4px 10px;border-radius:99px;font-size:12.5px;font-weight:800;background:rgba(255,255,255,.1)}
+.dh-cmp.up{color:var(--lime)}.dh-cmp.down{color:#FDBA74}.dh-cmp.same{color:rgba(255,255,255,.7)}
+.dh-eq{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:6px;margin-top:14px}
+.dh-eq>div{background:rgba(255,255,255,.08);border-radius:13px;padding:9px 8px;min-width:0;text-align:center}
+.dh-eq>div.keepbox{background:rgba(126,203,83,.18);box-shadow:inset 0 0 0 1.5px rgba(126,203,83,.5)}
+.dh-eq span{display:block;font-size:10.5px;font-weight:800;color:rgba(255,255,255,.62);line-height:1.25}
+.dh-eq b{display:block;font-size:clamp(14px,4.2vw,18px);font-weight:800;margin-top:2px;white-space:nowrap}
+.dh-eq em{font-style:normal;font-weight:900;font-size:18px;color:rgba(255,255,255,.55)}
+.dh-eq .neg{color:#FDBA74}.dh-eq .pos{color:var(--lime)}
+.dchips2{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.otiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:10px}
+.otile{display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 4px 8px;border-radius:14px;border:1.5px solid var(--line);background:#fff;font-family:inherit;cursor:pointer;min-width:0}
+.otile i{font-style:normal;font-size:13px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:#fff;background:#5B564C}
+.otile b{font-size:19px;font-weight:800;line-height:1.1;margin-top:3px}
+.otile span{font-size:11px;font-weight:800;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.otile em{font-style:normal;font-size:10.5px;font-weight:800;color:var(--g)}
+.otile.t-todo i{background:var(--or)}.otile.t-done i{background:var(--g)}.otile.t-cancelled i{background:#d93025}.otile.t-missed i{background:#918B7E}
+.otile.on{border-color:var(--g);background:var(--lime-s);box-shadow:0 4px 12px rgba(30,142,62,.15)}
+.osearch{display:flex;align-items:center;gap:8px;margin-top:10px;padding:0 12px;border:1.5px solid var(--line);border-radius:13px;background:#fff}
+.osearch input{flex:1;min-width:0;border:0;outline:0;padding:11px 0;font:700 14px inherit;font-family:inherit;background:transparent}
+.oday{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:16px 2px 8px;flex-wrap:wrap}
+.oday b{font-size:14px;font-weight:800}.oday span{font-size:12px;font-weight:800;color:var(--mut)}
+.ocard{background:#fff;border:1.5px solid var(--line);border-left:5px solid var(--oc);border-radius:14px;padding:12px 13px;margin-bottom:8px;cursor:pointer}
+.ocard.open{box-shadow:0 8px 22px rgba(16,27,48,.1)}
+.otop{display:flex;align-items:center;gap:10px}
+.omain{min-width:0;flex:1}.omain b{display:block;font-size:15px}.omain span{display:block;font-size:12px;font-weight:700;color:var(--mut);margin-top:2px}
+.oamt{text-align:right;flex:none}.oamt b{display:block;font-size:15px}
+.opill{display:inline-block;margin-top:4px;font-size:10.5px;font-weight:800;color:#fff;border-radius:20px;padding:3px 9px;white-space:nowrap}
+.owhy{margin-top:8px;font-size:12.5px;font-weight:700;color:#B42318;background:#FFF1F1;border-radius:9px;padding:7px 9px;line-height:1.4}
+.obody{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.oit{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:600;padding:3px 0}.oit.muted{color:var(--mut)}
+.opay{font-size:12.5px;font-weight:800;color:var(--tx2);margin-top:8px}
+.ocode{font-size:11.5px;font-weight:700;color:var(--mut);margin-top:6px}
+.oact{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+@media (max-width:380px){.otiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.dchip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:12px;background:#fff;border:1.5px solid var(--line);font-size:13px;font-weight:800;color:var(--tx2)}
+.dchip i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;color:#fff;background:var(--g)}
+.dchip b{font-size:15px;color:var(--tx)}
+.dchip.open i{background:var(--or)}.dchip.cx i{background:#B42318}.dchip.miss i{background:#A16207}.dchip.avg{font-weight:700}
+.keep .hupd{display:block;font-size:11px;font-weight:700;opacity:.7;margin-top:3px}
 .dh-split>div{background:rgba(255,255,255,.08);border-radius:14px;padding:10px 12px;min-width:0}
 .dh-split span{display:block;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.62);line-height:1.3}
 .dh-split b{display:block;font-size:clamp(17px,5.4vw,22px);font-weight:800;margin-top:3px}
@@ -1151,11 +1209,11 @@ body.has-nav .scr{padding-bottom:200px}
         <button class="av-btn" id="dutyAv" onclick="go('profile')" aria-label="My profile">R</button>
       </div>
       <div class="duty-name" id="dutyName">Ramesh Kumar · Sabzi</div>
-      <div class="earn">
+      <div class="earn" role="button" tabindex="0" onclick="go('earn')" style="cursor:pointer">
         <b id="earnToday">₹0</b>
         <span data-en="sale today" data-hi="आज की बिक्री">sale today</span>
       </div>
-      <div class="keep" id="heroKeep"></div>
+      <div class="keep" id="heroKeep" onclick="go('earn')" style="cursor:pointer"></div>
       <div class="duty-stats">
         <div><b id="stDone">0</b><span data-en="delivered" data-hi="डिलीवर">delivered</span></div>
         <div><b id="stLeft">0</b><span data-en="left today" data-hi="बाकी">left today</span></div>
@@ -1331,8 +1389,10 @@ body.has-nav .scr{padding-bottom:200px}
   </div>
   <div class="wrap" style="padding-top:12px">
     <div id="ordRange" style="display:flex;gap:7px;overflow-x:auto;padding-bottom:4px"></div>
-    <div id="ordStatus" style="display:flex;gap:7px;overflow-x:auto;padding:8px 0 4px"></div>
-    <div id="ordSum" style="font-size:13px;font-weight:800;color:var(--tx2);margin:8px 2px 10px"></div>
+    <div id="ordStatus" class="otiles"></div>
+    <div class="osearch"><span>🔍</span><input id="ordQ" type="search" autocomplete="off" oninput="ORD.q=this.value;paintOrders()"
+      data-en-ph="Search name, phone or village" data-hi-ph="नाम, फ़ोन या गाँव खोजो" placeholder="Search name, phone or village"></div>
+    <div id="ordSum" style="font-size:12.5px;font-weight:800;color:var(--mut);margin:10px 2px 8px"></div>
     <div id="ordList"></div>
   </div>
 </div>
@@ -1394,6 +1454,8 @@ body.has-nav .scr{padding-bottom:200px}
   <button class="bni" data-bn="orders" onclick="go('orders')"><span class="i">📋</span><span data-en="All orders" data-hi="सारे ऑर्डर">All orders</span></button>
 </div></nav>
 
+<button class="fab-voice" id="fabVoice" onclick="fabVoiceTap()" aria-label="Speak your rates"><svg class="fv-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" stroke="none"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg>
+  <span class="fv-txt" id="fabVoiceTxt"></span><span class="fv-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
 <button class="fab-contact" id="fabContact" onclick="go('contact')" aria-label="Contact us">
   <svg viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H7l-3 3V4z" fill="#fff"/>
     <circle cx="8.5" cy="10" r="1.1" fill="#1F8A3D"/>
@@ -1857,7 +1919,12 @@ async function liveWake(){
   if(LIVE.wake || !('wakeLock' in navigator) || document.hidden) return;
   try{ LIVE.wake=await navigator.wakeLock.request('screen'); LIVE.wake.addEventListener('release',()=>{ LIVE.wake=null; }); }catch(e){}
 }
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden && LIVE.watch!=null){ liveWake(); if(LIVE.last) livePos(LIVE.last, true); } });
+document.addEventListener('visibilitychange',()=>{
+  if(LIVE.watch==null || !LIVE.last) return;
+  if(!document.hidden){ liveWake(); livePos(LIVE.last, true); }
+  else livePos(LIVE.last, true);   /* screen off / app in the background: phones pause GPS for websites, so send where we are right now */
+});
+window.addEventListener('pagehide',()=>{ if(LIVE.watch!=null && LIVE.last) livePos(LIVE.last, true); });
 function liveMoved(a,b){ if(!a||!b) return 1e9; const R=6371000, t=x=>x*Math.PI/180;
   const dLa=t(b.lat-a.lat), dLo=t(b.lng-a.lng), h=Math.sin(dLa/2)**2+Math.cos(t(a.lat))*Math.cos(t(b.lat))*Math.sin(dLo/2)**2;
   return 2*R*Math.asin(Math.sqrt(h)); }
@@ -2071,7 +2138,9 @@ function demoDash(from, to){
     items:sale?share.map(([name,unit,f])=>({name, unit, qty:Math.max(1,Math.round(sale*f/30)), amount:Math.round(sale*f)})):[],
     list};
 }
+let RUNS_REV={day:null, rev:null};
 async function api(fn, args={}){
+  if(['setStatus','sendBill','verifyCode','takePayment'].includes(fn)) RUNS_REV={day:null, rev:null};   /* my own change → next list in full */
   if(DEMO){
     await new Promise(r=>setTimeout(r,260+Math.random()*260));
     switch(fn){
@@ -2083,12 +2152,17 @@ async function api(fn, args={}){
   }
   switch(fn){
     case 'getRuns': {
-      const r=await rpc('vendor_bookings',{p_date:istISO(RUN_DAY)});
+      /* "anything changed?" (2 Nov 2026): the day's list was re-sent in full every 20 s */
+      const day=istISO(RUN_DAY);
+      const r=await rpc('vendor_bookings_if_changed',{p_date:day, p_rev: RUNS_REV.day===day ? RUNS_REV.rev : null});
       if(!r.ok) return r;
-      RUNS=(r.data||[]).map(mapBooking);
-      /* gali groups: neighbours in the same slot — bring the bonus to every house of a complete group */
-      try{ const g=await rpc('vendor_gali_groups',{p_date:istISO(RUN_DAY)});
-        if(g.ok && g.data && g.data.on){ GALI_V=g.data; RUNS.forEach(x=>{ x.gali=(g.data.groups||{})[x.id]||null; }); } }catch(e){}
+      if(r.rev) RUNS_REV={day, rev:r.rev};
+      if(!r.same){
+        RUNS=(r.data||[]).map(mapBooking);
+        /* gali groups: neighbours in the same slot — bring the bonus to every house of a complete group */
+        try{ const g=await rpc('vendor_gali_groups',{p_date:day});
+          if(g.ok && g.data && g.data.on){ GALI_V=g.data; RUNS.forEach(x=>{ x.gali=(g.data.groups||{})[x.id]||null; }); } }catch(e){}
+      }
       liveSync();      /* LIVE.need (server, any date) keeps sharing on while another day's list is shown */
       return {ok:true, data:RUNS};
     }
@@ -2102,20 +2176,25 @@ async function api(fn, args={}){
     case 'activateCatalog':
       return await rpc('vendor_activate_catalog_item',
         {p_key:args.key, p_price:args.price, p_unit:args.unit||null});
-    case 'setStatus':
-      return await rpc('vendor_set_status',
+    case 'setStatus': {
+      const r=await rpc('vendor_set_status',
         {p_booking:args.id, p_status:ST_OUT[args.status]||args.status});
+      if(r.ok) heroSoon(); return r;
+    }
     case 'sendBill':
       return await rpc('vendor_finalize_bill',{p_booking:args.id,
         p_items:(args.items||[]).map(i => i.item_id
           ? {item_id:i.item_id, final_qty:i.final_qty, final_price:i.final_price, removed:!!i.removed}
           : {product_id:i.product_id, final_qty:i.final_qty, final_price:i.final_price})});
-    case 'verifyCode':
-      return await rpc('vendor_verify_otp',{p_booking:args.id, p_otp:args.otp});
+    case 'verifyCode': {
+      const r=await rpc('vendor_verify_otp',{p_booking:args.id, p_otp:args.otp});
+      if(r.ok) heroSoon(); return r;
+    }
     case 'takePayment': {
       const PAY={cash:'cash', upi:'upi_direct', online:'online'};   /* db enum names */
-      return await rpc('vendor_record_payment',
+      const r=await rpc('vendor_record_payment',
         {p_booking:args.id, p_method:PAY[args.mode]||'cash', p_amount:args.amount});
+      if(r.ok) heroSoon(); return r;          /* Home "sale today" updates right after a payment */
     }
     case 'setStock':
       return await rpc('vendor_set_stock',{p_product:args.id, p_in_stock:args.stock});
@@ -2216,6 +2295,9 @@ function go(s){
   document.querySelectorAll('.duty-nav button').forEach(b=>b.classList.toggle('on', b.dataset.dn===s));
   const fab=document.getElementById('fabContact');
   if(fab) fab.style.display = ['contact','login','setpw','run','bill','pay','code','item','stock','slots'].includes(s) ? 'none' : 'flex';
+  const fv=document.getElementById('fabVoice');
+  /* Home only: Stock has its own big button, and on All orders / Dashboard it covered the amounts */
+  if(fv){ fv.style.display = s==='home' ? 'flex' : 'none'; if(fv.style.display==='none') fabVoiceStop(true); }
   if(s==='home'){ RUN_DAY=0; renderHome(); }   /* the nav button says "Today" — it should mean it */
   if(s==='run')   renderRun();
   if(s==='bill')  renderBill();
@@ -3910,8 +3992,7 @@ async function renderHome(){
      only mean something for the day actually in progress right now,
      even while the vendor is browsing a future day below */
   if(isToday){
-    countTo(document.getElementById('earnToday'), done.reduce((s,r)=>s+(r.final||runTotal(r)),0));
-    refreshHeroSale();
+    refreshHeroSale();        /* one source for "sale today" = the server's sale rule (the local sum made it jump) */
     document.getElementById('stDone').textContent = done.length;
     document.getElementById('stLeft').textContent = left.length;
     document.getElementById('stKg').textContent   = runs.length+done.length;
@@ -4793,37 +4874,98 @@ async function openVoiceRates(listen){
 function closeVoiceRates(){ vrStop(true); try{ speechSynthesis.cancel(); }catch(e){} document.getElementById('vrWrap').classList.remove('on'); }
 function vrLang(l){ VR.lang=l; try{ localStorage.setItem('rb_vr_lang',l); }catch(e){} vrPaintTop(); vrExamples(); if(VR.on){ vrStop(true); vrStart(); } }
 function vrToggle(){ if(VR.on) vrStop(false); else vrStart(); }
+/* Long listening (2 Nov 2026): the phone's speech engine stopped at the first pause — people asked for more time.
+   longListen keeps it on (continuous, restarted when the engine ends by itself) until: a tap on stop, 5 s of silence after
+   speaking, 12 s with nothing heard, or 45 s in all. Android repeats finished sentences in continuous mode — a sentence that
+   starts with the one before it replaces it. onEnd(finals, reason): finals = [[guess1, guess2, guess3], …]. */
+function longListen(o){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return null;
+  const st={prev:[], sess:[], t0:Date.now(), last:0, stopped:false, ended:false, reason:'', rec:null};
+  const done=()=>{ if(st.ended) return; st.ended=true; clearInterval(st.tick); try{ st.rec && st.rec.abort(); }catch(e){}
+    o.onEnd && o.onEnd(st.prev.concat(st.sess), st.reason||'stop'); };
+  const stop=reason=>{ if(st.stopped) return; st.stopped=true; st.reason=st.reason||reason;
+    try{ st.rec ? st.rec.stop() : done(); }catch(e){ done(); } setTimeout(done, 1600); };
+  const start=()=>{
+    let r; try{ r=new SR(); }catch(e){ st.reason='start'; return done(); }
+    st.rec=r; st.sess=[]; r.lang=o.lang; r.interimResults=true; r.maxAlternatives=3; r.continuous=true;
+    r.onresult=e=>{
+      const fin=[]; let interim='';
+      for(let i=0;i<e.results.length;i++){ const res=e.results[i];
+        if(res.isFinal){ const alts=[]; for(let j=0;j<res.length;j++){ const t=String(res[j].transcript||'').trim(); if(t) alts.push(t); }
+          if(!alts.length) continue;
+          const pv=fin[fin.length-1]; if(pv && alts[0].toLowerCase().startsWith(pv[0].toLowerCase())) fin[fin.length-1]=alts; else fin.push(alts); }
+        else interim+=res[0].transcript; }
+      st.sess=fin; if(interim.trim() || fin.length) st.last=Date.now(); o.onInterim && o.onInterim(interim.trim(), st.prev.concat(fin));
+    };
+    r.onerror=e=>{ if(['not-allowed','service-not-allowed','audio-capture','network'].includes(e.error)){ st.reason=e.error; st.stopped=true; } };
+    r.onend=()=>{ if(st.rec!==r) return; st.prev=st.prev.concat(st.sess); st.sess=[];
+      if(st.stopped || st.ended) return done();
+      start(); };                                         /* ended by itself on a pause → keep listening */
+    try{ r.start(); }catch(e){ st.reason='start'; done(); }
+  };
+  st.tick=setInterval(()=>{ const now=Date.now();
+    if(now-st.t0>(o.maxMs||45000)) stop('max');
+    else if(st.last && now-st.last>(o.silenceMs||5000)) stop('silence');
+    else if(!st.last && now-st.t0>(o.idleMs||12000)) stop('nothing'); }, 300);
+  start(); o.onStart && o.onStart();
+  return {stop:()=>stop('user'), abort:()=>{ st.stopped=true; st.reason='abort'; done(); }, ended:()=>st.ended};
+}
+/* each sentence came with up to 3 guesses — keep the one that makes the most sense with this vendor's items */
+function vrPick(finals){ return finals.map(alts=>{ let best=alts[0], bs=-1e9;
+  alts.forEach(a=>{ const sc=VRATE.parse(a, vrProducts(), vrCatalog()).score; if(sc>bs){ bs=sc; best=a; } }); return best; }).join(', '); }
 function vrStart(){
   if(!VR_SR){ vrPaintTop(); return; }
-  try{ if(VR.rec) VR.rec.abort(); }catch(e){}
-  let r; try{ r=new VR_SR(); }catch(e){ VR.err='start'; vrPaintTop(); return; }
-  VR.rec=r; VR.err=''; VR.interim=''; VR.done=null;
-  r.lang=VR.lang; r.interimResults=true; r.maxAlternatives=3; r.continuous=false;
-  const finals=[];
-  r.onstart=()=>{ VR.on=true; vrPaintTop(); };
-  r.onresult=e=>{ let interim='';
-    for(let i=e.resultIndex;i<e.results.length;i++){ const res=e.results[i];
-      if(res.isFinal){ const alts=[]; for(let j=0;j<res.length;j++) alts.push(res[j].transcript); finals.push(alts); }
-      else interim+=res[0].transcript; }
-    VR.interim=interim; vrPaintHeard(); };
-  r.onerror=e=>{ if(e.error!=='aborted') VR.err=e.error||'error'; };
-  r.onend=()=>{
-    VR.on=false; VR.interim='';
-    if(finals.length){
-      /* each sentence came with up to 3 guesses — keep the one that makes the most sense with this vendor's items */
-      const box=document.getElementById('vrText'), before=box.value.trim();
-      const pick=finals.map(alts=>{ let best=alts[0], bs=-1e9;
-        alts.forEach(a=>{ const s=VRATE.parse(a, vrProducts(), vrCatalog()).score; if(s>bs){ bs=s; best=a; } }); return best; }).join(', ');
-      box.value=(before?before+', ':'')+pick;
-      vrParse();
-      if(!DEMO) rpc('log_visit',{p_page:'vendor_voice_rates_heard'}).catch(()=>{});
-    }
-    vrPaintTop(); vrPaintHeard();
-  };
-  try{ r.start(); }catch(e){ VR.err='start'; }
+  vrStop(true);
+  VR.err=''; VR.interim=''; VR.done=null;
+  let L=null;
+  L=longListen({lang:VR.lang,
+    onStart:()=>{ VR.on=true; vrPaintTop(); },
+    onInterim:t=>{ VR.interim=t; vrPaintHeard(); },
+    onEnd:(finals, reason)=>{
+      if(L && VR.rec!==L) return;
+      VR.rec=null; VR.on=false; VR.interim='';
+      if(finals.length){
+        const box=document.getElementById('vrText'), before=box.value.trim();
+        box.value=(before?before+', ':'')+vrPick(finals);
+        vrParse();
+        if(!DEMO) rpc('log_visit',{p_page:'vendor_voice_rates_heard'}).catch(()=>{});
+      } else if(reason!=='abort') VR.err = ['not-allowed','service-not-allowed','audio-capture','network','start'].includes(reason) ? reason : 'no-speech';
+      vrPaintTop(); vrPaintHeard();
+    }});
+  VR.rec = L && !L.ended() ? L : null; if(!L) VR.err='start';
   vrPaintTop();
 }
-function vrStop(abort){ const r=VR.rec; if(!r) return; try{ abort?r.abort():r.stop(); }catch(e){} if(abort){ VR.on=false; vrPaintTop(); } }
+function vrStop(abort){ const r=VR.rec; if(!r) return; if(abort){ VR.rec=null; VR.on=false; r.abort(); vrPaintTop(); } else r.stop(); }
+/* floating voice button: listens right there (circle → oval with what it hears), then opens "Speak your rates" to check and save */
+let FV=null, FV_T=null;
+function fabVoiceSet(mode, text){
+  const b=document.getElementById('fabVoice'), t=document.getElementById('fabVoiceTxt'); if(!b) return;
+  clearTimeout(FV_T); b.classList.toggle('on', mode==='on'); b.classList.toggle('msg', mode==='msg'); t.textContent=text||'';
+  b.setAttribute('aria-label', mode==='on' ? T('Listening — tap when done','सुन रहे हैं — बोलकर दबाओ') : T('Speak your rates','बोलकर रेट बदलो'));
+  if(mode==='msg') FV_T=setTimeout(()=>fabVoiceSet(''), 2600);
+}
+function fabVoiceStop(abort){ const f=FV; if(!f) return; if(abort){ FV=null; f.abort(); fabVoiceSet(''); } else f.stop(); }
+function fabVoiceTap(){
+  if(FV) return fabVoiceStop(false);
+  if(!VR_SR) return openVoiceRates(false);
+  let L=null;
+  L=longListen({lang:VR.lang,
+    onStart:()=>fabVoiceSet('on', T('Listening… say item and rate','सुन रहे हैं… सामान और रेट बोलो')),
+    onInterim:(t, fin)=>fabVoiceSet('on', t || (fin.length ? fin.map(a=>a[0]).join(', ') : T('Listening…','सुन रहे हैं…'))),
+    onEnd:async (finals, reason)=>{
+      if(L && FV!==L) return; FV=null;
+      if(finals.length){
+        fabVoiceSet('');
+        await openVoiceRates(false);
+        const box=document.getElementById('vrText'); box.value=vrPick(finals); vrParse();
+        if(!DEMO) rpc('log_visit',{p_page:'vendor_voice_fab'}).catch(()=>{});
+      } else if(reason!=='abort'){
+        fabVoiceSet('msg', ['not-allowed','service-not-allowed'].includes(reason) ? T('Microphone is blocked — allow it in settings','माइक बंद है — सेटिंग में अनुमति दो')
+                                                                              : T('Didn’t hear anything — tap and speak','कुछ सुनाई नहीं दिया — दबाकर बोलो'));
+      }
+    }});
+  FV = L && !L.ended() ? L : null;
+}
 function vrTyped(){ clearTimeout(VR.typeT); VR.typeT=setTimeout(vrParse, 350); }
 function vrParse(){
   const txt=(document.getElementById('vrText')||{}).value||'';
@@ -5084,7 +5226,7 @@ function renderPending(){
 /* ---------------- ALL ORDERS (4 Oct 2026) ----------------
    Home shows only orders still to do; this screen has everything — completed, cancelled, missed, earlier
    days and the coming week — from vendor_orders(p_from, p_to) (max 62 days, delivery code never sent). */
-const ORD={range:'today', status:'all', rows:[], open:null};
+const ORD={range:'today', status:'all', rows:[], open:null, q:''};
 const ORD_RANGES=[['today','Today','आज',0,0],['yday','Yesterday','बीता कल',-1,-1],['week','Last 7 days','पिछले 7 दिन',-6,0],
                   ['month','Last 30 days','पिछले 30 दिन',-29,0],['next','Coming 7 days','आने वाले 7 दिन',1,7]];
 const ORD_STATUS=[['all','All','सब'],['todo','To do','बाकी'],['done','Completed','पूरे'],['cancelled','Cancelled','कैंसल'],['missed','Missed','छूटे']];
@@ -5109,43 +5251,71 @@ async function loadOrders(){
 }
 function paintOrderFilters(){
   const chip=(on,label,fn)=>`<button class="chip ${on?'on':''}" style="white-space:nowrap" onclick="${fn}">${label}</button>`;
-  document.getElementById('ordRange').innerHTML=ORD_RANGES.map(r=>chip(ORD.range===r[0],T(r[1],r[2]),`ORD.range='${r[0]}';loadOrders()`)).join('');
-  const cnt=k=>k==='all'?ORD.rows.length:ORD.rows.filter(o=>ORD_GROUP[o.status]===k).length;
-  document.getElementById('ordStatus').innerHTML=ORD_STATUS.map(s=>chip(ORD.status===s[0],T(s[1],s[2])+(ORD.rows.length?` · ${cnt(s[0])}`:''),`ORD.status='${s[0]}';paintOrders()`)).join('');
+  document.getElementById('ordRange').innerHTML=ORD_RANGES.map(r=>chip(ORD.range===r[0],T(r[1],r[2]),`ORD.range='${r[0]}';ORD.open=null;loadOrders()`)).join('');
+  /* count tiles (tap = filter) — replaced a row of small chips (2 Nov 2026) */
+  const rows=ORD.rows, n=k=>k==='all'?rows.length:rows.filter(o=>ORD_GROUP[o.status]===k).length;
+  const sale=rows.filter(o=>ORD_GROUP[o.status]==='done').reduce((t,o)=>t+Number(o.pay_amount??o.final_total??0),0);
+  const TL={all:['📋',T('All','सब')], todo:['🕐',T('To do','बाकी')], done:['✓',T('Completed','पूरे')], cancelled:['✕',T('Cancelled','कैंसल')], missed:['⏰',T('Missed','छूटे')]};
+  document.getElementById('ordStatus').innerHTML=Object.keys(TL).map(k=>`<button class="otile t-${k} ${ORD.status===k?'on':''}" onclick="ORD.status='${k}';ORD.open=null;paintOrders()">
+      <i>${TL[k][0]}</i><b>${n(k)}</b><span>${TL[k][1]}</span>${k==='done'?`<em>₹${Math.round(sale).toLocaleString('en-IN')}</em>`:''}</button>`).join('');
+}
+const SLOT_RANK={morning:0,afternoon:1,evening:2};
+function ordReason(o){
+  const t=String(o.cancel_reason||'').trim();
+  if(o.status==='missed') return T('The slot ended before this order was delivered.','स्लॉट खत्म होने तक यह ऑर्डर नहीं पहुँचा।');
+  if(!t) return '';
+  if(/^admin\s*:/i.test(t)) return T('Cancelled by RozBazaar: ','RozBazaar ने कैंसल किया: ')+t.replace(/^admin\s*:\s*/i,'');
+  if(/^vendor\s*:/i.test(t)) return T('You cancelled: ','आपने कैंसल किया: ')+t.replace(/^vendor\s*:\s*/i,'');
+  return T('Customer cancelled: ','ग्राहक ने कैंसल किया: ')+t;
 }
 function paintOrders(){
   paintOrderFilters();
-  const list=ORD.rows.filter(o=>ORD.status==='all' || ORD_GROUP[o.status]===ORD.status);
-  const done=ORD.rows.filter(o=>ORD_GROUP[o.status]==='done');
-  const sale=done.reduce((t,o)=>t+Number(o.pay_amount??o.final_total??0),0);
-  document.getElementById('ordSum').textContent = T(`${list.length} orders · completed sale ₹${Math.round(sale)}`, `${list.length} ऑर्डर · पूरे हुए ऑर्डर की बिक्री ₹${Math.round(sale)}`);
-  document.getElementById('ordList').innerHTML = list.length ? list.map(o=>{
+  const q=String(ORD.q||'').trim().toLowerCase();
+  const list=ORD.rows.filter(o=>(ORD.status==='all' || ORD_GROUP[o.status]===ORD.status)
+      && (!q || [o.customer_name,o.customer_phone,o.area,o.code].some(v=>String(v||'').toLowerCase().includes(q))));
+  const fwd = ORD.range==='next';
+  list.sort((a,b)=> (a.booking_date===b.booking_date ? (SLOT_RANK[a.slot]??9)-(SLOT_RANK[b.slot]??9)
+                     : (fwd ? (a.booking_date<b.booking_date?-1:1) : (a.booking_date<b.booking_date?1:-1))));
+  const amt=o=>o.pay_amount??o.final_total??o.est_total;
+  document.getElementById('ordSum').textContent = list.length===ORD.rows.length ? ''
+    : T(`Showing ${list.length} of ${ORD.rows.length}`,`${ORD.rows.length} में से ${list.length} दिख रहे हैं`);
+  if(!list.length){
+    document.getElementById('ordList').innerHTML=`<div class="empty"><div class="e">📭</div><b>${q?T('Nothing matches your search','खोज से कुछ नहीं मिला'):T('No orders here','यहाँ कोई ऑर्डर नहीं')}</b>
+      <p>${T('Try another day range above','ऊपर से दूसरे दिन चुनो')}</p></div>`;
+    return;
+  }
+  let html='', day=null;
+  list.forEach(o=>{
+    if(o.booking_date!==day){
+      day=o.booking_date;
+      const dayRows=list.filter(x=>x.booking_date===day), done=dayRows.filter(x=>ORD_GROUP[x.status]==='done');
+      const dsale=done.reduce((t,x)=>t+Number(x.pay_amount??x.final_total??0),0);
+      const dl = day===istISO(0) ? T('Today','आज') : day===istISO(-1) ? T('Yesterday','बीता कल') : day===istISO(1) ? T('Tomorrow','कल') : '';
+      html+=`<div class="oday"><b>${dl?dl+' · ':''}${ordDate(day)}</b><span>${dayRows.length} ${T(dayRows.length===1?'order':'orders','ऑर्डर')}${done.length?` · ₹${Math.round(dsale).toLocaleString('en-IN')} ${T('earned','की बिक्री')}`:''}</span></div>`;
+    }
     const L=ORD_LABEL[o.status]||[o.status,o.status,'#5B564C'];
-    const amt=o.pay_amount??o.final_total??o.est_total;
-    const open=ORD.open===o.id;
-    const items=(o.items||[]).filter(i=>!i.removed).map(i=>`<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;padding:3px 0">
-        <span>${i.product_name||'—'} × ${Number(i.final_qty??i.qty??1)}</span><span>₹${Math.round(Number(i.final_price??i.price_at_booking??0)*Number(i.final_qty??i.qty??1))}</span></div>`).join('');
-    return `<div class="card" style="margin-bottom:10px;cursor:pointer" onclick="ORD.open=ORD.open==='${o.id}'?null:'${o.id}';paintOrders()">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="min-width:0;flex:1">
-          <b style="font-size:15px;display:block">${o.customer_name||'—'}</b>
-          <span style="font-size:12px;font-weight:700;color:var(--mut)">${o.code} · ${ordDate(o.booking_date)} · ${slotName(o.slot)}${o.area?' · '+o.area:''}</span>
-        </div>
-        <div style="text-align:right">
-          <b style="font-size:15px;display:block">${amt!=null?'₹'+Math.round(Number(amt)):''}</b>
-          <span style="display:inline-block;margin-top:3px;font-size:11px;font-weight:800;color:#fff;background:${L[2]};border-radius:20px;padding:3px 9px">${T(L[0],L[1])}</span>
-        </div>
+    const open=ORD.open===o.id, a=amt(o), its=(o.items||[]).filter(i=>!i.removed);
+    const items=its.map(i=>`<div class="oit"><span>${esc(i.product_name||'—')} × ${Number(i.final_qty??i.qty??1)}</span><span>₹${Math.round(Number(i.final_price??i.price_at_booking??0)*Number(i.final_qty??i.qty??1))}</span></div>`).join('');
+    const why=ordReason(o);
+    html+=`<div class="ocard ${open?'open':''}" style="--oc:${L[2]}" onclick="ORD.open=ORD.open==='${o.id}'?null:'${o.id}';paintOrders()">
+      <div class="otop">
+        <div class="omain"><b>${esc(o.customer_name||T('Customer','ग्राहक'))}</b>
+          <span>${slotName(o.slot)}${o.area?' · '+esc(o.area):''}${its.length?` · ${its.length} ${T(its.length===1?'item':'items','सामान')}`:''}</span></div>
+        <div class="oamt"><b>${a!=null?'₹'+Math.round(Number(a)):''}</b><span class="opill" style="background:${L[2]}">${T(L[0],L[1])}</span></div>
       </div>
-      ${open?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line)">
-        ${items||`<div style="font-size:13px;color:var(--mut)">${T('No items','कोई सामान नहीं')}</div>`}
-        ${o.cancel_reason?`<div style="font-size:12.5px;font-weight:700;color:#d93025;margin-top:6px">${T('Reason','कारण')}: ${o.cancel_reason}</div>`:''}
-        ${o.pay_method?`<div style="font-size:12.5px;font-weight:700;color:var(--tx2);margin-top:6px">${o.pay_method==='cash'?T('Paid in cash','नकद मिला'):T('Paid by UPI','UPI से मिला')}</div>`:''}
-        <div style="display:flex;gap:8px;margin-top:10px">
-          ${o.customer_phone?`<a class="btn btn-out btn-sm" href="tel:${o.customer_phone}" onclick="event.stopPropagation()">📞 ${T('Call','कॉल')}</a>`:''}
+      ${why && !open?`<div class="owhy">${esc(why)}</div>`:''}
+      ${open?`<div class="obody">
+        ${items||`<div class="oit muted">${T('No items','कोई सामान नहीं')}</div>`}
+        ${why?`<div class="owhy">${esc(why)}</div>`:''}
+        ${o.pay_method?`<div class="opay">${o.pay_method==='cash'?'💵 '+T('Paid in cash','नकद मिला'):'📱 '+T('Paid by UPI','UPI से मिला')}${o.pay_amount!=null?' · ₹'+Math.round(Number(o.pay_amount)):''}</div>`:''}
+        <div class="ocode">${T('Order','ऑर्डर')} ${esc(o.code||'')}${o.house_no?' · '+esc(o.house_no):''}</div>
+        <div class="oact">
+          ${o.customer_phone?`<a class="btn btn-out btn-sm" href="tel:${esc(o.customer_phone)}" onclick="event.stopPropagation()">📞 ${T('Call','कॉल')}</a>`:''}
           ${ORD_GROUP[o.status]==='todo' && o.booking_date===istISO(0)?`<button class="btn btn-g btn-sm" onclick="event.stopPropagation();openOrderToday('${o.code}')">${T('Open order','ऑर्डर खोलो')}</button>`:''}
         </div></div>`:''}
     </div>`;
-  }).join('') : `<div class="empty"><div class="e">📭</div><b>${T('No orders here','यहाँ कोई ऑर्डर नहीं')}</b></div>`;
+  });
+  document.getElementById('ordList').innerHTML=html;
 }
 async function openOrderToday(code){ RUN_DAY=0; await api('getRuns'); openRun(code); }
 
@@ -5337,14 +5507,18 @@ function setDashPeriod(p, btn){
   loadDash();
 }
 function renderEarn(){ loadDash(); }
+/* keep the open Dashboard fresh: every 60 s while it is on screen, and right after a payment (heroSoon) */
+setInterval(()=>{ if(!document.hidden && document.getElementById('s-earn')?.classList.contains('on')) loadDash(); }, 60000);
 async function loadDash(){
   const body=document.getElementById('earnBody');
   const [f,t]=dashRange(DASH_P);
   if(f>t) return toast(T('Start date must be before the end date','शुरू की तारीख़ आख़िरी तारीख़ से पहले होनी चाहिए'));
   if(!DASH) body.innerHTML=`<div class="sk" style="height:190px;border-radius:22px"></div><div class="sk" style="height:80px;margin-top:12px"></div><div class="sk" style="height:160px;margin-top:12px"></div>`;
   const seq=++DASH_SEQ;
-  const r=await api('dashboard',{from:f,to:t});
+  const n=Math.round((new Date(t+'T00:00:00')-new Date(f+'T00:00:00'))/86400000)+1;   /* same number of days just before → "more / less than" */
+  const [r, prev]=await Promise.all([api('dashboard',{from:f,to:t}), api('dashboard',{from:addDays(f,-n), to:addDays(f,-1)})]);
   if(seq!==DASH_SEQ) return;              /* a newer period was picked meanwhile */
+  if(r && r.ok && r.data) r.data._prev = prev && prev.ok && prev.data ? prev.data : null, r.data._days=n;
   if(!r || !r.ok){
     body.innerHTML=`<div class="empty"><div class="e">😕</div><b>${T('Could not load the dashboard','डैशबोर्ड लोड नहीं हुआ')}</b>
       <p>${esc((r&&r.msg)||T('Check your internet and try again','इंटरनेट देखकर दोबारा कोशिश करें'))}</p>
@@ -5366,17 +5540,29 @@ function dashHtml(d){
   const items=d.items||[], imax=Math.max(1,...items.map(x=>Number(x.amount)||0));
   const list=d.list||[];
   const PM={cash:['💵',T('Cash','नकद')], upi_direct:['📱','UPI'], online:['📱','UPI']};
+  /* the plain answer first: what you keep, how it is worked out, and more/less than before (2 Nov 2026) */
+  const p=d._prev, n=d._days||1, diff=p ? (Number(d.net)||0)-(Number(p.net)||0) : null;
+  const than = DASH_P==='today' ? T('than yesterday','कल से') : n===1 ? T('than the day before','उससे पहले वाले दिन से')
+             : T(`than the ${n} days before`,`पिछले ${n} दिनों से`);
+  const cmp = diff===null ? '' : diff===0 ? `<div class="dh-cmp same">＝ ${T('Same as','बराबर —')} ${than}</div>`
+            : `<div class="dh-cmp ${diff>0?'up':'down'}">${diff>0?'▲':'▼'} ${rs(Math.abs(diff))} ${diff>0?T('more','ज़्यादा'):T('less','कम')} ${than}</div>`;
+  const chip=(cls,ic,num,lbl)=>`<span class="dchip ${cls}"><i>${ic}</i><b>${num}</b>${lbl}</span>`;
   return `
   <div class="dhero">
-    <div class="dh-top"><span>${T('TOTAL SALE','कुल बिक्री')}</span><span>${esc(range)}</span></div>
-    <div class="dh-amt">${rs(d.sale)}</div>
-    <div class="dh-sub">${d.orders} ${T(d.orders==1?'order':'orders','ऑर्डर')}${d.orders?` · ${T('avg','औसत')} ${rs(d.avg)}`:''}</div>
-    <div class="dh-split">
-      <div><span>${T('RozBazaar commission','RozBazaar कमीशन')} (${rate}%)</span><b class="neg">− ${rs(d.commission)}</b></div>
-      <div><span>${T('You keep','आपकी कमाई')}</span><b class="pos">${rs(d.net)}</b></div>
+    <div class="dh-top"><span>${T('YOU KEEP','आपकी कमाई')}</span><span>${esc(range)}</span></div>
+    <div class="dh-amt">${rs(d.net)}</div>
+    ${cmp}
+    <div class="dh-eq">
+      <div><span>${T('Sale','बिक्री')}</span><b>${rs(d.sale)}</b></div><em>−</em>
+      <div><span>${T('Commission','कमीशन')} ${rate}%</span><b class="neg">${rs(d.commission)}</b></div><em>=</em>
+      <div class="keepbox"><span>${T('You keep','आपके')}</span><b class="pos">${rs(d.net)}</b></div>
     </div>
-    <div class="dh-note">${T(`Customers pay nothing extra — ${rate}% of your total sale is RozBazaar's commission.`,
-                            `ग्राहक से कुछ अतिरिक्त नहीं लिया जाता — आपकी कुल बिक्री का ${rate}% RozBazaar का कमीशन है।`)}</div>
+    <div class="dh-note">${T(`Customers pay nothing extra — ${rate}% of your sale is RozBazaar's commission.`,
+                            `ग्राहक से कुछ अतिरिक्त नहीं लिया जाता — आपकी बिक्री का ${rate}% RozBazaar का कमीशन है।`)}</div>
+  </div>
+  <div class="dchips2">
+    ${chip('ok','✓',d.orders,T(d.orders===1?'order paid':'orders paid','ऑर्डर के पैसे मिले'))}${d.open?chip('open','🕐',d.open,T('still to do','बाकी')):''}${d.cancelled?chip('cx','✕',d.cancelled,T('cancelled','रद्द')):''}${d.missed?chip('miss','⏰',d.missed,T('missed','छूटे')):''}
+    ${d.orders?`<span class="dchip avg">${T('avg','औसत')} <b>${rs(d.avg)}</b>${T('/order','/ऑर्डर')}</span>`:''}
   </div>
 
   <div class="dmonth">
@@ -5417,14 +5603,17 @@ function dashHtml(d){
 }
 /* home header: today's real sale (from the same rule), refreshed at most every 20 s */
 let HERO_T=0;
+function heroSoon(){ HERO_T=0; DASH=null; setTimeout(()=>{ refreshHeroSale(true); if(document.getElementById('s-earn')?.classList.contains('on')) loadDash(); }, 400); }
 async function refreshHeroSale(force){
   if(!force && Date.now()-HERO_T<20000) return; HERO_T=Date.now();
   const t=istToday(); const r=await api('dashboard',{from:t,to:t});
   if(!r || !r.ok) return;
   countTo(document.getElementById('earnToday'), Math.round(Number(r.data.sale)||0));
   const el=document.getElementById('heroKeep');
-  if(el) el.textContent = Number(r.data.sale)>0
-    ? T(`you keep ${rs(r.data.net)} after ${r.data.rate}% commission`,`${r.data.rate}% कमीशन के बाद आपके ${rs(r.data.net)}`) : '';
+  const now=new Date().toLocaleTimeString(LANG==='hi'?'hi-IN':'en-IN',{hour:'numeric',minute:'2-digit'});
+  if(el) el.innerHTML = (Number(r.data.sale)>0
+    ? esc(T(`you keep ${rs(r.data.net)} after ${r.data.rate}% commission`,`${r.data.rate}% कमीशन के बाद आपके ${rs(r.data.net)}`)) : '')
+    + `<small class="hupd">${T('updated','अपडेट')} ${esc(now)} · ${T('tap for details','पूरा हिसाब देखें')} ›</small>`;
 }
 
 /* ---------------- BOOT ---------------- */

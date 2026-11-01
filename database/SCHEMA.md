@@ -132,6 +132,7 @@ id · booking_id NOT NULL · vendor_id NOT NULL · stars int NOT NULL · comment
 ```
 id · name NOT NULL · is_active · lat · lng · radius_km DEFAULT 4
 coords_verified boolean · sort_order · created_at
+boundary jsonb   — [[lat,lng], …] drawn in admin → Villages (2 Nov 2026); null = centre + radius only
 ```
 Villages: Khandewla, Haileymandi, Rampur, Tirpari, Basunda, Jatola, Jatauli, Todapur.
 
@@ -200,6 +201,7 @@ admin_add_vendor(p_name, p_phone, p_type vendor_type, p_areas text[], p_shop, p_
 admin_areas() [definer]
 admin_block_customer(p_customer uuid, p_blocked bool) [definer]
 admin_bookings(p_date date, p_status booking_status, p_area text, p_limit int=100) [definer]
+admin_bookings_if_changed(p_date, p_status, p_area, p_limit, p_rev) [invoker] · admin_customers_if_changed(p_limit, p_rev) [invoker]  — same "same:true" idea (admin's 60 s refresh)
 admin_cancel_booking(p_booking uuid, p_reason text) [definer]
 admin_capacity_watch(p_days int=7) [definer]
 admin_catalog_list() [definer]
@@ -233,6 +235,7 @@ admin_visit_stats(p_days int=30) [definer]
 vendor_activate_catalog_item(p_key, p_price, p_unit) [definer]
 vendor_apply(p_name, p_phone, p_type, p_areas, p_shop, p_vehicle, p_capacity=15, p_lang='en') [definer]
 vendor_bookings(p_date date=CURRENT_DATE) [definer]
+vendor_bookings_if_changed(p_date, p_rev) [invoker]  — {ok,same:true,rev} when unchanged, else the full list + rev (vendor site's 20 s poll)
 vendor_bulk_prices(p_prices jsonb) [definer]
 vendor_cancel_booking(p_booking, p_reason) [definer]
 vendor_covers_area_in_slot(p_vendor_id, p_area, p_slot)        ← single source of truth for coverage
@@ -301,7 +304,9 @@ customer_vendors_in_area(p_area) [definer]
 
 ### Shared helpers
 ```
-area_from_point(p_lat, p_lng) [definer]       ← GPS → village; returns in_range/served/confident
+area_from_point(p_lat, p_lng) [definer]       ← GPS → village; returns in_range/served/confident (+ inside_boundary)
+                                                a drawn boundary decides first; a village WITH a boundary never claims points outside it by radius
+rb_in_poly(p_lat, p_lng, p_poly jsonb)        ← point in polygon (ray casting), immutable
 catalog_items_list() [definer]
 is_admin() [definer] · my_customer_id() (own row OR customer_logins link) · my_customer_uid() (primary auth user) · my_vendor_id() · my_role() · my_lang()
 ist_date() · ist_now() · ist_time()           ← ALWAYS use these, never now()/current_date for business logic
@@ -487,3 +492,15 @@ admin_set_service_km(p_km 1–50) → logs 'service_km_changed'
 admin_settings() also returns service_km, service_km_updated_at, service_villages[], service_outside_addresses (saved pins outside)
 public_app_config() also returns service_km
 ```
+
+### Village boundaries + changed-only lists (2 Nov 2026 — `20261102a_village_boundary.sql`, `20261102b_poll_if_changed_vendor_admin.sql`)
+```
+areas.boundary jsonb                          [[lat,lng], …], 3–300 points
+admin_set_area_boundary(p_name, p_points jsonb) [definer, admin_guard]
+                                              points inside India; keeps the centre pin if it is inside the shape, else the centroid;
+                                              radius_km = centre → farthest point (min 0.3); coords_verified = true; [] = remove the boundary
+area_from_point(…)                            boundary first (confident, inside_boundary: true), then the old centre + radius rule
+public_areas()                                also returns boundary
+vendor_bookings_if_changed · admin_bookings_if_changed · admin_customers_if_changed   (authenticated only; see Vendor / Admin)
+```
+

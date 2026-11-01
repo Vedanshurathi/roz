@@ -6,7 +6,7 @@
 <title>RozBazaar Admin</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Ts7BN5sfivMhSOv/Kt/63yiY64yVk8UsYyuCIQYILGk=' https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co https://server.arcgisonline.com https://tile.openstreetmap.org; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-GAsXDrl2Ucsg4sGRjk3lRGOrNFCl7p9Mus7I4JyR2/4=' https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://srvpfyjmwaruebbkqkdj.supabase.co https://server.arcgisonline.com https://tile.openstreetmap.org; connect-src https://srvpfyjmwaruebbkqkdj.supabase.co wss://srvpfyjmwaruebbkqkdj.supabase.co; base-uri 'none'; form-action 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="theme-color" content="#1E8E3E">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-192.png">
@@ -257,6 +257,7 @@ td.acts .btn+.btn{margin-left:6px}
 
 /* ---------- drawer + modal ---------- */
 .ov{position:fixed;inset:0;background:rgba(16,27,48,.38);z-index:90;opacity:0;pointer-events:none;transition:opacity .25s var(--ez)}
+.ov.m{z-index:125}   /* a question asked from the map sheet (z 110) opened behind it */
 .ov.show{opacity:1;pointer-events:auto}
 .drawer{position:fixed;top:0;right:0;bottom:0;width:min(480px,100%);background:var(--cream);z-index:95;box-shadow:var(--shl);
   transform:translateX(105%);transition:transform .32s var(--ez);display:flex;flex-direction:column}
@@ -276,7 +277,7 @@ td.acts .btn+.btn{margin-left:6px}
 .steps i{flex:1;height:6px;border-radius:4px;background:var(--line)}
 .steps i.on{background:var(--g)} .steps.bad i.on{background:var(--red)}
 .modal{position:fixed;left:50%;top:50%;width:min(460px,calc(100% - 28px));max-height:calc(100vh - 40px);overflow:auto;background:#fff;border-radius:20px;
-  box-shadow:var(--shl);z-index:100;padding:22px;transform:translate(-50%,-46%) scale(.96);opacity:0;pointer-events:none;transition:all .25s var(--sp)}
+  box-shadow:var(--shl);z-index:130;padding:22px;transform:translate(-50%,-46%) scale(.96);opacity:0;pointer-events:none;transition:all .25s var(--sp)}
 .modal.show{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}
 .modal h3{font-size:18px;font-weight:800;margin-bottom:4px}
 .modal .sub{font-size:13px;color:var(--tx2);margin-bottom:14px;line-height:1.5}
@@ -303,6 +304,12 @@ td.acts .btn+.btn{margin-left:6px}
 .ms-row input[type=range]{flex:1;min-width:120px;accent-color:var(--g)}
 .ms-pin{font-size:34px;line-height:1;filter:drop-shadow(0 3px 2px rgba(0,0,0,.35))}
 .ms-tip{font-weight:800;font-size:11.5px;padding:2px 7px}
+.ms-mode{display:flex;gap:4px;background:var(--grey);border-radius:12px;padding:4px;margin-bottom:10px}
+.ms-mode button{flex:1;padding:9px 8px;border-radius:9px;font-weight:800;font-size:13px;color:var(--tx2)}
+.ms-mode button.on{background:#fff;color:var(--tx);box-shadow:var(--sh)}
+.ms-vx i{display:block;width:18px;height:18px;margin:3px;border-radius:50%;background:#fff;border:3px solid #F2760D;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.ms-vx.first i{width:22px;height:22px;margin:1px;border-color:#1E8E3E;border-width:4px}
+.ms-mid i{display:grid;place-items:center;width:18px;height:18px;margin:2px;border-radius:50%;background:#F2760D;color:#fff;font-style:normal;font-weight:900;font-size:13px;line-height:1;opacity:.85;border:2px solid #fff}
 
 /* ---------- responsive ---------- */
 @media (max-width:1100px){ .k4{grid-template-columns:repeat(2,minmax(0,1fr))} .split{grid-template-columns:1fr} }
@@ -458,12 +465,20 @@ td.acts .btn+.btn{margin-left:6px}
   <div class="ms-map"><div id="msMap"></div>
     <div class="ms-lay"><button class="on" id="msSat" data-act="mapLayer" data-arg="sat">Satellite</button><button id="msStreet" data-act="mapLayer" data-arg="street">Map</button></div></div>
   <div class="ms-b">
+    <div class="ms-mode"><button class="on" id="msModePin" data-act="mapMode" data-arg="pin">📍 Beech ka point</button><button id="msModeDraw" data-act="mapMode" data-arg="draw">✏️ Gaon ki boundary banao</button></div>
     <div class="ms-info" id="msInfo"></div>
+    <div id="msPinRows">
     <div class="ms-row"><button class="btn btn-o" id="msGpsBtn" data-act="mapGps" style="flex:1">📡 Meri GPS</button></div>
     <div class="ms-row"><input class="fld" id="msCoords" autocomplete="off" placeholder="Coordinates: 28°23'00.8&quot;N 76°47'48.2&quot;E  ya  28.3836, 76.7967">
       <button class="btn btn-o" data-act="mapCoords">Pin yahan</button></div>
-    <div class="ms-row"><span class="mu">Gaon kitna bada (radius)</span><input type="range" id="msRad" min="1" max="10" step="0.5" value="4"><b id="msRadV">4 km</b></div>
+    <div class="ms-row" id="msRadRow"><span class="mu">Gaon kitna bada (radius)</span><input type="range" id="msRad" min="1" max="10" step="0.5" value="4"><b id="msRadV">4 km</b></div>
     <div class="ms-row" style="justify-content:flex-end"><button class="btn btn-o" data-act="mapClose">Cancel</button><button class="btn btn-g" data-act="mapSave">✓ Location save karo</button></div>
+    </div>
+    <div id="msDrawRows" hidden>
+      <div class="ms-row"><button class="btn btn-o" data-act="drawUndo">↶ Undo</button><button class="btn btn-o" data-act="drawClear">🗑 Saaf karo</button>
+        <button class="btn btn-o" id="msDrawRemove" data-act="drawRemove" style="margin-left:auto">Boundary hatao</button></div>
+      <div class="ms-row" style="justify-content:flex-end"><button class="btn btn-o" data-act="mapClose">Cancel</button><button class="btn btn-g" data-act="drawSave">✓ Boundary save karo</button></div>
+    </div>
   </div>
 </div>
 
@@ -484,6 +499,7 @@ const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY,
   { auth: { storageKey: 'rb-admin-auth', persistSession: true, autoRefreshToken: true } });
 
 let D = null, VIEW = 'home', ME = null, busy = false, timer = null;
+const REVA = {};   /* version of the last full bookings / customers list (refresh asks "anything changed?") */
 const TEAM_APP = 'admin';
 const UI = {
   oq: '', ostatus: 'all', oday: 'all',
@@ -542,7 +558,7 @@ async function rpc(fn, args) {
       return { ok: false, error: error.message };
     }
     if (Array.isArray(data)) return { ok: true, data };                       /* admin_pending_products returns a bare list */
-    if (data && typeof data === 'object' && 'ok' in data) return { ok: !!data.ok, data: data.data, msg: data.msg, error: data.msg };
+    if (data && typeof data === 'object' && 'ok' in data) return { ok: !!data.ok, data: data.data, msg: data.msg, error: data.msg, same: !!data.same, rev: data.rev };
     return { ok: true, data };
   } catch (e) { return { ok: false, error: 'Internet check karo' }; }
 }
@@ -597,8 +613,9 @@ async function refresh(silent) {
   const calls = {
     ov: ['admin_overview_stats'], vendors: ['admin_vendors', { p_status: null }], areas: ['admin_areas'],
     daily: ['admin_daily_report', { p_days: 14 }], gaps: ['admin_demand_gaps'], perf: ['admin_vendor_performance', { p_days: 30 }],
-    bookings: ['admin_bookings', { p_date: null, p_status: null, p_area: null, p_limit: 1000 }],
-    customers: ['admin_customers', { p_limit: 1000 }], pending: ['admin_pending_products'],
+    /* the two big lists come only when they changed (2 Nov 2026) — they were re-sent in full every 60 s */
+    bookings: ['admin_bookings_if_changed', { p_date: null, p_status: null, p_area: null, p_limit: 1000, p_rev: (D && REVA.bookings) || null }],
+    customers: ['admin_customers_if_changed', { p_limit: 1000, p_rev: (D && REVA.customers) || null }], pending: ['admin_pending_products'],
     visits: ['admin_visit_stats', { p_days: 30 }], finance: ['admin_finance_dashboard', { p_days: 30 }],
     products: ['admin_products'], messages: ['admin_messages', { p_limit: 200 }], catalog: ['admin_catalog_list'], staff: ['admin_staff_list'], pwreq: ['admin_password_requests'], vpwreq: ['admin_vendor_password_requests'],
     tasks: ['admin_tasks'], targets: ['admin_targets'], settings: ['admin_settings'], bcast: ['admin_broadcasts']
@@ -613,7 +630,8 @@ async function refresh(silent) {
     if (!D) { $('v-' + VIEW).innerHTML = `<div class="empty"><div class="e">⚠️</div><b>Data load nahi hua</b><p>${esc(bad.error || '')}</p>
       <button class="btn btn-g" style="margin-top:14px" data-act="refresh">Dubara try karo</button></div>`; return; }
   }
-  const next = {}; keys.forEach((k, i) => next[k] = res[i].ok ? res[i].data : (D ? D[k] : null));
+  keys.forEach((k, i) => { if (res[i].ok && res[i].rev) REVA[k] = res[i].rev; });
+  const next = {}; keys.forEach((k, i) => next[k] = res[i].ok ? (res[i].same && D ? D[k] : res[i].data) : (D ? D[k] : null));
   next.vendors = (next.vendors || []).map(v => ({ ...v, can_log_in: !!v.auth_user_id }));
   next.bookings = next.bookings || []; next.customers = next.customers || []; next.pending = next.pending || [];
   next.products = next.products || []; next.messages = next.messages || []; next.catalog = next.catalog || [];
@@ -707,6 +725,7 @@ function bar(label, amount, total, color) {
 let chartSeq = 0;
 function lineChart(points, series, opts) {
   opts = opts || {};
+  if (!points || !points.length) return `<div class="mu" style="padding:34px 0;text-align:center;font-weight:700">Abhi koi data nahi</div>`;   /* an empty chart drew a broken path */
   const W = window.innerWidth < 640 ? 420 : 900, H = opts.h || (window.innerWidth < 640 ? 180 : 220), PAD = 30, PADB = 26, id = 'c' + (chartSeq++), n = Math.max(1, points.length);
   const max = Math.max(1, ...points.flatMap(p => series.map(s => num(p[s.key]))));
   const x = i => PAD + (i / Math.max(1, n - 1)) * (W - PAD * 2);
@@ -1118,16 +1137,16 @@ function vAreas(el, rv) {
       ${kpi('Bina vendor', D.areas.filter(a => !a.vendor_count).length, 'yahan vendor chahiye', D.areas.some(a => !a.vendor_count) ? 'warn' : '', '🔍')}
       ${kpi('Location verified', D.areas.filter(a => a.coords_verified).length, 'baaki approximate', '', '✅')}
     </div>
-    <div class="toolbar ${rv} d2" style="margin-top:16px"><span class="mu">"📍 Location set karo" dabao — apni GPS se, map pe pin kheench ke, ya coordinates daal ke.</span>
+    <div class="toolbar ${rv} d2" style="margin-top:16px"><span class="mu">"📍 Location set karo" dabao — beech ka point (GPS, pin ya coordinates) ya ✏️ gaon ki boundary map pe banao.</span>
       <button class="btn btn-g" style="margin-left:auto" data-act="addArea">+ Naya gaon</button></div>
-    <div class="tw ${rv} d3"><table><thead><tr><th>Gaon</th><th>Vendors</th><th>Waitlist</th><th>Location</th><th>Radius</th><th>Active</th><th></th></tr></thead><tbody>
+    <div class="tw ${rv} d3"><table><thead><tr><th>Gaon</th><th>Vendors</th><th>Waitlist</th><th>Location</th><th>Boundary / radius</th><th>Active</th><th></th></tr></thead><tbody>
       ${D.areas.map(a => { const w = D.gaps.filter(g => g.area === a.name).reduce((s, g) => s + num(g.requests), 0); return `<tr>
         <td><b>${esc(a.name)}</b></td>
         <td>${a.vendor_count > 0 ? `<span class="pill p-g">${a.vendor_count} vendor</span>` : '<span class="pill p-r">koi nahi</span>'}</td>
         <td>${w ? `<span class="pill p-o">${w} wait</span>` : '<span class="mu">—</span>'}</td>
         <td>${a.lat != null ? `<a class="mu" href="https://www.google.com/maps?q=${a.lat},${a.lng}" target="_blank" rel="noopener">${num(a.lat).toFixed(4)}, ${num(a.lng).toFixed(4)} ↗</a>` : '<span class="pill p-r">nahi hai</span>'}
           ${a.coords_verified ? ' <span class="pill p-g">verified</span>' : ' <span class="pill p-o">approx</span>'}</td>
-        <td>${a.radius_km ?? '—'} km</td>
+        <td>${Array.isArray(a.boundary) && a.boundary.length > 2 ? `<span class="pill p-g">✏️ boundary · ${a.boundary.length} point</span>` : `${a.radius_km ?? '—'} km`}</td>
         <td><button class="pill ${a.is_active ? 'p-g' : 'p-m'}" data-act="areaActive" data-arg="${esc(a.name)}" data-arg2="${!a.is_active}">${a.is_active ? 'Active' : 'Band'}</button></td>
         <td class="acts"><button class="btn btn-o btn-sm" data-act="pin" data-arg="${esc(a.name)}">📍 Location set karo</button></td></tr>`; }).join('')}
     </tbody></table></div>`;
@@ -2126,7 +2145,7 @@ function vLaunch(el, rv) {
 /* ---------- drawer / modal ---------- */
 function openDrawer() { $('drawer').dataset.kind = ''; $('ov').classList.add('show'); $('drawer').classList.add('show'); $('drawer').setAttribute('aria-hidden', 'false'); $('drBody').scrollTop = 0; }
 function closeAll() {
-  $('ov').classList.remove('show'); $('drawer').classList.remove('show'); $('drawer').setAttribute('aria-hidden', 'true');
+  $('ov').classList.remove('show', 'm'); $('drawer').classList.remove('show'); $('drawer').setAttribute('aria-hidden', 'true');
   $('modal').classList.remove('show'); if (modalDone) { modalDone(null); modalDone = null; }
 }
 let modalDone = null;
@@ -2142,7 +2161,7 @@ function modal({ title, sub, fields, ok, danger }, preselect) {
         : `<input class="fld" id="m_${x.id}" type="${['date', 'time', 'url'].includes(x.type) ? x.type : 'text'}" ${x.type === 'number' ? 'inputmode="decimal"' : ''} value="${esc(x.value ?? '')}" placeholder="${esc(x.ph || '')}">`}${x.hint ? `<div class="mu" style="margin-top:4px">${x.hint}</div>` : ''}</div>`).join('')}
       </div><div class="foot"><button class="btn btn-o" data-act="modalCancel">Rehne do</button>
       <button class="btn ${danger ? 'btn-r' : 'btn-g'}" data-act="modalOk">${esc(ok || 'Save')}</button></div>`;
-    $('ov').classList.add('show'); $('modal').classList.add('show');
+    $('ov').classList.add('show', 'm'); $('modal').classList.add('show');
     modalDone = resolve;
     if (preselect) $('modal').querySelectorAll(`input[type=checkbox][value="${preselect}"]`).forEach(i => { i.checked = true; });
     const first = $('modal').querySelector('input:not([type=checkbox]),textarea,select'); if (first) setTimeout(() => first.focus(), 60);
@@ -2155,13 +2174,13 @@ function modalOk() {
     vals[k] = el.classList.contains('chips') ? [...el.querySelectorAll('input:checked')].map(i => i.value) : el.value.trim();
   });
   const done = modalDone; modalDone = null;
-  $('modal').classList.remove('show');
+  $('modal').classList.remove('show'); $('ov').classList.remove('m');
   if (!$('drawer').classList.contains('show')) $('ov').classList.remove('show');
   if (done) done(vals);
 }
 function modalCancel() {
   const done = modalDone; modalDone = null;
-  $('modal').classList.remove('show');
+  $('modal').classList.remove('show'); $('ov').classList.remove('m');
   if (!$('drawer').classList.contains('show')) $('ov').classList.remove('show');
   if (done) done(null);
 }
@@ -2284,7 +2303,8 @@ function loadLeaflet() {
 }
 const PATAUDI = [28.3256, 76.7795];
 const MP = { name: null, map: null, layers: null, pin: null, ring: null, acc: null, others: null, old: null,
-             lat: null, lng: null, rad: 4, src: '', moved: false, watch: null, timer: null, best: null };
+             lat: null, lng: null, rad: 4, src: '', moved: false, watch: null, timer: null, best: null,
+             mode: 'pin', pts: [], poly: null, vx: null, shapes: null };
 function kmBetween(a, b, c, d) {
   const r = Math.PI / 180, x = Math.sin((c - a) * r / 2) ** 2 + Math.cos(a * r) * Math.cos(c * r) * Math.sin((d - b) * r / 2) ** 2;
   return 2 * 6371 * Math.asin(Math.sqrt(x));
@@ -2307,6 +2327,14 @@ function parseCoords(s) {
 }
 function mapInfo() {
   const el = $('msInfo'); if (!el) return;
+  if (MP.mode === 'draw') {
+    const n = MP.pts.length, km2 = polyKm2(MP.pts);
+    el.innerHTML = n < 3
+      ? `<b>${n} point</b> — map pe gaon ke <b>kinare-kinare tap karo</b> (kam se kam 3). Pehla point bada gol hai.`
+      : `<b>${n} point</b> · andar ka hissa ≈ <b>${km2 < 1 ? Math.round(km2 * 100) / 100 : km2.toFixed(1)} km²</b> — orange hissa = gaon.`
+        + `<br><span class="mu">Point kheench ke sahi karo · beech ka <b>+</b> naya point jodta hai · customer ki GPS isi ke andar ho to ye gaon maana jayega.</span>`;
+    return;
+  }
   if (MP.lat == null) { el.textContent = ''; return; }
   const from = { old: 'abhi saved jagah', hand: 'aapne pin rakha', gps: 'aapki GPS', coords: 'coordinates se', start: 'shuruaat (Pataudi) — sahi jagah chuno' }[MP.src] || '';
   const moved = MP.old ? kmBetween(MP.old[0], MP.old[1], MP.lat, MP.lng) : null;
@@ -2329,6 +2357,7 @@ async function openPinMap(name) {
   stopGps();
   MP.name = name; MP.old = a.lat != null ? [num(a.lat), num(a.lng)] : null;
   MP.rad = Math.min(10, Math.max(1, num(a.radius_km) || 4)); MP.moved = false; MP.best = null;
+  MP.pts = Array.isArray(a.boundary) ? a.boundary.map(p => [num(p[0]), num(p[1])]) : [];
   const start = MP.old || PATAUDI;
   $('msTitle').textContent = '📍 ' + name + ' ki location';
   $('msRad').value = MP.rad; $('msRadV').textContent = MP.rad + ' km'; $('msCoords').value = '';
@@ -2348,7 +2377,8 @@ async function openPinMap(name) {
     MP.pin = L.marker(start, { draggable: true, autoPan: true, zIndexOffset: 1000,
       icon: L.divIcon({ className: 'ms-pin', html: '📍', iconSize: [36, 36], iconAnchor: [18, 34] }) }).addTo(MP.map);
     MP.pin.on('dragend', () => { const p = MP.pin.getLatLng(); setPin(p.lat, p.lng, 'hand'); });
-    MP.map.on('click', e => setPin(e.latlng.lat, e.latlng.lng, 'hand'));
+    MP.map.on('click', e => MP.mode === 'draw' ? drawAdd(e.latlng) : setPin(e.latlng.lat, e.latlng.lng, 'hand'));
+    MP.shapes = L.layerGroup().addTo(MP.map);
   }
   MP.others.clearLayers();
   if (MP.acc) { MP.map.removeLayer(MP.acc); MP.acc = null; }
@@ -2356,8 +2386,69 @@ async function openPinMap(name) {
     L.circleMarker([num(x.lat), num(x.lng)], { radius: 6, color: '#101B30', weight: 2, fillColor: '#fff', fillOpacity: 1, interactive: false })
       .bindTooltip(esc(x.name), { permanent: true, direction: 'top', offset: [0, -6], className: 'ms-tip' }).addTo(MP.others));
   MP.ring.setRadius(MP.rad * 1000);
+  MP.shapes.clearLayers();
+  D.areas.filter(x => x.name !== name && Array.isArray(x.boundary) && x.boundary.length > 2).forEach(x =>
+    L.polygon(x.boundary.map(p => [num(p[0]), num(p[1])]), { color: '#101B30', weight: 1.5, dashArray: '5 5', fillOpacity: .04, interactive: false }).addTo(MP.shapes));
   setPin(start[0], start[1], MP.src);
-  setTimeout(() => { MP.map.invalidateSize(); MP.map.setView(start, MP.old ? 15 : 13); }, 60);
+  mapMode(MP.pts.length ? 'draw' : 'pin');
+  setTimeout(() => { MP.map.invalidateSize();
+    if (MP.pts.length > 2) MP.map.fitBounds(L.latLngBounds(MP.pts).pad(.25), { maxZoom: 17 }); else MP.map.setView(start, MP.old ? 15 : 13); }, 60);
+}
+/* ---------- village boundary (2 Nov 2026): tap around the village edge; drag points; "+" adds a point between two ----------
+   Saved with admin_set_area_boundary — a customer's GPS inside the shape belongs to this village. */
+function mapMode(m) {
+  MP.mode = m;
+  $('msModePin').classList.toggle('on', m === 'pin'); $('msModeDraw').classList.toggle('on', m === 'draw');
+  $('msPinRows').hidden = m !== 'pin'; $('msDrawRows').hidden = m !== 'draw';
+  if (MP.pin) MP.pin.setOpacity(m === 'pin' ? 1 : .5);
+  if (MP.ring) MP.ring.setStyle({ opacity: m === 'pin' && !MP.pts.length ? 1 : .25, fillOpacity: m === 'pin' && !MP.pts.length ? .07 : 0 });
+  const rr = $('msRadRow'); if (rr) rr.hidden = MP.pts.length > 2;   /* with a boundary the radius is worked out from it */
+  if (m === 'draw') stopGps();
+  if (MP.map) MP.map.doubleClickZoom[m === 'draw' ? 'disable' : 'enable']();   /* a quick double tap added 2 points and zoomed */
+  drawPaint(); mapInfo();
+}
+function polyKm2(pts) {
+  if (pts.length < 3) return 0;
+  const R = 6371, r = Math.PI / 180, lat0 = pts.reduce((s, p) => s + p[0], 0) / pts.length * r;
+  const xy = pts.map(p => [p[1] * r * R * Math.cos(lat0), p[0] * r * R]);
+  let a = 0; xy.forEach((p, i) => { const q = xy[(i + 1) % xy.length]; a += p[0] * q[1] - q[0] * p[1]; });
+  return Math.abs(a) / 2;
+}
+function drawPaint() {
+  if (!MP.map || !window.L) return;
+  if (!MP.vx) MP.vx = L.layerGroup().addTo(MP.map);
+  MP.vx.clearLayers();
+  if (MP.poly) { MP.map.removeLayer(MP.poly); MP.poly = null; }
+  const pts = MP.pts;
+  if (pts.length >= 2) MP.poly = L.polygon(pts, { color: '#F2760D', weight: 3, fillColor: '#F2760D', fillOpacity: .16, interactive: false }).addTo(MP.map);
+  if (MP.mode !== 'draw') return;
+  pts.forEach((p, i) => {
+    const m = L.marker(p, { draggable: true, zIndexOffset: 900, icon: L.divIcon({ className: 'ms-vx' + (i === 0 ? ' first' : ''), html: '<i></i>', iconSize: [24, 24], iconAnchor: [12, 12] }) });
+    m.on('drag', e => { MP.pts[i] = [e.latlng.lat, e.latlng.lng]; if (MP.poly) MP.poly.setLatLngs(MP.pts); });
+    m.on('dragend', () => { drawPaint(); mapInfo(); });
+    m.addTo(MP.vx);
+  });
+  if (pts.length >= 3) pts.forEach((p, i) => {
+    const q = pts[(i + 1) % pts.length], mid = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+    L.marker(mid, { zIndexOffset: 800, icon: L.divIcon({ className: 'ms-mid', html: '<i>+</i>', iconSize: [22, 22], iconAnchor: [11, 11] }) })
+      .on('click', ev => { L.DomEvent.stop(ev); MP.pts.splice(i + 1, 0, mid); drawPaint(); mapInfo(); }).addTo(MP.vx);
+  });
+}
+function drawAdd(ll) { if (MP.pts.length >= 300) return toast('300 point se zyada nahi'); MP.pts.push([ll.lat, ll.lng]); drawPaint(); mapInfo(); }
+function drawUndo() { MP.pts.pop(); drawPaint(); mapInfo(); }
+function drawClear() { MP.pts = []; drawPaint(); mapInfo(); }
+async function drawSave() {
+  if (MP.pts.length < 3) return toast('Kam se kam 3 point chahiye — gaon ke kinare-kinare map pe tap karo');
+  const ok = await act('admin_set_area_boundary', { p_name: MP.name, p_points: MP.pts.map(p => [+p[0].toFixed(6), +p[1].toFixed(6)]) },
+    MP.name + ' ki boundary save ho gayi ✓');
+  if (ok) mapClose();
+}
+async function drawRemove() {
+  const a = (D.areas || []).find(x => x.name === MP.name);
+  if (!a || !Array.isArray(a.boundary)) { drawClear(); return toast('Abhi koi saved boundary nahi hai'); }
+  const v = await modal({ title: MP.name + ' ki boundary hatayein?', sub: 'Phir se beech ke point aur radius se gaon pehchana jayega.', danger: true, ok: 'Haan, hatao' });
+  if (!v) return;
+  if (await act('admin_set_area_boundary', { p_name: MP.name, p_points: [] }, 'Boundary hata di')) mapClose();
 }
 function mapLayer(k) {
   if (!MP.map) return;
@@ -2460,6 +2551,11 @@ document.addEventListener('click', e => {
     case 'mapGps': mapGps(); break;
     case 'mapCoords': mapCoords(); break;
     case 'mapSave': mapSave(); break;
+    case 'mapMode': mapMode(a); break;
+    case 'drawUndo': drawUndo(); break;
+    case 'drawClear': drawClear(); break;
+    case 'drawSave': drawSave(); break;
+    case 'drawRemove': drawRemove(); break;
     case 'mfilter': UI.mfilter = a; render(false); break;
     case 'addStaff': addStaff(); break;
     case 'staffPw': staffPw(a, a2); break;

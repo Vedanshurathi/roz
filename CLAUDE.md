@@ -746,6 +746,48 @@ Still open by choice: phone login has no OTP until an SMS provider is set (anyon
   (it used to say "we do not reach there" for anyone beyond the 2 km village radius). Logged as `log_visit('out_of_area')`.
 - The platform/ API is not updated for this (not deployed); it passes the server's message through.
 
+### Launch polish (2 Nov 2026 — migrations `20261102a_village_boundary.sql`, `20261102b_poll_if_changed_vendor_admin.sql`)
+Vedanshu's 13-point list before going live. All tested in the browser with fakes (scratchpad tests, not in the repo).
+- **Customer**
+  - Desktop menu: Fruits lights up "Fruits" (it lit Vegetables for every category).
+  - **Village change with items in the basket** → `#areaSwSheet` (`setArea(a)` → `askAreaChange` reads the new village's `customer_home`):
+    "basket stays" / "N items removed: …" / "basket will be emptied"; No = nothing changes. `setArea(a, keep)` = confirmed.
+  - **Cancelled / missed orders** are no longer shown as completed: `STATUS_MAP` cancelled/missed, `cancelInfo(b)` (cancel_reason
+    "Admin: …" → RozBazaar, "Vendor: …" → vendor, else customer; missed = slot ended). My bookings card with the reason, no code, no
+    rating; Home + basket note `#cxNote/#cxNoteB` for today/yesterday until closed (`rb_cx_seen`).
+  - **Slot screen**: today has no open slot → jumps to the next day that has one (`DAY_JUMP`, note "No slot left today — showing
+    tomorrow"); a day the customer taps is never changed (`DAY_PICKED`).
+  - **Map pin** = green SVG drop pin with an orange centre (`.rbpin`). **Move the map, not the pin** (Uber-style): the pin stays in
+    the middle while the map is dragged and the spot is taken at `moveend` (a flick keeps sliding after the finger lifts). A tap
+    still moves the pin there.
+  - **Success screen** shows no RB order code (delivery code only).
+  - **Shared basket**: "Basket updated from your other device — N items" + the basket icon/bar pulses (`.cbump`, `.cglow`).
+  - **Floating voice button** `#fabVoice` (orange circle above the chat bubble, Home / category / search only): tap → it grows into an
+    oval showing what it hears; `longListen()` keeps the mic on through pauses (continuous mode, restarted when the phone stops it;
+    ends after 5 s silence once something was said, 12 s with nothing, 45 s max, or a second tap); then the voice-order sheet opens
+    with the list — nothing goes into the basket until "Add to basket". The voice sheet's own mic uses `longListen` too.
+  - Not-in-area text: "Thank you for using RozBazaar! RozBazaar is not available in your area right now — but it's coming to your
+    area soon!" (+ Hindi). The location question never opens on top of another sheet (waits 6 s).
+  - Live tracking: a vendor position older than 90 s says "Live location paused N min ago — phone screen may be off".
+- **Vendor**
+  - Home sale box: real today's sale (`refreshHeroSale`) + "you keep ₹X after 10% commission" + "updated hh:mm · tap for details";
+    updated right after "on the way" / payment / delivery code (`heroSoon()`), not only every 20 s.
+  - Dashboard: starts with "YOU KEEP ₹X", ▲/▼ vs the same number of days before (`loadDash` fetches both periods), sale − commission
+    = keep, chips (orders paid / still to do / cancelled / missed); reloads every 60 s while open and after a payment.
+  - All orders: tap-to-filter count tiles (All / To do / Completed + sale / Cancelled / Missed), search (name, phone, village, code),
+    day headers with count + earned, coloured cards that open to items, who cancelled + why, payment, Call / Open order.
+  - Voice button on Home (Stock has its own big button) → listens long, then opens "Speak your rates" with the text.
+  - Live location: also sent when the screen goes off / the page is hidden (`visibilitychange`, `pagehide`). **A website cannot send
+    GPS while the phone is locked** — keeping the app open is still needed; true background tracking needs a native vendor app.
+  - Order list asks `vendor_bookings_if_changed` (69-byte "same" reply when nothing changed); own changes reset `RUNS_REV`.
+- **Admin**
+  - Villages → "📍 Location set karo" → tab "✏️ Gaon ki boundary banao": tap around the village edge, drag points, "+" adds a point
+    between two, Undo / Saaf karo / Boundary hatao, live km²; other villages' boundaries dashed. `admin_set_area_boundary`.
+    A customer GPS point inside a boundary belongs to that village (`area_from_point`); villages without one keep centre + radius.
+    Double-tap zoom is off while drawing. Modals now open above the map sheet (`.ov.m`, z 125/130 — the remove question opened
+    behind it). Empty charts show "Abhi koi data nahi" instead of a broken SVG path.
+  - 60 s refresh asks `admin_bookings_if_changed` / `admin_customers_if_changed` (`REVA`).
+
 ### Key business logic in the DB
 - `match_vendor()` — auto-assigns least-loaded, best-rated vendor for a slot.
 - `vendor_covers_area_in_slot(vendor, area, slot)` — the single source of truth
