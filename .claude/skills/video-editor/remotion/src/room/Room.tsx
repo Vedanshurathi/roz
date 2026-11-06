@@ -150,8 +150,8 @@ function drawScreen(ctx: CanvasRenderingContext2D, W: number, H: number, t: numb
 }
 
 const Screen: React.FC<{t: number; shot: number; st: number; lines: Line[]}> = ({t, shot, st, lines}) => {
-  const {c, ctx, tex} = useCanvas(1600, 1200);
-  ctx.setTransform(1600 / 1024, 0, 0, 1200 / 768, 0, 0);
+  const {c, ctx, tex} = useCanvas(1024, 768);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   drawScreen(ctx, 1024, 768, t, shot, st, lines); tex.needsUpdate = true;
   return (
     <mesh position={[0, 1.36, -1.262]}>
@@ -162,9 +162,9 @@ const Screen: React.FC<{t: number; shot: number; st: number; lines: Line[]}> = (
 };
 
 // ----------------------------------------------------------------- props
-const Box: React.FC<{p: [number, number, number]; s: [number, number, number]; c: string; r?: [number, number, number]; e?: string; ei?: number; rough?: number}> =
-  ({p, s, c, r = [0, 0, 0], e, ei = 0, rough = 0.75}) => (
-  <mesh position={p} rotation={r} castShadow receiveShadow>
+const Box: React.FC<{p: [number, number, number]; s: [number, number, number]; c: string; r?: [number, number, number]; e?: string; ei?: number; rough?: number; sh?: boolean}> =
+  ({p, s, c, r = [0, 0, 0], e, ei = 0, rough = 0.75, sh = false}) => (
+  <mesh position={p} rotation={r} castShadow={sh} receiveShadow={sh}>
     <boxGeometry args={s} />
     <meshStandardMaterial color={c} roughness={rough} emissive={e || '#000'} emissiveIntensity={ei} />
   </mesh>
@@ -198,7 +198,7 @@ const Character: React.FC<{turn: number; wave: number; t: number}> = ({turn, wav
       <Box p={[-0.11, 0.33, 0.36]} s={[0.16, 0.42, 0.16]} c={pants} />
       <Box p={[0.11, 0.33, 0.36]} s={[0.16, 0.42, 0.16]} c={pants} />
       {/* torso */}
-      <Box p={[0, 0.9, -0.02]} s={[0.46, 0.5, 0.26]} c={shirt} rough={0.9} />
+      <Box p={[0, 0.9, -0.02]} s={[0.46, 0.5, 0.26]} c={shirt} rough={0.9} sh />
       <Box p={[0, 1.13, 0.1]} s={[0.2, 0.05, 0.03]} c="#f2f2f2" />
       {/* arms */}
       <Box p={[-0.3, 0.92, 0.05]} s={[0.13, 0.42, 0.14]} c={shirt} r={[-0.5, 0, 0]} />
@@ -208,7 +208,7 @@ const Character: React.FC<{turn: number; wave: number; t: number}> = ({turn, wav
       </group>
       {/* head */}
       <group position={[0, 1.42, 0]}>
-        <Box p={[0, 0, 0]} s={[0.38, 0.38, 0.36]} c={skin} rough={0.8} />
+        <Box p={[0, 0, 0]} s={[0.38, 0.38, 0.36]} c={skin} rough={0.8} sh />
         <Box p={[0, 0.2, -0.02]} s={[0.41, 0.1, 0.4]} c={hair} />
         <Box p={[0, 0.05, -0.19]} s={[0.41, 0.3, 0.06]} c={hair} />
         <Box p={[-0.2, 0.08, 0]} s={[0.04, 0.2, 0.38]} c={hair} />
@@ -243,12 +243,19 @@ const Bubble: React.FC<{text: string; pos: [number, number, number]; t0: number;
 
 // ----------------------------------------------------------------- the film
 export const Room: React.FC<RoomProps> = ({lines, total}) => {
+  const UI = useVideoConfig().width / 1920;
   const frame = useCurrentFrame(); const {fps, width, height} = useVideoConfig();
   const t = frame / fps;
   const starts = [0, ...lines.slice(1).map((l) => l.start - 0.25)];
   let shot = 0; for (let k = 0; k < starts.length; k++) if (t >= starts[k]) shot = k;
   const st = t - starts[shot];
   const floorTex = useMemo(() => { const x = plankTexture('#7a5236', 'rgba(40,20,10,0.6)'); x.repeat.set(3, 3); return x; }, []);
+  const keysTex = useMemo(() => {
+    const c = document.createElement('canvas'); c.width = 512; c.height = 152; const x = c.getContext('2d')!;
+    x.fillStyle = '#d6ccb4'; x.fillRect(0, 0, 512, 152);
+    for (let r = 0; r < 3; r++) for (let k = 0; k < 14; k++) { x.fillStyle = '#f3ecdb'; x.fillRect(8 + k * 36, 10 + r * 46, 30, 38); }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  }, []);
   const wallTex = useMemo(() => { const x = plankTexture('#4a3326', 'rgba(20,10,5,0.7)', true); x.repeat.set(4, 1); return x; }, []);
   const glowUp = shot >= 5 ? easeOut((t - starts[5]) / 0.8) : 0;     // room "comes alive" on the good result
   const turn = shot >= 8 ? back((t - starts[8]) / 0.7) : 0;
@@ -264,41 +271,43 @@ export const Room: React.FC<RoomProps> = ({lines, total}) => {
     <AbsoluteFill style={{background: '#08060b'}}>
       <style>{`@font-face{font-family:Poppins;font-weight:800;src:url(${staticFile('Poppins-ExtraBold.ttf')})}
                @font-face{font-family:Poppins;font-weight:900;src:url(${staticFile('Poppins-Black.ttf')})}`}</style>
-      <ThreeCanvas width={width} height={height} shadows gl={{toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.3}}
+      <ThreeCanvas width={width} height={height} shadows gl={{toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.3, antialias: false, powerPreference: 'high-performance'}} dpr={1}
         camera={{fov: 38, near: 0.05, far: 60}}>
         <CameraRig t={t} starts={starts} total={total} />
         <color attach="background" args={['#0b0910']} />
         <fog attach="fog" args={['#0b0910', 6, 14]} />
         <hemisphereLight args={['#6f7dff', '#2a1608', 0.45 + 0.15 * glowUp]} />
         {/* soft key on the founder's face when he turns around */}
-        <pointLight position={[0.7, 1.7, 0.9]} intensity={shot >= 8 ? 5 : 0.6} distance={4} decay={1.5} color="#ffd2b0" />
+        {shot >= 8 && <pointLight position={[0.7, 1.7, 0.9]} intensity={5} distance={4} decay={1.5} color="#ffd2b0" />}
         {/* warm desk lamp (key) */}
-        <pointLight position={[-1.05, 1.75, -1.35]} intensity={9 + 4 * glowUp} distance={7} decay={1.6} color="#ffb067" castShadow
-          shadow-mapSize-width={1024} shadow-mapSize-height={1024} shadow-bias={-0.002} />
+        <pointLight position={[-1.05, 1.75, -1.35]} intensity={6 + 3 * glowUp} distance={7} decay={1.6} color="#ffb067" />
+        <spotLight position={[-1.0, 1.7, -1.4]} angle={1.05} penumbra={0.7} intensity={14 + 4 * glowUp} distance={6} decay={1.4}
+          color="#ffb067" castShadow shadow-mapSize-width={512} shadow-mapSize-height={512} shadow-bias={-0.002}
+          target-position={[0.2, 0.8, -1.2]} />
         {/* cool moonlight from the window side (rim) */}
-        <directionalLight position={[4, 4, 1]} intensity={0.9} color="#7b8cff" castShadow shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
+        <directionalLight position={[4, 4, 1]} intensity={0.9} color="#7b8cff" />
         {/* screen glow */}
         <pointLight position={[0, 1.36, -0.9]} intensity={2.2} distance={2.5} color={shot === 4 ? '#ff6bd5' : '#a9c6ff'} />
         {/* wall art lights up on the good result */}
-        <pointLight position={[0.9, 2.2, -1.9]} intensity={3 * glowUp} distance={2} color="#ff4d6d" />
-        <pointLight position={[-0.6, 2.3, -1.9]} intensity={3 * glowUp} distance={2} color="#4dc3ff" />
+        {glowUp > 0.01 && <pointLight position={[0.9, 2.2, -1.9]} intensity={3 * glowUp} distance={2} color="#ff4d6d" />}
+        {glowUp > 0.01 && <pointLight position={[-0.6, 2.3, -1.9]} intensity={3 * glowUp} distance={2} color="#4dc3ff" />}
 
         {/* room */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><planeGeometry args={[14, 14]} /><meshStandardMaterial map={floorTex} roughness={0.85} /></mesh>
-        <mesh position={[0, 3, -2.3]} receiveShadow><planeGeometry args={[14, 6]} /><meshStandardMaterial map={wallTex} roughness={0.9} /></mesh>
-        <mesh position={[-3.2, 3, 2]} rotation={[0, Math.PI / 2, 0]} receiveShadow><planeGeometry args={[10, 6]} /><meshStandardMaterial map={wallTex} roughness={0.9} /></mesh>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><planeGeometry args={[14, 14]} /><meshLambertMaterial map={floorTex} /></mesh>
+        <mesh position={[0, 3, -2.3]} receiveShadow><planeGeometry args={[14, 6]} /><meshLambertMaterial map={wallTex} /></mesh>
+        <mesh position={[-3.2, 3, 2]} rotation={[0, Math.PI / 2, 0]} receiveShadow><planeGeometry args={[10, 6]} /><meshLambertMaterial map={wallTex} /></mesh>
         {/* rug */}
         <Box p={[0, 0.005, 0.2]} s={[2.6, 0.01, 1.8]} c="#5b2a3c" rough={1} />
         {/* desk */}
-        <Box p={[0, 0.84, -1.55]} s={[2.5, 0.07, 1.0]} c="#8b5a3a" rough={0.6} />
+        <Box p={[0, 0.84, -1.55]} s={[2.5, 0.07, 1.0]} c="#8b5a3a" rough={0.6} sh />
         {[-1.15, 1.15].map((x) => [-1.95, -1.15].map((z) => <Box key={`${x}${z}`} p={[x, 0.41, z]} s={[0.07, 0.82, 0.07]} c="#5e3c27" />))}
         {/* retro computer */}
         <Box p={[0, 0.93, -1.6]} s={[0.95, 0.12, 0.72]} c="#d9cfb8" />
-        <Box p={[0, 1.36, -1.6]} s={[0.82, 0.66, 0.62]} c="#e6dcc4" rough={0.55} />
+        <Box p={[0, 1.36, -1.6]} s={[0.82, 0.66, 0.62]} c="#e6dcc4" rough={0.55} sh />
         <Box p={[0, 1.36, -1.29]} s={[0.7, 0.54, 0.02]} c="#b9ae96" />
         <Screen t={t} shot={shot} st={st} lines={lines} />
         <Box p={[0, 0.9, -1.05]} s={[0.78, 0.04, 0.26]} c="#ddd3bc" />
-        {Array.from({length: 24}).map((_, k) => <Box key={k} p={[-0.33 + (k % 12) * 0.06, 0.93, -1.12 + Math.floor(k / 12) * 0.08]} s={[0.045, 0.02, 0.05]} c="#f1ead8" />)}
+        <mesh position={[0, 0.925, -1.05]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[0.74, 0.22]} /><meshStandardMaterial map={keysTex} roughness={0.7} /></mesh>
         {/* lamp */}
         <Box p={[-1.0, 0.9, -1.75]} s={[0.22, 0.05, 0.22]} c="#222" />
         <Box p={[-1.0, 1.25, -1.75]} s={[0.035, 0.7, 0.035]} c="#222" />
@@ -317,7 +326,7 @@ export const Room: React.FC<RoomProps> = ({lines, total}) => {
         <Box p={[-1.9, 1.9, -2.15]} s={[1.0, 0.04, 0.26]} c="#5e3c27" />
         {['#d9534f', '#5bc0de', '#f0ad4e', '#5cb85c', '#9b59b6'].map((c2, k) => <Box key={k} p={[-2.3 + k * 0.17, 2.05, -2.15]} s={[0.12, 0.26 + (k % 2) * 0.05, 0.2]} c={c2} />)}
         {/* fairy lights that switch on with the good result */}
-        {Array.from({length: 14}).map((_, k) => (
+        {glowUp > 0.01 && Array.from({length: 14}).map((_, k) => (
           <mesh key={k} position={[-2.2 + k * 0.33, 2.85 - Math.sin((k / 13) * Math.PI) * 0.18, -2.25]}>
             <sphereGeometry args={[0.035, 10, 10]} />
             <meshBasicMaterial color={['#ffd166', '#ff6b6b', '#4dd4ff'][k % 3]} transparent opacity={0.15 + 0.85 * glowUp * (0.7 + 0.3 * Math.sin(t * 5 + k))} toneMapped={false} />
@@ -328,27 +337,27 @@ export const Room: React.FC<RoomProps> = ({lines, total}) => {
 
       {/* captions: word-by-word reveal, upper area like the reference */}
       {caption && (
-        <div style={{position: 'absolute', top: 70, width: '100%', textAlign: 'center', fontFamily: 'Poppins', fontWeight: 800,
-          fontSize: 64, color: '#fff', textShadow: '0 4px 18px rgba(0,0,0,0.85)', padding: '0 120px', lineHeight: 1.15}}>
-          <div style={{display: 'inline-block', background: 'rgba(10,8,14,0.55)', borderRadius: 26, padding: '10px 34px 14px', backdropFilter: 'blur(6px)'}}>
+        <div style={{position: 'absolute', top: 70 * UI, width: '100%', textAlign: 'center', fontFamily: 'Poppins', fontWeight: 800,
+          fontSize: 64 * UI, color: '#fff', textShadow: '0 4px 18px rgba(0,0,0,0.85)', padding: `0 ${120 * UI}px`, lineHeight: 1.15}}>
+          <div style={{display: 'inline-block', background: 'rgba(10,8,14,0.55)', borderRadius: 26 * UI, padding: `${10 * UI}px ${34 * UI}px ${14 * UI}px`}}>
           {caption.text.split(' ').map((w, k, arr) => {
             const ws = caption.start + ((caption.end - caption.start) * k) / arr.length;
             const a = clamp((t - ws) / 0.12);
             const key = KEY.has(w.toUpperCase());
             return <span key={k} style={{opacity: a, display: 'inline-block', transform: `translateY(${(1 - easeOut(a)) * 14}px)`,
-              color: key ? '#ffd166' : '#fff', marginRight: 16}}>{w}</span>;
+              color: key ? '#ffd166' : '#fff', marginRight: 16 * UI}}>{w}</span>;
           })}
           </div>
         </div>
       )}
       {/* "CODE." hit and CTA */}
       {shot === 6 && (
-        <div style={{position: 'absolute', bottom: 120, width: '100%', textAlign: 'center', fontFamily: 'Poppins', fontWeight: 900,
-          fontSize: 190 * (0.8 + 0.2 * back(st / 0.35)), color: '#ffd166', letterSpacing: 6, textShadow: '0 0 40px rgba(255,180,60,0.7)'}}>CODE.</div>
+        <div style={{position: 'absolute', bottom: 120 * UI, width: '100%', textAlign: 'center', fontFamily: 'Poppins', fontWeight: 900,
+          fontSize: UI * 190 * (0.8 + 0.2 * back(st / 0.35)), color: '#ffd166', letterSpacing: 6, textShadow: '0 0 40px rgba(255,180,60,0.7)'}}>CODE.</div>
       )}
       {shot === 9 && (
-        <div style={{position: 'absolute', bottom: 110, width: '100%', display: 'flex', justifyContent: 'center'}}>
-          <div style={{background: '#ff3448', color: '#fff', fontFamily: 'Poppins', fontWeight: 900, fontSize: 72, padding: '18px 54px', borderRadius: 60,
+        <div style={{position: 'absolute', bottom: 110 * UI, width: '100%', display: 'flex', justifyContent: 'center'}}>
+          <div style={{background: '#ff3448', color: '#fff', fontFamily: 'Poppins', fontWeight: 900, fontSize: 72 * UI, padding: `${18 * UI}px ${54 * UI}px`, borderRadius: 60 * UI,
             transform: `scale(${back((t - starts[9] - 0.2) / 0.4)})`, boxShadow: '0 10px 40px rgba(255,52,72,0.6)'}}>COMMENT “AI” 💬</div>
         </div>
       )}

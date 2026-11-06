@@ -9,7 +9,7 @@ export const Root: React.FC = () => (
   <>
     <Composition id="Title" component={Title} durationInFrames={90} fps={30} width={1080} height={1920}
       defaultProps={{words: ['BUILT', 'IN', '63 DAYS'], accent: '#7C4DFF'}} />
-    <Composition id="Room" component={Room} durationInFrames={Math.ceil(ROOM.total * 30)} fps={30} width={1920} height={1080}
+    <Composition id="Room" component={Room} durationInFrames={Math.ceil(ROOM.total * 30)} fps={30} width={1280} height={720}
       defaultProps={ROOM} />
   </>
 );
