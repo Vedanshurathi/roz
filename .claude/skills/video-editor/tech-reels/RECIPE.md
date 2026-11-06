@@ -37,6 +37,15 @@ Check it with Whisper (sherpa-onnx turbo, `language=hi`) — every sentence must
 Then clean: `highpass=80, loudnorm I=-15`.
 
 ## 5. Visuals (no camera footage needed)
+**Fastest path:** write a scene spec and run the ready-made engine, which does voice, captions,
+graphics, music, SFX and the final mix in one go:
+```bash
+python3 .claude/skills/video-editor/scripts/techreel.py spec.json out/    # -> out/reel.mp4
+```
+Spec format and scene types (title, cards, phone, chips, endcard) are documented at the top of
+`scripts/techreel.py`. Example: `tech-reels/example_spec.json`.
+Only hand-build graphics when a story needs something the engine can't show.
+
 - Pure motion graphics, 1080×1920, 30 fps, built with Python/PIL + ffmpeg (or Remotion in `../remotion`).
 - Look: dark background (#0A0812 → deep purple), accent **red #FF3448** + **gold #FFC63C**,
   fonts in `../assets` (Poppins Black/ExtraBold, Anton).
