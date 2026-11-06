@@ -8,6 +8,11 @@ description: Edit Instagram Reels, YouTube Shorts, TikToks and long-form YouTube
 You are editing for retention. Every decision answers one question:
 **"Does this make the viewer stay one more second?"**
 
+## Before anything: read the studio
+`studio/README.md`, `studio/brand-kit.md`, `studio/editing-style.md`, `studio/references.md` hold
+Vedanshu's brand, his past feedback (what he loved / rejected) and his reference reels. Follow them,
+show a storyboard before a full render, and append new feedback to `studio/editing-style.md`.
+
 ## Workflow
 
 1. **Probe** the footage: `python3 scripts/vedit.py probe in.mp4`

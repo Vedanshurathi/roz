@@ -13,7 +13,7 @@ git fetch origin claude/upbeat-archimedes-jld98p && git checkout claude/upbeat-a
 bash .claude/skills/video-editor/scripts/setup-tools.sh      # ~5–10 min: ffmpeg, whisper, kokoro voice, fonts...
 export KOKORO_DIR=$HOME/.cache/video-tools/kokoro-multi-lang-v1_0
 ```
-Read `../SKILL.md` and `../references/playbook.md`.
+Read `../SKILL.md`, `../references/playbook.md` and everything in `../studio/` (brand kit + Vedanshu's feedback rules).
 
 ## 2. Pick the story
 - Web-search tech news from the **last 3 days**: AI tools, phones/gadgets, apps, big-tech moves,

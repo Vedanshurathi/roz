@@ -21,7 +21,7 @@ echo "== python packages"
 pip install -q -U --ignore-installed setuptools wheel
 pip install -q opencv-python-headless numpy librosa onnxruntime sherpa-onnx faster-whisper \
   auto-editor "scenedetect[opencv-headless]" moviepy pydub noisereduce pedalboard \
-  ffmpeg-normalize rembg manim
+  ffmpeg-normalize rembg manim yt-dlp
 # moviepy needs Pillow < 12; rembg still runs fine on 11.x
 pip install -q "pillow==11.3.0"
 
