@@ -36,6 +36,10 @@ REL=https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models
 [ -f "$MODELS/silero_vad.onnx" ] || curl -sSL -o "$MODELS/silero_vad.onnx" "$REL/silero_vad.onnx"
 [ -f "$MODELS/u2net_human_seg.onnx" ] || curl -sSL -o "$MODELS/u2net_human_seg.onnx" \
   https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net_human_seg.onnx
+TTS=https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models
+[ -d "$MODELS/kokoro-multi-lang-v1_0" ] || \
+  curl -sSL "$TTS/kokoro-multi-lang-v1_0.tar.bz2" | tar xj -C "$MODELS"     # offline voiceover (scripts/tts.py)
+mkdir -p "$HOME/.fonts" && cp "$HERE"/assets/*.ttf "$HOME/.fonts/" && fc-cache -f >/dev/null
 
 echo "== done. Quick check:"
 ffmpeg -version | head -1
