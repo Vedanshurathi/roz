@@ -1,0 +1,62 @@
+slug: ep000-pilot-bina-gpu-anime
+kind: short
+working_title: 'Pilot — बिना camera, बिना GPU: anime video'
+created: '2026-11-07T17:30:00+05:30'
+state: internal_test   # NOT for publishing: owner asked for no videos about our own production system
+pillar: experiment
+summary: 'The host shows how this very Short was made: Claude wrote the script, a
+  free offline voice model made the Hindi voice, the first lip-sync was off, and driving
+  the mouth from voice loudness fixed it. Ends by asking viewers what they want built
+  next.'
+research_cutoff_ist: '2026-11-07T17:00:00+05:30'
+character:
+  name: Neel (provisional)
+  outfit: saffron hoodie, white tee
+  set: night room v1
+files:
+  video: media/final.mp4
+  thumbnail: null
+  cover: media/cover.png
+youtube:
+  title: 'बिना camera, बिना GPU — ये anime video कैसे बनी? 🤯 #AI #Shorts'
+  description: 'ये पूरी Short एक भी camera या GPU के बिना बनी है — Claude ने script
+    लिखी, free tools से आवाज़ बनी, और code से animation.
+
+    असली problem: होंठ आवाज़ से match नहीं कर रहे थे। Fix: voice loudness से mouth
+    animation sync।
+
+
+    Tools: Claude (script + code), Kokoro-82M (offline Hindi TTS), Remotion (animation),
+    FFmpeg (edit/mix).
+
+    Character, voice and music are AI/code-generated. Music: original, made for this
+    video.
+
+
+    आप AI से क्या बनवाना चाहोगे? Comment करो 👇
+
+    #AI #ArtificialIntelligence #AIinHindi #Anime #Shorts'
+  tags:
+  - AI
+  - AI in Hindi
+  - anime
+  - Claude
+  - Remotion
+  - text to speech
+  - Hindi
+  - experiment
+  publish_at_ist: '2026-11-09T19:00:00'
+  privacy: public
+instagram:
+  caption: 'बिना camera, बिना GPU… ये anime video कैसे बनी? 🤯
+
+    Script → Claude · Voice → free offline AI · Animation → code
+
+    सबसे बड़ी problem थी lip-sync 😅 — fix देखो video में.
+
+    आप AI से क्या बनवाना चाहोगे? Comment करो 👇
+
+    #AI #AIinHindi #Anime #TechIndia #Experiment'
+  suggested_time_ist: Mon 2026-11-09 19:30
+  disclosure: AI-generated character/voice — turn on Instagram's AI label.
+package_hash: f7171bca8988ccaedce888576ff25b1469ddab2f668214f2d72795bc76c8fdac

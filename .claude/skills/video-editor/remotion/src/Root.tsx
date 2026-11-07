@@ -4,6 +4,8 @@ import {Title} from './Title';
 import {Room} from './room/Room';
 import {Film} from './room/Film';
 import {Diwali} from './room/Diwali';
+import {Pilot} from './anime/Pilot';
+import PILOT from './anime/pilot-timeline.json';
 
 const DIWALI = {"lines": [{"text": "Is Diwali, ek diya jalao…", "start": 0.9, "end": 2.908}, {"text": "Par sirf apne ghar mein nahi.", "start": 3.458, "end": 5.555}, {"text": "Gaon ki us chhoti dukaan mein bhi, jo saal bhar aapka intezaar karti hai.", "start": 6.055, "end": 11.08}, {"text": "Is baar mithai, diye aur gifts — local se kharido.", "start": 11.58, "end": 14.899}, {"text": "Kyunki jab unka ghar roshan hota hai…", "start": 15.449, "end": 17.927}, {"text": "Tabhi poora Bharat jagmagata hai.", "start": 18.377, "end": 20.893}, {"text": "Happy Diwali — Vedanshu aur RozBazaar ki taraf se.", "start": 21.593, "end": 25.07}, {"text": "Comment mein ek diya bhejo.", "start": 25.57, "end": 27.466}], "total": 29.666};
 
@@ -19,5 +21,7 @@ export const Root: React.FC = () => (
       defaultProps={ROOM} />
     <Composition id="Diwali" component={Diwali} durationInFrames={Math.ceil(DIWALI.total * 30)} fps={30} width={720} height={1280}
       defaultProps={DIWALI} />
+    <Composition id="Pilot" component={Pilot} durationInFrames={Math.ceil(PILOT.total * 30)} fps={30} width={1080} height={1920}
+      defaultProps={PILOT} />
   </>
 );

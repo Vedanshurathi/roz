@@ -1,0 +1,84 @@
+{
+  "hash": "f7171bca8988ccaedce888576ff25b1469ddab2f668214f2d72795bc76c8fdac",
+  "core": {
+    "files": {
+      "video": "cade3e9eed6a18d8006a310a5dbf1da704e51e0c6d2670dff1203d95c401b156"
+    },
+    "title": "बिना camera, बिना GPU — ये anime video कैसे बनी? 🤯 #AI #Shorts",
+    "description": "ये पूरी Short एक भी camera या GPU के बिना बनी है — Claude ने script लिखी, free tools से आवाज़ बनी, और code से animation.\nअसली problem: होंठ आवाज़ से match नहीं कर रहे थे। Fix: voice loudness से mouth animation sync।\n\nTools: Claude (script + code), Kokoro-82M (offline Hindi TTS), Remotion (animation), FFmpeg (edit/mix).\nCharacter, voice and music are AI/code-generated. Music: original, made for this video.\n\nआप AI से क्या बनवाना चाहोगे? Comment करो 👇\n#AI #ArtificialIntelligence #AIinHindi #Anime #Shorts",
+    "tags": [
+      "AI",
+      "AI in Hindi",
+      "anime",
+      "Claude",
+      "Remotion",
+      "text to speech",
+      "Hindi",
+      "experiment"
+    ],
+    "publish_at_ist": "2026-11-09T19:00:00",
+    "privacy": "public",
+    "kind": "short"
+  },
+  "qc": {
+    "video": "/home/user/roz/content-studio/episodes/2026-11-07-ep000-pilot-bina-gpu-anime/media/final.mp4",
+    "kind": "short",
+    "sha256": "cade3e9eed6a18d8006a310a5dbf1da704e51e0c6d2670dff1203d95c401b156",
+    "checked_at": "2026-11-07T22:51:44+05:30",
+    "passed": true,
+    "checks": [
+      {
+        "check": "resolution",
+        "ok": true,
+        "detail": "1080x1920 (want 1080x1920)"
+      },
+      {
+        "check": "fps",
+        "ok": true,
+        "detail": "30.00"
+      },
+      {
+        "check": "duration",
+        "ok": true,
+        "detail": "34.89s (max 60)"
+      },
+      {
+        "check": "video_codec",
+        "ok": true,
+        "detail": "h264 yuv420p"
+      },
+      {
+        "check": "audio_present",
+        "ok": true,
+        "detail": "aac"
+      },
+      {
+        "check": "loudness",
+        "ok": true,
+        "detail": "-14.4 LUFS (target -14)"
+      },
+      {
+        "check": "true_peak",
+        "ok": true,
+        "detail": "-1.8 dBTP (max -1.5)"
+      },
+      {
+        "check": "no_black_gaps",
+        "ok": true,
+        "detail": "black segments [] (an opening fade is allowed)"
+      },
+      {
+        "check": "no_long_silence",
+        "ok": true,
+        "detail": "silences >1.5s at []"
+      },
+      {
+        "check": "file_size",
+        "ok": true,
+        "detail": "12.8 MB"
+      }
+    ]
+  },
+  "created": "2026-11-07T22:51:44+05:30",
+  "research_cutoff_ist": "2026-11-07T17:00:00+05:30"
+}

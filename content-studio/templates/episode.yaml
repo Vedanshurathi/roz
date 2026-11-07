@@ -1,0 +1,23 @@
+slug: ""
+kind: short            # short | reel | long | post
+working_title: ""
+created: ""
+state: draft           # draft -> scripted -> storyboarded -> rendered -> awaiting_approval -> approved -> scheduled -> published
+pillar: ""             # possible-today | experiment | weekly-update | tool-test | future | festival | journey
+summary: ""
+research_cutoff_ist: null
+character: {name: "Neel (provisional)", outfit: "", set: "night room"}
+files:
+  video: media/final.mp4        # media/ is git-ignored; videos are never committed
+  thumbnail: null               # media/thumb.png (1280x720) for long videos
+  cover: null                   # media/cover.png (1080x1920) for Reels
+youtube:
+  title: ""
+  description: ""
+  tags: []
+  publish_at_ist: "2026-01-01T08:00:00"
+  privacy: public               # what it becomes at publishAt; uploads always start private
+instagram:
+  caption: ""
+  suggested_time_ist: ""
+  disclosure: "Made with AI tools (animation, voice). Label as AI-generated when posting."

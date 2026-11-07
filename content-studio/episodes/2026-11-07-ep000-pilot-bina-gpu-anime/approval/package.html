@@ -1,0 +1,34 @@
+<!doctype html><meta charset="utf-8"><title>Approval ep000-pilot-bina-gpu-anime</title>
+<style>body{font-family:system-ui,'Noto Sans Devanagari';max-width:760px;margin:24px auto;padding:0 16px;background:#0E1330;color:#FFF4E6}
+code{background:#1A2150;padding:2px 6px;border-radius:6px} .card{background:#1A2150;border-radius:16px;padding:16px;margin:12px 0}
+video,img{max-width:100%;border-radius:12px} h1{color:#FF9A3C}</style>
+<h1>Approval package — Pilot — बिना camera, बिना GPU: anime video</h1>
+<p>Package hash: <code>f7171bca8988</code> · created 07 Nov 2026 22:51 IST · research cut-off: 2026-11-07T17:00:00+05:30</p>
+<div class="card"><video controls src="../media/final.mp4"></video></div>
+
+<div class="card"><b>YouTube title</b><br>बिना camera, बिना GPU — ये anime video कैसे बनी? 🤯 #AI #Shorts<br><br><b>Description</b><pre style="white-space:pre-wrap">ये पूरी Short एक भी camera या GPU के बिना बनी है — Claude ने script लिखी, free tools से आवाज़ बनी, और code से animation.
+असली problem: होंठ आवाज़ से match नहीं कर रहे थे। Fix: voice loudness से mouth animation sync।
+
+Tools: Claude (script + code), Kokoro-82M (offline Hindi TTS), Remotion (animation), FFmpeg (edit/mix).
+Character, voice and music are AI/code-generated. Music: original, made for this video.
+
+आप AI से क्या बनवाना चाहोगे? Comment करो 👇
+#AI #ArtificialIntelligence #AIinHindi #Anime #Shorts</pre>
+<b>Schedule</b>: 2026-11-09T19:00:00 IST · privacy after publish: public</div>
+<div class="card"><b>Instagram caption</b><pre style="white-space:pre-wrap">बिना camera, बिना GPU… ये anime video कैसे बनी? 🤯
+Script → Claude · Voice → free offline AI · Animation → code
+सबसे बड़ी problem थी lip-sync 😅 — fix देखो video में.
+आप AI से क्या बनवाना चाहोगे? Comment करो 👇
+#AI #AIinHindi #Anime #TechIndia #Experiment</pre></div>
+<div class="card"><b>Story</b><p>The host shows how this very Short was made: Claude wrote the script, a free offline voice model made the Hindi voice, the first lip-sync was off, and driving the mouth from voice loudness fixed it. Ends by asking viewers what they want built next.</p><b>Sources</b><pre style="white-space:pre-wrap"># Sources (research cut-off: 2026-11-07 17:00 IST)
+This episode makes no news claims; it documents how it was made.
+| id | Claim used on screen | Source | Checked | Status |
+|----|----|----|----|----|
+| s1 | Voice made with a free, offline model | Kokoro-82M (Apache-2.0 per model card mirrors; confirm on the official card before monetising) run via sherpa-onnx | 2026-11-07 | released |
+| s2 | No GPU used | Render log: CPU-only cloud container, 4 vCPU, no GPU present (`nvidia-smi` not found) | 2026-11-07 | verified locally |
+| s3 | Lip-sync driven by voice loudness | content-studio/../remotion/src/anime/Pilot.tsx (mouth = per-frame RMS of the voice track) | 2026-11-07 | verified locally |
+</pre></div>
+<div class="card"><b>QC</b><ul><li>✅ resolution: 1080x1920 (want 1080x1920)</li><li>✅ fps: 30.00</li><li>✅ duration: 34.89s (max 60)</li><li>✅ video_codec: h264 yuv420p</li><li>✅ audio_present: aac</li><li>✅ loudness: -14.4 LUFS (target -14)</li><li>✅ true_peak: -1.8 dBTP (max -1.5)</li><li>✅ no_black_gaps: black segments [] (an opening fade is allowed)</li><li>✅ no_long_silence: silences &gt;1.5s at []</li><li>✅ file_size: 12.8 MB</li></ul></div>
+<div class="card"><b>To decide</b>: reply in the Claude chat (or on the GitHub approval issue) with one of<br>
+<code>APPROVE f7171bca8988</code> · <code>REVISE f7171bca8988: what to change</code> · <code>REJECT f7171bca8988</code><br>
+Approval covers only this exact video, thumbnail, title, description and time.</div>

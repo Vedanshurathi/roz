@@ -1,0 +1,63 @@
+# Central config. Everything else reads from here. Times are Asia/Kolkata (IST).
+brand:
+  status: proposed            # proposed -> locked (only after the owner picks the names)
+  channel_name: "Kya Possible Hai"   # recommendation, NOT final (see brand/naming.md)
+  character_name: "Neel"             # recommendation, NOT final
+  handle_wanted: "kyapossiblehai"    # availability NOT verified (YouTube/Instagram unreachable from the sandbox)
+  tagline_hi: "आज AI से क्या possible है?"
+
+language:
+  primary: hi                 # natural Hindi, English tech words kept in Latin script in captions
+  caption_script: "Devanagari + English words in Latin"
+  tts_script: "Devanagari only (English words spelled in Devanagari)"   # Kokoro reads Latin badly in Hindi mode
+
+voice:
+  engine: kokoro-82m (sherpa-onnx, offline)
+  voice_id: hm_omega          # Hindi male; licence Apache-2.0 (confirm on the official model card before monetising)
+  speed: 1.0
+  tempo_after: 1.05           # rubberband time-stretch, pitch kept
+  pronunciation_check: whisper-turbo (sherpa-onnx) transcript must match the script
+
+schedule:                     # hypotheses until real analytics exist
+  timezone: Asia/Kolkata
+  youtube_weekly_update: {day: Sunday, approval_package_by: "07:30", publish_at: "08:00"}
+  youtube_long_max_per_week: 2
+  shorts_per_week: 4
+  reels_per_week: 4
+  instagram_posts_per_week: 1
+  proposed_slots:             # to be revised from analytics
+    shorts: ["Mon 19:00", "Wed 19:00", "Fri 19:00", "Sat 12:00"]
+    reels:  ["Mon 19:30", "Wed 19:30", "Fri 19:30", "Sat 12:30"]
+    post:   ["Thu 18:00"]
+  research_cutoff_rule: "Sunday video: research frozen Saturday 21:00 IST, re-checked Sunday 06:00 IST for breaking corrections"
+
+formats:
+  short:  {w: 1080, h: 1920, fps: 30, max_s: 60,  loudness_lufs: -14, true_peak_db: -1.5}
+  reel:   {w: 1080, h: 1920, fps: 30, max_s: 90,  loudness_lufs: -14, true_peak_db: -1.5}
+  long:   {w: 1920, h: 1080, fps: 30, max_s: 1500, loudness_lufs: -14, true_peak_db: -1.5}
+  thumbnail: {w: 1280, h: 720, max_mb: 2}
+  carousel:  {w: 1080, h: 1350, max_slides: 10}
+
+budget:
+  monthly_cash_limit_inr: 0   # nothing paid without written approval in chat
+  paid_services_enabled: []
+  render: "CPU in the Claude Code cloud container (no GPU)"
+
+content_rules:
+  focus: "what people can do with AI, surprising tech experiments, useful discoveries, important AI updates"
+  avoid_unless_asked: "videos about our own avatar, scripts, GPU, lip-sync or production system"
+  every_video: [hook, journey, payoff]
+
+workflow:
+  gate_1_brand_and_character: pending   # owner must say "yes" before the first real video
+  after_gate_1: "work independently: research, script, storyboard, voice, edit, thumbnail, captions, QC"
+  gate_2_final_package: "one package per piece: video/post, thumbnail/cover, title+caption/description, sources, platform+time, approve/change request"
+
+approval:
+  required_for: [youtube_publish, youtube_schedule, instagram_publish, metadata_change]
+  accepted_channels: [claude_chat, github_comment]   # email is notification-only until verified replies exist
+  rule: "Approval names the package hash; any change to video, thumbnail, title, description or time needs a new approval."
+
+publishing:
+  youtube: {enabled: false, privacy_default: private, made_for_kids: false, category_id: "28", disclose_synthetic: true}
+  instagram: {mode: owner_authorised_after_final_approval, method: "connected Chrome browser if available, else manual package"}
