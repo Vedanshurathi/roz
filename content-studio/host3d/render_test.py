@@ -126,6 +126,15 @@ for (name, s, *_), cam in zip(SHOTS, (c1, c2, c3)):
     m = sc.timeline_markers.new(name, frame=s); m.camera = cam
 sc.camera = c1
 
+# ---------------- look tweaks found in still tests (also in stage3 for future builds)
+_sb = bpy.data.materials["Skin"].node_tree.nodes["Principled BSDF"]
+_sb.inputs["Roughness"].default_value = 0.56; _sb.inputs["Specular IOR Level"].default_value = 0.3
+for _en in ("Eye_EyeLeft", "Eye_EyeRight"):
+    _m = bpy.data.materials.get(_en)
+    if _m:
+        _t = _m.node_tree; _img = [n for n in _t.nodes if n.type == "TEX_IMAGE"][0]
+        _h = _t.nodes.new("ShaderNodeHueSaturation"); _h.inputs["Value"].default_value = 0.6; _h.inputs["Saturation"].default_value = 0.75
+        _t.links.new(_img.outputs["Color"], _h.inputs["Color"]); _t.links.new(_h.outputs["Color"], _t.nodes["Principled BSDF"].inputs["Base Color"])
 # ---------------- render settings
 sc.render.engine = "CYCLES"; sc.cycles.device = "CPU"; sc.cycles.samples = a.samples; sc.cycles.use_denoising = True
 sc.cycles.max_bounces = 6; sc.cycles.diffuse_bounces = 2; sc.cycles.glossy_bounces = 2; sc.cycles.transparent_max_bounces = 8

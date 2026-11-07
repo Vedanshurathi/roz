@@ -118,13 +118,16 @@ for o in _unlinked: bpy.context.scene.collection.objects.link(o)
 # ---------------------------------------------------------------- 1. realistic skin, eyes, teeth
 skin = body.data.materials[0]; sb = skin.node_tree.nodes["Principled BSDF"]
 set_in(sb, "Subsurface Weight", 0.1); set_in(sb, "Subsurface Radius", (0.7, 0.36, 0.24)); set_in(sb, "Subsurface Scale", 0.006)
-set_in(sb, "Roughness", 0.46); set_in(sb, "Specular IOR Level", 0.42)
+set_in(sb, "Roughness", 0.56); set_in(sb, "Specular IOR Level", 0.3)
 pores = uv_noise_bump(skin, sb, 2600, 0.06, 0.0004, "voronoi")
 tc = nt_new(skin, "ShaderNodeTexCoord"); nz = nt_new(skin, "ShaderNodeTexNoise"); nz.inputs["Scale"].default_value = 420
 link(skin, tc.outputs["UV"], nz.inputs["Vector"]); bp2 = nt_new(skin, "ShaderNodeBump"); bp2.inputs["Strength"].default_value = 0.05
 link(skin, nz.outputs["Fac"], bp2.inputs["Height"]); link(skin, bp2.outputs["Normal"], pores.inputs["Normal"])
 for e in eyes:
     eb_ = e.data.materials[0].node_tree.nodes["Principled BSDF"]; set_in(eb_, "Roughness", 0.05); set_in(eb_, "Coat Weight", 1.0); set_in(eb_, "Coat Roughness", 0.02)
+    _t = e.data.materials[0].node_tree; _img = [n for n in _t.nodes if n.type == "TEX_IMAGE"][0]   # darker brown iris
+    _h = _t.nodes.new("ShaderNodeHueSaturation"); _h.inputs["Value"].default_value = 0.6; _h.inputs["Saturation"].default_value = 0.75
+    _t.links.new(_img.outputs["Color"], _h.inputs["Color"]); _t.links.new(_h.outputs["Color"], eb_.inputs["Base Color"])
 tb = teeth.data.materials[0].node_tree.nodes["Principled BSDF"]; set_in(tb, "Subsurface Weight", 0.1); set_in(tb, "Roughness", 0.22)
 hair.hide_render = True          # the sculpted shell stays only as the real-time (glTF) fallback
 hair.name = "HairShell_Realtime"

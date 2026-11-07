@@ -5,17 +5,25 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-// Simple viseme presets built from the model's morph targets (values 0..1).
+// Viseme presets = the same morph mixes lipsync.py uses (checked against avir.glb morph target names).
+// For real speech prefer playLipsync(): it applies lipsync.py's per-frame phoneme timing instead of a guessed viseme.
 export const VISEMES = {
   rest: {},
-  aa: { jawOpen: 0.75, mouthStretch: 0.1 },
-  ee: { jawOpen: 0.25, mouthStretch: 0.8, mouthSmileLeft: 0.2, mouthSmileRight: 0.2 },
-  ih: { jawOpen: 0.3, mouthStretch: 0.45 },
-  oh: { jawOpen: 0.5, mouthFunnel: 0.6 },
-  ou: { jawOpen: 0.15, mouthPucker: 0.9 },
-  mbp: { mouthPress: 1.0 },
-  fv: { jawOpen: 0.1, mouthShrugLower: 0.7 },
+  a: { jawOpen: 0.30 },
+  aa: { jawOpen: 0.55, mouthStretch: 0.05 },
+  i: { jawOpen: 0.18, mouthStretch: 0.45, mouthSmileLeft: 0.12, mouthSmileRight: 0.12 },
+  e: { jawOpen: 0.25, mouthStretch: 0.4 },
+  o: { jawOpen: 0.35, mouthFunnel: 0.5, mouthPucker: 0.15 },
+  u: { jawOpen: 0.12, mouthPucker: 0.75, mouthFunnel: 0.2 },
+  mbp: { mouthPress: 0.85 },
+  fv: { jawOpen: 0.08, mouthShrugLower: 0.6, mouthUpperUp: 0.1 },
+  back: { jawOpen: 0.25 },
+  ch: { jawOpen: 0.12, mouthFunnel: 0.35, mouthStretch: 0.2 },
+  dental: { jawOpen: 0.15, mouthStretch: 0.2 },
 };
+
+// Body clips in avir.glb (v2): Idle, Talk, Wave, Nod, Explain (hand-keyed); Gesture, WalkTurn, Sit (CMU mocap).
+// Outfits (read from the model): casual, hoodie, shirt, tee.
 
 export class CharacterController {
   constructor(scene) {
@@ -107,6 +115,9 @@ export class CharacterController {
     this._speech = { amp: THREE.MathUtils.clamp(amp, 0, 1), viseme };
   }
 
+  // Phoneme lip-sync: data = JSON from lipsync.py ({fps, frames:[{morph: value}]}), startAt = seconds the line starts.
+  playLipsync(data, startAt = 0) { this._lips = { data, startAt }; }
+
   lookAt(x, y) {   // -1..1 gaze offsets
     for (const e of this.eyes) {
       e.quaternion.copy(e.userData.rest).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(y * 0.25, 0, -x * 0.35)));
@@ -133,7 +144,10 @@ export class CharacterController {
     const add = (n, v) => (vals[n] = Math.min(1, (vals[n] || 0) + v));
     for (const [k, v] of Object.entries(this._expr)) (this.faceMap[k] || [k]).forEach((n) => add(n, v));
     const b = this._blinkValue(t); add("eyeBlinkLeft", b); add("eyeBlinkRight", b);
-    if (this._speech) {
+    if (this._lips) {
+      const { data, startAt } = this._lips; const f = Math.floor((t - startAt) * data.fps);
+      if (f >= 0 && f < data.frames.length) for (const [n, v] of Object.entries(data.frames[f])) add(n, v);
+    } else if (this._speech) {
       const preset = VISEMES[this._speech.viseme] || VISEMES.aa;
       for (const [n, v] of Object.entries(preset)) add(n, v * this._speech.amp);
     }
