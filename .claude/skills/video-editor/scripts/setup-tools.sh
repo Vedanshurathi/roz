@@ -28,6 +28,9 @@ pip install -q "pillow==11.3.0"
 echo "== Remotion (programmatic motion graphics)"
 ( cd "$HERE/remotion" && npm install --no-audit --no-fund )
 
+echo "== HyperFrames (HTML -> video CLI)"
+npm install -g hyperframes@0.7.67-alpha.0 --no-audit --no-fund
+
 echo "== models (from GitHub releases; Hugging Face is often blocked)"
 mkdir -p "$MODELS"
 REL=https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models
