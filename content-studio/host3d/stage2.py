@@ -199,14 +199,14 @@ scalp = np.zeros(NV, np.float32)
 for vi in body_idx:
     if P[vi, 2] > eyeL[2] - 0.01:
         co, _, d = hair_kd.find(Vector(P[vi]))
-        scalp[vi] = 1.0 - smooth(0.012, 0.02, d)
+        scalp[vi] = 1.0 - (smooth(0.004, 0.008, d) if A.stage == 'v2' else smooth(0.012, 0.02, d))
 attr = np.concatenate([P, scalp[:, None]], axis=1).astype(np.float32)
 U, AT = tris_of(body_faces, attr)
 print("rasterizing skin", len(U), "tris at", TEX)
 img, cov = rasterize(U, AT, TEX)
 pos = img[..., :3].reshape(-1, 3); sc = img[..., 3].reshape(-1)
 x, y, z = pos[:, 0], pos[:, 1], pos[:, 2]; nx = np.abs(x)
-skin = np.array([0.60, 0.40, 0.29]); n1 = vnoise(pos, 400)
+skin = np.array([0.47, 0.30, 0.21]) if A.stage == 'v2' else np.array([0.60, 0.40, 0.29]); n1 = vnoise(pos, 400)
 rgb = np.tile(skin, (len(pos), 1)) * (0.96 + 0.08 * vnoise(pos, 90))[:, None]
 rgb += np.array([0.05, -0.01, -0.02]) * (np.exp(-((nx - 0.045) ** 2 + (z - (mouth[2] + 0.04)) ** 2) / 0.0004) * (y < eyeL[1]))[:, None]
 # lips

@@ -89,8 +89,8 @@ def area(name, loc, target, energy, color, size):
     o.rotation_euler = (Vector(target) - Vector(loc)).to_track_quat("-Z", "Y").to_euler(); return o
 area("Key", (-1.4, -2.0, 2.6), (0, 0, 1.6), 520, (1.0, 0.86, 0.72), 1.6)
 area("Fill", (1.8, -2.2, 1.4), (0, 0, 1.4), 120, (0.8, 0.88, 1.0), 2.5)
-area("Rim", (1.5, 1.6, 2.4), (0, 0, 1.6), 420, (0.55, 0.8, 1.0), 0.8)
-area("HairTop", (-0.4, 1.0, 3.2), (0, 0, 1.8), 220, (1.0, 0.92, 0.85), 1.0)
+area("Rim", (1.5, 1.6, 2.4), (0, 0, 1.6), 300, (0.55, 0.8, 1.0), 0.8)
+area("HairTop", (-0.4, 1.0, 3.2), (0, 0, 1.8), 120, (1.0, 0.92, 0.85), 1.0)
 
 # ---------------- cameras (bound with markers, hard cuts)
 def camera(name, loc, target, lens, fstop, focus_obj=None):
@@ -109,10 +109,19 @@ foc.parent = arm; foc.parent_type = "BONE"; foc.parent_bone = "mixamorig:Head"
 bpy.context.view_layer.update(); foc.matrix_world = __import__("mathutils").Matrix.Translation((0, eye_y, eye_z))
 c1 = camera("CamClose", (0.16, -1.15, eye_z + 0.02), (0, eye_y, eye_z - 0.04), 85, 5.6)
 c2 = camera("CamMedium", (0.35, -2.35, hz - 0.15), (0, 0, hz - 0.3), 50, 4.0)
-c3 = camera("CamWalk", (0.0, -5.4, 1.15), (0, 0, 0.95), 35, 5.6)
+c3 = camera("CamWalk", (0.0, -4.3, 1.2), (0, 0, 1.0), 40, 5.6)
 cl = c3.constraints.new("COPY_LOCATION"); cl.target = arm; cl.subtarget = "mixamorig:Hips"; cl.use_z = False; cl.use_offset = True
-for cam in (c1, c2, c3):
-    cam.data.dof.focus_object = foc
+_eye = Vector((0, eye_y, eye_z))
+for cam in (c1, c2):
+    cam.data.dof.focus_distance = (cam.location - _eye).length - 0.01   # focus exactly on the eyes
+c3.data.dof.focus_object = arm; c3.data.dof.focus_subtarget = "mixamorig:Spine2"
+# strand colour: explicit dark brown-black (direct colouring is predictable across Blender versions)
+for mn, col in (("Hair_Strands", (0.018, 0.012, 0.009)), ("Beard_Strands", (0.014, 0.010, 0.008))):
+    m = bpy.data.materials.get(mn)
+    if m:
+        for n in m.node_tree.nodes:
+            if n.type == "BSDF_HAIR_PRINCIPLED":
+                n.parametrization = "COLOR"; n.inputs["Color"].default_value = (*col, 1)
 for (name, s, *_), cam in zip(SHOTS, (c1, c2, c3)):
     m = sc.timeline_markers.new(name, frame=s); m.camera = cam
 sc.camera = c1

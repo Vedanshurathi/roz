@@ -34,7 +34,7 @@ MAP = {  # our bone: (cmu joint from, cmu joint to)
     "Head": ("Head", "Head@tail"),
 }
 for s in ("Left", "Right"):
-    MAP.update({f"{s}Shoulder": (f"{s}Shoulder", f"{s}Arm"), f"{s}Arm": (f"{s}Arm", f"{s}ForeArm"), f"{s}ForeArm": (f"{s}ForeArm", f"{s}Hand"),
+    MAP.update({f"{s}Arm": (f"{s}Arm", f"{s}ForeArm"), f"{s}ForeArm": (f"{s}ForeArm", f"{s}Hand"),
                 f"{s}Hand": (f"{s}Hand", f"{s}Hand@tail"), f"{s}UpLeg": (f"{s}UpLeg", f"{s}Leg"), f"{s}Leg": (f"{s}Leg", f"{s}Foot"),
                 f"{s}Foot": (f"{s}Foot", f"{s}ToeBase"), f"{s}ToeBase": (f"{s}ToeBase", f"{s}ToeBase@tail")})
 
@@ -117,7 +117,7 @@ for o in _unlinked: bpy.context.scene.collection.objects.link(o)
 
 # ---------------------------------------------------------------- 1. realistic skin, eyes, teeth
 skin = body.data.materials[0]; sb = skin.node_tree.nodes["Principled BSDF"]
-set_in(sb, "Subsurface Weight", 0.18); set_in(sb, "Subsurface Radius", (0.9, 0.38, 0.22)); set_in(sb, "Subsurface Scale", 0.006)
+set_in(sb, "Subsurface Weight", 0.1); set_in(sb, "Subsurface Radius", (0.7, 0.36, 0.24)); set_in(sb, "Subsurface Scale", 0.006)
 set_in(sb, "Roughness", 0.46); set_in(sb, "Specular IOR Level", 0.42)
 pores = uv_noise_bump(skin, sb, 2600, 0.06, 0.0004, "voronoi")
 tc = nt_new(skin, "ShaderNodeTexCoord"); nz = nt_new(skin, "ShaderNodeTexNoise"); nz.inputs["Scale"].default_value = 420
@@ -208,11 +208,17 @@ def make_curves(name, pts, uv, r_root, r_tip, mat):
 
 
 def hair_mat(name, melanin, redness, rough, radial=0.3):
-    m = bpy.data.materials.new(name); m.use_nodes = True; nt = m.node_tree
+    # Principled BSDF on the strands: the Chiang hair BSDF read grey under the key/rim lights in tests
+    m = bpy.data.materials.new(name); m.use_nodes = True; b = m.node_tree.nodes["Principled BSDF"]
+    b.inputs["Base Color"].default_value = (0.016, 0.012, 0.009, 1); b.inputs["Roughness"].default_value = 0.55
+    set_in(b, "Specular IOR Level", 0.25)
+    return m
+    nt = m.node_tree
     for n in list(nt.nodes):
         if n.type == "BSDF_PRINCIPLED": nt.nodes.remove(n)
     h = nt.nodes.new("ShaderNodeBsdfHairPrincipled")
-    if hasattr(h, "parametrization"): h.parametrization = "MELANIN"
+    if hasattr(h, "parametrization"): h.parametrization = "COLOR"
+    h.inputs["Color"].default_value = (0.018, 0.012, 0.009, 1)
     for k, v in (("Melanin", melanin), ("Melanin Redness", redness), ("Roughness", rough), ("Radial Roughness", radial),
                  ("Random Roughness", 0.2), ("Random Color", 0.12), ("Coat", 0.0)):
         if k in h.inputs: h.inputs[k].default_value = v
@@ -231,8 +237,8 @@ back = smooth(0.1, 0.6, rel[:, 1]) * (1 - top)
 flow = (top[:, None] * np.array([0, 1.0, 0.25]) + side[:, None] * np.array([0, 0.45, -1.0]) + back[:, None] * np.array([0, 0.15, -1.0])
         + (1 - top - side - back).clip(0)[:, None] * np.array([0, 0.8, -0.4]))
 flow[:, 0] += np.sign(rel[:, 0]) * 0.15 * (1 - top)
-L = 0.024 + 0.040 * top + 0.016 * top * front + 0.008 * back
-lift = 0.25 + 1.05 * top * (0.6 + 0.6 * front)
+L = 0.022 + 0.030 * top + 0.012 * top * front + 0.008 * back
+lift = 0.2 + 0.75 * top * (0.6 + 0.6 * front)
 hpts = grow(hp, hn, flow, L * (0.85 + 0.3 * rng.random(len(hp))), lift, 9, 0.0045 * (0.4 + top), 1.2, clump=0.55, droop=0.1)
 make_curves("Hair", hpts, huv, 0.00011, 0.00003, HAIR_M)
 
