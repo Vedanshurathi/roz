@@ -1,4 +1,4 @@
-# Host 3D character pipeline (v1)
+# Avir: 3D character pipeline (v1)
 
 One rigged glTF character, built once and reused in every video. Face, hair and beard are defined in one place
 (`build_host.py` → "identity"), so they stay the same across episodes. Only outfits, poses, expressions and scenes change.

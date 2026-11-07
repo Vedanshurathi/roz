@@ -1,10 +1,13 @@
 # Central config. Everything else reads from here. Times are Asia/Kolkata (IST).
 brand:
-  status: proposed            # proposed -> locked (only after the owner picks the names)
-  channel_name: "Kya Possible Hai"   # recommendation, NOT final (see brand/naming.md)
-  character_name: "Neel"             # recommendation, NOT final
-  handle_wanted: "kyapossiblehai"    # availability NOT verified (YouTube/Instagram unreachable from the sandbox)
-  tagline_hi: "आज AI से क्या possible है?"
+  status: locked              # decided by the owner on 2026-11-07
+  brand_name: "Unfiltered Avir"
+  tagline: "Real experiments. Unfiltered results."
+  character_name: "Avir"
+  character_reference: brand/reference/avir_reference_approved.webp
+  virtual_creator: true       # Avir is a virtual character; never claim he is a real human
+  youtube: {channel_name: "Unfiltered Avir", handle: "@unfilteredavir", url: "https://www.youtube.com/@unfilteredavir"}
+  instagram: {page_name: "Avir", handle: "@unfiltered.avir", url: "https://www.instagram.com/unfiltered.avir/"}
 
 language:
   primary: hi                 # natural Hindi, English tech words kept in Latin script in captions
@@ -44,12 +47,16 @@ budget:
   render: "CPU in the Claude Code cloud container (no GPU)"
 
 content_rules:
-  focus: "what people can do with AI, surprising tech experiments, useful discoveries, important AI updates"
+  focus: "what people can do with AI, surprising tech experiments, useful discoveries, important AI updates; may grow into wider tech and real-world experiments"
+  trust:
+    - "Demos use genuine screen recordings and real results"
+    - "Clearly separate real actions/outcomes from simulated or fictional (animated) scenes, on screen when needed"
+    - "Avir is a virtual creator: never claim he is a real human; use platform AI/synthetic-content disclosures"
   avoid_unless_asked: "videos about our own avatar, scripts, GPU, lip-sync or production system"
   every_video: [hook, journey, payoff]
 
 workflow:
-  gate_1_brand_and_character: pending   # owner must say "yes" before the first real video
+  gate_1_brand_and_character: names_locked   # brand + name locked 2026-11-07; first video still needs the owner's go-ahead on the character model
   after_gate_1: "work independently: research, script, storyboard, voice, edit, thumbnail, captions, QC"
   gate_2_final_package: "one package per piece: video/post, thumbnail/cover, title+caption/description, sources, platform+time, approve/change request"
 

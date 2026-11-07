@@ -157,7 +157,7 @@ def cmd_package(a):
 <style>body{{font-family:system-ui,'Noto Sans Devanagari';max-width:760px;margin:24px auto;padding:0 16px;background:#0E1330;color:#FFF4E6}}
 code{{background:#1A2150;padding:2px 6px;border-radius:6px}} .card{{background:#1A2150;border-radius:16px;padding:16px;margin:12px 0}}
 video,img{{max-width:100%;border-radius:12px}} h1{{color:#FF9A3C}}</style>
-<h1>Approval package — {e(ep['working_title'])}</h1>
+<h1>Unfiltered Avir · approval package: {e(ep['working_title'])}</h1>
 <p>Package hash: <code>{h[:12]}</code> · created {now_ist():%d %b %Y %H:%M} IST · research cut-off: {e(str(ep.get('research_cutoff_ist')))}</p>
 <div class="card"><video controls src="../{e(ep['files']['video'])}"></video></div>
 {f'<div class="card"><img src="../{e(ep["files"]["thumbnail"])}"></div>' if ep['files'].get('thumbnail') else ''}

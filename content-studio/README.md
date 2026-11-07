@@ -1,7 +1,9 @@
-# Content studio: AI + tech in natural Hindi, hosted by a recurring anime character
+# Unfiltered Avir: content studio
+"Real experiments. Unfiltered results." Natural Hindi with everyday English, hosted by **Avir**, a virtual creator.
+YouTube [@unfilteredavir](https://www.youtube.com/@unfilteredavir) · Instagram [@unfiltered.avir](https://www.instagram.com/unfiltered.avir/)
 
-**Status (2026-11-07):** Gate 1 is open. Brand and character names are proposed in `brand/naming.md` and the character is
-described in `brand/character-bible.md`; waiting for the owner's "yes" before the first real video.
+**Status (2026-11-07):** Brand and character name are locked (`config/studio.yaml`, `brand/`). A rigged 3D model of
+Avir (v1) is in `host3d/`. Nothing is published without the owner's approval of the exact final package.
 
 ## Pipeline
 research → idea → script → storyboard → visuals → voice → edit → captions → thumbnail/copy → QC → **final approval package** → publish → analytics

@@ -6,7 +6,8 @@ state: draft           # draft -> scripted -> storyboarded -> rendered -> awaiti
 pillar: ""             # possible-today | experiment | weekly-update | tool-test | future | festival | journey
 summary: ""
 research_cutoff_ist: null
-character: {name: "Neel (provisional)", outfit: "", set: "night room"}
+character: {name: "Avir", outfit: "", set: "Avir's room"}
+real_vs_simulated: ""        # which scenes are real screen recordings / results and which are animated
 files:
   video: media/final.mp4        # media/ is git-ignored; videos are never committed
   thumbnail: null               # media/thumb.png (1280x720) for long videos
@@ -20,4 +21,4 @@ youtube:
 instagram:
   caption: ""
   suggested_time_ist: ""
-  disclosure: "Made with AI tools (animation, voice). Label as AI-generated when posting."
+  disclosure: "Avir is a virtual creator (AI-generated character and voice). Turn on the AI label."

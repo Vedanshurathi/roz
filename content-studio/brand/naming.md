@@ -1,3 +1,11 @@
+# Brand decision (locked by the owner, 2026-11-07)
+- Brand: **Unfiltered Avir**. Tagline: **Real experiments. Unfiltered results.**
+- Character: **Avir**
+- YouTube: Unfiltered Avir · @unfilteredavir · https://www.youtube.com/@unfilteredavir
+- Instagram: Avir · @unfiltered.avir · https://www.instagram.com/unfiltered.avir/
+
+The earlier proposals below are kept for history only.
+
 # Brand & character names (proposal, 2026-11-07, waiting for owner's choice)
 
 Checks done: web search for each exact name (2026-11-07). **No handle is verified as available**: youtube.com and

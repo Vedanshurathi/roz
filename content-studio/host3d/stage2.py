@@ -423,7 +423,7 @@ OUTFITS = {
 bpy.data.objects.remove(host, do_unlink=True)
 arm["outfits"] = json.dumps(OUTFITS)
 arm["face_controls"] = json.dumps(list(UNITS))
-arm["identity"] = "recurring host v1 — face/hair/beard fixed; outfits interchangeable"
+arm["identity"] = "Avir (Unfiltered Avir), virtual creator, model v1: face/hair/beard fixed; outfits interchangeable"
 
 # ---------------------------------------------------------------- animations (world-space rotations, keyed per pose bone)
 exec(open(Path(__file__).parent / "anims.py", encoding="utf-8").read())
