@@ -100,10 +100,17 @@ def camera(name, loc, target, lens, fstop, focus_obj=None):
     cd.dof.focus_distance = (Vector(target) - Vector(loc)).length
     return o
 hz = arm.data.bones["mixamorig:Head"].head_local.z
-c1 = camera("CamClose", (0.18, -1.05, hz + 0.08), (0, 0, hz + 0.05), 85, 2.2)
-c2 = camera("CamMedium", (0.35, -2.35, hz - 0.15), (0, 0, hz - 0.3), 50, 3.2)
+eye_z = bpy.data.objects["EyeLeft"].matrix_world.translation.z if "EyeLeft" in bpy.data.objects else hz + 0.1
+eye_y = min(v.co.y for v in bpy.data.objects["EyeLeft"].data.vertices) if "EyeLeft" in bpy.data.objects else -0.14
+foc = bpy.data.objects.new("EyeFocus", None); sc.collection.objects.link(foc)
+foc.parent = arm; foc.parent_type = "BONE"; foc.parent_bone = "mixamorig:Head"
+bpy.context.view_layer.update(); foc.matrix_world = __import__("mathutils").Matrix.Translation((0, eye_y, eye_z))
+c1 = camera("CamClose", (0.16, -1.15, eye_z + 0.02), (0, eye_y, eye_z - 0.04), 85, 4.0)
+c2 = camera("CamMedium", (0.35, -2.35, hz - 0.15), (0, 0, hz - 0.3), 50, 4.0)
 c3 = camera("CamWalk", (0.0, -5.4, 1.15), (0, 0, 0.95), 35, 5.6)
 cl = c3.constraints.new("COPY_LOCATION"); cl.target = arm; cl.subtarget = "mixamorig:Hips"; cl.use_z = False; cl.use_offset = True
+for cam in (c1, c2, c3):
+    cam.data.dof.focus_object = foc
 for (name, s, *_), cam in zip(SHOTS, (c1, c2, c3)):
     m = sc.timeline_markers.new(name, frame=s); m.camera = cam
 sc.camera = c1

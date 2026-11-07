@@ -284,7 +284,9 @@ def relax_and_fit(ob, clear, collar=None):
                 nb = [e.other_vert(v) for e in v.link_edges if e.is_boundary]
                 if len(nb) == 2: new[v] = v.co * 0.5 + (nb[0].co + nb[1].co) * 0.25
         for v, co in new.items(): v.co = co
-    bmesh.ops.smooth_laplacian_vert(bm, verts=bm.verts[:], lambda_factor=0.6, lambda_border=0.0, use_x=True, use_y=True, use_z=True, preserve_volume=True)
+    inner = [v for v in bm.verts if not v.is_boundary]
+    for _ in range(3):   # gentle smoothing removes muscle detail; boundary untouched (Laplacian+volume blew up on open meshes)
+        bmesh.ops.smooth_vert(bm, verts=inner, factor=0.35, use_axis_x=True, use_axis_y=True, use_axis_z=True)
     for v in bm.verts:                                   # keep cloth outside the skin
         loc, nrm_, _, d = bvh_body.find_nearest(v.co)
         if loc is None: continue
@@ -351,6 +353,8 @@ sh = pieces["Shoes_Sneakers_White"]; ss = sh.modifiers.new("Smooth", "SUBSURF");
 for p in sh.data.polygons: p.use_smooth = True
 
 # ---------------------------------------------------------------- 5. save + export
+for _a in list(bpy.data.actions):   # drop raw imported BVH takes; keep retargeted clips only
+    if _a.name not in {"Idle", "Talk", "Wave", "Nod", "Explain", "WalkTurn", "Gesture", "Sit"}: bpy.data.actions.remove(_a)
 bpy.ops.wm.save_as_mainfile(filepath=str(OUT / "avir.blend"), compress=True)
 for o in bpy.data.objects:
     if o.type == "CURVES": o.hide_set(True); o.hide_render = True
