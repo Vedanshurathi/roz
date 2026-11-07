@@ -35,7 +35,7 @@ for name, s, e, outfit, act, _ in SHOTS:
     if act == "Idle": st.repeat = max(1.0, (e - s) / max(alen, 1))
     elif act in ("Gesture", "WalkTurn"):   # mocap clips were keyed at 24 fps, one key per frame
         st.scale = 1.0
-    st.frame_end = e; st.extend_mode = "HOLD"; st.blend_type = "REPLACE"
+    st.frame_end = e; st.extrapolation = "HOLD"; st.blend_type = "REPLACE"
     st.use_auto_blend = False
 
 # ---------------- outfits per shot
