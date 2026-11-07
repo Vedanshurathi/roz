@@ -100,8 +100,10 @@ def camera(name, loc, target, lens, fstop, focus_obj=None):
     cd.dof.focus_distance = (Vector(target) - Vector(loc)).length
     return o
 hz = arm.data.bones["mixamorig:Head"].head_local.z
-eye_z = bpy.data.objects["EyeLeft"].matrix_world.translation.z if "EyeLeft" in bpy.data.objects else hz + 0.1
-eye_y = min(v.co.y for v in bpy.data.objects["EyeLeft"].data.vertices) if "EyeLeft" in bpy.data.objects else -0.14
+_ev = [v.co for v in bpy.data.objects["EyeLeft"].data.vertices]
+eye_z = sum(c.z for c in _ev) / len(_ev)
+eye_y = min(c.y for c in _ev)
+print("eye", round(eye_z, 3), round(eye_y, 3))
 foc = bpy.data.objects.new("EyeFocus", None); sc.collection.objects.link(foc)
 foc.parent = arm; foc.parent_type = "BONE"; foc.parent_bone = "mixamorig:Head"
 bpy.context.view_layer.update(); foc.matrix_world = __import__("mathutils").Matrix.Translation((0, eye_y, eye_z))
