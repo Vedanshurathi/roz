@@ -107,7 +107,7 @@ print("eye", round(eye_z, 3), round(eye_y, 3))
 foc = bpy.data.objects.new("EyeFocus", None); sc.collection.objects.link(foc)
 foc.parent = arm; foc.parent_type = "BONE"; foc.parent_bone = "mixamorig:Head"
 bpy.context.view_layer.update(); foc.matrix_world = __import__("mathutils").Matrix.Translation((0, eye_y, eye_z))
-c1 = camera("CamClose", (0.16, -1.15, eye_z + 0.02), (0, eye_y, eye_z - 0.04), 85, 4.0)
+c1 = camera("CamClose", (0.16, -1.15, eye_z + 0.02), (0, eye_y, eye_z - 0.04), 85, 5.6)
 c2 = camera("CamMedium", (0.35, -2.35, hz - 0.15), (0, 0, hz - 0.3), 50, 4.0)
 c3 = camera("CamWalk", (0.0, -5.4, 1.15), (0, 0, 0.95), 35, 5.6)
 cl = c3.constraints.new("COPY_LOCATION"); cl.target = arm; cl.subtarget = "mixamorig:Hips"; cl.use_z = False; cl.use_offset = True

@@ -48,7 +48,7 @@ def align2(n, d, lat_target, lat_fn):
     turn(n, dd, math.degrees(ang * sgn))
 
 
-def retarget(fname, name, t0, t1, final_facing=None, root_motion=True, keep_xy=False):
+def retarget(fname, name, t0, t1, final_facing=None, root_motion=True, keep_xy=False, start_facing=None):
     try:
         bpy.ops.preferences.addon_enable(module="io_anim_bvh")
     except Exception:
@@ -75,6 +75,10 @@ def retarget(fname, name, t0, t1, final_facing=None, root_motion=True, keep_xy=F
         lat = J("RightUpLeg") - J("LeftUpLeg"); fwd = Vector((0, 0, 1)).cross(lat); fwd.z = 0; fwd.normalize()
         a_ = math.atan2(final_facing[1], final_facing[0]) - math.atan2(fwd.y, fwd.x)
         rot = Matrix.Rotation(a_, 3, "Z")
+    if start_facing is not None:      # rotate so the facing at the first frame == start_facing
+        sc.frame_set(int(t0 * 120))
+        lat = J("RightUpLeg") - J("LeftUpLeg"); fwd = Vector((0, 0, 1)).cross(lat); fwd.z = 0; fwd.normalize()
+        rot = Matrix.Rotation(math.atan2(start_facing[1], start_facing[0]) - math.atan2(fwd.y, fwd.x), 3, "Z")
     act = bpy.data.actions.new(name); act.use_fake_user = True; arm.animation_data.action = act
     for k, f in enumerate(range(int(t0 * 120), int(t1 * 120), 5)):
         sc.frame_set(f)
@@ -85,7 +89,7 @@ def retarget(fname, name, t0, t1, final_facing=None, root_motion=True, keep_xy=F
         if root_motion:
             d = rot @ (J("Hips") - hips0)
             tgt = Vector(bh["Hips"]) + Vector((d.x * ratio, d.y * ratio, (J("Hips").z - zbase) * ratio))
-            pb = pbn("Hips"); M = pb.matrix.copy(); M.translation = tgt; pb.matrix = M; upd()
+            pb = pbn("Hips"); M = pb.matrix.copy(); M.translation = tgt; pb.matrix = M; pb.scale = (1, 1, 1); upd()
         for b in ORDER:
             n = b.name.replace("mixamorig:", "")
             if n in MAP:
@@ -105,7 +109,7 @@ def retarget(fname, name, t0, t1, final_facing=None, root_motion=True, keep_xy=F
 _unlinked = [o for o in list(bpy.context.scene.collection.objects) if o.type != "ARMATURE"]
 for o in _unlinked: bpy.context.scene.collection.objects.unlink(o)
 retarget("016/16_17.bvh", "WalkTurn", 0.2, 4.2, final_facing=(0, -1))                 # walk, 90-degree left turn, ends facing camera
-retarget("018/18_08.bvh", "Gesture", 6.0, 10.0, root_motion=False)
+retarget("018/18_08.bvh", "Gesture", 6.0, 10.0, root_motion=False, start_facing=(0, -1))
 retarget("013/13_04.bvh", "Sit", 4.0, 7.0, root_motion=True)
 arm.animation_data.action = None
 reset()

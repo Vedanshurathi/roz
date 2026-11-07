@@ -19,13 +19,14 @@ def upd():
 
 def reset():
     for pb in pbs:
-        pb.rotation_quaternion = (1, 0, 0, 0); pb.location = (0, 0, 0)
+        pb.rotation_quaternion = (1, 0, 0, 0); pb.location = (0, 0, 0); pb.scale = (1, 1, 1)
     upd()
 
 
 def _apply(pb, R):
     M = pb.matrix.copy(); h = M.to_translation()
-    pb.matrix = Matrix.Translation(h) @ R @ Matrix.Translation(-h) @ M; upd()
+    pb.matrix = Matrix.Translation(h) @ R @ Matrix.Translation(-h) @ M
+    pb.scale = (1, 1, 1); upd()   # matrix assignment can leak numeric scale; bones never scale
 
 
 def turn(n, axis, deg):
