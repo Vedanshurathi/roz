@@ -222,14 +222,16 @@ beard = smooth(-0.003, 0.002, top_line - z) * smooth(-0.004, 0.006, z - low_line
 beard = np.maximum(beard, side_burn * smooth(-0.004, 0.004, z - (mouth[2] + 0.0)) * (z < eyeL[2] + 0.025))
 beard *= front * (1 - smooth(0.85, 1.25, le) * 0 - (le < 1.15)) * (z < eyeL[2] + 0.03)
 beard = np.clip(beard, 0, 1) * (0.72 + 0.28 * n1)
-rgb = rgb * (1 - 0.85 * beard[:, None]) + np.array([0.075, 0.055, 0.045]) * (0.85 * beard[:, None])
+BEARD_A = 0.38 if A.stage == 'v2' else 0.85   # v2: strands carry the beard, skin only gets a soft shadow
+rgb = rgb * (1 - BEARD_A * beard[:, None]) + np.array([0.11, 0.075, 0.06]) * (BEARD_A * beard[:, None])
 # brows
 for c, s in ((eyeL, 1), (eyeR, -1)):
     dx = (x - c[0]) * s; dz = z - c[2]
     zc = 0.021 + 0.004 * (1 - ((dx - 0.006) / 0.03) ** 2)
     th = 0.0058 - 0.0028 * np.clip((dx + 0.026) / 0.058, 0, 1)
     bm_ = (1 - smooth(th * 0.7, th, np.abs(dz - zc))) * smooth(-0.028, -0.024, dx) * (1 - smooth(0.03, 0.034, dx)) * (y < c[1] + 0.01)
-    rgb = rgb * (1 - 0.9 * bm_[:, None]) + np.array([0.04, 0.03, 0.03]) * 0.9 * bm_[:, None]
+    BROW_A = 0.4 if A.stage == 'v2' else 0.9
+    rgb = rgb * (1 - BROW_A * bm_[:, None]) + np.array([0.06, 0.045, 0.04]) * BROW_A * bm_[:, None]
 # scalp under hair
 rgb = rgb * (1 - sc[:, None]) + np.array([0.05, 0.04, 0.035]) * sc[:, None]
 rgb = dilate(rgb.reshape(TEX, TEX, 3), cov)
@@ -420,7 +422,8 @@ OUTFITS = {
     "hoodie": ["Top_Hoodie_Navy", "Bottom_Chinos_Black", "Shoes_Sneakers_White"],
     "tee": ["Top_Tee_Black", "Bottom_Jeans_Blue", "Shoes_Sneakers_White"],
 }
-bpy.data.objects.remove(host, do_unlink=True)
+if A.stage != 'v2':
+    bpy.data.objects.remove(host, do_unlink=True)
 arm["outfits"] = json.dumps(OUTFITS)
 arm["face_controls"] = json.dumps(list(UNITS))
 arm["identity"] = "Avir (Unfiltered Avir), virtual creator, model v1: face/hair/beard fixed; outfits interchangeable"
@@ -429,8 +432,11 @@ arm["identity"] = "Avir (Unfiltered Avir), virtual creator, model v1: face/hair/
 exec(open(Path(__file__).parent / "anims.py", encoding="utf-8").read())
 
 # ---------------------------------------------------------------- save + export
-bpy.ops.wm.save_as_mainfile(filepath=str(OUT / "host.blend"), compress=True)
-bpy.ops.export_scene.gltf(filepath=str(OUT / "host.glb"), export_format="GLB", export_skins=True, export_morph=True,
-                          export_morph_normal=False, export_animations=True, export_animation_mode="ACTIONS",
-                          export_image_format="JPEG", export_jpeg_quality=88, export_extras=True, export_yup=True)
-print("export ok", (OUT / "host.glb").stat().st_size // 1024, "KB")
+if A.stage == 'v2':
+    exec(open(Path(__file__).parent / "stage3.py", encoding="utf-8").read())
+else:
+  bpy.ops.wm.save_as_mainfile(filepath=str(OUT / "host.blend"), compress=True)
+  bpy.ops.export_scene.gltf(filepath=str(OUT / "host.glb"), export_format="GLB", export_skins=True, export_morph=True,
+                            export_morph_normal=False, export_animations=True, export_animation_mode="ACTIONS",
+                            export_image_format="JPEG", export_jpeg_quality=88, export_extras=True, export_yup=True)
+  print("export ok", (OUT / "host.glb").stat().st_size // 1024, "KB")
