@@ -10,6 +10,7 @@ import {HostTest} from './host/HostTest';
 import {AlignTest} from './ep1/AlignTest';
 import {Ep1, EP1_TOTAL} from './ep1/Ep1';
 import {Thumb} from './ep1/Thumb';
+import {Short, SHORTS} from './ep1/Short';
 
 const DIWALI = {"lines": [{"text": "Is Diwali, ek diya jalao…", "start": 0.9, "end": 2.908}, {"text": "Par sirf apne ghar mein nahi.", "start": 3.458, "end": 5.555}, {"text": "Gaon ki us chhoti dukaan mein bhi, jo saal bhar aapka intezaar karti hai.", "start": 6.055, "end": 11.08}, {"text": "Is baar mithai, diye aur gifts — local se kharido.", "start": 11.58, "end": 14.899}, {"text": "Kyunki jab unka ghar roshan hota hai…", "start": 15.449, "end": 17.927}, {"text": "Tabhi poora Bharat jagmagata hai.", "start": 18.377, "end": 20.893}, {"text": "Happy Diwali — Vedanshu aur RozBazaar ki taraf se.", "start": 21.593, "end": 25.07}, {"text": "Comment mein ek diya bhejo.", "start": 25.57, "end": 27.466}], "total": 29.666};
 
@@ -30,6 +31,9 @@ export const Root: React.FC = () => (
     <Composition id="HostTest" component={HostTest} durationInFrames={261} fps={30} width={720} height={1280} />
     <Composition id="Ep1" component={Ep1} durationInFrames={Math.ceil(EP1_TOTAL * 24)} fps={24} width={1920} height={1080} />
     <Composition id="Thumb" component={Thumb} durationInFrames={1} fps={24} width={1280} height={720} defaultProps={{clip: 'SitSecret', at: 2.0}} />
+    {(['startup', 'fellowship', 'founder'] as const).map((k) => (
+      <Composition key={k} id={`Short-${k}`} component={Short} durationInFrames={Math.round((SHORTS[k].t1 - SHORTS[k].t0) * 24)} fps={24} width={1080} height={1920} defaultProps={{kind: k}} />
+    ))}
     <Composition id="AlignTest" component={AlignTest} durationInFrames={10} fps={24} width={1920} height={1080}
       defaultProps={{cam: 'medium' as const, clip: 'SitTalkBoth', at: 2.5}} />
   </>

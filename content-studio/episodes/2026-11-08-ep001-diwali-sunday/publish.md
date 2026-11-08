@@ -73,3 +73,20 @@ Comment में guess करो 👇
 - The founder lessons and the startup teaser speak for you (Vedanshu / RozBazaar). The startup line stays vague on purpose.
 - Line 36 promises to pin the closest guess in the next video — keep only if you will do that.
 - "₹10,00,00,000 funding" appears only inside the "EXPECTATION" joke screen.
+
+---
+## Update 8 Nov evening — thumbnail v2 + Shorts (DRAFT, not approved)
+
+### Thumbnail
+- **Recommended:** `previews/EP001_thumbnail_v2_startup.png` — Avir big, "मेरा STARTUP" + CLASSIFIED stamp (matches title 1).
+- **Test & Compare variant:** `previews/EP001_thumbnail_v2_fellowship.png` — "₹2 लाख तक · AI Fellowship · STUDENTS".
+- Title stays: **मेरा Secret Startup 🔒 + इस हफ़्ते की 4 बड़ी AI News | Diwali Special**
+
+### Shorts / Reels (same vertical file for YouTube Shorts and Instagram Reels)
+| # | File | Length | Hook → payoff | YouTube Shorts title | Instagram caption | Proposed time (IST, test assumption) |
+|---|---|---|---|---|---|---|
+| 1 | `EP001_short_startup.mp4` | ~23 s | "मैं एक startup launch करने वाला हूँ" → name/date/product CLASSIFIED → comment your guess | मेरा Startup? 🔒 CLASSIFIED #shorts | मेरा startup? CLASSIFIED 🔒 Guess करो — comment में 👇 · 🤖 Avir is an AI-generated virtual creator · #startup #founder #UnfilteredAvir | Tue 10 Nov, 6:30 PM |
+| 2 | `EP001_short_fellowship.mp4` | ~17 s | UG ₹1 लाख / PG ₹2 लाख → last date 30 Nov → official portal | Students: ₹2 लाख तक की AI Fellowship 👀 #shorts | IndiaAI Fellowship 2026–27: UG ₹1 लाख तक, PG ₹2 लाख तक. Last date 30 Nov. Official portal: fellowship.indiaai.gov.in (PhD: portal check करें) · Sources: Business Today, EducationPost, Biotecnika · 🤖 AI-generated creator · #IndiaAI #students | Wed 11 Nov, 6:30 PM |
+| 3 | `EP001_short_founder.mp4` | ~20 s | "जिसके बारे में कोई बात नहीं करता" → Expectation (office, funding) vs Reality (3 AM bug) | Founder Life: Expectation vs Reality 💀 #shorts | Founder life: बाहर से funding और congratulations… अंदर से 3 AM bug 💀 Relatable? · 🤖 AI-generated creator · #founder #startuplife | Fri 13 Nov, 7:00 PM |
+
+Times are starting assumptions (Indian evening, no channel analytics yet); adjust after 2–3 weeks of data.

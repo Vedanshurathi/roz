@@ -59,7 +59,7 @@ const aim = (b: THREE.Object3D, fwdLocal: THREE.Vector3, target: THREE.Vector3, 
 };
 
 export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name: string; time: number; w: number}[]; face: Face; perf: Perf; lens: number[];
-  box?: {x: number; y: number; w: number}; hidden?: boolean}> = ({t, cam, view, poses, face, perf, lens, box, hidden}) => {
+  box?: {x: number; y: number; w: number}; hidden?: boolean; win?: {x: number; y: number; w: number; h: number}}> = ({t, cam, view, poses, face, perf, lens, box, hidden, win}) => {
   const {scene, camera, gl, size} = useThree();
   const [rig, setRig] = useState<(Rig & {bones: Bones; fwd: Record<string, THREE.Vector3>}) | null>(null);
   const [handle] = useState(() => delayRender('load avir'));
@@ -106,7 +106,9 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
     const W = size.width, H = size.height, z = Math.max(1, view.z);
     // corner window: whole frame drawn inside the box, clipped by a WebGL scissor (a CSS clip-path on the canvas is ~10x slower)
     const inBox = !!box && box.w < W - 0.5;
-    if (inBox) {
+    if (win) {   // vertical/other crop of the 16:9 plate camera: same frustum, only a window of it fills the canvas
+      c.aspect = 16 / 9; c.setViewOffset(1920, 1080, win.x, win.y, win.w, win.h); gl.setScissorTest(false);
+    } else if (inBox) {
       const k = box!.w / W, bh = box!.w * H / W;
       c.setViewOffset(W, H, -box!.x / k, -box!.y / k, W / k, H / k);
       gl.setScissorTest(false); gl.clear(); gl.setScissor(box!.x, H - box!.y - bh, box!.w, bh); gl.setScissorTest(true);
@@ -140,7 +142,7 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
       inf.fill(0);
       for (const k in face) { const i = dict[k]; if (i !== undefined) inf[i] = Math.max(0, Math.min(1, face[k])); }
     }
-  }, [rig, t, cam, view, poses, face, perf, lens, box, hidden, camera, size, gl]);
+  }, [rig, t, cam, view, poses, face, perf, lens, box, hidden, win, camera, size, gl]);
   return null;
 };
 

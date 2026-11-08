@@ -64,13 +64,13 @@ export const Pop: React.FC<{t0: number; t1: number; dir?: 'l' | 'r' | 'u' | 'd' 
 
 /** Captions: phrase groups (punctuation or 6 words), the spoken word lights up saffron. */
 export type Word = {w: string; t0: number; t1: number};
-export const Captions: React.FC<{words: Word[]; end: number; bottom?: number; size?: number}> = ({words, end, bottom = 58, size = 50}) => {
+export const Captions: React.FC<{words: Word[]; end: number; bottom?: number; size?: number; maxW?: number; perGroup?: number}> = ({words, end, bottom = 58, size = 50, maxW = 1380, perGroup = 6}) => {
   const {t} = useT();
   if (!words.length || t < words[0].t0 - 0.15 || t > end + 0.25) return null;
   const groups: Word[][] = []; let cur: Word[] = [];
   for (const w of words) {
     cur.push(w);
-    if (/[?।,—…!.:;]$/.test(w.w) || cur.length >= 6) { groups.push(cur); cur = []; }
+    if (/[?।,—…!.:;]$/.test(w.w) || cur.length >= perGroup) { groups.push(cur); cur = []; }
   }
   if (cur.length) groups.push(cur);
   // merge tiny groups (one short word) into the next one
@@ -85,7 +85,7 @@ export const Captions: React.FC<{words: Word[]; end: number; bottom?: number; si
   const gIn = ramp(t, g[0].t0 - 0.12, g[0].t0 + 0.05);
   return (
     <div style={{position: 'absolute', left: 0, right: 0, bottom, display: 'flex', justifyContent: 'center', pointerEvents: 'none'}}>
-      <div style={{maxWidth: 1380, padding: '12px 34px 16px', borderRadius: 26, background: 'rgba(8,10,22,0.55)',
+      <div style={{maxWidth: maxW, padding: '12px 34px 16px', borderRadius: 26, background: 'rgba(8,10,22,0.55)',
         backdropFilter: 'blur(16px) saturate(150%)', WebkitBackdropFilter: 'blur(16px) saturate(150%)', border: '1.5px solid rgba(255,255,255,0.18)',
         boxShadow: '0 14px 40px rgba(0,0,0,0.35)', textAlign: 'center', transform: `translateY(${(1 - ease(gIn)) * 14}px)`}}>
         {g.map((w, i) => {
