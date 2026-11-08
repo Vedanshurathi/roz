@@ -292,6 +292,7 @@ w = bpy.data.worlds.new("night"); w.use_nodes = True; w.node_tree.nodes["Backgro
 sc.render.engine = "CYCLES"; sc.cycles.device = "CPU"; sc.cycles.samples = a.samples; sc.cycles.use_denoising = True
 sc.cycles.max_bounces = 6; sc.cycles.diffuse_bounces = 3; sc.cycles.glossy_bounces = 2; sc.cycles.transmission_bounces = 4
 sc.view_settings.view_transform = "AgX"
+bpy.ops.file.pack_all()   # embed generated textures so the .blend works anywhere
 bpy.ops.wm.save_as_mainfile(filepath=str(OUT / "home.blend"), compress=True)
 if not a.avir:
     bpy.ops.export_scene.gltf(filepath=str(OUT / "home.glb"), export_format="GLB", export_cameras=True, export_lights=True, export_image_format="JPEG")

@@ -119,7 +119,7 @@ for q in range(26):
                                          scale=(1, 0.18, 0.45), rotation=(rng.uniform(-1, 1), tilt, ang))
     bpy.context.active_object.data.materials.append(mat(f"MonsteraLeaf{q}", (0.07, 0.3 + 0.08 * rng.random(), 0.1), 0.55))
 cyl("SoftboxPole", (1.9, -1.6, 0.9), 0.015, 1.8, mat("Metal", (0.2, 0.2, 0.22), 0.3, metal=1))
-box("Softbox", (1.9, -1.55, 1.85), (0.55, 0.12, 0.55), mat("SoftboxFace", (1, 1, 1), 0.5, emit=4, ecol=(1.0, 0.95, 0.9)))
+box("Softbox", (1.9, -1.55, 1.85), (0.55, 0.12, 0.55), mat("SoftboxFace", (1, 1, 1), 0.5, emit=1.2, ecol=(1.0, 0.95, 0.9)))
 
 # ---------------- desk setup in front of Avir
 box("DeskTop", (0, -0.6, 0.75), (1.5, 0.7, 0.04), oak, 0.006)
@@ -205,6 +205,7 @@ if a.avir:
 
 sc.render.engine = "CYCLES"; sc.cycles.device = "CPU"; sc.cycles.samples = a.samples; sc.cycles.use_denoising = True
 sc.cycles.max_bounces = 6; sc.cycles.diffuse_bounces = 2; sc.view_settings.view_transform = "AgX"
+bpy.ops.file.pack_all()   # embed generated textures so the .blend works anywhere
 bpy.ops.wm.save_as_mainfile(filepath=str(OUT / "studio.blend"), compress=True)
 if not a.avir:
     bpy.ops.export_scene.gltf(filepath=str(OUT / "studio.glb"), export_format="GLB", export_lights=True, export_cameras=True, export_image_format="JPEG")
