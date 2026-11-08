@@ -23,3 +23,5 @@
 - The cloud machine is reclaimed after ~20 min idle: long renders need a keep-alive watcher and resumable chunks.
 - Overlays that read episode time need a shifted `<Sequence>` when cut into Shorts.
 - Captions must never cover the mouth in vertical framing: cards and captions sit below y≈1150 of 1920.
+- EP001 Shorts (1080×1920, native vertical): startup 23 s = 55 min, fellowship 17 s = 36 min, founder 20 s = 41 min
+  (≈ 5.3 s/frame). Approval package emailed 8 Nov.
