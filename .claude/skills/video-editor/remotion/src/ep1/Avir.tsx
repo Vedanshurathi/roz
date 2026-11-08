@@ -104,8 +104,16 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
     c.position.set(cam.pos[0], cam.pos[1], cam.pos[2]); c.up.set(0, 1, 0); c.lookAt(cam.target[0], cam.target[1], cam.target[2]);
     // zoom = crop of the full frame (matches the CSS scale of the plates), so Avir stays sharp in tight shots
     const W = size.width, H = size.height, z = Math.max(1, view.z);
-    if (box && box.w < W - 0.5) { const k = box.w / W; c.setViewOffset(W, H, -box.x / k, -box.y / k, W / k, H / k); }   // whole frame drawn inside the corner box
-    else if (z > 1.0001) c.setViewOffset(W, H, view.ox * W * (1 - 1 / z), view.oy * H * (1 - 1 / z), W / z, H / z); else c.clearViewOffset();
+    // corner window: whole frame drawn inside the box, clipped by a WebGL scissor (a CSS clip-path on the canvas is ~10x slower)
+    const inBox = !!box && box.w < W - 0.5;
+    if (inBox) {
+      const k = box!.w / W, bh = box!.w * H / W;
+      c.setViewOffset(W, H, -box!.x / k, -box!.y / k, W / k, H / k);
+      gl.setScissorTest(false); gl.clear(); gl.setScissor(box!.x, H - box!.y - bh, box!.w, bh); gl.setScissorTest(true);
+    } else {
+      gl.setScissorTest(false);
+      if (z > 1.0001) c.setViewOffset(W, H, view.ox * W * (1 - 1 / z), view.oy * H * (1 - 1 / z), W / z, H / z); else c.clearViewOffset();
+    }
     c.updateProjectionMatrix();
     if (!rig) return;
     rig.root.visible = !hidden;
@@ -132,7 +140,7 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
       inf.fill(0);
       for (const k in face) { const i = dict[k]; if (i !== undefined) inf[i] = Math.max(0, Math.min(1, face[k])); }
     }
-  }, [rig, t, cam, view, poses, face, perf, lens, box, hidden, camera, size]);
+  }, [rig, t, cam, view, poses, face, perf, lens, box, hidden, camera, size, gl]);
   return null;
 };
 

@@ -236,14 +236,14 @@ export const Ep1: React.FC = () => {
   const cam = pip ? 'close' : v.cam;
   const bx = {x: PIP_BOX.x * p, y: PIP_BOX.y * p, w: 1920 + (PIP_BOX.w - 1920) * p}; const bh = bx.w * 9 / 16;
   const plate: React.CSSProperties = pip
-    ? {position: 'absolute', left: bx.x, top: bx.y, width: bx.w, height: bh}
+    ? {position: 'absolute', left: bx.x, top: bx.y, width: bx.w, height: bh, borderRadius: 22 * p, overflow: 'hidden'}
     : {position: 'absolute', width: '100%', height: '100%', transform: `scale(${v.z})`, transformOrigin: `${v.ox * 100}% ${v.oy * 100}%`};
   const radius = 22 * p;
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
       {pip && b && <BrollScene b={b} />}
       {pip && !b && <AbsoluteFill style={{background: '#0d0f1c'}} />}
-      <AbsoluteFill style={{transform: `translate(${sx}px, ${sy}px)`, filter: IP.nofilter && pip ? undefined : g.filter, clipPath: pip && !IP.noclip ? `inset(${bx.y}px ${1920 - bx.x - bx.w}px ${1080 - bx.y - bh}px ${bx.x}px round ${radius}px)` : undefined}}>
+      <AbsoluteFill style={{transform: `translate(${sx}px, ${sy}px)`, filter: g.filter}}>
         {!full && <Img src={staticFile(`ep1/plates/bg_${cam}.png`)} style={plate} />}
         {LAYERS !== 'nothree' && (
           <ThreeCanvas width={1920} height={1080} gl={{antialias: true, alpha: true, preserveDrawingBuffer: true}}>
