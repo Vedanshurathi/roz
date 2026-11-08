@@ -90,3 +90,11 @@ Comment में guess करो 👇
 | 3 | `EP001_short_founder.mp4` | ~20 s | "जिसके बारे में कोई बात नहीं करता" → Expectation (office, funding) vs Reality (3 AM bug) | Founder Life: Expectation vs Reality 💀 #shorts | Founder life: बाहर से funding और congratulations… अंदर से 3 AM bug 💀 Relatable? · 🤖 AI-generated creator · #founder #startuplife | Fri 13 Nov, 7:00 PM |
 
 Times are starting assumptions (Indian evening, no channel analytics yet); adjust after 2–3 weeks of data.
+
+---
+## Published status (8 Nov 2026, approved by Vedanshu: "Approve as is", thumbnail: Fellowship)
+- YouTube: uploaded to **Unfiltered Avir**, video ID `Ym78sb20uyg` (https://youtu.be/Ym78sb20uyg), private until scheduled
+  publish **2026-11-09 07:00 UTC = 12:30 PM IST**; made for kids: no; altered/synthetic content: yes.
+- Thumbnail: API call refused with `quotaExceeded` (OAuth Playground's shared quota) → set
+  `EP001_thumbnail_v2_fellowship.png` manually in YouTube Studio.
+- Instagram: not uploaded (no connection).
