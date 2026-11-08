@@ -38,3 +38,16 @@ Same vertical file goes to YouTube Shorts and Instagram Reels, with platform-spe
 
 ## Smoke test of the scheduler
 See the result section appended below by the check on 8 Nov.
+
+### Result (8 Nov 2026, 17:20 UTC) — scheduler works, production does not yet
+- A one-off scheduled task started a fresh cloud session on its own and finished in ~15 s (cost ≈ $0.08 of plan usage).
+- That session had Node 22, npm 10, Python 3.11, ffmpeg 6.1, 4 CPU, 15 GB RAM, ~31 GB free disk.
+- **It did not have the repository** (working dir `/home/user`, no `roz` checkout): scheduled tasks created from this session
+  carry no repository source. → Create the production routine from the claude.ai routines page with `Vedanshurathi/roz`
+  selected (or I recreate it once a repo source can be attached).
+- Missing on a fresh machine: `bpy`, Remotion `node_modules`, Avir model + plates (not in git) → needs private asset
+  storage + an environment setup script.
+- Network: `huggingface.co` and `www.googleapis.com` reachable; `graph.facebook.com` (Instagram API) **blocked** (403).
+- YouTube upload from this environment **works** with a short-lived OAuth Playground token (EP001 uploaded 8 Nov); the
+  shared Playground project hit `quotaExceeded` when setting the thumbnail. For regular uploads, a Google Cloud project of
+  your own (free) gives your own quota.
