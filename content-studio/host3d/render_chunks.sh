@@ -19,6 +19,6 @@ for ((i=0; i<n; i++)); do
   done
   [ $ok = 1 ] || { echo "chunk $i FAILED $(date +%H:%M)" >> "$OUT/progress.txt"; exit 1; }
 done
-ls "$OUT"/c*.mp4 | grep -v tmp | sed "s/^/file '/; s/$/'/" > "$OUT/list.txt"
+ls "$OUT"/c*.mp4 | grep -v '\.tmp\.mp4$' | sed "s/^/file '/; s/$/'/" > "$OUT/list.txt"
 ffmpeg -loglevel error -y -f concat -safe 0 -i "$OUT/list.txt" -i "$AUD" -map 0:v -map 1:a -c:v copy -c:a aac -b:a 192k -shortest -movflags +faststart "$FINAL" \
   && echo "FINAL DONE $(date +%H:%M)" >> "$OUT/progress.txt"

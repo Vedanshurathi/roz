@@ -3,7 +3,7 @@
 - Video: `EP001_full_1080p.mp4` (1920×1080, 24 fps, 4:07, −14 LUFS)
 - Thumbnail: `previews/EP001_thumbnail.png` (1280×720)
 - Platform: YouTube (@unfilteredavir) first; Instagram (@unfiltered.avir) gets the Shorts/Reel cut later
-- Proposed time: **Sunday 8 Nov 2026, 5:00 PM IST** (before Diwali puja hours) — or 9 Nov, 12:30 PM IST if today is too busy
+- Proposed time: **Monday 9 Nov 2026, 12:30 PM IST** (the render finished at 10 PM IST on Diwali night — too late for today)
 - YouTube setting: **"Altered or synthetic content" = Yes** (Avir is an AI-generated character). Not made for kids.
 
 ## Title (pick one)
