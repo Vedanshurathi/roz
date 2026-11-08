@@ -14,7 +14,8 @@ export const AlignTest: React.FC<{cam: 'close' | 'medium'; clip: string; at: num
       <Img src={staticFile(`ep1/plates/bg_${cam}.png`)} style={{position: 'absolute', width: '100%', height: '100%'}} />
       <ThreeCanvas width={width} height={height} gl={{antialias: true, alpha: true}}>
         <AvirLights />
-        <AvirLayer t={t} cam={(CAMS as any)[cam]} segs={[{clip, start: 0}]} face={{jawOpen: 0.2, mouthSmileLeft: 0.2, mouthSmileRight: 0.2}} nod={0} />
+        <AvirLayer t={t} cam={(CAMS as any)[cam]} view={{z: 1, ox: 0.5, oy: 0.5}} poses={[{name: clip, time: t % 4, w: 1}]} face={{jawOpen: 0.2}}
+          perf={{nod: 0, tilt: 0, turn: 0, lean: 0, look: [0, 0], headAim: 0.45}} lens={(CAMS as any)[cam].pos} />
       </ThreeCanvas>
       {cam === 'close' && <Img src={staticFile(`ep1/plates/fg_${cam}.png`)} style={{position: 'absolute', width: '100%', height: '100%'}} />}
     </AbsoluteFill>

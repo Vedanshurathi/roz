@@ -35,9 +35,31 @@ export const poseAt = (t: number, segs: Seg[], durs: Record<string, number>) => 
   return out;
 };
 
-export const AvirLayer: React.FC<{t: number; cam: Cam; segs: Seg[]; face: Face; nod: number}> = ({t, cam, segs, face, nod}) => {
+export type View = {z: number; ox: number; oy: number};
+export type Perf = {nod: number; tilt: number; turn: number; lean: number; look: [number, number]; headAim: number};
+type Bones = Record<string, THREE.Object3D>;
+const _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _v = new THREE.Vector3(), _v2 = new THREE.Vector3(), _id = new THREE.Quaternion();
+
+/** Rotate bone b (in world space) so that its forward axis turns toward `target`, by `amount`, at most `maxRad`. */
+const aim = (b: THREE.Object3D, fwdLocal: THREE.Vector3, target: THREE.Vector3, amount: number, maxRad: number) => {
+  b.updateWorldMatrix(true, false);
+  const bw = b.getWorldQuaternion(new THREE.Quaternion());
+  const f = fwdLocal.clone().applyQuaternion(bw).normalize();
+  const d = target.clone().sub(b.getWorldPosition(_v)).normalize();
+  _q.setFromUnitVectors(f, d);
+  const ang = 2 * Math.acos(Math.min(1, Math.abs(_q.w)));
+  const k = Math.min(amount, ang > 1e-5 ? maxRad / ang : 1);
+  _q2.copy(_id).slerp(_q, k);
+  const nw = _q2.multiply(bw);
+  const pw = b.parent!.getWorldQuaternion(new THREE.Quaternion()).invert();
+  b.quaternion.copy(pw.multiply(nw));
+  b.updateWorldMatrix(false, true);
+};
+
+export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name: string; time: number; w: number}[]; face: Face; perf: Perf; lens: number[]}> = (
+  {t, cam, view, poses, face, perf, lens}) => {
   const {scene, camera, gl, size} = useThree();
-  const [rig, setRig] = useState<Rig | null>(null);
+  const [rig, setRig] = useState<(Rig & {bones: Bones; fwd: Record<string, THREE.Vector3>}) | null>(null);
   const [handle] = useState(() => delayRender('load avir'));
 
   useEffect(() => {
@@ -46,8 +68,7 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; segs: Seg[]; face: Face; 
     if (!(getInputProps() as any).noenv) scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
     loadAvir().then((g) => {
       const root = g.scene as THREE.Object3D;   // one canvas per render tab, so the loaded scene is used directly
-      const morphs: THREE.Mesh[] = [];
-      let neck: THREE.Object3D | undefined, head: THREE.Object3D | undefined;
+      const morphs: THREE.Mesh[] = []; const bones: Bones = {};
       root.traverse((o: any) => {
         if (o.isMesh) {
           o.frustumCulled = false;
@@ -59,16 +80,18 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; segs: Seg[]; face: Face; 
             if (/Cornea/i.test(o.name)) { m.transparent = true; m.opacity = 0.25; m.roughness = 0.05; }
           }
         }
-        if (o.isBone && o.name === 'Neck') neck = o;
-        if (o.isBone && o.name === 'Head') head = o;
+        if (o.isBone) bones[o.name] = o;
       });
-      scene.add(root);
+      scene.add(root); root.updateMatrixWorld(true);
+      // forward (+Z, toward the camera side) expressed in each bone's local frame, from the rest pose
+      const fwd: Record<string, THREE.Vector3> = {};
+      for (const n of ['Head', 'LeftEye', 'RightEye']) if (bones[n]) fwd[n] = new THREE.Vector3(0, 0, 1).applyQuaternion(bones[n].getWorldQuaternion(new THREE.Quaternion()).invert());
       const mixer = new THREE.AnimationMixer(root);
       const actions: Record<string, THREE.AnimationAction> = {}, durs: Record<string, number> = {};
       for (const c of g.animations as THREE.AnimationClip[]) {
         const a = mixer.clipAction(c); a.play(); a.setEffectiveWeight(0); actions[c.name] = a; durs[c.name] = c.duration;
       }
-      setRig({root, mixer, actions, durs, morphs, neck, head});
+      setRig({root, mixer, actions, durs, morphs, neck: bones.Neck, head: bones.Head, bones, fwd});
       continueRender(handle);
     });
   }, [scene, gl, handle]);
@@ -77,25 +100,34 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; segs: Seg[]; face: Face; 
     const c = camera as THREE.PerspectiveCamera;
     c.fov = cam.vfov_deg; c.aspect = size.width / size.height; c.near = 0.05; c.far = 50;
     c.position.set(cam.pos[0], cam.pos[1], cam.pos[2]); c.up.set(0, 1, 0); c.lookAt(cam.target[0], cam.target[1], cam.target[2]);
+    // zoom = crop of the full frame (matches the CSS scale of the plates), so Avir stays sharp in tight shots
+    const W = size.width, H = size.height, z = Math.max(1, view.z);
+    if (z > 1.0001) c.setViewOffset(W, H, view.ox * W * (1 - 1 / z), view.oy * H * (1 - 1 / z), W / z, H / z); else c.clearViewOffset();
     c.updateProjectionMatrix();
     if (!rig) return;
     for (const a of Object.values(rig.actions)) a.setEffectiveWeight(0);
-    for (const p of poseAt(t, segs, rig.durs)) {
-      const a = rig.actions[p.name]; if (!a) continue;
-      a.time = p.time; a.setEffectiveWeight(p.w);
-    }
+    for (const p of poses) { const a = rig.actions[p.name]; if (!a) continue; a.time = p.time; a.setEffectiveWeight(p.w); }
     rig.mixer.update(0);
-    // a little extra life on top of the clips: speech nods + slow drift
-    if (rig.head) {
-      rig.head.rotateX(-0.035 * nod + 0.012 * Math.sin(t * 0.83));
-      rig.head.rotateY(0.02 * Math.sin(t * 0.51 + 1.3));
+    const B = rig.bones;
+    // torso leans in while talking; head nods on stressed words, tilts on questions, turns slightly
+    if (B.Spine2) B.Spine2.rotateX(perf.lean);
+    if (B.Head && rig.fwd.Head) {
+      const lensV = new THREE.Vector3(lens[0], lens[1], lens[2]);
+      aim(B.Head, rig.fwd.Head, lensV, perf.headAim, 0.3);
+      B.Head.rotateX(perf.nod); B.Head.rotateZ(perf.tilt); B.Head.rotateY(perf.turn);
+      B.Head.updateWorldMatrix(false, true);
+      // eyes: into the lens, with micro-saccades and the occasional thinking glance
+      const right = new THREE.Vector3(1, 0, 0), up = new THREE.Vector3(0, 1, 0);
+      const dist = lensV.distanceTo(B.Head.getWorldPosition(_v2));
+      const tgt = lensV.clone().addScaledVector(right, perf.look[0] * dist).addScaledVector(up, perf.look[1] * dist);
+      for (const n of ['LeftEye', 'RightEye']) if (B[n] && rig.fwd[n]) aim(B[n], rig.fwd[n], tgt, 1, 0.45);
     }
     for (const m of rig.morphs) {
       const dict = m.morphTargetDictionary!, inf = m.morphTargetInfluences!;
       inf.fill(0);
       for (const k in face) { const i = dict[k]; if (i !== undefined) inf[i] = Math.max(0, Math.min(1, face[k])); }
     }
-  }, [rig, t, cam, segs, face, nod, camera, size]);
+  }, [rig, t, cam, view, poses, face, perf, lens, camera, size]);
   return null;
 };
 
