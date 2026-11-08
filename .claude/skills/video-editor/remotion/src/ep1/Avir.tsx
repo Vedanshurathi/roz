@@ -12,6 +12,8 @@ export type Seg = {clip: string; start: number};
 export type Face = Record<string, number>;
 
 const FADE = 0.45;
+// fast lighting: hemisphere light instead of the reflection environment (about half the render time)
+export const FAST = (getInputProps() as any).fast !== false;
 export const ONE_SHOT = new Set(['SitWave', 'SitNamaste', 'SitPoint', 'SitSecret']);
 const smooth = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 
@@ -56,8 +58,8 @@ const aim = (b: THREE.Object3D, fwdLocal: THREE.Vector3, target: THREE.Vector3, 
   b.updateWorldMatrix(false, true);
 };
 
-export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name: string; time: number; w: number}[]; face: Face; perf: Perf; lens: number[]}> = (
-  {t, cam, view, poses, face, perf, lens}) => {
+export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name: string; time: number; w: number}[]; face: Face; perf: Perf; lens: number[];
+  box?: {x: number; y: number; w: number}; hidden?: boolean}> = ({t, cam, view, poses, face, perf, lens, box, hidden}) => {
   const {scene, camera, gl, size} = useThree();
   const [rig, setRig] = useState<(Rig & {bones: Bones; fwd: Record<string, THREE.Vector3>}) | null>(null);
   const [handle] = useState(() => delayRender('load avir'));
@@ -65,7 +67,7 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
   useEffect(() => {
     gl.toneMapping = THREE.AgXToneMapping; gl.toneMappingExposure = 1.0; gl.outputColorSpace = THREE.SRGBColorSpace;
     const pm = new THREE.PMREMGenerator(gl);
-    if (!(getInputProps() as any).noenv) scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
+    if (!FAST) scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
     loadAvir().then((g) => {
       const root = g.scene as THREE.Object3D;   // one canvas per render tab, so the loaded scene is used directly
       const morphs: THREE.Mesh[] = []; const bones: Bones = {};
@@ -102,9 +104,12 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
     c.position.set(cam.pos[0], cam.pos[1], cam.pos[2]); c.up.set(0, 1, 0); c.lookAt(cam.target[0], cam.target[1], cam.target[2]);
     // zoom = crop of the full frame (matches the CSS scale of the plates), so Avir stays sharp in tight shots
     const W = size.width, H = size.height, z = Math.max(1, view.z);
-    if (z > 1.0001) c.setViewOffset(W, H, view.ox * W * (1 - 1 / z), view.oy * H * (1 - 1 / z), W / z, H / z); else c.clearViewOffset();
+    if (box && box.w < W - 0.5) { const k = box.w / W; c.setViewOffset(W, H, -box.x / k, -box.y / k, W / k, H / k); }   // whole frame drawn inside the corner box
+    else if (z > 1.0001) c.setViewOffset(W, H, view.ox * W * (1 - 1 / z), view.oy * H * (1 - 1 / z), W / z, H / z); else c.clearViewOffset();
     c.updateProjectionMatrix();
     if (!rig) return;
+    rig.root.visible = !hidden;
+    if (hidden) return;
     for (const a of Object.values(rig.actions)) a.setEffectiveWeight(0);
     for (const p of poses) { const a = rig.actions[p.name]; if (!a) continue; a.time = p.time; a.setEffectiveWeight(p.w); }
     rig.mixer.update(0);
@@ -127,14 +132,15 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
       inf.fill(0);
       for (const k in face) { const i = dict[k]; if (i !== undefined) inf[i] = Math.max(0, Math.min(1, face[k])); }
     }
-  }, [rig, t, cam, view, poses, face, perf, lens, camera, size]);
+  }, [rig, t, cam, view, poses, face, perf, lens, box, hidden, camera, size]);
   return null;
 };
 
 /** Lights matched to the studio plates (warm key front-right, cool fill, cyan + warm rims, diya glow from the desk). */
 export const AvirLights: React.FC<{warm?: number; night?: number}> = ({warm = 1, night = 0}) => (
   <>
-    <ambientLight intensity={0.25 * (1 - 0.5 * night)} color={'#b9c2ff'} />
+    {FAST && <hemisphereLight args={['#e8ecff', '#4a3226', 1.25 * (1 - 0.4 * night)]} />}
+    <ambientLight intensity={(FAST ? 0.12 : 0.25) * (1 - 0.5 * night)} color={'#b9c2ff'} />
     <directionalLight position={[1.5, 2.0, 1.9]} intensity={2.3 * (1 - 0.45 * night)} color={'#ffe7cf'} />
     <directionalLight position={[-1.4, 1.6, 2.0]} intensity={0.55} color={'#cdd6ff'} />
     <directionalLight position={[-1.2, 2.3, -1.5]} intensity={2.6} color={'#38e8ff'} />

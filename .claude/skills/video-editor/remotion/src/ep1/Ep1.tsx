@@ -6,6 +6,7 @@ import {ThreeCanvas} from '@remotion/three';
 import {AvirLayer, AvirLights} from './Avir';
 import {Bursts, C, Captions, Chip, F, Glass, Pop, Twinkles, clamp01, ease, ramp, rng, useT} from './ui';
 import {L, SHOTS, en, faceAt, lineAt, perfAt, posesAt, shotAt, st} from './perf';
+import {Broll, BrollScene} from './screens';
 import DATA from './data.json';
 import CAMS from './cams.json';
 
@@ -15,6 +16,14 @@ export const EP1_TOTAL = DATA.total;
 const wt = (i: number, sub: string, nth = 0) => L[i].words.filter((w) => w.w.toLowerCase().includes(sub.toLowerCase()))[nth]?.t0 ?? L[i].start;
 const TITLE0 = en(2) + 0.25, TITLE1 = st(3) - 0.1;
 const LENS = (CAMS as any).close.pos as number[];   // Avir talks to the main (close/medium) camera
+
+// ---------- B-roll: full-screen screens/memes; over 4 s Avir shrinks into a corner window ----------
+const BROLL = DATA.cue.broll as Broll[];
+const brollAt = (t: number) => BROLL.find((b) => t >= b.t0 && t < b.t1);
+const PIPS: [number, number][] = [];
+for (const b of BROLL.filter((x) => x.pip)) { const l = PIPS[PIPS.length - 1]; if (l && b.t0 - l[1] < 0.06) l[1] = b.t1; else PIPS.push([b.t0, b.t1]); }
+const PIP_BOX = {x: 1368, y: 752, w: 512};
+const pipAt = (t: number) => { for (const [a, b] of PIPS) if (t >= a && t < b) return ease(ramp(t, a, a + 0.45)) * (1 - ease(ramp(t, b - 0.4, b))); return 0; };
 
 // ---------- view: shot plan + punch-ins + shake ----------
 const PUNCH = [
@@ -45,40 +54,14 @@ const gradeAt = (t: number) => {
 };
 
 // ---------- overlays (one card at a time, kept off Avir's face) ----------
-const NEWS = [
-  {lines: [13, 14], org: 'OpenAI · ChatGPT', title: 'Images 2.6', date: '4 Nov 2026', src: 'The Next Web · Decrypt · MySmartPrice',
-    pts: [{t: () => wt(13, 'line'), x: 'एक line → animated GIF'}, {t: () => wt(14, '50%'), x: '~50% faster (OpenAI का दावा)'}]},
-  {lines: [15, 16], org: 'Google · Gemini', title: 'Omni 1.2 Flash', date: '5 Nov 2026', src: 'ai-tldr · xenospectrum · runtimewire',
-    pts: [{t: () => wt(16, '15'), x: '15 sec तक के video clips'}, {t: () => wt(16, '30%'), x: '~30% सस्ता · paid API'}]},
-  {lines: [17, 18], org: 'Anthropic · Claude', title: 'Personal Finance (beta)', date: '5 Nov 2026', src: 'MacRumors · 9to5Mac · BleepingComputer',
-    pts: [{t: () => wt(18, 'read-only'), x: 'Bank accounts — read-only'}, {t: () => wt(18, 'America'), x: 'अभी सिर्फ़ US · paid plans'}]},
-  {lines: [19, 20, 21], org: 'IndiaAI', title: 'IndiaAI Fellowship 2026–27', date: 'Last date: 30 Nov', src: 'Business Today · EducationPost · Biotecnika',
-    pts: [{t: () => wt(20, 'UG'), x: 'UG: ₹1 लाख तक · PG: ₹2 लाख तक'}, {t: () => wt(21, 'PhD'), x: 'fellowship.indiaai.gov.in'}]},
-];
-const NewsCard: React.FC<{k: number}> = ({k}) => {
-  const n = NEWS[k]; const {t} = useT();
-  const t0 = st(n.lines[0]) - 0.1, t1 = en(n.lines[n.lines.length - 1]) + 0.3;
-  return (
-    <Pop t0={t0} t1={t1} dir="r" style={{left: 1920 - 80 - 600, top: 170, width: 600}}>
-      {({sheen}) => (
-        <Glass sheen={sheen} style={{padding: '24px 28px 20px'}}>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-            <Chip color={C.saffron} size={19}>AI NEWS {k + 1}/4</Chip>
-            <div style={{fontFamily: F.bold, fontSize: 19, color: 'rgba(255,255,255,0.8)'}}>{n.date}</div>
-          </div>
-          <div style={{fontFamily: F.bold, fontSize: 22, color: C.cyan, marginTop: 16}}>{n.org}</div>
-          <div style={{fontFamily: F.head, fontSize: n.title.length > 18 ? 42 : 54, color: '#fff', lineHeight: 1.08}}>{n.title}</div>
-          {n.pts.map((p, i) => {
-            const v = ease(ramp(t, p.t() - 0.1, p.t() + 0.35)); if (v <= 0) return null;
-            return <div key={i} style={{fontFamily: F.deva, fontSize: 30, color: '#fff', marginTop: 12, opacity: v, transform: `translateX(${(1 - v) * 30}px)`}}>
-              <span style={{color: C.saffron}}>›</span> {p.x}</div>;
-          })}
-          <div style={{fontFamily: F.bold, fontSize: 16, color: 'rgba(255,255,255,0.6)', marginTop: 16}}>Sources: {n.src}</div>
-        </Glass>
-      )}
-    </Pop>
-  );
-};
+const HEADS: [number, string, string][] = [[12, '1/4', 'OpenAI · ChatGPT'], [15, '2/4', 'Google · Gemini'], [17, '3/4', 'Anthropic · Claude'], [19, '4/4', 'IndiaAI Fellowship']];
+const HeadChip: React.FC<{i: number; n: string; org: string}> = ({i, n, org}) => (
+  <Pop t0={st(i) + (i === 12 ? 2.2 : 0.1)} t1={en(i) + 0.2} dir="r" style={{left: 1920 - 80 - 520, top: 200, width: 520}}>
+    {({sheen}) => <Glass sheen={sheen} style={{padding: '18px 26px'}}>
+      <div style={{fontFamily: F.bold, fontSize: 19, letterSpacing: 4, color: C.saffron}}>AI NEWS {n}</div>
+      <div style={{fontFamily: F.head, fontSize: 44, color: '#fff', lineHeight: 1.1, marginTop: 4}}>{org}</div></Glass>}
+  </Pop>
+);
 const LESSONS = [
   {line: 27, a: 'Idea की value = 0', b: 'रोज़ थोड़ा-थोड़ा बनाओ'},
   {line: 28, a: 'Perfect का इंतज़ार मत करो', b: 'पहला version बुरा होगा — ठीक है'},
@@ -99,6 +82,7 @@ const Overlays: React.FC = () => {
   const scramble = (s: string, seed: number) => { const R = rng(Math.floor(t * 12) + seed); return s.split('').map(() => '█▓▒░#%&@'[Math.floor(R() * 8)]).join(''); };
   return (
     <AbsoluteFill>
+      {(() => { const b = brollAt(t); return b && !b.pip ? <BrollScene b={b} /> : null; })()}
       {letter > 0 && <>
         <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: 110 * letter, background: '#000'}} />
         <div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: 110 * letter, background: '#000'}} />
@@ -177,7 +161,7 @@ const Overlays: React.FC = () => {
       <Section t0={st(12) - 0.3} t1={st(12) + 2.6} n="CHAPTER 1" title="AI NEWS" />
       <Section t0={st(22) - 0.3} t1={st(22) + 2.6} n="CHAPTER 2" title="FOUNDER LIFE" />
       <Section t0={st(32) - 0.3} t1={st(32) + 2.6} n="CHAPTER 3" title="TOP SECRET 🔒" />
-      {NEWS.map((_, i) => <NewsCard key={i} k={i} />)}
+      {HEADS.map(([i, n, org]) => <HeadChip key={i} i={i} n={n} org={org} />)}
 
       {LESSONS.map((ls, i) => (
         <Pop key={i} t0={st(ls.line) - 0.1} t1={en(ls.line) + 0.25} dir="r" style={{left: 1300, top: 220, width: 540}}>
@@ -190,22 +174,6 @@ const Overlays: React.FC = () => {
           )}
         </Pop>
       ))}
-      <Pop t0={wt(29, 'version') - 0.1} t1={en(29) + 0.25} dir="l" style={{left: 90, top: 190, width: 400}}>
-        {({sheen}) => {
-          const tape = ease(ramp(t, wt(29, 'देखना'), wt(29, 'देखना') + 0.15));
-          return (
-            <Glass sheen={sheen} style={{padding: 16}}>
-              <div style={{fontFamily: F.head, fontSize: 34, color: '#fff', marginBottom: 8}}>Avir <span style={{color: C.saffron}}>v0.1</span> 😅</div>
-              <div style={{position: 'relative', borderRadius: 16, overflow: 'hidden', height: 400}}>
-                <Img src={staticFile('ep1/v01.png')} style={{width: '100%', height: '100%', objectFit: 'cover', filter: `blur(${2 + 6 * tape}px)`}} />
-                {tape > 0 && <div style={{position: 'absolute', left: -40, right: -40, top: 170, padding: '10px 0', background: C.red, transform: `rotate(-14deg) scale(${1.6 - 0.6 * tape})`,
-                  fontFamily: F.head, fontSize: 38, color: '#fff', textAlign: 'center', letterSpacing: 3}}>DON'T LOOK 🙈</div>}
-              </div>
-            </Glass>
-          );
-        }}
-      </Pop>
-
       <Pop t0={st(34) - 0.12} t1={en(34) + 0.3} dir="l" style={{left: 90, top: 220, width: 560}}>
         {({sheen}) => (
           <Glass sheen={sheen} tint="255,70,80" border="rgba(255,90,100,0.5)" style={{padding: '22px 28px 26px'}}>
@@ -253,7 +221,8 @@ const Overlays: React.FC = () => {
         )}
       </Pop>
 
-      {k >= 0 && !(t >= TITLE0 && t < TITLE1) && <Captions words={L[k].words} end={en(k)} bottom={letter > 0.5 ? 26 : 52} size={letter > 0.5 ? 40 : 44} />}
+      {k >= 0 && !(t >= TITLE0 && t < TITLE1) && <div style={{position: 'absolute', left: 0, top: 0, bottom: 0, right: 560 * pipAt(t)}}>
+        <Captions words={L[k].words} end={en(k)} bottom={letter > 0.5 ? 26 : 52} size={letter > 0.5 ? 40 : 44} /></div>}
       <AbsoluteFill style={{background: '#000', opacity: Math.max(1 - ramp(t, 0, 0.6), ramp(t, DATA.total - 0.6, DATA.total))}} />
     </AbsoluteFill>
   );
@@ -262,20 +231,32 @@ const Overlays: React.FC = () => {
 export const Ep1: React.FC = () => {
   const {t, frame} = useT();
   const v = viewAt(t); const [sx, sy] = shakeAt(t); const g = gradeAt(t);
-  const plate: React.CSSProperties = {position: 'absolute', width: '100%', height: '100%', transform: `scale(${v.z})`, transformOrigin: `${v.ox * 100}% ${v.oy * 100}%`};
+  const b = brollAt(t); const p = pipAt(t); const full = !!b && !b.pip;
+  const pip = p > 0;
+  const cam = pip ? 'close' : v.cam;
+  const bx = {x: PIP_BOX.x * p, y: PIP_BOX.y * p, w: 1920 + (PIP_BOX.w - 1920) * p}; const bh = bx.w * 9 / 16;
+  const plate: React.CSSProperties = pip
+    ? {position: 'absolute', left: bx.x, top: bx.y, width: bx.w, height: bh}
+    : {position: 'absolute', width: '100%', height: '100%', transform: `scale(${v.z})`, transformOrigin: `${v.ox * 100}% ${v.oy * 100}%`};
+  const radius = 22 * p;
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
-      <AbsoluteFill style={{transform: `translate(${sx}px, ${sy}px)`, filter: g.filter}}>
-        <Img src={staticFile(`ep1/plates/bg_${v.cam}.png`)} style={plate} />
+      {pip && b && <BrollScene b={b} />}
+      {pip && !b && <AbsoluteFill style={{background: '#0d0f1c'}} />}
+      <AbsoluteFill style={{transform: `translate(${sx}px, ${sy}px)`, filter: g.filter, clipPath: pip ? `inset(${bx.y}px ${1920 - bx.x - bx.w}px ${1080 - bx.y - bh}px ${bx.x}px round ${radius}px)` : undefined}}>
+        {!full && <Img src={staticFile(`ep1/plates/bg_${cam}.png`)} style={plate} />}
         {LAYERS !== 'nothree' && (
           <ThreeCanvas width={1920} height={1080} gl={{antialias: true, alpha: true, preserveDrawingBuffer: true}}>
             <AvirLights night={g.night} warm={1 - 0.3 * g.secret} />
-            <AvirLayer t={t} cam={(CAMS as any)[v.cam]} view={{z: v.z, ox: v.ox, oy: v.oy}} poses={posesAt(t, frame)} face={faceAt(t, frame)} perf={perfAt(t, frame)} lens={LENS} />
+            <AvirLayer t={t} cam={(CAMS as any)[cam]} view={pip ? {z: 1, ox: 0.5, oy: 0.5} : {z: v.z, ox: v.ox, oy: v.oy}} box={pip ? bx : undefined} hidden={full}
+              poses={posesAt(t, frame)} face={faceAt(t, frame)} perf={perfAt(t, frame)} lens={LENS} />
           </ThreeCanvas>
         )}
-        <Img src={staticFile(`ep1/plates/fg_${v.cam}.png`)} style={plate} />
-        <AbsoluteFill style={{background: `radial-gradient(ellipse at 50% 42%, rgba(0,0,0,0) 52%, rgba(0,0,0,${0.34 + 0.3 * g.secret}) 100%)`}} />
+        {!full && <Img src={staticFile(`ep1/plates/fg_${cam}.png`)} style={plate} />}
+        {!full && !pip && <AbsoluteFill style={{background: `radial-gradient(ellipse at 50% 42%, rgba(0,0,0,0) 52%, rgba(0,0,0,${0.34 + 0.3 * g.secret}) 100%)`}} />}
       </AbsoluteFill>
+      {pip && <div style={{position: 'absolute', left: bx.x, top: bx.y, width: bx.w, height: bh, borderRadius: radius, border: `${3 * p}px solid rgba(255,255,255,${0.8 * p})`,
+        boxShadow: `0 20px 50px rgba(0,0,0,${0.5 * p})`}} />}
       {LAYERS !== 'noui' && <Overlays />}
       <Audio src={staticFile('ep1/ep1_mix.wav')} />
     </AbsoluteFill>

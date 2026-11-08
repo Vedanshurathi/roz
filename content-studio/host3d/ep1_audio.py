@@ -71,6 +71,35 @@ for l in L:
     if l.get('news') or l.get('lesson'): tick(l['start'] + 0.15)
 tick(st[3] - 2.2, 1200); whoosh(st[3] - 2.35)
 for at in CUE['classified']: stamp(at - 0.05)
+# B-roll and meme sounds (all synthesized here)
+def click(at):
+    n = int(0.03 * sr); add(fx, at, rng.normal(size=n) * np.exp(-np.arange(n) / sr / 0.004), 0.25)
+def typing(t0, dur, cps=16):
+    k = 0.0
+    while k < dur: click(t0 + k); k += 1 / cps * (0.7 + 0.6 * rng.random())
+def boom(at, g=0.9):
+    n = int(0.9 * sr); tt = np.arange(n) / sr; add(fx, at, np.sin(2 * np.pi * (42 + 110 * np.exp(-tt * 18)) * tt) * np.exp(-tt * 3.5), g)
+def scratch(at):
+    n = int(0.45 * sr); tt = np.arange(n) / sr; fr = 300 + 2200 * np.abs(np.sin(2 * np.pi * 3.2 * tt))
+    add(fx, at, np.sin(2 * np.pi * np.cumsum(fr) / sr) * rng.normal(size=n) * 0.6 * np.exp(-tt * 3), 0.35)
+def trombone(at):
+    for i, (m, d) in enumerate(((58, 0.32), (57, 0.32), (56, 0.32), (55, 0.9))):
+        n = int(d * sr); tt = np.arange(n) / sr; ff = f(m) * (1 + 0.012 * np.sin(2 * np.pi * 5.5 * tt) * (i == 3))
+        w = sum(np.sin(2 * np.pi * ff * h * tt) / h for h in range(1, 7)) * np.minimum(1, tt / 0.03) * np.minimum(1, (d - tt) / 0.08)
+        add(fx, at + i * 0.3, w, 0.12)
+def chime(at):
+    for i, m in enumerate((84, 88, 91, 96)):
+        n = int(0.8 * sr); tt = np.arange(n) / sr; add(fx, at + i * 0.07, np.sin(2 * np.pi * f(m) * tt) * np.exp(-tt * 5), 0.12)
+for b in CUE.get('broll', []):
+    whoosh(b['t0'] + 0.1); ev = b.get('ev', [])
+    if b['kind'] == 'wifi': trombone(b['t0'] + 0.15)
+    elif b['kind'] == 'v01': boom(b['t0']); stamp(ev[0])
+    elif b['kind'] == 'expect': chime(b['t0'] + 0.1); [click(e) for e in ev]
+    elif b['kind'] == 'reality': scratch(b['t0'] - 0.05); typing(ev[0] + 0.1, 0.9)
+    elif b['kind'] == 'news0': click(ev[0] + 0.1); typing(ev[0] + 0.2, 2.6, 18); click(ev[1] + 0.25)
+    elif b['kind'] == 'news1': click(ev[0] + 0.2)
+    elif b['kind'] == 'news3': click(ev[0] + 0.15); click(ev[1] + 0.15); click(ev[3] - 0.1); typing(ev[3], 1.3, 20); click(ev[4] + 0.2)
+    if b.get('pip'): whoosh(b['t1'] - 0.2)
 sf.write('sfx.wav', fx, sr); print('music+sfx ok', round(tot, 1))
-subprocess.run('ffmpeg -loglevel error -y -i voice_track.wav -i music.wav -i sfx.wav -filter_complex "[0:a]aresample=48000,highpass=f=85,equalizer=f=250:t=q:w=1:g=1.5,equalizer=f=3200:t=q:w=1:g=2.5,acompressor=threshold=-20dB:ratio=3:attack=5:release=90,aecho=0.8:0.5:30:0.08,volume=1.8,asplit=2[v][sc];[1:a]volume=0.5[m];[m][sc]sidechaincompress=threshold=0.025:ratio=8:attack=20:release=400[md];[2:a]volume=0.9[f];[v][md][f]amix=inputs=3:normalize=0,loudnorm=I=-14:TP=-2:LRA=10[o]" -map "[o]" -ar 48000 -ac 2 ep1_mix.wav', shell=True, check=True)
+subprocess.run('ffmpeg -loglevel error -y -i voice_track.wav -i music.wav -i sfx.wav -filter_complex "[0:a]aresample=48000,highpass=f=80,equalizer=f=170:t=q:w=1:g=2,equalizer=f=420:t=q:w=1.2:g=-2,equalizer=f=3000:t=q:w=1:g=2.5,equalizer=f=9500:t=q:w=1:g=2,deesser=i=0.35,acompressor=threshold=-22dB:ratio=3.5:attack=4:release=80:makeup=1.5,aecho=0.8:0.55:19|33:0.07|0.045,volume=1.7,asplit=2[v][sc];[1:a]volume=0.5[m];[m][sc]sidechaincompress=threshold=0.025:ratio=8:attack=20:release=400[md];[2:a]volume=0.9[f];[v][md][f]amix=inputs=3:normalize=0,loudnorm=I=-14:TP=-2:LRA=10[o]" -map "[o]" -ar 48000 -ac 2 ep1_mix.wav', shell=True, check=True)
 print('mix ok')

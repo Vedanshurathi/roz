@@ -67,6 +67,29 @@ for l in T["lines"]:
 cue = {}
 w34 = [w for w in lines[34]["words"] if "CLASSIFIED" in w["w"].upper()]
 cue["classified"] = [w["t0"] for w in w34]
+
+
+def w(i, sub, nth=0, end=False):
+    ws = [x for x in lines[i]["words"] if sub.lower() in x["w"].lower()]
+    if len(ws) <= nth: return lines[i]["start"]
+    return ws[nth]["t1" if end else "t0"]
+
+
+st = lambda i: lines[i]["start"]
+en = lambda i: lines[i]["start"] + lines[i]["dur"]
+# B-roll: full-screen screens and memes. Longer than 4 s -> Avir stays on screen in a corner window (pip).
+broll = [
+    {"kind": "wifi", "t0": w(4, "wifi") - 0.05, "t1": min(en(4) + 0.3, w(4, "wifi") + 1.9)},
+    {"kind": "news0", "t0": st(13) - 0.15, "t1": en(14) + 0.2, "ev": [w(13, "line"), w(13, "gif"), w(14, "50%"), w(14, "धीरे")]},
+    {"kind": "news1", "t0": st(16) - 0.15, "t1": en(16) + 0.2, "ev": [w(16, "15"), w(16, "30%"), w(16, "paid")]},
+    {"kind": "news2", "t0": st(18) - 0.15, "t1": en(18) + 0.2, "ev": [w(18, "bank"), w(18, "read-only"), w(18, "ख़र्चों"), w(18, "america")]},
+    {"kind": "news3", "t0": st(20) - 0.15, "t1": en(21) + 0.2, "ev": [w(20, "ug"), w(20, "pg"), w(20, "last"), w(21, "portal"), w(21, "link")]},
+    {"kind": "expect", "t0": st(24) - 0.15, "t1": st(25) - 0.12, "ev": [w(24, "office"), w(24, "funding"), w(24, "congrat")]},
+    {"kind": "reality", "t0": st(25) - 0.12, "t1": en(25) + 0.2, "ev": [w(25, "रात"), w(25, "bug"), w(25, "सुबह")]},
+    {"kind": "v01", "t0": w(29, "version") - 0.05, "t1": min(en(29), w(29, "देखना") + 0.9), "ev": [w(29, "देखना")]},
+]
+for b_ in broll: b_["pip"] = (b_["t1"] - b_["t0"]) > 4.0
+cue["broll"] = broll
 json.dump({"fps": T["fps"], "total": T["total"], "lines": lines, "cue": cue}, open(OUT / "data.json", "w"), ensure_ascii=False)
 json.dump(T["morph"], open(OUT / "morph.json", "w"), separators=(",", ":"))
 print("ok", len(lines), "lines; classified at", cue["classified"])
