@@ -105,3 +105,8 @@ Covers: previews/EP001_cover_{startup,fellowship,founder}.jpg. YouTube uses `#sh
 1. **मेरा Startup? 🔒 CLASSIFIED** — "मेरा startup? नाम, date, product — सब CLASSIFIED 🔒 Guess करो 👇 · 🤖 AI-generated creator" · #AI #startup #founder #UnfilteredAvir #shorts/#reels — Mon 9 Nov 6:30 PM IST
 2. **Students: ₹2 लाख तक की AI Fellowship 👀** — "UG ₹1 लाख, PG ₹2 लाख तक. Last date 30 Nov 👉 fellowship.indiaai.gov.in · 🤖 AI-generated creator" · #AI #students #IndiaAI #scholarship #shorts/#reels — Tue 10 Nov 9:00 AM IST
 3. **Founder Life: Expectation vs Reality 💀** — "बाहर से funding 🎉 अंदर से 3 AM bug 💀 Relatable? · 🤖 AI-generated creator" · #AI #startup #founder #entrepreneur #shorts/#reels — Wed 11 Nov 9:00 AM IST
+
+**APPROVED by Vedanshu, 9 Nov 2026:** 3 Shorts + covers v2 (`previews/EP001_cover_v2_*.jpg`) + the short captions above,
+for YouTube Shorts and Instagram Reels at: #1 Mon 9 Nov 6:30 PM IST, #2 Tue 10 Nov 9:00 AM IST, #3 Wed 11 Nov 9:00 AM IST.
+Upload status: not uploaded by Claude (YouTube token rejected as invalid; Claude in Chrome not available in this cloud session) →
+Vedanshu uploads/schedules from the approved files.
