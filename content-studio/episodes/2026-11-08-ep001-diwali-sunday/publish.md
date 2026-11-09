@@ -114,3 +114,5 @@ Vedanshu uploads/schedules from the approved files.
   computer (no Remote Control folder shared; Claude in Chrome not available in this cloud session) → posted by Vedanshu.
 - 9 Nov: CORRECTION — "all done" meant the files were downloaded; the 3 Shorts are NOT yet scheduled. Vedanshu to schedule
   them with Claude in Chrome on his laptop (paste prompt provided in chat). Short 1's 1:30 PM slot passed → post now or new time.
+- 9 Nov: separate **Instagram captions** written (hook line, line breaks, save/share/tag CTA, max 5 hashtags, AI disclosure);
+  full text + Claude-in-Chrome paste prompt given in chat. Reel 1 promises a shoutout to the closest guess in the next video.
