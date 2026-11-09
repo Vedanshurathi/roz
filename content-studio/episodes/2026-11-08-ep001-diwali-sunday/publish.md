@@ -98,3 +98,10 @@ Times are starting assumptions (Indian evening, no channel analytics yet); adjus
 - Thumbnail: API call refused with `quotaExceeded` (OAuth Playground's shared quota) → set
   `EP001_thumbnail_v2_fellowship.png` manually in YouTube Studio.
 - Instagram: not uploaded (no connection).
+
+---
+## Shorts v2 captions (9 Nov, short, max 5 hashtags) — awaiting approval
+Covers: previews/EP001_cover_{startup,fellowship,founder}.jpg. YouTube uses `#shorts`, Instagram uses `#reels` in that slot.
+1. **मेरा Startup? 🔒 CLASSIFIED** — "मेरा startup? नाम, date, product — सब CLASSIFIED 🔒 Guess करो 👇 · 🤖 AI-generated creator" · #AI #startup #founder #UnfilteredAvir #shorts/#reels — Mon 9 Nov 6:30 PM IST
+2. **Students: ₹2 लाख तक की AI Fellowship 👀** — "UG ₹1 लाख, PG ₹2 लाख तक. Last date 30 Nov 👉 fellowship.indiaai.gov.in · 🤖 AI-generated creator" · #AI #students #IndiaAI #scholarship #shorts/#reels — Tue 10 Nov 9:00 AM IST
+3. **Founder Life: Expectation vs Reality 💀** — "बाहर से funding 🎉 अंदर से 3 AM bug 💀 Relatable? · 🤖 AI-generated creator" · #AI #startup #founder #entrepreneur #shorts/#reels — Wed 11 Nov 9:00 AM IST
