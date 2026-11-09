@@ -112,6 +112,5 @@ Upload status: not uploaded by Claude (YouTube token rejected as invalid; Claude
 Vedanshu uploads/schedules from the approved files.
 - 9 Nov 13:00 IST: Vedanshu moved Short 1 (startup) to **Mon 9 Nov 1:30 PM IST** (YouTube + Instagram). Claude cannot reach his
   computer (no Remote Control folder shared; Claude in Chrome not available in this cloud session) → posted by Vedanshu.
-- 9 Nov ~13:15 IST: Vedanshu reports all 3 Shorts scheduled/posted on YouTube + Instagram via Claude in Chrome on his
-  laptop (Short 1: 9 Nov 1:30 PM IST; Short 2: 10 Nov 9:00 AM; Short 3: 11 Nov 9:00 AM). Not verified from this session
-  (no access to his accounts).
+- 9 Nov: CORRECTION — "all done" meant the files were downloaded; the 3 Shorts are NOT yet scheduled. Vedanshu to schedule
+  them with Claude in Chrome on his laptop (paste prompt provided in chat). Short 1's 1:30 PM slot passed → post now or new time.
