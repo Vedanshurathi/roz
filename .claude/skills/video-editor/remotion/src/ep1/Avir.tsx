@@ -147,7 +147,18 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
 };
 
 /** Lights matched to the studio plates (warm key front-right, cool fill, cyan + warm rims, diya glow from the desk). */
-export const AvirLights: React.FC<{warm?: number; night?: number}> = ({warm = 1, night = 0}) => (
+export const AvirLights: React.FC<{warm?: number; night?: number; premium?: boolean}> = ({warm = 1, night = 0, premium = false}) => premium ? (
+  // premium studio (Reel 3+): soft warm key front-right, neutral fill, warm rims from the slat-wall LED and the floor lamp, no cyan
+  <>
+    {FAST && <hemisphereLight args={['#f3e7da', '#3b281b', 1.1]} />}
+    <ambientLight intensity={0.1} color={'#e9dccd'} />
+    <directionalLight position={[1.4, 1.9, 2.1]} intensity={2.15} color={'#ffe3c6'} />
+    <directionalLight position={[-1.5, 1.4, 1.9]} intensity={0.75} color={'#e6e9f2'} />
+    <directionalLight position={[-1.0, 2.5, -1.4]} intensity={1.5} color={'#ffd2a3'} />
+    <directionalLight position={[1.2, 2.2, -1.5]} intensity={1.2 * warm} color={'#ffb478'} />
+    <pointLight position={[0.0, 0.9, 0.9]} intensity={0.45} distance={2.0} decay={2} color={'#ffc896'} />
+  </>
+) : (
   <>
     {FAST && <hemisphereLight args={['#e8ecff', '#4a3226', 1.25 * (1 - 0.4 * night)]} />}
     <ambientLight intensity={(FAST ? 0.12 : 0.25) * (1 - 0.5 * night)} color={'#b9c2ff'} />

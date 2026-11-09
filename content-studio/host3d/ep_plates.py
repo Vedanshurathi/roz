@@ -11,6 +11,7 @@ from mathutils import Vector
 ap = argparse.ArgumentParser(); ap.add_argument("studio"); ap.add_argument("out"); ap.add_argument("--check", default="")
 ap.add_argument("--res", type=int, default=1920); ap.add_argument("--samples", type=int, default=64); ap.add_argument("--cams", default="")
 ap.add_argument("--diwali", action="store_true", help="add Diwali decor (fairy-light curtain, marigolds, diyas, lanterns, rangoli) and a moodier light")
+ap.add_argument("--premium", action="store_true", help="calm premium workspace: walnut slat wall, warm practical lamps, toned-down neon")
 a = ap.parse_args(); OUT = Path(a.out); OUT.mkdir(parents=True, exist_ok=True)
 bpy.ops.wm.open_mainfile(filepath=a.studio); sc = bpy.context.scene
 FG_PREFIX = ("Desk", "Keyboard", "KeyGlow", "Mouse", "Mug", "Mic", "Monitor", "Diya")
@@ -152,8 +153,74 @@ def diwali_decor():
         if o.type == "LIGHT": o.visible_camera = False
 
 
+def premium_decor():
+    """Calmer, premium creator workspace: warm walnut slat wall behind Avir, warm practicals, no random graphics,
+    neon toned down to a soft warm-white sign."""
+    import bmesh
+
+    def mat(name, col, rough=0.6, emit=0.0, ecol=None):
+        m = bpy.data.materials.new(name); m.use_nodes = True; p = m.node_tree.nodes["Principled BSDF"]
+        p.inputs["Base Color"].default_value = (*col, 1); p.inputs["Roughness"].default_value = rough
+        if emit:
+            p.inputs["Emission Color"].default_value = (*(ecol or col), 1); p.inputs["Emission Strength"].default_value = emit
+        return m
+
+    def set_mat(name, col=None, emit=None, ecol=None, rough=None):
+        m = bpy.data.materials.get(name)
+        if not m or not m.use_nodes: return
+        p = m.node_tree.nodes.get("Principled BSDF")
+        if not p: return
+        if col: p.inputs["Base Color"].default_value = (*col, 1)
+        if rough is not None: p.inputs["Roughness"].default_value = rough
+        if emit is not None: p.inputs["Emission Strength"].default_value = emit
+        if ecol: p.inputs["Emission Color"].default_value = (*ecol, 1)
+
+    for o in sc.objects:   # random wall graphics and the orange tagline bar go
+        if o.name.startswith(("Hex", "Tagline")): o.hide_render = True
+    set_mat("Wall", col=(0.115, 0.095, 0.08), rough=0.92)
+    WARM = (1.0, 0.72, 0.46)
+    set_mat("LEDCyan", emit=1.2, ecol=WARM); set_mat("NeonCyan", emit=2.2, ecol=(1.0, 0.9, 0.78))
+    set_mat("KeyRGB", emit=0.25, ecol=WARM)
+    for n in ("Glow1", "Glow-1"): set_mat(n, emit=1.2, ecol=WARM)
+    for n in ("ShelfLED-10", "ShelfLED-11", "ShelfLED10", "ShelfLED11"): set_mat(n, emit=1.5, ecol=WARM)
+    # walnut slat panel behind Avir with a hidden warm LED strip above it
+    walnut = mat("Walnut", (0.17, 0.085, 0.04), 0.5); me = bpy.data.meshes.new("SlatWall"); bm = bmesh.new()
+    x = -0.86
+    while x < 0.86:
+        bmesh.ops.create_cube(bm, size=1, matrix=Matrix.Translation((x, 1.855, 1.5)) @ Matrix.Diagonal((0.034, 0.03, 1.5, 1)))
+        x += 0.056
+    bmesh.ops.create_cube(bm, size=1, matrix=Matrix.Translation((0, 1.88, 1.5)) @ Matrix.Diagonal((1.76, 0.01, 1.5, 1)))
+    bm.to_mesh(me); bm.free(); so = bpy.data.objects.new("SlatWall", me); sc.collection.objects.link(so); me.materials.append(walnut)
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(0, 1.82, 2.27), scale=(1.74, 0.02, 0.012))
+    led = bpy.context.active_object; led.name = "SlatLED"; led.data.materials.append(mat("SlatLEDm", WARM, 0.4, emit=6))
+    up = bpy.data.lights.new("SlatGraze", "AREA"); up.energy = 30; up.color = WARM; up.size = 1.6; up.shape = "RECTANGLE"; up.size_y = 0.05
+    uo = bpy.data.objects.new("SlatGraze", up); uo.location = (0, 1.74, 2.24); sc.collection.objects.link(uo)
+    uo.rotation_euler = (Vector((0, 1.86, 1.0)) - Vector(uo.location)).to_track_quat("-Z", "Y").to_euler()
+    # floor lamp (fabric shade) in the back-left corner and a small warm table lamp on the right shelf
+    black = bpy.data.materials.get("BlackMetal") or mat("BlackM", (0.02, 0.02, 0.02), 0.4)
+    shade = mat("LampShade", (0.9, 0.78, 0.62), 0.85, emit=0.7, ecol=(1.0, 0.7, 0.42))
+    for nm, (lx, ly, h, r) in (("FloorLamp", (-1.3, 1.45, 1.55, 0.2)), ("ShelfLamp", (1.05, 1.74, 1.37, 0.07))):
+        bpy.ops.mesh.primitive_cylinder_add(radius=0.012 if r > 0.1 else 0.006, depth=h - (0 if r > 0.1 else 1.18), location=(lx, ly, (h + (0 if r > 0.1 else 1.18)) / 2))
+        bpy.context.active_object.name = nm + "Pole"; bpy.context.active_object.data.materials.append(black)
+        bpy.ops.mesh.primitive_cone_add(vertices=40, radius1=r, radius2=r * 0.72, depth=r * 1.3, location=(lx, ly, h), end_fill_type="NOTHING")
+        o = bpy.context.active_object; o.name = nm + "Shade"; o.data.materials.append(shade); bpy.ops.object.shade_smooth()
+        ld = bpy.data.lights.new(nm + "Bulb", "POINT"); ld.energy = 45 if r > 0.1 else 8; ld.color = (1.0, 0.68, 0.42); ld.shadow_soft_size = r * 0.6
+        lo = bpy.data.objects.new(nm + "Bulb", ld); lo.location = (lx, ly, h); sc.collection.objects.link(lo)
+    for n_, e in (("Key", 45), ("Fill", 12), ("RimWarm", 55), ("RimCyan", 8), ("NeonGlow", 12), ("Moonlight", 6)):
+        if n_ in bpy.data.lights: bpy.data.lights[n_].energy = e
+    if "RimCyan" in bpy.data.lights: bpy.data.lights["RimCyan"].color = (0.75, 0.85, 1.0)
+    sb = bpy.data.materials.get("SoftboxFace")
+    if sb: sb.node_tree.nodes["Principled BSDF"].inputs["Emission Strength"].default_value = 0.25
+    sc.view_settings.exposure = -0.15
+    for o in sc.objects:
+        if o.type == "LIGHT": o.visible_camera = False
+
+
+from mathutils import Matrix
 if a.diwali:
     diwali_decor()
+if a.premium:
+    premium_decor()
 CAMS = {   # name: (location, target, lens)  — Avir's head is at about (0, 0.33, 1.38) when seated
     "close": ((0.08, -1.45, 1.42), (0.0, 0.3, 1.36), 62),
     "medium": ((0.15, -2.45, 1.45), (0.0, 0.3, 1.2), 38),
@@ -203,7 +270,7 @@ if a.check:   # reference: Avir seated in the room (Cycles), to tune cameras and
     arm.animation_data_create(); arm.animation_data.action = bpy.data.actions["SitTalkBoth"]; sc.frame_set(60)
     for c in sel:
         sc.camera = bpy.data.objects[f"EP_{c}"]; sc.render.filepath = str(OUT / f"check_{c}.png"); bpy.ops.render.render(write_still=True)
-        if a.diwali: bloom(OUT / f"check_{c}.png")
+        if a.diwali or a.premium: bloom(OUT / f"check_{c}.png")
     raise SystemExit
 
 for c in sel:
@@ -215,7 +282,7 @@ for c in sel:
     for o in fg: o.hide_render = False
     sc.render.film_transparent = True; sc.render.image_settings.color_mode = "RGBA"
     sc.render.filepath = str(OUT / f"fg_{c}.png"); bpy.ops.render.render(write_still=True)
-    if a.diwali: bloom(OUT / f"bg_{c}.png"); bloom(OUT / f"fg_{c}.png", rgba=True)
+    if a.diwali or a.premium: bloom(OUT / f"bg_{c}.png"); bloom(OUT / f"fg_{c}.png", rgba=True)
     for o in sc.objects:
         if o.type == "MESH": o.is_holdout = False
     sc.render.image_settings.color_mode = "RGB"

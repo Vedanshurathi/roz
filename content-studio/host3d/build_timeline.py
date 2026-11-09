@@ -39,7 +39,8 @@ def tts(text, out, lang="hi", speed=1.0):
 
 
 L = json.load(open(EP / "script.json"))
-t, lines, voice = 1.0, [], []
+import os
+t, lines, voice = float(os.environ.get('LEAD', '1.0')), [], []   # LEAD: silence before the first line (Shorts: ~0.3 s)
 for i, l in enumerate(L):
     t += l.get("pause_before", 0.0)
     wav = EP / f"l{i:02d}.wav"; sp = l.get("speed", 1.0)
@@ -53,7 +54,7 @@ for i, l in enumerate(L):
     lines.append({**l, "i": i, "tts": spoken, "start": round(t, 3), "dur": round(len(x) / SR, 3), "clip": l.get("clip", "SitTalkRight"), "lips": f"ls{i:02d}.json"})
     voice.append((t, x)); t += len(x) / SR + l.get("gap", 0.42)
     print(f"{i:02d} {t:7.2f}s  {spoken[:60]}")
-total = t + 2.5
+total = t + float(os.environ.get('TAIL', '2.5'))
 buf = np.zeros(int(total * SR))
 for st, x in voice: a = int(st * SR); buf[a:a + len(x)] += x
 sf.write(EP / "voice_track.wav", buf, SR)

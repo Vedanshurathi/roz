@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="hi"><head><meta charset="utf-8"><title>Avir's AI Tools — local</title>
+<style>
+:root{--bg:#f4f1ec;--card:#fff;--ink:#1d1b19;--mut:#6f6a63;--line:#e2ddd5;--acc:#e5522b;--acc2:#1f7a5a}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,'Noto Sans Devanagari',sans-serif}
+.wrap{width:1080px;padding:34px 40px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+h1{font-size:40px;margin:0;font-weight:800;letter-spacing:-0.5px}h1 span{color:var(--acc)}
+.chip{font-size:20px;padding:8px 16px;border-radius:999px;background:#e7f3ee;color:var(--acc2);font-weight:600}
+.tabs{display:flex;gap:12px;margin-bottom:20px}.tab{font-size:26px;font-weight:700;padding:14px 24px;border-radius:16px;background:#e9e4dc;color:var(--mut)}
+.tab.on{background:var(--ink);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:0 8px 30px rgba(0,0,0,.05)}
+label{display:block;font-size:22px;font-weight:700;color:var(--mut);margin:0 0 10px}
+textarea,input{width:100%;font:500 27px/1.4 Inter,'Noto Sans Devanagari',sans-serif;padding:16px 18px;border:2px solid var(--line);border-radius:16px;color:var(--ink);background:#fcfbf9;resize:none}
+textarea:focus,input:focus{outline:none;border-color:var(--acc)}
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 20px}.meta div{font-size:20px;padding:7px 14px;border-radius:10px;background:#f1eee8;color:#55504a}
+button{font:800 30px Inter,'Noto Sans Devanagari',sans-serif;padding:20px 30px;border:0;border-radius:18px;background:var(--acc);color:#fff;transition:transform .12s,filter .12s}
+button.pressed{transform:scale(.96);filter:brightness(.88)}button:disabled{background:#c9c2b8}
+.row{display:flex;gap:20px;align-items:center}
+.bar{flex:1;height:22px;border-radius:999px;background:#eee8df;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#f08a3c,var(--acc));transition:width .3s}
+.stat{font:700 26px Inter;min-width:300px;text-align:right;color:var(--mut)}
+.out{display:flex;gap:24px;margin-top:22px;align-items:flex-start}
+.frame{width:430px;height:645px;border-radius:18px;background:#ece7df;overflow:hidden;position:relative;flex:none}
+.frame img,.frame canvas{width:100%;height:100%;object-fit:cover;display:block}
+.frame .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;color:#a49d93;text-align:center;padding:30px}
+.side{flex:1}.side .note{font-size:20px;color:var(--mut);line-height:1.45;margin-top:12px}
+.hide{display:none!important}
+.wave{height:150px;border-radius:16px;background:#f1eee8;margin-top:20px;position:relative;overflow:hidden}.wave canvas{width:100%;height:100%}
+.vstat{font:700 26px Inter,'Noto Sans Devanagari';color:var(--acc2);margin-top:14px;min-height:36px}
+.small{font-size:20px;color:var(--mut);margin-top:16px}
+</style></head><body><div class="wrap">
+<header><h1>Avir's <span>AI Tools</span></h1><div class="chip">● runs locally · CPU · free models</div></header>
+<div class="tabs"><div class="tab on" id="t1">1 · Poster (Image AI)</div><div class="tab" id="t2">2 · Voice (AI आवाज़)</div></div>
+
+<section id="p1" class="card">
+  <label>Prompt</label>
+  <textarea id="prompt" rows="3" placeholder="Describe the picture…"></textarea>
+  <div class="meta"><div>Model: DreamShaper 8 + LCM-LoRA</div><div>6 steps</div><div>512×768</div><div>seed 7</div></div>
+  <div class="row"><button id="gen">Generate</button><div class="bar"><i id="fill"></i></div><div class="stat" id="stat">ready</div></div>
+  <div class="out">
+    <div class="frame" id="frame"><div class="ph" id="ph">image appears here</div><img id="img" class="hide"><canvas id="poster" class="hide" width="1080" height="1620"></canvas></div>
+    <div class="side hide" id="layout">
+      <label>Text on poster</label>
+      <input id="shop" value="" placeholder="Shop name" style="margin-bottom:12px">
+      <input id="line" value="" placeholder="Offer line" style="margin-bottom:12px">
+      <input id="foot" value="" placeholder="Footer" style="margin-bottom:18px">
+      <button id="mk">Make poster</button>
+      <div class="note">The image model can't write Hindi text, so the words are added by this tool's layout template.</div>
+    </div>
+  </div>
+</section>
+
+<section id="p2" class="card hide">
+  <label>Line to speak</label>
+  <textarea id="vtext" rows="2"></textarea>
+  <div class="meta"><div>Model: Kokoro v1.0 (Hindi)</div><div>voice: hf_beta</div><div>speed 1.1</div></div>
+  <div class="row"><button id="vgen">Generate voice</button><div class="stat" id="vstat2" style="text-align:left">ready</div></div>
+  <div class="wave"><canvas id="wave" width="1000" height="150"></canvas></div>
+  <div class="vstat" id="vstat"></div>
+</section>
+<div class="small">DreamShaper 8 (CreativeML OpenRAIL-M) · LCM-LoRA (OpenRAIL++) · Kokoro (Apache-2.0) · no paid API</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const press=b=>{b.classList.add('pressed');setTimeout(()=>b.classList.remove('pressed'),260)};
+const mmss=s=>{s=Math.floor(s);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+$('gen').onclick=async()=>{press($('gen'));$('gen').disabled=true;$('layout').classList.add('hide');$('poster').classList.add('hide');$('img').classList.add('hide');
+  $('ph').textContent='loading model…';$('stat').textContent='starting…';
+  await fetch('/api/image',{method:'POST',body:JSON.stringify({prompt:$('prompt').value,steps:6,seed:7})});
+  const prev=new Image();prev.className='';
+  const tick=async()=>{const s=await (await fetch('/api/status')).json();
+    $('fill').style.width=(s.total?100*s.step/s.total:0)+'%';
+    $('stat').textContent=s.state==='done'?`done · ${s.elapsed.toFixed(1)} s`:`step ${s.step}/${s.total} · ${mmss(s.elapsed)}`;
+    if(s.preview){$('ph').textContent='';$('img').src=s.preview;$('img').classList.remove('hide');$('img').style.filter='blur(2px)'}
+    if(s.state==='done'){$('img').src=s.image;$('img').style.filter='';$('gen').disabled=false;$('layout').classList.remove('hide');window.__imgDone=true;return}
+    setTimeout(tick,250)};tick()};
+function wrapText(c,txt,x,y,maxW,lh){const w=txt.split(' ');let l='';for(const s of w){const t=l?l+' '+s:s;if(c.measureText(t).width>maxW&&l){c.fillText(l,x,y);y+=lh;l=s}else l=t}c.fillText(l,x,y)}
+$('mk').onclick=async()=>{press($('mk'));const c=$('poster').getContext('2d'),W=1080,H=1620,im=$('img');
+  c.imageSmoothingQuality='high';const BH=300;
+  c.drawImage(im,0,0,im.naturalWidth,im.naturalWidth*(H-BH)/W,0,BH,W,H-BH);
+  let g=c.createLinearGradient(0,0,0,BH);g.addColorStop(0,'#8e0c14');g.addColorStop(1,'#5e060c');c.fillStyle=g;c.fillRect(0,0,W,BH);
+  c.fillStyle='#ffd75e';c.fillRect(0,BH-6,W,6);
+  g=c.createLinearGradient(0,H-520,0,H);g.addColorStop(0,'rgba(20,6,4,0)');g.addColorStop(.45,'rgba(20,6,4,.82)');g.addColorStop(1,'rgba(20,6,4,.96)');c.fillStyle=g;c.fillRect(0,H-520,W,520);
+  c.textAlign='center';c.fillStyle='#ffd75e';c.font="800 118px 'Noto Sans Devanagari'";c.shadowColor='rgba(0,0,0,.45)';c.shadowBlur=14;c.fillText($('shop').value,W/2,160);
+  c.font="800 58px Inter";c.fillStyle='#fff';c.fillText('FESTIVE SALE',W/2,250);
+  c.font="800 80px 'Noto Sans Devanagari'";c.fillStyle='#fff';wrapText(c,$('line').value,W/2,H-170,W-80,96);
+  c.font="700 50px 'Noto Sans Devanagari'";c.fillStyle='#ffd75e';c.fillText($('foot').value,W/2,H-70);c.shadowBlur=0;
+  $('img').classList.add('hide');$('poster').classList.remove('hide');
+  await fetch('/api/save',{method:'POST',body:JSON.stringify({name:'poster.png',data:$('poster').toDataURL('image/png')})});window.__posterDone=true};
+$('t2').onclick=()=>{$('t1').classList.remove('on');$('t2').classList.add('on');$('p1').classList.add('hide');$('p2').classList.remove('hide')};
+$('t1').onclick=()=>{$('t2').classList.remove('on');$('t1').classList.add('on');$('p2').classList.add('hide');$('p1').classList.remove('hide')};
+$('vgen').onclick=async()=>{press($('vgen'));$('vgen').disabled=true;const t0=performance.now();$('vstat').textContent='';
+  const iv=setInterval(()=>$('vstat2').textContent='generating… '+((performance.now()-t0)/1000).toFixed(1)+' s',100);
+  const r=await (await fetch('/api/voice',{method:'POST',body:JSON.stringify({text:$('vtext').value,voice:'hf_beta',speed:1.1})})).json();clearInterval(iv);
+  const buf=await (await fetch(r.url)).arrayBuffer();const ac=new (window.OfflineAudioContext)(1,1,24000);const ab=await ac.decodeAudioData(buf);
+  const d=ab.getChannelData(0),cv=$('wave'),c=cv.getContext('2d'),N=250;c.clearRect(0,0,1000,150);c.fillStyle='#1f7a5a';
+  for(let i=0;i<N;i++){let m=0;const a=Math.floor(i*d.length/N),b=Math.floor((i+1)*d.length/N);for(let j=a;j<b;j++)m=Math.max(m,Math.abs(d[j]));const h=Math.max(3,m*140);c.fillRect(i*4,75-h/2,2.6,h)}
+  $('vstat2').textContent=`done · ${r.took.toFixed(1)} s`;$('vstat').textContent=`▶ ${ab.duration.toFixed(1)} s audio ready`;$('vgen').disabled=false;window.__voiceDone=r.url};
+</script></body></html>
