@@ -106,3 +106,27 @@ from our TTS alignment, which is exact for synthetic speech).
 talking-head model, and no licensed real footage. So the shop scene is a labelled illustrative still (AI-generated) with his
 voice over it. For a real speaking shot we need either (a) a consenting real shopkeeper filmed on a phone (10 s, vertical,
 saying the line), or (b) a GPU talking-head model (e.g. LivePortrait/SadTalker class — check licence) run on a GPU machine.
+
+**Render time (CPU only, 4 vCPU)**
+| Step | Time |
+|---|---|
+| Image model download (one time) | ~2 min |
+| Shop/bazaar stills (4 × 640×960) | ~11 min |
+| Real tool recordings (3 takes × ~2 min) | ~6 min |
+| Studio plates (Cycles, close + medium) | ~8 min |
+| Avir (Remotion, only on-screen frames: 750 of 1,132) | ~2 h 06 min (≈10 s/frame; close-ups ≈14 s) |
+| HyperFrames edit (IG + YT) | ~2 min each |
+| Audio (music/SFX synth + mix), Whisper QC | ~2 min |
+
+Lesson: a CSS `filter` on the WebGL layer made frames ~2× slower again (same issue as EP001's corner window) — the grade and
+vignette now run in FFmpeg after the render (`reel3_finish.sh`).
+
+**Limitations**
+- Length is ~46.8 s (IG) / ~47.2 s (YT), slightly over the 35–45 s target, to keep every scripted beat.
+- Avir is a stylised 3D character, not photoreal; very tight close-ups crop the top of his hair.
+- The shopkeeper does not move his lips (still image + voice) — see above for what a real speaking shot needs.
+- Kokoro pronounces "कपड़े" a little soft in the ad voice (Whisper hears "कप्र"); it is the tool's real output, kept as is.
+- The AI image has the usual SD-1.5 look (slightly smooth face); fine for a demo poster, not a final client ad.
+
+**QC:** 1080×1920, 24 fps, H.264 + AAC; −14.4 LUFS, peak −4.0 dBFS (IG) / −2.6 dBFS (YT); every line checked with Whisper;
+captions kept out of the top ~170 px and bottom ~380 px and off Avir's mouth.
