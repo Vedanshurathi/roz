@@ -110,3 +110,5 @@ Covers: previews/EP001_cover_{startup,fellowship,founder}.jpg. YouTube uses `#sh
 for YouTube Shorts and Instagram Reels at: #1 Mon 9 Nov 6:30 PM IST, #2 Tue 10 Nov 9:00 AM IST, #3 Wed 11 Nov 9:00 AM IST.
 Upload status: not uploaded by Claude (YouTube token rejected as invalid; Claude in Chrome not available in this cloud session) →
 Vedanshu uploads/schedules from the approved files.
+- 9 Nov 13:00 IST: Vedanshu moved Short 1 (startup) to **Mon 9 Nov 1:30 PM IST** (YouTube + Instagram). Claude cannot reach his
+  computer (no Remote Control folder shared; Claude in Chrome not available in this cloud session) → posted by Vedanshu.
