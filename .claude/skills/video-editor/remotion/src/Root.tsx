@@ -10,6 +10,7 @@ import {HostTest} from './host/HostTest';
 import {AlignTest} from './ep1/AlignTest';
 import {Ep1, EP1_TOTAL} from './ep1/Ep1';
 import {Thumb} from './ep1/Thumb';
+import {Cover} from './ep1/Cover';
 import {Bench} from './ep1/Bench';
 import {Short, SHORTS} from './ep1/Short';
 
@@ -36,6 +37,7 @@ export const Root: React.FC = () => (
       <Composition key={k} id={`Short-${k}`} component={Short} durationInFrames={Math.round((SHORTS[k].t1 - SHORTS[k].t0) * 24)} fps={24} width={1080} height={1920} defaultProps={{kind: k}} />
     ))}
     <Composition id="Bench" component={Bench} durationInFrames={144} fps={24} width={1920} height={1080} />
+    <Composition id="Cover" component={Cover} durationInFrames={1} fps={24} width={1080} height={1920} defaultProps={{kind: 'startup' as const}} />
     <Composition id="AlignTest" component={AlignTest} durationInFrames={10} fps={24} width={1920} height={1080}
       defaultProps={{cam: 'medium' as const, clip: 'SitTalkBoth', at: 2.5}} />
   </>
