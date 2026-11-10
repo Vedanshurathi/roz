@@ -2,7 +2,9 @@
 
 - Instagram Reel: `previews/REEL3_ig.mp4` (1080×1920, 24 fps, ~46.8 s, −14 LUFS) — ends "FOLLOW @unfiltered.avir"
 - YouTube Short: `previews/REEL3_yt.mp4` (1080×1920, 24 fps, ~47.2 s) — ends "SUBSCRIBE: UNFILTERED AVIR" (last line says "सब्सक्राइब करो")
-- Cover (both): `previews/REEL3_cover.jpg`
+- Cover (both): `previews/REEL3_cover.jpg` — v2 (10 Nov, requested): "₹500 का AD · सिर्फ़ 2 मिनट में!" + the real stopwatch 1:28
+  (83.8 s poster + 4.1 s voice in the recording). Kept as a speed claim, not an "earn ₹500" claim, because the reel itself says
+  the ₹500 job is illustrative and earnings are not guaranteed. Previous cover: `previews/REEL3_cover_v1.jpg`.
 - YouTube setting: "Altered or synthetic content" = **Yes** (AI character, AI voice, AI-generated shop images). Not made for kids.
 - EP001 is untouched (not re-uploaded, not edited).
 
