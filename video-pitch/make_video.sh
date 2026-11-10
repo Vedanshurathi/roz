@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Builds 110684-RozBazaar.mp4 for SBI Youth Ideathon 2026.
 #   3 s opening screen (PDF page 4, filled)  +  edited recording  +  3 s ending screen (PDF page 5)
+#   Phone recordings whose picture starts later than the sound are lined up first.
 #   "UID: 110684" shown top-right for the whole video.
 #
 # Usage:
@@ -22,11 +23,11 @@ if [[ -n "$KEEP" ]]; then
   IFS=',' read -ra SEGS <<< "$KEEP"
   for s in "${SEGS[@]}"; do
     a=${s%-*}; b=${s#*-}
-    FC+="[0:v]trim=$a:$b,setpts=PTS-STARTPTS,$FIT[v$N];[0:a]atrim=$a:$b,asetpts=PTS-STARTPTS,$A[a$N];"
+    FC+="[0:v]setpts=PTS-STARTPTS,trim=$a:$b,setpts=PTS-STARTPTS,$FIT[v$N];[0:a]asetpts=PTS-STARTPTS,atrim=$a:$b,asetpts=PTS-STARTPTS,$A[a$N];"
     N=$((N+1))
   done
 else
-  FC+="[0:v]$FIT[v0];[0:a]$A[a0];"; N=1
+  FC+="[0:v]setpts=PTS-STARTPTS,$FIT[v0];[0:a]asetpts=PTS-STARTPTS,$A[a0];"; N=1
 fi
 LIST=""; for ((i=0;i<N;i++)); do LIST+="[v$i][a$i]"; done
 FC+="${LIST}concat=n=$N:v=1:a=1[mv][ma];"
