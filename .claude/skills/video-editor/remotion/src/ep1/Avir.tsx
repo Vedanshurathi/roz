@@ -14,6 +14,29 @@ export type Face = Record<string, number>;
 const FADE = 0.45;
 // fast lighting: hemisphere light instead of the reflection environment (about half the render time)
 export const FAST = (getInputProps() as any).fast !== false;
+// look: 'v1' = EP001/Reel 3 look. 'real' = more lifelike: skin with wrapped (subsurface-style) diffuse + sheen, wet eyes with
+// catchlights, softer hair, self-shadows from the key light and soft image-based reflections.
+export const LOOK: 'v1' | 'real' = (getInputProps() as any).look === 'v1' ? 'v1' : ((getInputProps() as any).look === 'real' ? 'real' : 'v1');
+export const REAL = LOOK === 'real';
+
+/** Skin: wrap the diffuse term per colour channel (red travels furthest under skin), so the shadow edge turns soft and warm. */
+const skinify = (m: THREE.MeshStandardMaterial) => {
+  const p = new THREE.MeshPhysicalMaterial({name: m.name, map: m.map, normalMap: m.normalMap, roughnessMap: m.roughnessMap, aoMap: m.aoMap,
+    color: m.color, metalness: 0, roughness: Math.min(1, m.roughness * 0.95), sheen: 0.18, sheenRoughness: 0.55,
+    sheenColor: new THREE.Color(0.45, 0.16, 0.1), specularIntensity: 0.5, envMapIntensity: 0.35});
+  if (p.normalMap) p.normalScale.set(1.25, 1.25);
+  p.onBeforeCompile = (sh) => {
+    const chunk = THREE.ShaderChunk.lights_physical_pars_fragment.replace(
+      'reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );',
+      `vec3 wrapW = vec3( 0.46, 0.22, 0.13 );
+       vec3 sss = clamp( ( dot( geometryNormal, directLight.direction ) + wrapW ) / ( 1.0 + wrapW ), 0.0, 1.0 );
+       reflectedLight.directDiffuse += sss * directLight.color * BRDF_Lambert( material.diffuseColor ) * vec3( 0.95, 0.85, 0.79 );`);
+    sh.fragmentShader = sh.fragmentShader.replace('#include <lights_physical_pars_fragment>', chunk);
+  };
+  p.customProgramCacheKey = () => 'avir-skin';
+  return p;
+};
+
 export const ONE_SHOT = new Set(['SitWave', 'SitNamaste', 'SitPoint', 'SitSecret']);
 const smooth = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 
@@ -67,7 +90,8 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
   useEffect(() => {
     gl.toneMapping = THREE.AgXToneMapping; gl.toneMappingExposure = 1.0; gl.outputColorSpace = THREE.SRGBColorSpace;
     const pm = new THREE.PMREMGenerator(gl);
-    if (!FAST) scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
+    if (!FAST || REAL) scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
+    if (REAL) { (scene as any).environmentIntensity = 0.28; gl.shadowMap.enabled = true; gl.shadowMap.type = THREE.PCFSoftShadowMap; }
     loadAvir().then((g) => {
       const root = g.scene as THREE.Object3D;   // one canvas per render tab, so the loaded scene is used directly
       const morphs: THREE.Mesh[] = []; const bones: Bones = {};
@@ -76,10 +100,26 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
           o.frustumCulled = false;
           if (o.morphTargetDictionary) morphs.push(o);
           const m = o.material;
-          if (m) {
+          if (m && !REAL) {
             m.envMapIntensity = 0.45;
             if (/haircut/i.test(m.name)) { m.color.setRGB(0.13, 0.12, 0.115); m.roughness = 0.82; m.envMapIntensity = 0.15; }
             if (/Cornea/i.test(o.name)) { m.transparent = true; m.opacity = 0.25; m.roughness = 0.05; }
+          }
+          if (m && REAL) {
+            o.castShadow = true; o.receiveShadow = true; m.envMapIntensity = 0.5;
+            if (/AvatarHead|AvatarBody/.test(m.name)) o.material = skinify(m);
+            else if (/Cornea/i.test(m.name)) {
+              o.material = new THREE.MeshPhysicalMaterial({name: m.name, color: 0x0a0a0a, transparent: true, opacity: 0.07, roughness: 0.03, metalness: 0,
+                clearcoat: 1, clearcoatRoughness: 0.03, specularIntensity: 1, envMapIntensity: 1.2, depthWrite: false});
+              o.castShadow = false; o.receiveShadow = false; o.renderOrder = 3;
+            } else if (/Eyeball/i.test(m.name)) { m.roughness = 0.3; m.envMapIntensity = 0.35; m.color.multiplyScalar(0.9); o.castShadow = false; }
+            else if (/Teeth/i.test(m.name)) { m.color.multiplyScalar(0.8); m.roughness = 0.35; o.castShadow = false; }
+            else if (/Eyelash/i.test(m.name)) { o.castShadow = false; }
+            else if (/haircut/i.test(m.name)) {
+              o.material = new THREE.MeshPhysicalMaterial({name: m.name, map: m.map, normalMap: m.normalMap, roughnessMap: m.roughnessMap, aoMap: m.aoMap,
+                color: new THREE.Color(0.105, 0.09, 0.08), roughness: 0.7, metalness: 0, specularIntensity: 0.45,
+                anisotropy: 0.35, anisotropyRotation: Math.PI / 2, envMapIntensity: 0.08, transparent: false, alphaTest: 0.35, alphaToCoverage: true, side: THREE.DoubleSide});
+            } else if (/outfit/i.test(m.name)) { m.roughness = Math.min(1, m.roughness * 1.05); m.envMapIntensity = 0.3; }
           }
         }
         if (o.isBone) bones[o.name] = o;
@@ -126,6 +166,12 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
     const B = rig.bones;
     // torso leans in while talking; head nods on stressed words, tilts on questions, turns slightly
     if (B.Spine2) B.Spine2.rotateX(perf.lean);
+    if (REAL) {   // breathing: chest rises ~14 times a minute, shoulders follow, the neck cancels it so the head stays steady
+      const br = Math.sin(t * 2 * Math.PI / 4.2), br2 = Math.sin(t * 2 * Math.PI / 4.2 - 0.5);
+      if (B.Spine1) B.Spine1.rotateX(-0.012 * br);
+      if (B.LeftShoulder) B.LeftShoulder.rotateZ(0.012 * br2); if (B.RightShoulder) B.RightShoulder.rotateZ(-0.012 * br2);
+      if (B.Neck) B.Neck.rotateX(0.008 * br);
+    }
     if (B.Head && rig.fwd.Head) {
       const lensV = new THREE.Vector3(lens[0], lens[1], lens[2]);
       aim(B.Head, rig.fwd.Head, lensV, perf.headAim, 0.3);
@@ -150,9 +196,11 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
 export const AvirLights: React.FC<{warm?: number; night?: number; premium?: boolean}> = ({warm = 1, night = 0, premium = false}) => premium ? (
   // premium studio (Reel 3+): soft warm key front-right, neutral fill, warm rims from the slat-wall LED and the floor lamp, no cyan
   <>
-    {FAST && <hemisphereLight args={['#f3e7da', '#3b281b', 1.1]} />}
-    <ambientLight intensity={0.1} color={'#e9dccd'} />
-    <directionalLight position={[1.4, 1.9, 2.1]} intensity={2.15} color={'#ffe3c6'} />
+    {FAST && <hemisphereLight args={['#f3e7da', '#3b281b', REAL ? 0.45 : 1.1]} />}
+    <ambientLight intensity={REAL ? 0.05 : 0.1} color={'#e9dccd'} />
+    <directionalLight position={REAL ? [1.4, 2.5, 2.3] : [1.4, 1.9, 2.1]} intensity={REAL ? 2.5 : 2.15} color={'#ffe3c6'} castShadow={REAL}
+      shadow-mapSize={[2048, 2048]} shadow-bias={-0.0005} shadow-normalBias={0.02} shadow-radius={5}
+      shadow-camera-left={-1.1} shadow-camera-right={1.1} shadow-camera-top={2.2} shadow-camera-bottom={0.2} shadow-camera-near={0.5} shadow-camera-far={8} />
     <directionalLight position={[-1.5, 1.4, 1.9]} intensity={0.75} color={'#e6e9f2'} />
     <directionalLight position={[-1.0, 2.5, -1.4]} intensity={1.5} color={'#ffd2a3'} />
     <directionalLight position={[1.2, 2.2, -1.5]} intensity={1.2 * warm} color={'#ffb478'} />
