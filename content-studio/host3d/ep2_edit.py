@@ -87,8 +87,8 @@ page = f'''<!doctype html><html lang="hi"><head><meta charset="UTF-8"><meta name
 #hack .h1 {{ font-family:PoppinsBlack; font-size:40px; color:#FFD24A; }} #hack .row {{ font-size:34px; margin-top:12px; font-family: DevaBold, PoppinsXB; }}
 #disc {{ left:40px; bottom:150px; padding:8px 18px; border-radius:12px; background:rgba(10,10,12,.78); font-size:22px; color:rgba(255,255,255,.9); }}
 #ai {{ right:40px; bottom:150px; padding:8px 18px; border-radius:999px; background:rgba(10,8,7,.6); border:1px solid rgba(255,255,255,.25); font-size:22px; }}
-#end {{ left:0; width:1920px; top:210px; text-align:center; }}
-#end .e1 {{ font-family:PoppinsBlack; font-size:120px; -webkit-text-stroke:6px #120b05; paint-order:stroke fill; }}
+#end {{ left:0; width:1920px; top:46px; text-align:center; }}
+#end .e1 {{ font-family:PoppinsBlack; font-size:92px; -webkit-text-stroke:6px #120b05; paint-order:stroke fill; }}
 #end .e2 {{ display:inline-block; margin-top:14px; font-family:PoppinsBlack; font-size:64px; padding:10px 34px; border-radius:20px; background:#FF0000; }}
 #end .e3 {{ margin-top:20px; font-size:34px; }}
 #fade {{ left:0; top:0; width:1920px; height:1080px; background:#000; opacity:0; }}

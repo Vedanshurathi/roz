@@ -22,7 +22,7 @@ AI News मेरे घर से! 🏡 Gemini 4 Carbon, Claude Fable 5.2, ₹1
 
 ⏱ Chapters
 0:00 घर से Sunday special
-0:16 छठ greeting card — AI से
+0:12 छठ पूजा + AI greeting card
 0:34 Gemini 4 Carbon
 0:56 Claude Fable 5.2 + Mythos 5.2
 1:17 AI Kaushal Hackathon (UP)
@@ -62,3 +62,11 @@ House tour चाहिए? 🏡 "TOUR" लिखो 👇 — और बता�
 - **Real experiment:** the Chhath card was generated live by DreamShaper 8 + LCM-LoRA on the CPU (timer visible); the Hindi words
   are added by the tool's text template.
 - **Virtual:** Avir (3D, Kokoro voice), his home (Blender villa), the music and SFX (synthesized).
+
+## Production notes
+- Locations: pool deck (jhoola, villa), living-room sofa (villa), studio — Avir composited into Cycles plates of the villa
+  (`host3d/villa_plates.py`: seat anchors convert each villa camera into Avir's frame) and the premium studio plates.
+- Avir look: "lite" (realistic skin/eyes/hair materials, no shadows) + lip-sync v2. Render: 1,462 Avir frames ≈ 2 h 10 min
+  on 4 CPUs (≈5.3 s/frame; close-ups ≈11 s); HyperFrames edit 4.5 min; villa plates ≈ 35 min.
+- QC: 1920×1080, 24 fps, 1:51, −14.3 LUFS, true peak −3.1 dBFS; all claims checked against the pages shown.
+- Limits: Avir is a stylised 3D character (not photoreal) and only seated (no walking yet); his gestures are clip-based.
