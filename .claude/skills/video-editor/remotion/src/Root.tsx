@@ -15,6 +15,8 @@ import {Reel2Avir, REEL2_TOTAL} from './reel2/Reel2Avir';
 import {Reel3Avir, REEL3_TOTAL} from './reel3/Reel3Avir';
 import {Reel3Cover} from './reel3/Reel3Cover';
 import {SpeakTest, SPEAK_TOTAL} from './speak/SpeakTest';
+import {Ep2Avir, EP2_TOTAL} from './ep2/Ep2Avir';
+import {Ep2Thumb} from './ep2/Ep2Thumb';
 import {Bench} from './ep1/Bench';
 import {Short, SHORTS} from './ep1/Short';
 
@@ -42,6 +44,8 @@ export const Root: React.FC = () => (
     ))}
     <Composition id="Bench" component={Bench} durationInFrames={144} fps={24} width={1920} height={1080} />
     <Composition id="Cover" component={Cover} durationInFrames={1} fps={24} width={1080} height={1920} defaultProps={{kind: 'startup' as const}} />
+    <Composition id="Ep2Thumb" component={Ep2Thumb} durationInFrames={1} fps={24} width={1280} height={720} />
+    <Composition id="Ep2Avir" component={Ep2Avir} durationInFrames={Math.ceil(EP2_TOTAL * 24)} fps={24} width={1920} height={1080} />
     <Composition id="SpeakTest" component={SpeakTest} durationInFrames={Math.ceil(SPEAK_TOTAL * 24)} fps={24} width={1080} height={1920} />
     <Composition id="Reel3Cover" component={Reel3Cover} durationInFrames={1} fps={24} width={1080} height={1920} />
     <Composition id="Reel3Avir" component={Reel3Avir} durationInFrames={Math.ceil(REEL3_TOTAL * 24)} fps={24} width={1080} height={1920} />

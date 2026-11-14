@@ -43,6 +43,7 @@ button.pressed{transform:scale(.96);filter:brightness(.88)}button:disabled{backg
       <label>Text on poster</label>
       <input id="shop" value="" placeholder="Shop name" style="margin-bottom:12px">
       <input id="line" value="" placeholder="Offer line" style="margin-bottom:12px">
+      <input id="tag" value="" placeholder="Headline (optional)" style="margin-bottom:12px">
       <input id="foot" value="" placeholder="Footer" style="margin-bottom:18px">
       <button id="mk">Make poster</button>
       <div class="note">The image model can't write Hindi text, so the words are added by this tool's layout template.</div>
@@ -82,7 +83,7 @@ $('mk').onclick=async()=>{press($('mk'));const c=$('poster').getContext('2d'),W=
   c.fillStyle='#ffd75e';c.fillRect(0,BH-6,W,6);
   g=c.createLinearGradient(0,H-520,0,H);g.addColorStop(0,'rgba(20,6,4,0)');g.addColorStop(.45,'rgba(20,6,4,.82)');g.addColorStop(1,'rgba(20,6,4,.96)');c.fillStyle=g;c.fillRect(0,H-520,W,520);
   c.textAlign='center';c.fillStyle='#ffd75e';c.font="800 118px 'Noto Sans Devanagari'";c.shadowColor='rgba(0,0,0,.45)';c.shadowBlur=14;c.fillText($('shop').value,W/2,160);
-  c.font="800 58px Inter";c.fillStyle='#fff';c.fillText('FESTIVE SALE',W/2,250);
+  c.font="800 58px Inter, 'Noto Sans Devanagari'";c.fillStyle='#fff';c.fillText($('tag').value||'FESTIVE SALE',W/2,250);
   c.font="800 80px 'Noto Sans Devanagari'";c.fillStyle='#fff';wrapText(c,$('line').value,W/2,H-170,W-80,96);
   c.font="700 50px 'Noto Sans Devanagari'";c.fillStyle='#ffd75e';c.fillText($('foot').value,W/2,H-70);c.shadowBlur=0;
   $('img').classList.add('hide');$('poster').classList.remove('hide');

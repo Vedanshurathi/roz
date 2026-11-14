@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reel 3 ("₹500 का AD") audio — all music and SFX synthesized here (no third-party audio), plus the voice mix.
+"""Episode audio (Reel 3 and EP002) — all music and SFX synthesized here (no third-party audio), plus the voice mix.
   python3 reel3_audio.py <edit.json> <out.wav>
 edit.json: {"total", "lines": [{start, dur}], "voices": [[wav, t0, gain, (fade_out_at_s)]], "ev": {...edit event times}}
 Music: playful bazaar groove (110 bpm, D major pentatonic plucks + tabla-like bols + shaker), dropped to a pad under the
@@ -107,10 +107,13 @@ def coin(at):
 
 
 # ---- music plan ----
-groove(0.0, ev['demo_ad'][0], 0.55)                    # bazaar groove from the top through the demo
-groove(ev['demo_ad'][0], ev['demo_ad'][1], 0.75, 'bright')   # the ad itself: brighter, a jingle
-groove(ev['demo_ad'][1], ev['math'][1], 0.45, 'pad')  # calm under the maths + disclaimer
-groove(ev['math'][1], tot, 0.55)
+if 'plan' in E:      # generic: [[t0, t1, gain, mode], ...]  mode: full | bright | pad
+    for t0, t1, g, mode in E['plan']: groove(t0, t1, g, mode)
+else:                # Reel 3
+    groove(0.0, ev['demo_ad'][0], 0.55)
+    groove(ev['demo_ad'][0], ev['demo_ad'][1], 0.75, 'bright')
+    groove(ev['demo_ad'][1], ev['math'][1], 0.45, 'pad')
+    groove(ev['math'][1], tot, 0.55)
 n = len(mus); t = np.arange(n) / sr
 mus *= np.minimum(1, t / 0.4) * np.minimum(1, (tot - t) / 1.2)
 # ---- SFX ----

@@ -16,8 +16,10 @@ const FADE = 0.45;
 export const FAST = (getInputProps() as any).fast !== false;
 // look: 'v1' = EP001/Reel 3 look. 'real' = more lifelike: skin with wrapped (subsurface-style) diffuse + sheen, wet eyes with
 // catchlights, softer hair, self-shadows from the key light and soft image-based reflections.
-export const LOOK: 'v1' | 'real' = (getInputProps() as any).look === 'v1' ? 'v1' : ((getInputProps() as any).look === 'real' ? 'real' : 'v1');
+export const LOOK: 'v1' | 'lite' | 'real' = (['v1', 'lite', 'real'] as const).find((k) => k === (getInputProps() as any).look) ?? 'v1';
 export const REAL = LOOK === 'real';
+// 'lite': the realistic materials (skin, eyes, hair) without the costly shadows / reflection environment
+export const LITE = LOOK === 'lite';
 
 /** Skin: wrap the diffuse term per colour channel (red travels furthest under skin), so the shadow edge turns soft and warm. */
 const skinify = (m: THREE.MeshStandardMaterial) => {
@@ -100,13 +102,13 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
           o.frustumCulled = false;
           if (o.morphTargetDictionary) morphs.push(o);
           const m = o.material;
-          if (m && !REAL) {
+          if (m && !REAL && !LITE) {
             m.envMapIntensity = 0.45;
             if (/haircut/i.test(m.name)) { m.color.setRGB(0.13, 0.12, 0.115); m.roughness = 0.82; m.envMapIntensity = 0.15; }
             if (/Cornea/i.test(o.name)) { m.transparent = true; m.opacity = 0.25; m.roughness = 0.05; }
           }
-          if (m && REAL) {
-            o.castShadow = true; o.receiveShadow = true; m.envMapIntensity = 0.5;
+          if (m && (REAL || LITE)) {
+            o.castShadow = REAL; o.receiveShadow = REAL; m.envMapIntensity = 0.5;
             if (/AvatarHead|AvatarBody/.test(m.name)) o.material = skinify(m);
             else if (/Cornea/i.test(m.name)) {
               o.material = new THREE.MeshPhysicalMaterial({name: m.name, color: 0x0a0a0a, transparent: true, opacity: 0.07, roughness: 0.03, metalness: 0,
@@ -166,7 +168,7 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
     const B = rig.bones;
     // torso leans in while talking; head nods on stressed words, tilts on questions, turns slightly
     if (B.Spine2) B.Spine2.rotateX(perf.lean);
-    if (REAL) {   // breathing: chest rises ~14 times a minute, shoulders follow, the neck cancels it so the head stays steady
+    if (REAL || LITE) {   // breathing: chest rises ~14 times a minute, shoulders follow, the neck cancels it so the head stays steady
       const br = Math.sin(t * 2 * Math.PI / 4.2), br2 = Math.sin(t * 2 * Math.PI / 4.2 - 0.5);
       if (B.Spine1) B.Spine1.rotateX(-0.012 * br);
       if (B.LeftShoulder) B.LeftShoulder.rotateZ(0.012 * br2); if (B.RightShoulder) B.RightShoulder.rotateZ(-0.012 * br2);
@@ -193,18 +195,18 @@ export const AvirLayer: React.FC<{t: number; cam: Cam; view: View; poses: {name:
 };
 
 /** Lights matched to the studio plates (warm key front-right, cool fill, cyan + warm rims, diya glow from the desk). */
-export const AvirLights: React.FC<{warm?: number; night?: number; premium?: boolean}> = ({warm = 1, night = 0, premium = false}) => premium ? (
+export const AvirLights: React.FC<{warm?: number; night?: number; premium?: boolean; gain?: number; cool?: number}> = ({warm = 1, night = 0, premium = false, gain = 1, cool = 0}) => premium ? (
   // premium studio (Reel 3+): soft warm key front-right, neutral fill, warm rims from the slat-wall LED and the floor lamp, no cyan
   <>
-    {FAST && <hemisphereLight args={['#f3e7da', '#3b281b', REAL ? 0.45 : 1.1]} />}
-    <ambientLight intensity={REAL ? 0.05 : 0.1} color={'#e9dccd'} />
-    <directionalLight position={REAL ? [1.4, 2.5, 2.3] : [1.4, 1.9, 2.1]} intensity={REAL ? 2.5 : 2.15} color={'#ffe3c6'} castShadow={REAL}
+    {FAST && <hemisphereLight args={['#f3e7da', '#3b281b', (REAL ? 0.45 : 1.0) * gain]} />}
+    <ambientLight intensity={(REAL ? 0.05 : 0.1) * gain} color={'#e9dccd'} />
+    <directionalLight position={REAL ? [1.4, 2.5, 2.3] : [1.4, 1.9, 2.1]} intensity={(REAL ? 2.5 : 2.15) * gain} color={'#ffe3c6'} castShadow={REAL}
       shadow-mapSize={[2048, 2048]} shadow-bias={-0.0005} shadow-normalBias={0.02} shadow-radius={5}
       shadow-camera-left={-1.1} shadow-camera-right={1.1} shadow-camera-top={2.2} shadow-camera-bottom={0.2} shadow-camera-near={0.5} shadow-camera-far={8} />
-    <directionalLight position={[-1.5, 1.4, 1.9]} intensity={0.75} color={'#e6e9f2'} />
-    <directionalLight position={[-1.0, 2.5, -1.4]} intensity={1.5} color={'#ffd2a3'} />
-    <directionalLight position={[1.2, 2.2, -1.5]} intensity={1.2 * warm} color={'#ffb478'} />
-    <pointLight position={[0.0, 0.9, 0.9]} intensity={0.45} distance={2.0} decay={2} color={'#ffc896'} />
+    <directionalLight position={[-1.5, 1.4, 1.9]} intensity={(0.75 + 0.6 * cool) * gain} color={cool ? '#b9c8ff' : '#e6e9f2'} />
+    <directionalLight position={[-1.0, 2.5, -1.4]} intensity={(1.5) * gain} color={'#ffd2a3'} />
+    <directionalLight position={[1.2, 2.2, -1.5]} intensity={(1.2 * warm) * gain} color={'#ffb478'} />
+    <pointLight position={[0.0, 0.9, 0.9]} intensity={(0.45) * gain} distance={2.0} decay={2} color={'#ffc896'} />
   </>
 ) : (
   <>
