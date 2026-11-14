@@ -1,7 +1,7 @@
 #!/bin/bash
 # Resumable render of only the frame ranges a composition is actually on screen (e.g. Avir between screen-recording
 # cut-aways). Each range is rendered in chunks (finished chunks are skipped), then joined into <out_dir>/<name>.mp4.
-#   [BUNDLE=<prebuilt bundle dir>] render_ranges.sh <remotion_dir> <composition> <chunk_frames> <out_dir> '<props json>' name:a-b [name:a-b ...]
+#   [BUNDLE=<prebuilt bundle dir>] [EXTRA="--scale=0.6667"] [CONC=2] render_ranges.sh <remotion_dir> <composition> <chunk_frames> <out_dir> '<props json>' name:a-b [name:a-b ...]
 R=$1; COMP=$2; CH=$3; OUT=$4; PROPS=$5; shift 5
 mkdir -p "$OUT"; cd "$R"
 for spec in "$@"; do
@@ -15,7 +15,7 @@ for spec in "$@"; do
     s=$(date +%s); ok=0
     for try in 1 2 3; do
       rm -f "$f.tmp.mp4"
-      if npx remotion render "${BUNDLE:-src/index.ts}" "$COMP" "$f.tmp.mp4" --frames=$a-$b --props="$PROPS" --gl=swangle --concurrency=4 --crf=16 --muted --timeout=180000 --log=error > "$OUT/log_${name}.txt" 2>&1; then
+      if npx remotion render "${BUNDLE:-src/index.ts}" "$COMP" "$f.tmp.mp4" --frames=$a-$b --props="$PROPS" --gl=swangle --concurrency=${CONC:-4} --crf=16 --muted ${EXTRA:-} --timeout=180000 --log=error > "$OUT/log_${name}.txt" 2>&1; then
         mv "$f.tmp.mp4" "$f"; echo "$name frames $a-$b done in $(( $(date +%s) - s ))s $(date +%H:%M)" >> "$OUT/progress.txt"; ok=1; break
       fi
       echo "$name $a-$b try $try failed $(date +%H:%M)" >> "$OUT/progress.txt"
