@@ -50,4 +50,6 @@ sheet("02_ground_floor", "GROUND FLOOR", [("Foyer", "Foyer: pooja niche, floatin
       ("LivingFromBridge", "Living room seen from the bridge"), ("Dining", "Dining for eight"), ("Kitchen", "Kitchen with marble island"), ("GuestRoom", "Guest bedroom"), ("Cabana", "Cabana with fire table")])
 sheet("03_first_floor", "FIRST FLOOR", [("Studio", "Creator studio"), ("StudioDesk", "Studio: Avir's camera view"), ("FamilyLounge", "Family lounge"), ("MasterBedroom", "Master bedroom"),
       ("Closet", "Walk-in closet"), ("MasterBath", "Master bath: vanity and rain shower"), ("MasterBathTub", "Master bath: freestanding tub"), ("Balcony", "Balcony over the pool")])
+sheet("04_cars", "THE CARS · executive sedan + luxury 4x4", [("Cars", "Car porch: sedan and 4x4"), ("CarsSide", "Sedan, side"), ("CarsLow", "4x4, front"), ("SedanInterior", "Sedan cabin: dashboard and screens"),
+      ("SedanSeats", "Sedan cabin: seats"), ("SUVInterior", "4x4 cabin: dashboard"), ("SUVSeats", "4x4 cabin: three rows")])
 print("board ok ->", OUT)

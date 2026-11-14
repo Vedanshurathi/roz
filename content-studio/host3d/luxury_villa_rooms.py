@@ -259,6 +259,8 @@ for i, x in enumerate((3.6, 7.6, 13.0, 18.0, 22.4)): plight(f"FrontUp{i}", (x, 7
 alight("FrontCladdingWash", (13, 6.0, 0.3), (13, 8.2, 5.5), 380, size=8.0, size_y=1.0); alight("EntryDown", (5.3, 8.5, GH - 0.15), (5.3, 8.5, 0), 120, size=1.2)
 alight("DeckDown", (18, 19.9, 3.6), (18, 19.9, 0), 160, size=8.0, size_y=1.4)
 
+exec(open(Path(__file__).with_name("luxury_villa_cars.py")).read())
+
 # =================================================================== WORLD + SUN
 w = bpy.data.worlds.new("GoldenDusk"); sc.world = w; w.use_nodes = True; nt = w.node_tree; bg = nt.nodes["Background"]
 tc = nt.nodes.new("ShaderNodeTexCoord"); sp = nt.nodes.new("ShaderNodeSeparateXYZ"); nt.links.new(tc.outputs["Generated"], sp.inputs[0])
@@ -278,7 +280,9 @@ CAMS = {   # name: (location, target, lens, [collections hidden])
     "MasterBedroom": ((15.0, 18.5, FZ + 1.55), (19.6, 14.2, FZ + 0.8), 15), "MasterBath": ((22.5, 13.1, FZ + 1.6), (19.2, 9.7, FZ + 0.85), 15), "MasterBathTub": ((18.6, 13.0, FZ + 1.55), (21.9, 9.9, FZ + 0.7), 16),
     "Closet": ((17.3, 13.0, FZ + 1.6), (14.0, 9.0, FZ + 1.0), 15), "Backyard": ((15.5, 33.0, 2.0), (12.6, 19, 3.4), 19),
     "Cabana": ((9.6, 23.6, 1.6), (4.8, 26.6, 0.9), 19), "Studio": ((12.55, 11.7, FZ + 1.6), (9.0, 8.9, FZ + 1.0), 14),
-    "StudioDesk": ((10.35, 11.55, FZ + 1.35), (10.0, 8.4, FZ + 1.3), 20), "GuestRoom": ((18.45, 18.6, 1.55), (21.9, 15.3, 0.8), 15), "Balcony": ((14.0, 20.4, FZ + 1.6), (20, 26, 0.5), 17),
+    "StudioDesk": ((10.35, 11.55, FZ + 1.35), (10.0, 8.4, FZ + 1.3), 20), "Cars": ((14.3, 0.7, 1.25), (19.3, 5.5, 0.75), 24),
+    "CarsLow": ((23.6, 0.9, 0.75), (19.2, 5.4, 0.8), 22), "SedanInterior": ((17.47, 5.72, 0.93), (17.3, 4.6, 0.68), 12), "SUVInterior": ((20.97, 5.75, 1.3), (20.8, 4.6, 1.05), 12),
+    "SedanSeats": ((17.45, 4.95, 1.02), (17.45, 6.6, 0.62), 12), "SUVSeats": ((20.95, 4.98, 1.42), (20.95, 6.9, 0.95), 12), "CarsSide": ((13.9, 5.2, 1.1), (17.45, 5.5, 0.7), 22), "GuestRoom": ((18.45, 18.6, 1.55), (21.9, 15.3, 0.8), 15), "Balcony": ((14.0, 20.4, FZ + 1.6), (20, 26, 0.5), 17),
 }
 for name, (loc, tgt, lens) in CAMS.items():
     cd = bpy.data.cameras.new("Cam_" + name); cd.lens = lens; cd.sensor_width = 36; cd.clip_start = 0.05; cd.clip_end = 600
@@ -310,4 +314,5 @@ if not a.no_render:
         if c.startswith("Plan"): sc.render.resolution_x = a.res; sc.render.resolution_y = a.res
         else: sc.render.resolution_x = a.res; sc.render.resolution_y = a.res * 9 // 16
         sc.view_settings.exposure = -0.75 if c in INTERIOR else (0.25 if not c.startswith("Plan") else 0.6)
+        if c in ("SedanInterior", "SUVInterior", "SedanSeats", "SUVSeats"): sc.view_settings.exposure = 0.7
         sc.render.filepath = str(OUT / f"{c}.png"); bpy.ops.render.render(write_still=True); print("rendered", c, round(time.time() - t0), "s", flush=True)
