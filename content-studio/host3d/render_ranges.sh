@@ -15,7 +15,7 @@ for spec in "$@"; do
     s=$(date +%s); ok=0
     for try in 1 2 3; do
       rm -f "$f.tmp.mp4"
-      if npx remotion render "${BUNDLE:-src/index.ts}" "$COMP" "$f.tmp.mp4" --frames=$a-$b --props="$PROPS" --gl=swangle --concurrency=${CONC:-4} --crf=16 --muted ${EXTRA:-} --timeout=180000 --log=error > "$OUT/log_${name}.txt" 2>&1; then
+      if npx remotion render "${BUNDLE:-src/index.ts}" "$COMP" "$f.tmp.mp4" --frames=$a-$b --props="$PROPS" --gl=swangle --concurrency=${CONC:-4} --crf=16 --muted ${EXTRA:-} --timeout=${FRAME_TIMEOUT:-180000} --log=error > "$OUT/log_${name}.txt" 2>&1; then
         mv "$f.tmp.mp4" "$f"; echo "$name frames $a-$b done in $(( $(date +%s) - s ))s $(date +%H:%M)" >> "$OUT/progress.txt"; ok=1; break
       fi
       echo "$name $a-$b try $try failed $(date +%H:%M)" >> "$OUT/progress.txt"

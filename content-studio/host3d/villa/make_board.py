@@ -11,7 +11,7 @@ f = lambda s: ImageFont.truetype(FONT, s)
 INK, GOLD, BG = (245, 240, 230), (255, 205, 90), (16, 13, 11)
 
 # plan cameras: orthographic, centred on (13, 17.5), 40 m across
-GF = [("FOYER", 5.0, 11.4), ("POOJA", 3.5, 11.5), ("STAIR", 3.9, 16.2), ("LOUNGE / LIBRARY", 10.0, 11.3), ("LIVING\n(double height)", 10.0, 16.4),
+GF = [("FOYER", 5.3, 10.5), ("POOJA", 4.1, 12.4), ("STAIR", 3.9, 16.2), ("LOUNGE / LIBRARY", 10.0, 11.3), ("LIVING\n(double height)", 10.0, 16.4),
       ("DINING", 15.6, 16.5), ("KITCHEN", 17.6, 11.4), ("GUEST BEDROOM", 20.5, 16.2), ("CAR PORCH", 19.2, 5.4), ("ENTRY", 5.3, 4.0), ("LAWN", 9.6, 4.2),
       ("WATER FEATURE", 10.0, 7.7), ("DECK + JHOOLA", 13.0, 20.9), ("POOL", 14.0, 25.0), ("CABANA", 5.6, 25.6), ("SUN DECK", 21.3, 25.0), ("GARDEN", 13.0, 31.5), ("STREET", 13.0, -5.6)]
 FF = [("FAMILY LOUNGE", 5.0, 10.6), ("READING NOOK", 5.7, 17.6), ("BRIDGE", 10.0, 12.75), ("CREATOR STUDIO", 10.0, 10.0), ("open to living\nbelow", 10.0, 16.4),
