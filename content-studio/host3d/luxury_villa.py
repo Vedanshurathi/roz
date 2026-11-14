@@ -72,13 +72,18 @@ def marble(name, base=(0.9, 0.87, 0.82), vein=(0.6, 0.55, 0.5), rough=0.12, scal
 
 
 def wood(name, c0=(0.16, 0.085, 0.04), c1=(0.34, 0.19, 0.09), scale=3.0, rough=0.4, axis="X"):
+    """Timber with a fine straight grain running along `axis` (stretched noise; soft contrast, light bump)."""
     m = bpy.data.materials.new(name); m.use_nodes = True; nt = m.node_tree; b = nt.nodes["Principled BSDF"]
-    tc = nt.nodes.new("ShaderNodeTexCoord")
-    wv = nt.nodes.new("ShaderNodeTexWave"); wv.bands_direction = axis; wv.inputs["Scale"].default_value = scale; wv.inputs["Distortion"].default_value = 5; wv.inputs["Detail"].default_value = 4
-    nt.links.new(tc.outputs["Object"], wv.inputs["Vector"])
-    r = nt.nodes.new("ShaderNodeValToRGB"); r.color_ramp.elements[0].color = (*c0, 1); r.color_ramp.elements[1].color = (*c1, 1)
-    nt.links.new(wv.outputs["Fac"], r.inputs["Fac"]); nt.links.new(r.outputs["Color"], b.inputs["Base Color"]); b.inputs["Roughness"].default_value = rough
-    bp = nt.nodes.new("ShaderNodeBump"); bp.inputs["Strength"].default_value = 0.08; nt.links.new(wv.outputs["Fac"], bp.inputs["Height"]); nt.links.new(bp.outputs["Normal"], b.inputs["Normal"])
+    tc = nt.nodes.new("ShaderNodeTexCoord"); mp = nt.nodes.new("ShaderNodeMapping")
+    k = 9.0 * scale; mp.inputs["Scale"].default_value = {"X": (0.35, k, k), "Y": (k, 0.35, k), "Z": (k, k, 0.35)}[axis]
+    nt.links.new(tc.outputs["Object"], mp.inputs["Vector"])
+    n = nt.nodes.new("ShaderNodeTexNoise"); n.inputs["Scale"].default_value = 1.0; n.inputs["Detail"].default_value = 5; n.inputs["Roughness"].default_value = 0.6
+    nt.links.new(mp.outputs["Vector"], n.inputs["Vector"])
+    mid = tuple((a_ + b_) / 2 for a_, b_ in zip(c0, c1)); lo = tuple(a_ * 0.6 + b_ * 0.4 for a_, b_ in zip(c0, c1)); hi = tuple(a_ * 0.25 + b_ * 0.75 for a_, b_ in zip(c0, c1))
+    r = nt.nodes.new("ShaderNodeValToRGB"); e = r.color_ramp.elements; e[0].position = 0.3; e[0].color = (*lo, 1); e[1].position = 0.72; e[1].color = (*hi, 1)
+    em = r.color_ramp.elements.new(0.5); em.color = (*mid, 1)
+    nt.links.new(n.outputs["Fac"], r.inputs["Fac"]); nt.links.new(r.outputs["Color"], b.inputs["Base Color"]); b.inputs["Roughness"].default_value = rough
+    bp = nt.nodes.new("ShaderNodeBump"); bp.inputs["Strength"].default_value = 0.05; nt.links.new(n.outputs["Fac"], bp.inputs["Height"]); nt.links.new(bp.outputs["Normal"], b.inputs["Normal"])
     return m
 
 

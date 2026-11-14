@@ -124,12 +124,12 @@ box("EntrySidelight", (6.3, Y0, 1.5), (0.6, 0.012, 3.0), M["glass"]); boxes("Ent
 glazing_x("GF_GlassLiving", Y1, 7.0, 13.0, 0, RZ - 0.15, 5); boxes("LivingTransom", [((10, Y1, 3.75), (6.0, 0.1, 0.1), 0)], [M["black"]])
 glazing_x("GF_GlassDining", Y1, 13.2, 18.0, 0, GH, 4); wall_x("GF_NorthStair", Y1, X0, 7.0, 0, GH, P, openings=[(4.9, 6.8, 2.9)]); box("GF_StairHallGlass", (5.85, Y1, 1.45), (1.9, 0.012, 2.9), M["glass"])
 wall_x("GF_NorthGuest", Y1, 18.0, X1, 0, GH, P, openings=[(19.2, 21.8, 2.6)]); box("GF_GuestSill", (20.5, Y1, 0.25), (2.6, 0.2, 0.5), P); box("GF_GuestGlass", (20.5, Y1, 1.55), (2.6, 0.012, 2.1), M["glass_dark"])
-box("GF_GuestCurtain", (20.5, Y1 - 0.2, 1.6), (2.7, 0.03, 2.4), mat("GuestCurtainGlow", (0.95, 0.85, 0.7), 0.9, emit=0.9, ecol=(1.0, 0.75, 0.5)))
+box("GF_GuestCurtain", (20.5, Y1 - 0.2, 1.6), (2.9, 0.03, 2.6), M["sheer"])
 # interior partitions (GF)
 wall_y("GF_FoyerEast", 7.0, Y0, 13.5, 0, GH, PI, openings=[(10.2, 12.8, 3.0)], t=0.16)
 wall_y("GF_LoungeKitchen", 13.0, Y0, 11.5, 0, GH, PI, t=0.16)
 wall_y("GF_FeatureWall", 13.0, 14.6, Y1, 0, GH, PI, t=0.3)
-wall_y("GF_GuestWest", 18.0, 13.5, Y1, 0, GH, PI, openings=[(14.0, 15.0, 2.4)], t=0.16); box("GF_GuestDoor", (18.0, 14.5, 1.2), (0.05, 1.0, 2.4), M["walnut_z"])
+wall_y("GF_GuestWest", 18.0, 13.5, Y1, 0, GH, PI, openings=[(14.0, 15.0, 2.4)], t=0.16); box("GF_GuestDoor", (18.52, 14.03, 1.2), (1.0, 0.05, 2.4), M["walnut_z"])
 wall_x("GF_GuestSouth", 13.5, 18.0, X1, 0, GH, PI, t=0.16)
 
 CUR[0] = "FFSlab"
@@ -157,7 +157,7 @@ wall_x("FF_MasterSouth", 13.5, 13.0, X1, FZ, RZ, PI, openings=[(13.7, 14.7, FZ +
 wall_y("FF_ClosetBath", 18.0, YC, 13.5, FZ, RZ, PI, t=0.14)
 # creator studio box (the existing studio set attaches here) + "ON AIR" door
 wall_x("FF_StudioNorth", 12.0, 7.0, 13.0, FZ, RZ, PI, openings=[(9.4, 10.4, FZ + 2.4)], t=0.16); wall_y("FF_StudioWest", 7.0, YC, 12.0, FZ, RZ, PI, t=0.16)
-box("StudioDoor", (9.9, 12.0, FZ + 1.2), (1.0, 0.05, 2.4), M["walnut_z"]); box("OnAirSign", (9.9, 12.12, FZ + 2.62), (0.7, 0.04, 0.2), mat("OnAir", (1.0, 0.15, 0.1), 0.4, emit=6))
+box("StudioDoor", (9.43, 12.52, FZ + 1.2), (0.05, 1.0, 2.4), M["walnut_z"]); box("OnAirSign", (9.9, 12.12, FZ + 2.62), (0.7, 0.04, 0.2), mat("OnAir", (1.0, 0.15, 0.1), 0.4, emit=6))
 # glass railings around the living void and the stair opening
 for nm, c, s in (("RailBridge", (10, 13.5, FZ + 0.55), (6.0, 0.012, 1.1)), ("RailVoidW", (7.0, 16.25, FZ + 0.55), (0.012, 5.5, 1.1)), ("RailStair", (4.5, 16.15, FZ + 0.55), (0.012, 4.5, 1.1)), ("RailStairS", (3.85, 13.9, FZ + 0.55), (1.3, 0.012, 1.1))):
     box(nm, c, s, M["glass"]); box(nm + "Cap", (c[0], c[1], FZ + 1.11), (max(s[0], 0.05), max(s[1], 0.05), 0.03), M["brass"])
