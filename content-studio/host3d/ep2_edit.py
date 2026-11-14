@@ -79,11 +79,11 @@ page = f'''<!doctype html><html lang="hi"><head><meta charset="UTF-8"><meta name
 #chh {{ right:70px; top:120px; text-align:center; padding:26px 40px; border-radius:28px; background:linear-gradient(160deg, rgba(255,170,40,.92), rgba(220,80,20,.92)); box-shadow:0 30px 80px rgba(0,0,0,.45); }}
 #chh .c1 {{ font-family:DevaBold; font-size:66px; line-height:1.1; }} #chh .c2 {{ font-size:30px; margin-top:6px; }}
 #demobg {{ left:0; top:0; width:1920px; height:1080px; background: radial-gradient(ellipse at 50% 40%, #2b1d14 0%, #0d0907 75%); }}
-#demo {{ left:672px; top:40px; width:576px; height:800px; border-radius:22px; box-shadow:0 30px 90px rgba(0,0,0,.7); object-fit:cover; }}
-#demotag {{ left:96px; top:300px; width:500px; }} #demotag .d1 {{ font-family:PoppinsBlack; font-size:44px; color:#4BE08A; }} #demotag .d2 {{ font-size:32px; margin-top:12px; line-height:1.35; }}
-#speed {{ right:120px; top:330px; padding:12px 24px; border-radius:16px; background:#E5522B; font-size:32px; font-family:PoppinsBlack; }}
+#demo {{ left:593px; top:24px; width:734px; height:1020px; border-radius:22px; box-shadow:0 30px 90px rgba(0,0,0,.7); object-fit:cover; }}
+#demotag {{ left:70px; top:300px; width:500px; }} #demotag .d1 {{ font-family:PoppinsBlack; font-size:44px; color:#4BE08A; }} #demotag .d2 {{ font-size:32px; margin-top:12px; line-height:1.35; }}
+#speed {{ right:90px; top:330px; padding:12px 24px; border-radius:16px; background:#E5522B; font-size:32px; font-family:PoppinsBlack; }}
 #card {{ right:110px; top:110px; width:440px; border-radius:18px; border:8px solid #fff; box-shadow:0 30px 80px rgba(0,0,0,.6); transform:rotate(4deg); }}
-#hack {{ right:70px; top:150px; width:620px; padding:30px 36px; border-radius:26px; background:linear-gradient(140deg, rgba(255,255,255,.2), rgba(255,255,255,.06)); backdrop-filter: blur(22px) brightness(.7); border:1.5px solid rgba(255,255,255,.3); }}
+#hack {{ right:70px; top:150px; width:640px; padding:30px 36px; border-radius:26px; background:rgba(12,10,9,.88); border:2px solid rgba(255,210,74,.6); box-shadow:0 30px 80px rgba(0,0,0,.5); }}
 #hack .h1 {{ font-family:PoppinsBlack; font-size:40px; color:#FFD24A; }} #hack .row {{ font-size:34px; margin-top:12px; font-family: DevaBold, PoppinsXB; }}
 #disc {{ left:40px; bottom:150px; padding:8px 18px; border-radius:12px; background:rgba(10,10,12,.78); font-size:22px; color:rgba(255,255,255,.9); }}
 #ai {{ right:40px; bottom:150px; padding:8px 18px; border-radius:999px; background:rgba(10,8,7,.6); border:1px solid rgba(255,255,255,.25); font-size:22px; }}

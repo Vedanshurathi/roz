@@ -15,12 +15,12 @@ const Chip: React.FC<{children: React.ReactNode; bg: string}> = ({children, bg})
 );
 
 export const Ep2Thumb: React.FC = () => {
-  const cam = (VCAMS as any).jho_close; const z = 1.18, ox = 0.62, oy = 0.42;
+  const cam = (VCAMS as any).jho_close; const z = 1.0, ox = 0.5, oy = 0.5;
   const plate: React.CSSProperties = {position: 'absolute', left: 0, top: 0, width: 1920, height: 1080, transform: `scale(${z})`, transformOrigin: `${ox * 100}% ${oy * 100}%`};
   return (
     <AbsoluteFill style={{background: '#0b0807', overflow: 'hidden'}}>
       <div style={{position: 'absolute', left: 0, top: 0, width: 1920, height: 1080, transform: 'scale(0.6667)', transformOrigin: '0 0'}}>
-        <div style={{position: 'absolute', left: -260, top: 0, width: 1920, height: 1080}}>
+        <div style={{position: 'absolute', left: 330, top: 0, width: 1920, height: 1080}}>
           <Img src={staticFile('ep2/plates/bg_jho_close.png')} style={plate} />
           <ThreeCanvas width={1920} height={1080} gl={{antialias: true, alpha: true, preserveDrawingBuffer: true}}>
             <AvirLights premium gain={0.85} cool={0.6} warm={1.25} />
