@@ -7,8 +7,9 @@ import {AvirLayer, AvirLights} from '../ep1/Avir';
 import {F} from '../ep1/ui';
 import VCAMS from './vcams.json';
 
-const FACE = {mouthSmileLeft: 0.7, mouthSmileRight: 0.55, jawOpen: 0.32, mouthFunnel: 0.15, browInnerUp: 0.75, browOuterUpLeft: 0.95, browOuterUpRight: 0.85,
-  eyeWideLeft: 0.55, eyeWideRight: 0.55, cheekSquintLeft: 0.2};
+// confident closed-mouth smile: lips together, cheeks lifted, a slight brow raise, relaxed eyes
+const FACE = {mouthSmileLeft: 0.9, mouthSmileRight: 0.85, cheekSquintLeft: 0.42, cheekSquintRight: 0.38, mouthClose: 0.08, mouthDimpleLeft: 0.25, mouthDimpleRight: 0.25,
+  browInnerUp: 0.25, browOuterUpLeft: 0.4, browOuterUpRight: 0.35, eyeWideLeft: 0.18, eyeWideRight: 0.18, eyeSquintLeft: 0.15, eyeSquintRight: 0.15};
 const Line: React.FC<{children: React.ReactNode; size: number; color: string; glow: string; style?: React.CSSProperties}> = ({children, size, color, glow, style}) => (
   <div style={{fontFamily: F.head, fontSize: size, lineHeight: 0.92, color, letterSpacing: -1, WebkitTextStroke: '5px #07060a', paintOrder: 'stroke fill',
     textShadow: `0 7px 0 #07060a, 0 0 38px ${glow}`, whiteSpace: 'nowrap', ...style}}>{children}</div>
@@ -25,9 +26,9 @@ export const Ep2Thumb: React.FC = () => {
         <div style={{position: 'absolute', left: 520, top: -40, width: 1920, height: 1080}}>
           <Img src={staticFile('ep2/plates/bg_jho_close.png')} style={plate} />
           <ThreeCanvas width={1920} height={1080} gl={{antialias: true, alpha: true, preserveDrawingBuffer: true}}>
-            <AvirLights premium gain={1.05} cool={1.0} warm={1.6} />
-            <AvirLayer t={2.2} cam={cam} view={{z, ox, oy}} poses={[{name: 'SitTalkBoth', time: 2.2, w: 1}]} face={FACE}
-              perf={{nod: 0, tilt: 0.07, turn: -0.06, lean: 0.05, look: [0, 0], headAim: 0.8}} lens={cam.pos} />
+            <AvirLights premium gain={1.2} cool={0.9} warm={1.5} />
+            <AvirLayer t={2.2} cam={cam} view={{z, ox, oy}} poses={[{name: 'SitIdle', time: 1.0, w: 1}]} face={FACE}
+              perf={{nod: 0.07, tilt: 0.06, turn: -0.05, lean: 0.02, look: [0, 0.04], headAim: 0.85}} lens={cam.pos} />
           </ThreeCanvas>
         </div>
       </div>
