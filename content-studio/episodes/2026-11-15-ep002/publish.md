@@ -1,7 +1,7 @@
 # EP002 — Sunday AI update from Avir's home · package (DRAFT — awaiting approval, NOT published, NOT scheduled)
 
 - Video: `previews/EP002_Sunday_1080p.mp4` (1920×1080, 24 fps, ~1:51, −14 LUFS)
-- Thumbnail: `previews/EP002_thumbnail.png` (1280×720)
+- Thumbnail: `previews/EP002_thumbnail.png` (1280×720) — v2, English only: "THIS WEEK IN AI · GEMINI 4 CARBON + CLAUDE FABLE 5.2 · ₹1 LAKH AI HACKATHON" (v1 kept as `EP002_thumbnail_v1.png`)
 - Proposed: YouTube (@unfilteredavir), **Sun 15 Nov 2026, 8:00 AM IST** (Chhath main day)
 - YouTube setting: "Altered or synthetic content" = **Yes** (AI character, AI voice, virtual home). Not made for kids.
 
