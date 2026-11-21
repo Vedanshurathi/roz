@@ -19,7 +19,7 @@ $SUDO apt-get install -y -q --no-install-recommends \
 echo "== python packages"
 # Debian's setuptools is too old for Python 3.13 sdists (e.g. srt, needed by manim)
 pip install -q -U --ignore-installed setuptools wheel
-pip install -q opencv-python-headless numpy librosa onnxruntime sherpa-onnx faster-whisper \
+pip install -q opencv-python-headless numpy librosa onnxruntime "sherpa-onnx==1.13.8" faster-whisper \
   auto-editor "scenedetect[opencv-headless]" moviepy pydub noisereduce pedalboard \
   ffmpeg-normalize rembg manim yt-dlp
 # moviepy needs Pillow < 12; rembg still runs fine on 11.x

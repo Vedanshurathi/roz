@@ -1,0 +1,92 @@
+[
+ {
+  "sec": "hook",
+  "clip": "SitTalkBoth",
+  "speed": 1.08,
+  "gap": 0.25,
+  "tts": "ये पूरी reel… क्लॉड ने edit की है।",
+  "cap": "ये पूरी reel… *Claude* ने [edit] की है।",
+  "lip": "ये पूरी रील… क्लॉड ने एडिट की है।"
+ },
+ {
+  "sec": "noeditor",
+  "clip": "SitTalkRight",
+  "speed": 1.12,
+  "gap": 0.2,
+  "tts": "ना Premiere, ना CapCut, ना कोई editor।",
+  "cap": "ना Premiere, ना CapCut, ना कोई *editor*।",
+  "lip": "ना प्रीमियर, ना कैपकट, ना कोई एडिटर।"
+ },
+ {
+  "sec": "prompt",
+  "clip": "SitPoint",
+  "speed": 1.05,
+  "gap": 0.3,
+  "tts": "बस एक master prompt।",
+  "cap": "बस एक *master* [prompt]।",
+  "lip": "बस एक मास्टर प्रॉम्प्ट।"
+ },
+ {
+  "sec": "terminal",
+  "clip": "SitTalkRight",
+  "speed": 1.12,
+  "gap": 0.2,
+  "tts": "क्लॉड Code खुद एफ़-एफ़-एम-पेग और हाइपर-फ़्रेम्स चलाता है —",
+  "cap": "Claude Code खुद *FFmpeg* और *HyperFrames* चलाता है —",
+  "lip": "क्लॉड कोड खुद एफ़एफ़एमपेग और हाइपरफ़्रेम्स चलाता है —"
+ },
+ {
+  "sec": "feat1",
+  "clip": "SitTalkBoth",
+  "speed": 1.12,
+  "gap": 0.12,
+  "tts": "cuts, zooms, word-by-word captions,",
+  "cap": "[cuts], [zooms], *word-by-word* captions,",
+  "lip": "कट्स, ज़ूम्स, वर्ड बाय वर्ड कैप्शन्स,"
+ },
+ {
+  "sec": "feat2",
+  "clip": "SitTalkBoth",
+  "speed": 1.12,
+  "gap": 0.3,
+  "tts": "motion graphics, music, sound effects — सब।",
+  "cap": "motion graphics, music, sound effects — [सब]।",
+  "lip": "मोशन ग्राफ़िक्स, म्यूज़िक, साउंड इफ़ेक्ट्स — सब।"
+ },
+ {
+  "sec": "free",
+  "clip": "SitTalkRight",
+  "speed": 1.08,
+  "gap": 0.2,
+  "tts": "और tools? पूरे free।",
+  "cap": "और tools? पूरे *free*।",
+  "lip": "और टूल्स? पूरे फ़्री।"
+ },
+ {
+  "sec": "local",
+  "clip": "SitTalkRight",
+  "speed": 1.1,
+  "gap": 0.35,
+  "tts": "आपके अपने computer पर।",
+  "cap": "आपके अपने [computer] पर।",
+  "lip": "आपके अपने कंप्यूटर पर।"
+ },
+ {
+  "sec": "ask",
+  "clip": "SitPoint",
+  "speed": 1.08,
+  "gap": 0.2,
+  "tts": "Master prompt चाहिए?",
+  "cap": "*Master prompt* चाहिए?",
+  "lip": "मास्टर प्रॉम्प्ट चाहिए?"
+ },
+ {
+  "sec": "cta",
+  "clip": "SitWave",
+  "speed": 1.05,
+  "gap": 0.2,
+  "tts": "Comment करो एडिट — मैं भेज दूँगा।",
+  "cap": "Comment करो [EDIT] — मैं भेज *दूँगा*।",
+  "lip": "कमेंट करो एडिट — मैं भेज दूँगा।"
+ }
+]

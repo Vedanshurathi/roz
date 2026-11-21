@@ -70,6 +70,29 @@ def groove(t0, t1, gain, mode='full'):
         b += 1
 
 
+def tech(t0, t1, gain, bpm=122):
+    """Dark electronic groove for tech reels: four-on-the-floor kick, off-beat hats, sub bass, minor arp (A minor)."""
+    bt = 60 / bpm; n_b = int((t1 - t0) / bt); prog = [45, 41, 43, 40]   # Am F G Em roots
+    for k in range(n_b):
+        tb = t0 + k * bt; root = prog[(k // 8) % 4]
+        n = int(0.32 * sr); tt = np.arange(n) / sr
+        add(mus, tb, np.sin(2 * np.pi * (48 + 110 * np.exp(-tt * 28)) * tt) * env(n, 0.001, 0.16), gain * 0.9)        # kick
+        h = int(0.06 * sr); add(mus, tb + bt / 2, np.diff(rng.normal(size=h), prepend=0) * env(h, 0.001, 0.018), gain * 0.22)   # hat
+        nb = int(bt * 0.9 * sr); tb2 = np.arange(nb) / sr                                                             # sub bass on off-beat
+        add(mus, tb + bt / 2, np.tanh(2.2 * np.sin(2 * np.pi * f(root - 12) * tb2)) * env(nb, 0.005, 0.18), gain * 0.32)
+        for q, iv in enumerate((0, 7, 12, 15)):                                                                     # 16th arp
+            m = root + 24 + iv + (3 if (k // 4) % 2 else 0) * (q == 3)
+            add(mus, tb + q * bt / 4, pluck(m, 0.18, 1.1), gain * 0.09)
+        if k % 8 == 4:                                                                                              # clap
+            c = int(0.15 * sr); add(mus, tb, np.convolve(rng.normal(size=c), np.ones(4) / 4, 'same') * env(c, 0.001, 0.05), gain * 0.25)
+
+
+def impact(at, g=0.5):
+    n = int(0.9 * sr); tt = np.arange(n) / sr
+    boom = np.sin(2 * np.pi * (38 + 90 * np.exp(-tt * 14)) * tt) * env(n, 0.001, 0.35)
+    add(fx, at, boom + 0.25 * np.convolve(rng.normal(size=n), np.ones(40) / 40, 'same') * env(n, 0.001, 0.12), g)
+
+
 def whoosh(at, g=0.3):
     n = int(0.35 * sr); w = np.convolve(rng.normal(size=n), np.ones(30) / 30, 'same') * np.sin(np.pi * np.arange(n) / n) ** 2; add(fx, at - 0.15, w, g)
 
@@ -107,8 +130,10 @@ def coin(at):
 
 
 # ---- music plan ----
-if 'plan' in E:      # generic: [[t0, t1, gain, mode], ...]  mode: full | bright | pad
-    for t0, t1, g, mode in E['plan']: groove(t0, t1, g, mode)
+if 'plan' in E:      # generic: [[t0, t1, gain, mode], ...]  mode: full | bright | pad | tech
+    for t0, t1, g, mode in E['plan']:
+        if mode == 'tech': tech(t0, t1, g)
+        else: groove(t0, t1, g, mode)
 else:                # Reel 3
     groove(0.0, ev['demo_ad'][0], 0.55)
     groove(ev['demo_ad'][0], ev['demo_ad'][1], 0.75, 'bright')
@@ -124,6 +149,7 @@ for at in ev.get('chime', []): chime(at)
 for at in ev.get('rimshot', []): rimshot(at)
 for t0, t1 in ev.get('riser', []): riser(t0, t1)
 for at in ev.get('coin', []): coin(at)
+for at in ev.get('impact', []): impact(at)
 sf.write(OUT.replace('.wav', '_music.wav'), mus, sr); sf.write(OUT.replace('.wav', '_sfx.wav'), fx, sr)
 # ---- voices (Avir track + shopkeeper + the tool's generated ad voice) ----
 vo = np.zeros(N)

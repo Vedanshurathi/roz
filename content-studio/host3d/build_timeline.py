@@ -7,6 +7,7 @@ script.json: list of lines
   {"sec": "news", "shot": "medium", "clip": "SitTalkBoth",
    "tts": "देवनागरी text as spoken",          # or "parts": [["Real experiments.", "en-us"], ["यही वादा है।", "hi"]]
    "cap": "caption text (Hinglish, same words in the same order)",
+   "lip": "देवनागरी",       # optional: all-Devanagari reading used only for lip-sync (lipsync.py ignores Latin words)
    "speed": 1.0,          # optional per-line pace (Kokoro speed; default 1.0) — vary for energy
    "pause_before": 0.0,   # optional extra pause before this line (title card / chapter change)
    "gap": 0.42}           # optional pause after this line
@@ -50,7 +51,7 @@ for i, l in enumerate(L):
         spoken = " ".join(EN_SPOKEN.get(txt, txt) for txt, _ in l["parts"])
     else:
         x = tts(l["tts"], wav, "hi", sp); spoken = l["tts"]
-    subprocess.run(["python3", str(HERE / "lipsync.py"), spoken, str(wav), str(EP / f"ls{i:02d}.json"), "--fps", str(FPS)], check=True, capture_output=True)
+    subprocess.run(["python3", str(HERE / "lipsync.py"), l.get("lip", spoken), str(wav), str(EP / f"ls{i:02d}.json"), "--fps", str(FPS)], check=True, capture_output=True)
     lines.append({**l, "i": i, "tts": spoken, "start": round(t, 3), "dur": round(len(x) / SR, 3), "clip": l.get("clip", "SitTalkRight"), "lips": f"ls{i:02d}.json"})
     voice.append((t, x)); t += len(x) / SR + l.get("gap", 0.42)
     print(f"{i:02d} {t:7.2f}s  {spoken[:60]}")
