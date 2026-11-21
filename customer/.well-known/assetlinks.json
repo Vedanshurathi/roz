@@ -16,5 +16,18 @@
         "15:67:4B:50:12:AA:25:56:FF:20:8D:9C:C8:DD:ED:D3:83:72:E8:CD:40:87:2F:53:31:B2:3D:FE:81:2C:D6:64"
       ]
     }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "shop.rozbazaar.app",
+      "sha256_cert_fingerprints": [
+        "67:8E:1B:01:BD:34:57:47:5D:B9:38:18:BD:BE:05:FF:79:22:49:B6:5D:A9:96:76:63:8C:68:8A:A5:B1:07:E0"
+      ]
+    }
   }
 ]

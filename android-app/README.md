@@ -1,6 +1,7 @@
 # RozBazaar Android app (WebView)
 
-Replaces the PWABuilder/TWA build (Nov 2026). Same Play Store package `shop.rozbazaar.twa`.
+Replaces the PWABuilder/TWA build (Nov 2026). New Play app (21 Nov 2026): package `shop.rozbazaar.app`, listed as "RozBazaar: Sabzi Mandi at Home".
+(The old app `shop.rozbazaar.twa` got versionCode 5/6 from this project before the switch.)
 Shows https://rozbazaar.shop/?source=pwa in a full-screen WebView — no TWA / androidbrowserhelper code.
 
 - `MainActivity.java` — WebView, splash, offline screen + Retry, pull-to-refresh, back button,
@@ -20,4 +21,4 @@ Signing passwords are never in the repo. Make a file OUTSIDE the repo with
     ./gradlew assembleRelease bundleRelease
 
 Raise `versionCode` (and `versionName`) in `app/build.gradle` for every Play upload.
-History: 4 = 1.1.1.0 (last TWA) → 5 = 1.2.0.0 (first WebView build) → 6 = 1.2.1.0.
+shop.rozbazaar.app: 1 = 1.0.0 (first upload).

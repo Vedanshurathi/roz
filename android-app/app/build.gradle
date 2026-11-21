@@ -15,11 +15,11 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId 'shop.rozbazaar.twa'   // same package as the Play Store app — never change
+        applicationId 'shop.rozbazaar.app'   // NEW Play app (Nov 2026) — never change after the first upload
         minSdk 24
         targetSdk 36
-        versionCode 6                        // 4 = 1.1.1.0 (TWA), 5 = 1.2.0.0 (first WebView build)
-        versionName '1.2.1.0'
+        versionCode 1                        // new app: starts again at 1
+        versionName '1.0.0'
     }
 
     signingConfigs {
