@@ -1,0 +1,57 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Signing: passwords are NEVER stored in this repo. Point RB_SIGNING_PROPS at a
+// properties file kept outside the repo with storeFile, storePassword, keyAlias, keyPassword.
+def signingProps = new Properties()
+def propsPath = System.getenv('RB_SIGNING_PROPS')
+if (propsPath != null && new File(propsPath).exists()) {
+    new File(propsPath).withInputStream { signingProps.load(it) }
+}
+
+android {
+    namespace 'shop.rozbazaar.twa'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'shop.rozbazaar.twa'   // same package as the Play Store app — never change
+        minSdk 24
+        targetSdk 36
+        versionCode 5                        // was 4 (1.1.1.0)
+        versionName '1.2.0.0'
+    }
+
+    signingConfigs {
+        release {
+            if (signingProps['storeFile']) {
+                storeFile file(signingProps['storeFile'])
+                storePassword signingProps['storePassword']
+                keyAlias signingProps['keyAlias']
+                keyPassword signingProps['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (signingProps['storeFile']) signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.activity:activity:1.10.1'
+    implementation 'androidx.core:core:1.16.0'
+    implementation 'androidx.webkit:webkit:1.14.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'androidx.browser:browser:1.8.0'   // only to open the Google login page
+}
