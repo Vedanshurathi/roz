@@ -20,4 +20,4 @@ Signing passwords are never in the repo. Make a file OUTSIDE the repo with
     ./gradlew assembleRelease bundleRelease
 
 Raise `versionCode` (and `versionName`) in `app/build.gradle` for every Play upload.
-History: 4 = 1.1.1.0 (last TWA) → 5 = 1.2.0.0 (first WebView build).
+History: 4 = 1.1.1.0 (last TWA) → 5 = 1.2.0.0 (first WebView build) → 6 = 1.2.1.0.

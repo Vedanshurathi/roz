@@ -81,7 +81,7 @@ scripts/
 docs/              business context
   pitch-deck/        the pitch deck: deck.src.html → `npm run build` → RozBazaar_Pitch_Deck.pdf (see its README)
 android-app/       Play Store app (21 Nov 2026): plain Android WebView of rozbazaar.shop/?source=pwa, package
-                   shop.rozbazaar.twa (never change), replaces the PWABuilder TWA; versionCode 5 = 1.2.0.0. No TWA code.
+                   shop.rozbazaar.twa (never change), replaces the PWABuilder TWA; versionCode 6 = 1.2.1.0. No TWA code.
                    Voice/share/permissions bridged in assets/rb-bridge.js. Build + signing: android-app/README.md
                    (keystore + passwords stay with Vedanshu, never in the repo). Raise versionCode every upload.
 platform/          NEW (30 Sep 2026): TypeScript/Express API + React customer & vendor apps
