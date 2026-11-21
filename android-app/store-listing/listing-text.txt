@@ -1,0 +1,50 @@
+APP NAME (30)
+RozBazaar: Sabzi Mandi at Home
+
+SHORT DESCRIPTION (max 80)
+Fresh sabzi & fruits from your village vendor. Book a slot, pay at your door.
+
+FULL DESCRIPTION
+RozBazaar brings the sabzi mandi to your door. Order fresh vegetables, fruits and onion-potato from a trusted local vendor in your village, pick a time that suits you, and the vendor comes to your house.
+
+HOW IT WORKS
+• Choose your items at today's rates, with real photos
+• Pick a time slot: morning 7–11, afternoon 12–4 or evening 5–8
+• The vendor comes in your slot and weighs everything in front of you
+• Pay the vendor directly in cash or UPI, only for what you take
+• Confirm the handover with your 4-digit delivery code
+
+WHY PEOPLE LIKE IT
+• Order by voice: just say "1 kilo tamatar, 2 kilo aloo" in Hindi or English
+• Today's rates on the home screen, with up and down arrows
+• Track your vendor live on the map when they are on the way
+• Order with your neighbours in the same lane (gali group) and get a free bonus
+• Share today's rates on WhatsApp with one tap
+• Works in Hindi and English
+• Save several addresses: home, shop, family
+
+NO HIDDEN CHARGES
+The price you see is an estimate. The final bill is made at your door after weighing, so you never pay for more than you get.
+
+WHERE WE DELIVER
+RozBazaar currently serves villages near Gurugram, Haryana, and is adding new villages soon. If we are not in your area yet, the app will tell you.
+
+Questions? Use "Contact us" in the app or visit https://rozbazaar.shop
+
+---------------------------------------------
+HINDI (optional, if you add Hindi – hi-IN as a translation)
+
+SHORT DESCRIPTION
+गाँव के सब्ज़ीवाले से ताज़ी सब्ज़ी और फल। समय चुनें, दरवाज़े पर भुगतान करें।
+
+FULL DESCRIPTION
+RozBazaar सब्ज़ी मंडी को आपके दरवाज़े तक लाता है। अपने गाँव के भरोसेमंद सब्ज़ीवाले से ताज़ी सब्ज़ी, फल और प्याज़-आलू मँगाएँ, अपना समय चुनें, और वेंडर आपके घर आएगा।
+
+• आज के रेट, असली फ़ोटो के साथ
+• समय चुनें: सुबह 7–11, दोपहर 12–4 या शाम 5–8
+• वेंडर आपके सामने तौलता है
+• नकद या UPI से सीधे वेंडर को भुगतान
+• बोलकर ऑर्डर करें: "एक किलो टमाटर, दो किलो आलू"
+• रास्ते में वेंडर को मैप पर लाइव देखें
+• गली के पड़ोसियों के साथ ऑर्डर करें और मुफ़्त बोनस पाएँ
+• हिंदी और अंग्रेज़ी दोनों में
