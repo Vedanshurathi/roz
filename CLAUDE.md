@@ -82,7 +82,7 @@ docs/              business context
   pitch-deck/        the pitch deck: deck.src.html → `npm run build` → RozBazaar_Pitch_Deck.pdf (see its README)
 android-app/       Play Store app (21 Nov 2026): plain Android WebView of rozbazaar.shop/?source=pwa. NEW Play app (Vedanshu,
                    21 Nov: old shop.rozbazaar.twa kept failing the 14-day test) = package shop.rozbazaar.app, Play name
-                   "RozBazaar: Sabzi Mandi at Home", versionCode 1 = 1.0.0 (never change the package now). No TWA code.
+                   "RozBazaar: Sabzi Mandi at Home", versionCode 2 = 1.0.1 (never change the package now). No TWA code.
                    assetlinks.json lists shop.rozbazaar.app with the upload key — ADD its Play app-signing SHA-256 too.
                    Voice/share/permissions bridged in assets/rb-bridge.js. Build + signing: android-app/README.md
                    (keystore + passwords stay with Vedanshu, never in the repo). Raise versionCode every upload.

@@ -593,5 +593,5 @@ public class MainActivity extends ComponentActivity {
     }
 
     /** Small holder so the user-agent carries the app version without enabling BuildConfig generation. */
-    static final class BuildConfigInfo { static final String VERSION = "1.0.0"; }
+    static final class BuildConfigInfo { static final String VERSION = "1.0.1"; }
 }
