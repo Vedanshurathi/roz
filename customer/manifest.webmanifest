@@ -37,6 +37,10 @@
   "related_applications": [
     {
       "platform": "play",
+      "id": "shop.rozbazaar.app"
+    },
+    {
+      "platform": "play",
       "id": "shop.rozbazaar.twa"
     },
     {
