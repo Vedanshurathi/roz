@@ -79,5 +79,5 @@ word-by-word animated captions with highlighted keywords, cards for numbers/list
 under the voice, -14 LUFS, a clear CTA at the end. Show me preview frames before the final export.
 ```
 
-*Made by Avir (an AI character) and Vedanshu Rathi. The reel that teased this prompt was itself edited with Claude Code
-using FFmpeg, HyperFrames, Kokoro (voice) and Whisper.*
+*From @vedanshu.rathi × @unfiltered.avir. The reel that teased this prompt was itself edited with Claude Code using
+FFmpeg, HyperFrames, Blender (the character), Kokoro (voice) and Whisper.*

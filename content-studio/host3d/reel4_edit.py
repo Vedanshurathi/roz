@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """Reel 4 ("ये पूरी reel Claude ने edit की है") — 1080x1920 HyperFrames composition in the dark / orange motion-graphics
-style: numbered scene header, kinetic word captions, floating glass UI cards, big glowing numbers, Avir in a facecam card.
-  python3 reel4_edit.py <data.json> <hf_dir> avir|vedanshu [--no-avir]
-Media: <hf_dir>/media/avir.mp4 (Remotion Reel4Avir: Avir bust over the facecam background, full length).
+style: numbered scene header, kinetic word captions, floating glass UI cards, big glowing numbers, an original chibi character (chibi_char.py) centre-bottom.
+  python3 reel4_edit.py <data.json> <hf_dir> [--no-char]   (one collab video for @vedanshu.rathi x @unfiltered.avir)
+Media: <hf_dir>/media/chibi.webm (VP9 with alpha, from chibi_char.py frames).
 Writes <hf_dir>/index.html and <hf_dir>/edit.json (event times for reel3_audio.py).
 Mobile-safe: header below the top ~170 px, nothing important in the bottom ~380 px.
 Caption markup in the script: *word* = orange italic serif accent, [word] = orange highlight box."""
 import json, sys, html, random
 from pathlib import Path
 
-D = json.load(open(sys.argv[1])); HF = Path(sys.argv[2]); ACC = sys.argv[3]; NO_AVIR = '--no-avir' in sys.argv
+D = json.load(open(sys.argv[1])); HF = Path(sys.argv[2]); NO_CHAR = '--no-char' in sys.argv
 L = D['lines']; TOT = D['total']
 st = lambda i: L[i]['start']; en = lambda i: L[i]['start'] + L[i]['dur']
 W = lambda i, sub: next(w for w in L[i]['words'] if sub in w['w'])
@@ -19,8 +19,7 @@ SC = [(0.0, 'THE HOOK'), (st(1) - 0.12, 'NO EDITOR'), (st(2) - 0.12, 'ONE PROMPT
       (st(6) - 0.12, 'THE PRICE'), (st(7) - 0.12, 'YOUR COMPUTER'), (st(8) - 0.12, 'THE PROMPT'), (st(9) - 0.12, 'GET IT')]
 SE = [SC[i + 1][0] if i + 1 < len(SC) else TOT for i in range(len(SC))]
 END0 = W(9, 'दूँगा')['t1'] + 0.35
-ACCT = {'avir': ('@unfiltered.avir', 'AI creator · real experiments, unfiltered results'),
-        'vedanshu': ('@vedanshu.rathi', 'Founder, RozBazaar · AI experiments every week')}[ACC]
+
 
 css = r'''
 @font-face { font-family: IDB; src: url(fonts/InterDisplay-Black.otf); }
@@ -52,19 +51,14 @@ html, body { width:1080px; height:1920px; overflow:hidden; background:#070505; }
 .bar { height:54px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; padding:0 22px; gap:10px; font-family:JBM; font-size:21px; color:rgba(255,255,255,.6); }
 .dot { width:14px; height:14px; border-radius:50%; background:#3a3230; } .dot.r { background:#ff5f57; } .dot.y { background:#febc2e; } .dot.g { background:#28c840; }
 /* captions */
-.cap { left:40px; width:1000px; top:850px; height:200px; display:flex; flex-wrap:wrap; justify-content:center; align-content:center; gap:4px 22px; }
+.cap { left:40px; width:1000px; top:790px; height:170px; display:flex; flex-wrap:wrap; justify-content:center; align-content:center; gap:4px 22px; }
 .cap span { display:inline-block; font-family: IDB, DEV, sans-serif; font-weight:800; font-size:80px; line-height:1.12; letter-spacing:-1px; text-shadow:0 6px 26px rgba(0,0,0,.8); }
 .cap span.acc { font-family: SER, DEV, serif; font-weight:400; font-size:100px; color:#FF7A2F; letter-spacing:0; text-shadow:0 0 30px rgba(255,110,30,.55), 0 6px 20px rgba(0,0,0,.7); }
 .cap span.box { background:#FF6A1A; color:#fff; padding:0 16px; border-radius:14px; box-shadow:0 0 34px rgba(255,106,26,.55); text-shadow:none; }
-/* avir facecam */
-#avv { left:265px; top:1078px; width:550px; height:470px; border-radius:40px; overflow:hidden; object-fit:cover;
-  box-shadow: 0 0 0 8px rgba(255,106,26,.08), 0 0 70px rgba(255,106,26,.38), 0 40px 90px rgba(0,0,0,.7);
-  background: radial-gradient(ellipse at 50% 30%, #3a2418, #120c0a 75%); }
-#cam { left:265px; top:1078px; width:550px; height:470px; border-radius:40px; border:2px solid rgba(255,140,60,.55); }
-#avv .ph { position:absolute; left:0; top:0; width:550px; height:470px; display:flex; align-items:center; justify-content:center; font-family:IDB; font-size:64px; color:rgba(255,160,90,.35); letter-spacing:8px; }
-#camlbl { left:290px; top:1500px; display:flex; align-items:center; gap:10px; padding:7px 16px; border-radius:999px; background:rgba(8,6,5,.72);
-  border:1px solid rgba(255,255,255,.16); font-family:JBM; font-size:19px; color:rgba(255,255,255,.85); }
-#camlbl i { width:11px; height:11px; border-radius:50%; background:#ff3b30; box-shadow:0 0 10px #ff3b30; }
+/* character (original chibi "editor buddy", Blender render with alpha) */
+#chr { left:280px; top:922px; width:520px; height:693px; }
+#floor { left:290px; top:1480px; width:500px; height:130px; border-radius:50%; background:radial-gradient(ellipse at 50% 50%, rgba(255,120,40,.45), rgba(255,90,20,.12) 50%, transparent 72%); }
+#chr .ph { width:520px; height:693px; display:flex; align-items:center; justify-content:center; font-family:IDB; font-size:50px; color:rgba(255,160,90,.35); }
 /* scene 1: timeline */
 #tl1 { left:70px; top:330px; width:940px; height:440px; }
 .trk { position:absolute; left:110px; height:52px; width:800px; }
@@ -72,7 +66,7 @@ html, body { width:1080px; height:1920px; overflow:hidden; background:#070505; }
 .clp { position:absolute; top:0; height:52px; border-radius:10px; transform-origin:0 50%; }
 #ph1 { position:absolute; left:110px; top:70px; width:3px; height:350px; background:#FF7A2F; box-shadow:0 0 14px #FF7A2F; }
 #ph1:before { content:''; position:absolute; left:-9px; top:-6px; width:21px; height:14px; background:#FF7A2F; border-radius:4px; }
-#chip1 { left:0; right:0; margin:0 auto; width:max-content; top:790px; padding:12px 26px; border-radius:999px; background:#FF6A1A; font-family:IDB; font-size:30px; letter-spacing:2px; box-shadow:0 0 40px rgba(255,106,26,.6); }
+#chip1 { right:92px; top:339px; padding:7px 18px; border-radius:999px; background:#FF6A1A; font-family:IDB; font-size:23px; letter-spacing:2px; box-shadow:0 0 40px rgba(255,106,26,.6); }
 /* scene 2: editors */
 .app { width:300px; height:190px; padding:26px; }
 .app .nm { font-family:IDB; font-size:42px; margin-top:12px; } .app .ic { font-size:46px; } .app .sb { font-family:ISB; font-size:20px; color:rgba(255,255,255,.5); margin-top:6px; }
@@ -85,7 +79,7 @@ html, body { width:1080px; height:1920px; overflow:hidden; background:#070505; }
 #prsend { position:absolute; right:26px; bottom:24px; width:66px; height:66px; border-radius:50%; background:#FF6A1A; display:flex; align-items:center; justify-content:center; font-size:34px; box-shadow:0 0 30px rgba(255,106,26,.6); }
 #prfile { left:330px; top:300px; padding:10px 22px; border-radius:14px; background:rgba(255,106,26,.14); border:1.5px solid rgba(255,140,60,.6); font-family:JBM; font-size:24px; color:#ffb27a; }
 /* scene 4: terminal */
-#term { left:50px; top:330px; width:980px; height:500px; }
+#term { left:50px; top:318px; width:980px; height:462px; }
 .tl { position:absolute; left:30px; font-family:JBM; font-size:23px; white-space:nowrap; color:rgba(255,255,255,.88); }
 .tl.c { color:#FF9A5C; } .tl.ok { color:#4BE08A; } .tl.dim { color:rgba(255,255,255,.45); }
 .chip { padding:10px 22px; border-radius:14px; font-family:IDB; font-size:30px; background:rgba(16,12,10,.9); border:1.5px solid rgba(255,140,60,.65); box-shadow:0 0 30px rgba(255,106,26,.35); }
@@ -124,9 +118,10 @@ html, body { width:1080px; height:1920px; overflow:hidden; background:#070505; }
 #endc { left:90px; top:300px; width:900px; height:520px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
 #endc .e0 { font-family:JBM; font-size:24px; letter-spacing:4px; color:#FF7A2F; }
 #endc .e1 { font-family:IDB; font-size:76px; margin-top:18px; letter-spacing:-1px; }
-#endc .e2 { margin-top:16px; padding:14px 34px; border-radius:999px; background:#FF6A1A; font-family:IDB; font-size:40px; box-shadow:0 0 40px rgba(255,106,26,.55); }
+#endc .row { display:flex; gap:18px; margin-top:16px; align-items:center; } #endc .x { font-family:IDB; font-size:34px; color:rgba(255,255,255,.6); }
+#endc .e2 { padding:12px 26px; border-radius:999px; background:#FF6A1A; font-family:IDB; font-size:32px; box-shadow:0 0 40px rgba(255,106,26,.55); }
 #endc .e3 { margin-top:20px; font-family:ISB; font-size:24px; color:rgba(255,255,255,.65); }
-#disc { left:0; width:1080px; top:1572px; text-align:center; font-family:ISB; font-size:20px; color:rgba(255,255,255,.55); }
+#disc { left:0; width:1080px; top:1632px; text-align:center; font-family:ISB; font-size:20px; color:rgba(255,255,255,.55); }
 .sweep { left:-700px; top:0; width:520px; height:1920px; background:linear-gradient(90deg, transparent, rgba(255,150,80,.22), rgba(255,230,200,.35), rgba(255,150,80,.22), transparent); transform:skewX(-14deg); }
 #flash { left:0; top:0; width:1080px; height:1920px; background:#fff; opacity:0; }
 #fade { left:0; top:0; width:1080px; height:1920px; background:#000; opacity:0; }
@@ -157,16 +152,15 @@ for i, ((a, name), b) in enumerate(zip(SC, SE)):
     if i:
         clip(f'sw{i}', a - 0.05, a + 0.45, cls='sweep', track=11)
         js(f'tl.fromTo("#sw{i}",{{x:0}},{{x:2300,duration:0.45,ease:"power2.inOut"}},{a - 0.05:.3f});')
-clip('tag', 0.2, SC[1][0], '🤖 Avir is an AI character · this reel was edited by Claude Code', track=1)
+clip('tag', 0.2, SC[1][0], '🤖 AI-generated character &amp; voice · edited by Claude Code', track=1)
 pop('#tag', 0.25, 0.3, 'opacity:0', 'opacity:1', 'none')
 
-# Avir facecam (rendered by Remotion over the same background)
-if NO_AVIR: clip('avv', 0, TOT, '<div class="ph">AVIR</div>', track=4)
-else: H.append(f'<video id="avv" class="clip" src="media/avir.mp4" muted playsinline data-start="0" data-duration="{TOT:.3f}" data-track-index="4"></video>')
-clip('cam', 0, TOT, track=5)
-clip('camlbl', 0, TOT, '<i></i> AVIR · AI HOST', track=6)
-pop('#avv', 0.0, 0.45, 'y:80,opacity:0,scale:.92', 'y:0,opacity:1,scale:1', 'power3.out')
-pop('#cam', 0.0, 0.45, 'y:80,opacity:0,scale:.92', 'y:0,opacity:1,scale:1', 'power3.out')
+# the character (transparent video) on a glowing floor
+clip('floor', 0, TOT, track=2)
+js(f'tl.fromTo("#floor",{{opacity:.7,scaleX:.95}},{{opacity:1,scaleX:1.05,duration:1.3,yoyo:true,repeat:{int(TOT / 1.3)},ease:"sine.inOut"}},0);')
+if NO_CHAR: clip('chr', 0, TOT, '<div class="ph">CHARACTER</div>', track=4)
+else: H.append(f'<video id="chr" class="clip" src="media/chibi.webm" muted playsinline data-start="0" data-duration="{TOT:.3f}" data-track-index="4"></video>')
+pop('#chr', 0.0, 0.4, 'y:120,opacity:0,scale:.85', 'y:0,opacity:1,scale:1', 'back.out(1.6)')
 
 # ---------- captions ----------
 def clean(w): return w.replace('*', '').replace('[', '').replace(']', '')
@@ -260,12 +254,12 @@ TL = [('c', '> edit raw.mp4 using master_prompt.md'), ('', '⏺ Bash(ffmpeg -i r
       ('', '⏺ Bash(whisper voice.wav → words.json)'), ('ok', '  ✓ word-by-word captions timed'), ('', '⏺ Write(index.html) · HyperFrames scenes'),
       ('', '⏺ Bash(npx hyperframes render -o reel.mp4)'), ('ok', '  ✓ rendered 1080×1920 · 24 fps')]
 inner = '<div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp; claude — ~/reels</div>'
-inner += ''.join(f'<div class="tl {c}" id="tl_{i}" style="top:{76 + i * 50}px">{html.escape(t)}</div>' for i, (c, t) in enumerate(TL))
+inner += ''.join(f'<div class="tl {c}" id="tl_{i}" style="top:{74 + i * 44}px">{html.escape(t)}</div>' for i, (c, t) in enumerate(TL))
 clip('term', a, b, inner, cls='card', track=3)
 pop('#term', a, 0.35, 'y:80,opacity:0,scale:.92', 'y:0,opacity:1,scale:1', 'power3.out')
 for i in range(len(TL)):
     pop(f'#tl_{i}', a + 0.2 + i * (b - a - 0.7) / len(TL), 0.12, 'x:-20,opacity:0', 'x:0,opacity:1', 'power2.out')
-for nm, x, y, t in (('FFmpeg', 180, 258, wt(3, 'FFmpeg')), ('HyperFrames', 560, 258, wt(3, 'HyperFrames'))):
+for nm, x, y, t in (('FFmpeg', 180, 250, wt(3, 'FFmpeg')), ('HyperFrames', 560, 250, wt(3, 'HyperFrames'))):
     clip(f'ch_{nm}', t - 0.05, b, nm, cls='chip', track=6, style=f'left:{x}px;top:{y}px')
     pop(f'#ch_{nm}', t - 0.05, 0.3, 'y:30,opacity:0,scale:1.4', 'y:0,opacity:1,scale:1', 'back.out(2.2)')
     out(f'#ch_{nm}', b)
@@ -329,10 +323,11 @@ pop('#cbox', a + 0.1, 0.35, 'y:50,opacity:0', 'y:0,opacity:1', 'power3.out')
 for i, s in enumerate(['E', 'ED', 'EDI', 'EDIT']): js(f'tl.set("#cbt",{{textContent:"{s}"}},{t_edit - 0.2 + i * 0.09:.3f});')
 js(f'tl.fromTo("#cbs",{{scale:1}},{{scale:1.3,duration:0.12,yoyo:true,repeat:1}},{t_edit + 0.35:.3f});')
 for s in ('#cmt1', '#cmt2', '#cbox'): out(s, END0)
-handle, sub = ACCT
-clip('endc', END0, TOT, f'<div class="e0">MASTER PROMPT · COMMENT “EDIT”</div><div class="e1">Follow for more AI</div><div class="e2">{html.escape(handle)}</div><div class="e3">{html.escape(sub)}</div>', cls='card', track=3)
+clip('endc', END0, TOT, '<div class="e0">MASTER PROMPT · COMMENT “EDIT”</div><div class="e1">Follow for more AI</div>'
+     '<div class="row"><div class="e2">@vedanshu.rathi</div><div class="x">×</div><div class="e2">@unfiltered.avir</div></div>'
+     '<div class="e3">real AI experiments · every week</div>', cls='card', track=3)
 pop('#endc', END0, 0.45, 'y:80,opacity:0,scale:.9', 'y:0,opacity:1,scale:1', 'back.out(1.6)')
-clip('disc', END0, TOT, 'Avir is an AI character · edited with Claude Code + free open-source tools', track=6)
+clip('disc', END0, TOT, 'AI-generated character &amp; voice · edited with Claude Code + free open-source tools', track=6)
 pop('#disc', END0 + 0.2, 0.3, 'opacity:0', 'opacity:1', 'none')
 PUNCH += [t_edit]
 
@@ -361,4 +356,4 @@ ev = {'whoosh': [a for a, _ in SC[1:]] + [END0], 'click': [], 'chime': [t_cl, EN
       'impact': FLASH + PUNCH, 'scenes': SC, 'end': END0}
 for i in range(len(TL)): ev['click'].append(SC[3][0] + 0.2 + i * (SE[3] - SC[3][0] - 0.7) / len(TL))
 json.dump({'total': TOT, 'ev': ev}, open(HF / 'edit.json', 'w'), indent=1, ensure_ascii=False)
-print('ok', ACC, round(TOT, 2), 'caption groups', len(allg), 'scenes', len(SC), 'end', round(END0, 2))
+print('ok', 'collab', round(TOT, 2), 'caption groups', len(allg), 'scenes', len(SC), 'end', round(END0, 2))
