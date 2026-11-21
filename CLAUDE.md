@@ -83,7 +83,7 @@ docs/              business context
 android-app/       Play Store app (21 Nov 2026): plain Android WebView of rozbazaar.shop/?source=pwa. NEW Play app (Vedanshu,
                    21 Nov: old shop.rozbazaar.twa kept failing the 14-day test) = package shop.rozbazaar.app, Play name
                    "RozBazaar: Sabzi Mandi at Home", versionCode 2 = 1.0.1 (never change the package now). No TWA code.
-                   assetlinks.json lists shop.rozbazaar.app with the upload key — ADD its Play app-signing SHA-256 too.
+                   assetlinks.json lists shop.rozbazaar.app with the Play app-signing key 6D:07…BF:F8, Google's hybrid key A2:C4…6A:EF and the upload key 67:8E…07:E0.
                    Voice/share/permissions bridged in assets/rb-bridge.js. Build + signing: android-app/README.md
                    (keystore + passwords stay with Vedanshu, never in the repo). Raise versionCode every upload.
 platform/          NEW (30 Sep 2026): TypeScript/Express API + React customer & vendor apps

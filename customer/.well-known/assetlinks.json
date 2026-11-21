@@ -26,7 +26,9 @@
       "namespace": "android_app",
       "package_name": "shop.rozbazaar.app",
       "sha256_cert_fingerprints": [
-        "67:8E:1B:01:BD:34:57:47:5D:B9:38:18:BD:BE:05:FF:79:22:49:B6:5D:A9:96:76:63:8C:68:8A:A5:B1:07:E0"
+        "6D:07:07:89:B0:3A:67:57:4B:DE:8F:BF:51:F7:4F:FC:1D:69:2D:3C:0D:BB:B3:FB:31:E8:61:AD:B4:71:BF:F8",
+        "67:8E:1B:01:BD:34:57:47:5D:B9:38:18:BD:BE:05:FF:79:22:49:B6:5D:A9:96:76:63:8C:68:8A:A5:B1:07:E0",
+        "A2:C4:94:A7:1A:18:A8:25:13:7B:B9:36:48:C0:CC:71:D1:5F:C0:C6:53:BE:71:26:AD:B8:3A:2E:64:0F:6A:EF"
       ]
     }
   }
