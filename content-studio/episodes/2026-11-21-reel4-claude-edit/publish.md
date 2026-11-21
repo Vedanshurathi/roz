@@ -33,7 +33,31 @@ Comment keyword: **EDIT**. Reply/DM with `content-studio/prompts/master-video-ed
 
 ---
 
-## Caption (one caption for the collab post)
+## Caption v2 (viral; use this one)
+
+Editors ko ye reel mat dikhana 🤫🎬
+
+Is reel mein maine ek bhi editing app nahi kholi.
+Bas Claude Code ko ek MASTER PROMPT diya… aur usne khud:
+✂️ silences kaate (jump cuts)
+🔍 har punchline pe zoom kiya
+💬 word-by-word captions banaye
+✨ motion graphics + 3D character add kiya
+🎵 music + sound effects daale
+
+Free tools (FFmpeg, HyperFrames, Blender). Sab apne computer pe ⚡
+
+Prompt chahiye? Comment karo "EDIT" 👇 DM mein bhej denge.
+📌 Save kar lo, next reel isi se banana.
+📤 Us dost ko bhejo jo har reel pe 3 ghante lagata hai 😅
+
+AI video editing kaise kare | Claude Code video editing | Reels editing in Hindi
+
+(Claude Code needs a Claude plan. The editing tools are free. 🤖 AI-generated character & voice.)
+
+#ClaudeCode #AIVideoEditing #ReelsEditing #AITools #VideoEditingTips #ContentCreator #AIinHindi #BuildInPublic
+
+## Caption v1 (one caption for the collab post)
 
 ये पूरी reel किसी editor ने नहीं… **Claude** ने edit की है 🤯🎬
 
