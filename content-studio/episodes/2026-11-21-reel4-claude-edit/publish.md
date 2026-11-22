@@ -33,6 +33,34 @@ Comment keyword: **EDIT**. Reply/DM with `content-studio/prompts/master-video-ed
 
 ---
 
+## YouTube Shorts (viral)
+
+**Title:** Claude Ne Ye Poori Video Edit Ki 🤯 (1 Prompt, ₹0 Tools) #shorts
+
+Backup titles:
+- Editor Ki Zarurat Khatam? Claude AI Video Editing 🤯 #shorts
+- 1 Prompt = Pro Video Edit | Claude Code Hindi #shorts
+
+**Description:**
+Is video mein ek bhi editing app nahi khuli: bas Claude Code ko ek master prompt diya 🤯
+Usne khud FFmpeg + HyperFrames chala ke jump cuts, zooms, word-by-word captions, motion graphics aur sound effects banaye. Sab free tools, apne computer pe.
+
+👇 Master prompt chahiye? Comment karo "EDIT"
+🔔 Subscribe for more AI experiments
+
+AI video editing kaise kare | Claude Code tutorial Hindi | free AI video editor | auto captions | YouTube Shorts editing
+
+Note: Claude Code needs a Claude plan; the editing tools (FFmpeg, HyperFrames, Blender, Whisper) are free and open-source.
+🤖 AI-generated character & voice.
+
+#shorts #ClaudeAI #AIVideoEditing #ClaudeCode #VideoEditing #AITools #TechHindi
+
+**Tags:** claude ai, claude code, ai video editing, ai video editor free, video editing in hindi, auto captions, ffmpeg, hyperframes, ai tools 2026, shorts editing, reels editing, ai for creators, master prompt, claude code hindi
+
+**Pinned comment:** Comment "EDIT" aur master prompt le jao 👇 Kisi bhi talking video pe kaam karta hai 🎬
+
+**Settings:** Altered or synthetic content → **Yes** (AI character + voice). Category: Science & Technology.
+
 ## Caption v2 (viral; use this one)
 
 Editors ko ye reel mat dikhana 🤫🎬
