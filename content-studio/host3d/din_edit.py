@@ -43,6 +43,7 @@ css = r'''
 #end .e1 { font-family: DEV, IDB; font-weight:800; font-size:66px; } #end .e2 { display:flex; justify-content:center; gap:12px; margin-top:22px; }
 #end .e2 b { width:74px; height:74px; border-radius:18px; background:#FF6A1A; font-family:IDB; font-size:44px; display:flex; align-items:center; justify-content:center; }
 #end .e3 { margin-top:24px; font-family:IDB; font-size:40px; } #end .e3 span { color:#FF8A3D; } #end .e4 { margin-top:12px; font-family:ISB; font-size:22px; color:rgba(255,255,255,.6); }
+#night { left:0; top:0; width:1080px; height:1920px; background:rgba(20,40,110,.42); mix-blend-mode:multiply; }
 #fade { left:0; top:0; width:1080px; height:1920px; background:#000; opacity:0; }
 '''
 H, J = [], []
@@ -53,6 +54,8 @@ def pop(sel, t, d=0.35, fr='y:40,opacity:0', to='y:0,opacity:1', ease='back.out(
 
 H.append(f'<video id="avir" class="clip full" src="media/avir.mp4" muted playsinline data-start="0" data-duration="{TOT:.3f}" data-track-index="0"></video>')
 clip('shade', 0, TOT, track=1)
+clip('night', st(12) - 0.12, TOT, track=1)   # blue night grade over the last bedroom scene
+J.append(f'tl.fromTo("#night",{{opacity:0}},{{opacity:1,duration:0.4}},{st(12) - 0.12:.3f});')
 # hook title
 clip('title', 0.0, st(1) - 0.2, '<div class="t1">A DAY IN THE LIFE</div><div class="t2">AVIR KA<br>EK DIN</div><div class="t3">6 real lessons · 1 AI creator</div>', track=5)
 pop('#title .t1', 0.0, 0.3, 'y:-30,opacity:0', 'y:0,opacity:1', 'power3.out'); pop('#title .t2', 0.1, 0.45, 'scale:1.6,opacity:0', 'scale:1,opacity:1', 'back.out(1.8)')
