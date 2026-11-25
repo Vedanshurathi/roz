@@ -1,0 +1,126 @@
+/**
+ * Customer login.
+ *
+ * Phone login: no OTP by the founder's decision (face-to-face village delivery) — whoever types
+ * a number gets that account. This is the biggest remaining account-takeover risk and is rate
+ * limited per IP and per number here; see docs/SECURITY.md for the SMS-OTP upgrade path.
+ *
+ * Google login: server-side PKCE. The code verifier lives in an encrypted, short-lived cookie
+ * bound to this browser, so a stolen or injected `code` is useless (also prevents login CSRF).
+ */
+import { Router } from 'express';
+import {
+  customerPhoneLoginBody,
+  customerProfileBody,
+  type CustomerProfile,
+  type SessionInfo,
+} from '@rozbazaar/shared';
+import type { Deps } from '../../deps.js';
+import { parse } from '../../middleware/validate.js';
+import { ok, safeReturnPath, startingApp } from '../../lib/respond.js';
+import { pkceChallenge, randomToken } from '../../lib/crypto.js';
+import { businessRule } from '../../lib/errors.js';
+import { requireSession } from '../../middleware/auth.js';
+import { mapCustomer } from '../mappers.js';
+
+export function customerAuthRoutes(d: Deps): Router {
+  const r = Router();
+  const AUD = 'customer' as const;
+
+  async function me(token: string): Promise<CustomerProfile | null> {
+    const out = await d.rpc.call<Record<string, unknown> | null>('customer_me', {}, { kind: 'user', token });
+    const row = out.data;
+    if (row && row.is_blocked === true)
+      throw businessRule('This account is blocked. Please contact RozBazaar.');
+    return mapCustomer(row);
+  }
+
+  r.get('/session', async (req, res) => {
+    const s = await d.sessions.resolve(req, res, AUD);
+    const user = s ? await me(s.accessToken).catch(() => null) : null;
+    const body: SessionInfo<CustomerProfile> = { authenticated: Boolean(s && user), user };
+    ok(res, body);
+  });
+
+  r.post('/auth/phone', d.limiters.customerLoginIp, d.limiters.customerLoginPhone, async (req, res) => {
+    const b = parse(customerPhoneLoginBody, req.body);
+    // Re-use the current session when there is one (the number/name gets updated on it).
+    const existing = await d.sessions.resolve(req, res, AUD);
+    const session = existing ? null : await d.auth.signUpAnonymous();
+    const token = existing?.accessToken ?? session!.accessToken;
+    const out = await d.rpc.call<Record<string, unknown>>(
+      'customer_phone_login',
+      { p_name: b.name, p_phone: b.phone },
+      { kind: 'user', token },
+    );
+    if (out.data?.is_blocked === true)
+      throw businessRule('This account is blocked. Please contact RozBazaar.');
+    if (session) d.sessions.write(res, AUD, session);
+    d.logger.info({ uid: session?.userId ?? existing?.userId }, 'customer phone login');
+    ok(res, mapCustomer(out.data));
+  });
+
+  r.put('/profile', requireSession(d.sessions, AUD), d.limiters.customerLoginPhone, async (req, res) => {
+    const b = parse(customerProfileBody, req.body);
+    const out = await d.rpc.call<Record<string, unknown>>(
+      'customer_phone_login',
+      { p_name: b.name, p_phone: b.phone },
+      { kind: 'user', token: req.auth!.accessToken },
+    );
+    ok(res, mapCustomer(out.data));
+  });
+
+  r.get('/auth/google', (req, res) => {
+    const verifier = randomToken(48);
+    d.sessions.writeOAuthState(res, {
+      aud: AUD,
+      verifier,
+      returnTo: safeReturnPath(req.query.returnTo),
+      app: startingApp(req.get('referer'), d.env.CORS_ORIGINS, d.env.CUSTOMER_APP_URL),
+    });
+    res.redirect(
+      302,
+      d.auth.authorizeUrl(
+        'google',
+        `${d.env.PUBLIC_API_URL}/v1/customer/auth/callback`,
+        pkceChallenge(verifier),
+      ),
+    );
+  });
+
+  r.get('/auth/callback', async (req, res) => {
+    const state = d.sessions.takeOAuthState(req, res);
+    const app = state?.app ?? d.env.CUSTOMER_APP_URL;
+    const code = typeof req.query.code === 'string' && req.query.code.length < 512 ? req.query.code : null;
+    if (!state || state.aud !== AUD || !code) {
+      res.redirect(302, `${app}/login?error=google`);
+      return;
+    }
+    try {
+      const s = await d.auth.exchangePkce(code, state.verifier);
+      const meta = s.userMeta;
+      const name =
+        [meta.full_name, meta.name].find((x): x is string => typeof x === 'string' && x.trim().length > 0) ??
+        null;
+      await d.rpc.call(
+        'customer_bootstrap',
+        { p_name: name?.slice(0, 60) ?? null, p_phone: null, p_email: s.email, p_provider: 'google' },
+        { kind: 'user', token: s.accessToken },
+      );
+      const token = d.sessions.write(res, AUD, s);
+      res.redirect(302, d.sessions.afterLogin(`${app}${state.returnTo}`, token));
+    } catch (err) {
+      d.logger.warn({ err: (err as Error).message }, 'google callback failed');
+      res.redirect(302, `${app}/login?error=google`);
+    }
+  });
+
+  r.post('/auth/logout', async (req, res) => {
+    const token = d.sessions.peekAccessToken(req, AUD);
+    if (token) await d.auth.logout(token);
+    d.sessions.clear(res, AUD);
+    res.status(204).end();
+  });
+
+  return r;
+}

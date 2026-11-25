@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="rb_green">#FF1E8E3E</color>
+    <color name="rb_green_dark">#FF14682C</color>
+    <color name="rb_navy">#FF101B30</color>
+    <color name="rb_white">#FFFFFFFF</color>
+</resources>

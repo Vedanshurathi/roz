@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- white silhouette of the RozBazaar shopping bag (status-bar icon) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M9,6a3,3 0,0 1,6 0h-1.6a1.4,1.4 0,0 0,-2.8 0zM5,7h14l-1,13a1,1 0,0 1,-1 1H7a1,1 0,0 1,-1 -1zM9.2,10v7h1.7v-2.4h1.1l1.6,2.4h2l-1.8,-2.7c0.9,-0.4 1.4,-1.1 1.4,-2.1c0,-1.4 -1.1,-2.2 -2.6,-2.2zM10.9,11.4h1.5c0.6,0 1,0.3 1,0.8s-0.4,0.9 -1,0.9h-1.5z"/>
+</vector>
