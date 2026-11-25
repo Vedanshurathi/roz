@@ -24,10 +24,10 @@ css = r'''
 .chip { left:56px; top:200px; display:flex; align-items:center; gap:16px; padding:12px 24px 12px 16px; border-radius:22px; background:rgba(10,8,7,.6);
   backdrop-filter: blur(14px); border:1.5px solid rgba(255,255,255,.2); }
 .chip .e { font-size:46px; } .chip .t { font-family:IDB; font-size:40px; letter-spacing:1px; } .chip .p { font-family:ISB; font-size:24px; color:#FFB27A; }
-#title { left:0; width:1080px; top:1040px; text-align:center; }
+#title { left:0; width:1080px; top:1010px; text-align:center; }
 #title .t1 { display:inline-block; font-family:JBM; font-size:28px; letter-spacing:6px; padding:8px 20px; border-radius:10px; background:#FF6A1A; }
-#title .t2 { font-family:IDB; font-size:150px; line-height:1; margin-top:20px; letter-spacing:-3px; text-shadow:0 10px 40px rgba(0,0,0,.8); }
-#title .t3 { font-family:SER; font-size:70px; color:#FF9A5C; margin-top:8px; text-shadow:0 4px 24px rgba(0,0,0,.9); }
+#title .t2 { font-family:IDB; font-size:112px; line-height:1; margin-top:16px; white-space:nowrap; letter-spacing:-3px; text-shadow:0 10px 40px rgba(0,0,0,.8); }
+#title .t3 { font-family:SER; font-size:60px; color:#FF9A5C; margin-top:8px; text-shadow:0 4px 24px rgba(0,0,0,.9); }
 .lesson { left:60px; width:960px; top:1110px; padding:30px 36px 34px; border-radius:30px; background:linear-gradient(160deg, rgba(28,20,16,.88), rgba(12,9,8,.9));
   border:2px solid rgba(255,140,60,.7); box-shadow:0 0 50px rgba(255,106,26,.35), 0 30px 80px rgba(0,0,0,.6); }
 .lesson .n { font-family:JBM; font-size:26px; letter-spacing:5px; color:#FF8A3D; }
@@ -57,7 +57,7 @@ clip('shade', 0, TOT, track=1)
 clip('night', st(12) - 0.12, TOT, track=1)   # blue night grade over the last bedroom scene
 J.append(f'tl.fromTo("#night",{{opacity:0}},{{opacity:1,duration:0.4}},{st(12) - 0.12:.3f});')
 # hook title
-clip('title', 0.0, st(1) - 0.2, '<div class="t1">A DAY IN THE LIFE</div><div class="t2">AVIR KA<br>EK DIN</div><div class="t3">6 real lessons · 1 AI creator</div>', track=5)
+clip('title', 0.0, st(1) - 0.2, '<div class="t1">A DAY IN THE LIFE</div><div class="t2">AVIR KA EK DIN</div><div class="t3">6 real lessons · 1 AI creator</div>', track=5)
 pop('#title .t1', 0.0, 0.3, 'y:-30,opacity:0', 'y:0,opacity:1', 'power3.out'); pop('#title .t2', 0.1, 0.45, 'scale:1.6,opacity:0', 'scale:1,opacity:1', 'back.out(1.8)')
 pop('#title .t3', 0.45, 0.4, 'opacity:0', 'opacity:1', 'none')
 J.append(f'tl.to("#title",{{opacity:0,y:-30,duration:0.25}},{st(1) - 0.45:.3f});')
