@@ -18,8 +18,8 @@ android {
         applicationId 'shop.rozbazaar.app'   // NEW Play app (Nov 2026) — never change after the first upload
         minSdk 24
         targetSdk 36
-        versionCode 2                        // new app: 1 was used by the first upload attempt
-        versionName '1.0.1'
+        versionCode 3                        // 2 = 1.0.1 (first upload), 3 = 1.1.0 (notifications, fast location)
+        versionName '1.1.0'
     }
 
     signingConfigs {
@@ -53,5 +53,6 @@ dependencies {
     implementation 'androidx.core:core:1.16.0'
     implementation 'androidx.webkit:webkit:1.14.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'androidx.work:work-runtime:2.10.1'   // background check for order notifications
     implementation 'androidx.browser:browser:1.8.0'   // only to open the Google login page
 }

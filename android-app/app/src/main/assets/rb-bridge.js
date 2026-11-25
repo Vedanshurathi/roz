@@ -79,6 +79,87 @@
     }
   } catch (e) {}
 
+  /* ---------- notifications: web Notification API backed by Android notifications ---------- */
+  try {
+    if (N.notifState) {
+      var nReq = 0, nWait = {};
+      window.__rbNotif = function (id, state) { var f = nWait[id]; delete nWait[id]; if (f) f(String(state)); };
+      var RBNotification = function (title, opts) {
+        opts = opts || {};
+        this.title = String(title || ''); this.body = String(opts.body || ''); this.tag = opts.tag || '';
+        this.onclick = this.onclose = this.onerror = this.onshow = null;
+        try { N.notify(this.title, this.body, String(this.tag)); } catch (e) {}
+      };
+      RBNotification.prototype.close = function () {};
+      RBNotification.prototype.addEventListener = function () {};
+      RBNotification.prototype.removeEventListener = function () {};
+      Object.defineProperty(RBNotification, 'permission', { get: function () { return String(N.notifState()); } });
+      RBNotification.requestPermission = function (cb) {
+        return new Promise(function (ok) {
+          var id = ++nReq;
+          nWait[id] = function (st) { try { if (typeof cb === 'function') cb(st); } catch (e) {} ok(st); };
+          N.notifRequest(id);
+        });
+      };
+      def(window, 'Notification', RBNotification);
+      /* app-only helpers the website uses to switch background order alerts on (see customer/index.html) */
+      def(window, 'RBApp', {
+        push: true,
+        token: function () { return String(N.pushToken()); },
+        pushEnable: function (on) { N.pushEnable(!!on); }
+      });
+    }
+  } catch (e) {}
+
+  /* ---------- location: navigator.geolocation backed by the phone's fast location providers ---------- */
+  try {
+    if (N.geoNative && N.geoNative()) {
+      var gSeq = 0, gRun = {};
+      var mkPos = function (d) {
+        return { coords: { latitude: d.lat, longitude: d.lng, accuracy: d.acc, altitude: d.alt == null ? null : d.alt,
+                 altitudeAccuracy: null, heading: d.head == null ? null : d.head, speed: d.speed == null ? null : d.speed },
+                 timestamp: d.ts || Date.now() };
+      };
+      var mkErr = function (code, msg) {
+        return { code: code, message: msg || '', PERMISSION_DENIED: 1, POSITION_UNAVAILABLE: 2, TIMEOUT: 3 };
+      };
+      window.__rbGeo = function (id, type, d) {
+        var r = gRun[id]; if (!r) return;
+        if (type === 'pos') {
+          r.got = true; clearTimeout(r.timer);
+          try { r.ok(mkPos(d)); } catch (e) { setTimeout(function () { throw e; }); }
+          if (r.once) { delete gRun[id]; N.geoStop(id); }
+        } else if (type === 'err') {
+          clearTimeout(r.timer);
+          var once = r.once || d.code === 1;
+          if (once) { delete gRun[id]; N.geoStop(id); }
+          if (r.err) try { r.err(mkErr(d.code, d.message)); } catch (e) {}
+        }
+      };
+      var begin = function (ok, err, o, once) {
+        o = o || {};
+        var id = ++gSeq, r = { ok: ok, err: err, once: once, got: false };
+        gRun[id] = r;
+        var t = o.timeout;
+        if (typeof t === 'number' && isFinite(t) && t >= 0) {
+          r.timer = setTimeout(function () {
+            if (r.got || !gRun[id]) return;
+            if (once) { delete gRun[id]; N.geoStop(id); }
+            if (err) try { err(mkErr(3, 'Timeout expired')); } catch (e) {}
+          }, t);
+        }
+        N.geoStart(id, o.enableHighAccuracy !== false);
+        return id;
+      };
+      var geo = {
+        getCurrentPosition: function (ok, err, o) { begin(ok, err, o, true); },
+        watchPosition: function (ok, err, o) { return begin(ok, err, o, false); },
+        clearWatch: function (id) { var r = gRun[id]; if (!r) return; clearTimeout(r.timer); delete gRun[id]; N.geoStop(id); }
+      };
+      def(navigator, 'geolocation', geo);
+    }
+  } catch (e) {}
+
   /* ---------- sharing (rates card, invites) through Android's share sheet ---------- */
   function toB64(blob) {
     return new Promise(function (ok, no) {

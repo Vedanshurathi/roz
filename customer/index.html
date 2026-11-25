@@ -5196,12 +5196,23 @@ async function useGps(){
   if(addrCoords && addrCoords.pinned) addrCoords.pinned=false;   /* ◎ / Redo = the customer asks for GPS again */
   const userPinned=()=>!!(addrCoords && addrCoords.pinned);
   try{
+    /* Faster (25 Nov 2026): the address and village are filled from the FIRST usable reading (±150 m or better)
+       instead of after the whole 20 s search, and filled again only when a reading is clearly sharper.
+       The search itself stops at ±25 m or 12 s. Inside the Android app the readings come from the phone's
+       own fast location (fused + GPS + network) through rb-bridge.js. */
+    let filledAcc=Infinity;
     const best=await getPreciseLocation(p=>{
       if(userPinned()) return;
-      if(btn) lbl.textContent=T('Sharpening… ±','और सही कर रहे हैं… ±')+Math.round(p.coords.accuracy)+T(' m',' मी');
-      showLocated(p.coords.latitude, p.coords.longitude, p.coords.accuracy);
-      openPinMap(p.coords.latitude, p.coords.longitude, p.coords.accuracy);   /* map now, pin follows the sharper readings */
-    }, 20000, 20);
+      const acc=p.coords.accuracy;
+      if(btn) lbl.textContent=T('Sharpening… ±','और सही कर रहे हैं… ±')+Math.round(acc)+T(' m',' मी');
+      showLocated(p.coords.latitude, p.coords.longitude, acc);
+      openPinMap(p.coords.latitude, p.coords.longitude, acc);   /* map now, pin follows the sharper readings */
+      if(acc<=150 && acc*1.8<filledAcc){
+        filledAcc=acc; clearTimeout(window.__gpsFillT);
+        const la=p.coords.latitude, ln=p.coords.longitude;
+        window.__gpsFillT=setTimeout(()=>{ if(!userPinned()){ fillFromCoords(la, ln); matchAreaFromCoords(la, ln); } }, 400);
+      }
+    }, 12000, 25);
     reset();
     if(userPinned()) return;
     const c=best.coords;
@@ -5209,6 +5220,7 @@ async function useGps(){
     openPinMap(c.latitude, c.longitude, c.accuracy);
     toast(c.accuracy<=60 ? T('Location found — check the pin is on your house','लोकेशन मिल गई — देख लें पिन आपके घर पर है')
                          : T('Location is rough — drag the pin onto your house','लोकेशन सही नहीं है — पिन को अपने घर पर रखें'));
+    clearTimeout(window.__gpsFillT);
     fillFromCoords(c.latitude, c.longitude);
     matchAreaFromCoords(c.latitude, c.longitude);
   }catch(err){
@@ -5275,13 +5287,32 @@ async function matchAreaFromCoords(lat,lng){
    typed on top of that, so if it fails or a village never got a name
    in OpenStreetMap (routine for smaller villages), the exact pin
    location itself is never at risk of being wrong or lost. */
+/* nearest named place around a point (Photon, OpenStreetMap data, free, no key) — e.g. "Shiv Mandir",
+   "Govt. School", "Yadav Kiryana Store". Resolves to a name or '' (never throws, gives up after 4 s). */
+let FILL_SEQ=0;
+function nearPlace(lat,lng){
+  return new Promise(res=>{
+    const t=setTimeout(()=>res(''),4000);
+    fetch(`https://photon.komoot.io/reverse?lat=${lat}&lon=${lng}&limit=8&radius=0.4`).then(r=>r.json()).then(j=>{
+      const skip=/^(boundary|place|highway|landuse|natural|waterway|power|railway)$/;
+      const f=(j.features||[]).map(x=>x.properties||{}).find(p=>p.name && !skip.test(p.osm_key||'') && p.name.length<=40);
+      clearTimeout(t); res(f?String(f.name):'');
+    }).catch(()=>{ clearTimeout(t); res(''); });
+  });
+}
 async function fillFromCoords(lat,lng){
   const box=document.getElementById('aFull'), src=document.getElementById('addrSrc');
   if(box.dataset.touched==='1') return;
   src.textContent=T('detecting…','पता लगा रहे हैं…');
+  const seq=(FILL_SEQ=(FILL_SEQ||0)+1);
   try{
-    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+    /* two free map services at once: OpenStreetMap (road / colony / hamlet) and Photon (the nearest named
+       place — a temple, school, shop or colony — used as the landmark). Neither needs a key. */
+    const near=nearPlace(lat,lng);
+    const lang=LANG==='hi'?'hi,en':'en';
+    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=${lang}`);
     const j=await r.json(); const a=j.address||{};
+    if(seq!==FILL_SEQ) return;              /* a newer reading is being filled */
     /* Build the text from the small parts only — house no., road, mohalla/hamlet — plus OUR village
        (from the village list / GPS match). OpenStreetMap's own display_name for a village here is
        usually the tehsil and district ("Farrukhnagar, Gurgaon, Haryana, India"), which is not an
@@ -5289,10 +5320,20 @@ async function fillFromCoords(lat,lng){
     const known=(AREAS||[]).map(x=>typeof x==='string'?x:x.name);
     const village=document.getElementById('aArea').value
       || [a.village,a.hamlet,a.suburb,a.town].find(v=>v && known.some(k=>k.toLowerCase()===String(v).toLowerCase())) || '';
-    const parts=[a.house_number, a.road||a.pedestrian||a.footway||a.residential,
-                 a.neighbourhood||a.hamlet||a.quarter||a.suburb, village]
-      .filter(Boolean).filter((v,i,arr)=>arr.findIndex(x=>String(x).toLowerCase()===String(v).toLowerCase())===i);
-    if(box.dataset.touched!=='1') box.value = parts.join(', ');
+    /* 25 Nov 2026 (Vedanshu): every address used to read "Khandewla, Khandewla". Now the text is the real
+       place name the map has for that spot — road, colony / mohalla / dhani, and the map's own village or town
+       name when it is not ours (a nearby hamlet) — and our village only once, at the end. */
+    const same=(x,y)=>String(x||'').trim().toLowerCase()===String(y||'').trim().toLowerCase();
+    const road=a.road||a.pedestrian||a.footway||a.residential||'';
+    const local=[a.neighbourhood,a.quarter,a.residential,a.suburb,a.hamlet,a.isolated_dwelling,a.farm,a.city_district,a.village,a.town]
+      .filter(v=>v && !same(v,village) && !same(v,road));
+    const p0=await near;
+    if(seq!==FILL_SEQ) return;
+    const parts=[a.house_number, road, local[0], local[1], village]
+      .filter(Boolean).filter((v,i,arr)=>arr.findIndex(x=>same(x,v))===i);
+    const spot=parts.filter(v=>!same(v,village));
+    if(box.dataset.touched!=='1') box.value = spot.length ? parts.join(', ')
+      : (p0 ? T('Near ','')+p0+T('',' के पास')+(village?', '+village:'') : village);
 
     /* Village/area selection is handled entirely by matchAreaFromCoords()
        below, which checks your real, live, admin-configured village
@@ -5302,9 +5343,9 @@ async function fillFromCoords(lat,lng){
        happened to finish last. This function only ever fills things
        matchAreaFromCoords() doesn't touch: street and landmark. */
     const streetEl=document.getElementById('aStreet');
-    if(!streetEl.value){
-      const street = a.road || a.pedestrian || a.footway || a.residential || a.neighbourhood || '';
-      if(street) streetEl.value=street;
+    if(!streetEl.value || streetEl.value===streetEl.dataset.sv){        /* never overwrite what the customer typed */
+      const street = [road, local[0]].filter(Boolean).filter((v,i,arr)=>arr.findIndex(x=>same(x,v))===i).join(', ');
+      if(street){ streetEl.value=street; streetEl.dataset.sv=street; }
     }
 
     /* A bare coordinate can't know "near the Hanuman mandir" — but
@@ -5312,9 +5353,10 @@ async function fillFromCoords(lat,lng){
        of reference point. Offered as an editable suggestion, not
        locked in, since it's a guess, not a fact. */
     const landEl=document.getElementById('aLand');
-    if(!landEl.value){
-      const landmark = a.amenity || a.shop || a.place_of_worship || a.building || a.hamlet || '';
-      if(landmark){ landEl.value=landmark; landEl.dataset.suggested='1'; }
+    if(!landEl.value || landEl.value===landEl.dataset.sv){
+      const named = a.amenity || a.shop || a.place_of_worship || a.tourism || '';
+      const landmark = named || p0 || '';
+      if(landmark && !same(landmark,village)){ landEl.value=T('Near ','')+landmark+T('',' के पास'); landEl.dataset.suggested='1'; landEl.dataset.sv=landEl.value; }
     }
 
     src.textContent=T('auto-filled · check and edit if needed','अपने आप भर दिया · जाँच लें, ज़रूरत हो तो बदलें');
@@ -5387,10 +5429,15 @@ async function saveAddress(){
   }
   go(SESSION?'acct':'home');
 }
+function streetToSave(){
+  const v=String(addr.area||'').toLowerCase();
+  const s=uniqParts([addr.street || addr.full]).filter(x=>x.toLowerCase()!==v && x!==addr.house).join(', ');
+  return s || null;
+}
 async function saveAddressToDb(){
   const r = await rpc('customer_save_address',{
     p_label:addr.tag||'Ghar', p_house:addr.house||null,
-    p_street:addr.street || addr.full || null,          /* the "full address" text is kept too */
+    p_street:streetToSave(),          /* the "full address" text is kept too, minus a repeat of the village */
     p_landmark:[addr.land, addr.note].filter(Boolean).join(' · ') || null, p_area:addr.area,
     p_lat:addr.lat, p_lng:addr.lng, p_make_default: addr.id ? (!!addr.is_default || ADDRS.length<=1) : !ADDRS.length, p_address_id:addr.id||null
   });
@@ -5417,7 +5464,13 @@ function addrName(a){
   return a ? (M[a.tag]||a.tag||M.Ghar) : '';
 }
 function addrIcon(a){ return !a?'📍':a.tag==='Dukaan'?'🏪':a.tag==='Mummy ka ghar'?'👵':(!a.tag||a.tag==='Ghar')?'🏠':'📍'; }
-function lineOf(a){ return a ? [a.house, a.street, a.area].filter(Boolean).join(', ') + (a.land?' · '+a.land:'') : ''; }
+function lineOf(a){ return a ? uniqParts([a.house, a.street, a.area]).join(', ') + (a.land?' · '+a.land:'') : ''; }
+/* one copy of each part — a street saved as just the village name used to show "Khandewla, Khandewla" */
+function uniqParts(list){
+  const out=[];
+  list.filter(Boolean).forEach(v=>{ String(v).split(/\s*,\s*/).forEach(x=>{ x=x.trim(); if(x && !out.some(y=>y.toLowerCase()===x.toLowerCase())) out.push(x); }); });
+  return out;
+}
 async function deleteAddr(id){
   const a=ADDRS.find(x=>x.id===id); if(!a) return;
   if(!confirm(T(`Delete "${addrName(a)}"?`,`"${addrName(a)}" हटाएँ?`))) return;
@@ -5471,7 +5524,7 @@ function addrLine(){
      shown right above the confirm button as if it were genuinely
      theirs. Honest beats convincing-but-fake here. */
   if(!addr) return null;
-  return [addr.house, addr.street, addr.area].filter(Boolean).join(', ')
+  return uniqParts([addr.house, addr.street, addr.area]).join(', ')
        + (addr.land?' · '+addr.land:'');
 }
 
@@ -6092,6 +6145,7 @@ function paintHeaderIdentity(){
 }
 async function logout(){
   cartLogout(); SESSION=null; sessionReady=false;
+  if(window.RBApp && !DEMO){ try{ RBApp.pushEnable(false); rpc('app_device_forget',{p_token:RBApp.token()}).catch(()=>{}); }catch(e){} }
   if(!DEMO){ try{ const c=await getSb(); await c.auth.signOut(); }catch(e){} }
   user=null; addr=null; ADDRS=[]; ADDR_PICKED=false; cart={}; BOOKINGS=[]; FAVS.clear(); REV.bk=REV.nt=null; paintWayBar();
   try{ localStorage.removeItem('rb_addr_draft'); }catch(e){}
@@ -6144,6 +6198,16 @@ function maybeAskNotif(){
   if(notifAsked) return;
   setTimeout(()=>{card.style.display='flex'},1400);  /* let the success moment land first */
 }
+/* Inside the Android app (shop.rozbazaar.app) a WebView has no Web Push. The app keeps a secret for this phone;
+   registering it lets the app fetch new order updates in the background (app_device_poll) and show them itself. */
+async function appPushRegister(){
+  if(!window.RBApp || DEMO || !SESSION) return false;
+  try{
+    const r=await rpc('customer_app_device_register',{p_token:RBApp.token()});
+    RBApp.pushEnable(true);
+    return !!(r && r.ok);
+  }catch(e){ return false; }
+}
 async function askNotif(){
   notifAsked=true;
   dismissPerm('permNotif'); hidePermBar();
@@ -6151,6 +6215,12 @@ async function askNotif(){
     const r=await Notification.requestPermission();
     if(r==='granted' && !SESSION && !DEMO){
       toast(T('Notifications on — log in once and order updates will reach this phone','सूचनाएँ चालू — एक बार लॉगिन करें, फिर ऑर्डर की हर जानकारी इस फ़ोन पर आएगी'));
+      setTimeout(nag, 4000); return;
+    }
+    if(r==='granted' && window.RBApp){
+      await appPushRegister();
+      toast(T('Done — order updates will come to this phone','हो गया — ऑर्डर की हर जानकारी इस फ़ोन पर आएगी'));
+      new Notification('RozBazaar', {body:T('Notifications are on. We will tell you when the vendor sets out.','सूचनाएँ चालू हैं। वेंडर के निकलते ही बता देंगे।'), tag:'rb-welcome'});
       setTimeout(nag, 4000); return;
     }
     if(r==='granted'){
@@ -6313,6 +6383,7 @@ async function nag(){
 async function syncPush(){
   try{
     if(DEMO || !SESSION || !('Notification' in window) || Notification.permission!=='granted') return;
+    if(window.RBApp){ await appPushRegister(); return; }
     const sub=await subscribeToPush();
     await rpc('save_push_subscription',{p_endpoint:sub.endpoint, p_p256dh:sub.p256dh, p_auth:sub.auth, p_agent:navigator.userAgent, p_role:'customer'});
   }catch(e){}

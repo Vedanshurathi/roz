@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -188,6 +189,57 @@ final class WebBridge {
     void release() {
         speechEnded = true;
         cancelRecognizer();
+    }
+
+    // ---------------------------------------------------------------- location (fast, native)
+    @JavascriptInterface
+    public boolean geoNative() { return true; }
+
+    @JavascriptInterface
+    public void geoStart(final int id, final boolean high) {
+        if (!trusted()) return;
+        act.runOnUiThread(() -> act.geoStart(id, high));
+    }
+
+    @JavascriptInterface
+    public void geoStop(final int id) {
+        act.runOnUiThread(() -> act.geoStop(id));
+    }
+
+    // ---------------------------------------------------------------- notifications
+    /** "granted" | "denied" | "default" — same words as the web Notification.permission */
+    @JavascriptInterface
+    public String notifState() {
+        if (PollWorker.canNotify(act)) return "granted";
+        if (Build.VERSION.SDK_INT >= 33) {
+            return act.wasPermanentlyDenied(Manifest.permission.POST_NOTIFICATIONS) ? "denied" : "default";
+        }
+        return "denied";   // switched off in phone settings (older Android has no question to ask)
+    }
+
+    @JavascriptInterface
+    public void notifRequest(final int reqId) {
+        if (!trusted()) return;
+        act.runOnUiThread(() -> act.askNotifPermission(reqId));
+    }
+
+    /** show a notification now (the website's `new Notification(...)`) */
+    @JavascriptInterface
+    public void notify(String title, String body, String tag) {
+        if (!trusted()) return;
+        int id = (tag == null || tag.isEmpty() ? String.valueOf(System.currentTimeMillis()) : tag).hashCode();
+        PollWorker.show(act, id, title, body);
+    }
+
+    /** this phone's secret for app_device_poll; the website registers it with customer_app_device_register */
+    @JavascriptInterface
+    public String pushToken() { return trusted() ? PollWorker.token(act) : ""; }
+
+    /** turn background order alerts on/off (after login / logout) */
+    @JavascriptInterface
+    public void pushEnable(boolean on) {
+        if (!trusted()) return;
+        PollWorker.enable(act, on);
     }
 
     // ---------------------------------------------------------------- sharing

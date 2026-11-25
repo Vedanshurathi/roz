@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- the website asks for the customer's location (address pin, nearest village) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- order updates: booking confirmed, vendor on the way, bill ready, slot reminders -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- the website's "order by voice" button -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- added by WorkManager but never used (the app does not run foreground services) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
 
     <uses-feature android:name="android.hardware.location" android:required="false" />
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />

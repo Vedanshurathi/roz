@@ -21,4 +21,4 @@ Signing passwords are never in the repo. Make a file OUTSIDE the repo with
     ./gradlew assembleRelease bundleRelease
 
 Raise `versionCode` (and `versionName`) in `app/build.gradle` for every Play upload.
-shop.rozbazaar.app: 1 = 1.0.0 (first upload).
+shop.rozbazaar.app: 1 = 1.0.0 (upload attempt), 2 = 1.0.1 (first release), 3 = 1.1.0 (notifications + fast location).

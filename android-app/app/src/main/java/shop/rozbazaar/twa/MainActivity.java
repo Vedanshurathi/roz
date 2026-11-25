@@ -97,6 +97,13 @@ public class MainActivity extends ComponentActivity {
     private GeolocationPermissions.Callback geoCallback;
     private String geoOrigin;
     private PermissionResult micResult;
+    private ActivityResultLauncher<String> notifLauncher;
+    private int notifReqId = 0;
+    private final java.util.List<Runnable> afterLocation = new java.util.ArrayList<>();
+    private NativeGeo geo;
+
+    /** true while the app is on screen (the background checker then leaves alerts to the website) */
+    static volatile boolean inForeground = false;
 
     interface PermissionResult { void done(boolean granted); }
 
@@ -107,6 +114,9 @@ public class MainActivity extends ComponentActivity {
         super.onCreate(saved);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         registerLaunchers();
+        geo = new NativeGeo(this, (id, type, json) -> jsCall("__rbGeo", id, type, json));
+        PollWorker.ensureChannel(this);
+        if (PollWorker.prefs(this).getBoolean("push_on", false)) PollWorker.enable(this, true);
         buildViews();
         setupWebView();
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -134,10 +144,12 @@ public class MainActivity extends ComponentActivity {
     }
 
     @Override protected void onSaveInstanceState(Bundle out) { super.onSaveInstanceState(out); web.saveState(out); }
-    @Override protected void onResume() { super.onResume(); web.onResume(); CookieManager.getInstance().flush(); }
-    @Override protected void onPause() { CookieManager.getInstance().flush(); web.onPause(); bridge.release(); super.onPause(); }
+    @Override protected void onResume() { super.onResume(); inForeground = true; web.onResume(); CookieManager.getInstance().flush(); }
+    @Override protected void onPause() { inForeground = false; CookieManager.getInstance().flush(); web.onPause(); bridge.release(); geo.stopAll(); super.onPause(); }
+    @Override protected void onStop() { super.onStop(); PollWorker.kick(this); }
     @Override protected void onDestroy() {
         bridge.release();
+        if (geo != null) geo.stopAll();
         if (web != null) { web.stopLoading(); web.destroy(); }
         super.onDestroy();
     }
@@ -544,6 +556,12 @@ public class MainActivity extends ComponentActivity {
             boolean ok = hasLocation();
             if (geoCallback != null) geoCallback.invoke(geoOrigin, ok, false);
             geoCallback = null;
+            java.util.List<Runnable> q = new java.util.ArrayList<>(afterLocation);
+            afterLocation.clear();
+            for (Runnable x : q) x.run();
+        });
+        notifLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), ok -> {
+            jsCall("__rbNotif", notifReqId, ok ? "granted" : bridgeNotifState(), null);
         });
         micLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), ok -> {
             PermissionResult cb = micResult;
@@ -574,6 +592,43 @@ public class MainActivity extends ComponentActivity {
 
     // ------------------------------------------------------------------ bridge helpers
 
+    private String bridgeNotifState() { return bridge.notifState(); }
+
+    /** Android 13+: the system "Allow notifications?" question. Older phones: open the app's notification settings if off. */
+    void askNotifPermission(int reqId) {
+        notifReqId = reqId;
+        if (PollWorker.canNotify(this)) { jsCall("__rbNotif", reqId, "granted", null); return; }
+        if (Build.VERSION.SDK_INT >= 33 && !wasPermanentlyDenied(Manifest.permission.POST_NOTIFICATIONS)) {
+            markAsked(Manifest.permission.POST_NOTIFICATIONS);
+            notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            return;
+        }
+        try {
+            Intent i = new Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, getPackageName());
+            startActivity(i);
+        } catch (Exception ignored) {}
+        jsCall("__rbNotif", reqId, bridgeNotifState(), null);
+    }
+
+    void geoStart(int id, boolean high) {
+        if (geo.permitted()) { geo.start(id, high); return; }
+        if (wasPermanentlyDenied(Manifest.permission.ACCESS_FINE_LOCATION)) { geo.start(id, high); return; }   // reports "denied"
+        afterLocation.add(() -> geo.start(id, high));
+        if (afterLocation.size() == 1) {
+            markAsked(Manifest.permission.ACCESS_FINE_LOCATION);
+            locLauncher.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION});
+        }
+    }
+
+    void geoStop(int id) { geo.stop(id); }
+
+    /** window.<fn>(id, 'type', json) on the page, from any thread */
+    void jsCall(String fn, int id, String type, String json) {
+        final String js = "window." + fn + "&&window." + fn + "(" + id + ",'" + type + "'," + (json == null ? "null" : json) + ")";
+        ui.post(() -> { if (web != null && ownPage) web.evaluateJavascript(js, null); });
+    }
+
     void setPullAllowed(boolean ok) { pullAllowed = ok; }
 
     void speechEvent(int id, String type, String json) {
@@ -593,5 +648,5 @@ public class MainActivity extends ComponentActivity {
     }
 
     /** Small holder so the user-agent carries the app version without enabling BuildConfig generation. */
-    static final class BuildConfigInfo { static final String VERSION = "1.0.1"; }
+    static final class BuildConfigInfo { static final String VERSION = "1.1.0"; }
 }

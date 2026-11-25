@@ -82,7 +82,12 @@ docs/              business context
   pitch-deck/        the pitch deck: deck.src.html → `npm run build` → RozBazaar_Pitch_Deck.pdf (see its README)
 android-app/       Play Store app (21 Nov 2026): plain Android WebView of rozbazaar.shop/?source=pwa. NEW Play app (Vedanshu,
                    21 Nov: old shop.rozbazaar.twa kept failing the 14-day test) = package shop.rozbazaar.app, Play name
-                   "RozBazaar: Sabzi Mandi at Home", versionCode 2 = 1.0.1 (never change the package now). No TWA code.
+                   "RozBazaar: Sabzi Mandi at Home", versionCode 3 = 1.1.0 (never change the package now). No TWA code.
+                   Notifications (25 Nov): WebView has no Web Push → rb-bridge.js gives the page a Notification stand-in
+                   (POST_NOTIFICATIONS question) + window.RBApp; the page registers a per-phone secret with
+                   customer_app_device_register, PollWorker (WorkManager, ~15 min) calls app_device_poll and shows
+                   new customer notifications (migration 20261125a_app_notifications.sql). Location: navigator.geolocation
+                   is replaced by NativeGeo (fused+GPS+network, fresh last-known first) for a fast first fix.
                    assetlinks.json lists shop.rozbazaar.app with the Play app-signing key 6D:07…BF:F8, Google's hybrid key A2:C4…6A:EF and the upload key 67:8E…07:E0.
                    Voice/share/permissions bridged in assets/rb-bridge.js. Build + signing: android-app/README.md
                    (keystore + passwords stay with Vedanshu, never in the repo). Raise versionCode every upload.
