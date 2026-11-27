@@ -18,6 +18,7 @@ import {SpeakTest, SPEAK_TOTAL} from './speak/SpeakTest';
 import {Ep2Avir, EP2_TOTAL} from './ep2/Ep2Avir';
 import {Ep2Thumb} from './ep2/Ep2Thumb';
 import {DinAvir, DIN_TOTAL} from './din/DinAvir';
+import {PromptAvir, PROMPT_TOTAL} from './prompt/PromptAvir';
 import {Bench} from './ep1/Bench';
 import {Short, SHORTS} from './ep1/Short';
 
@@ -49,6 +50,7 @@ export const Root: React.FC = () => (
     <Composition id="Ep2Avir" component={Ep2Avir} durationInFrames={Math.ceil(EP2_TOTAL * 24)} fps={24} width={1920} height={1080} />
     <Composition id="SpeakTest" component={SpeakTest} durationInFrames={Math.ceil(SPEAK_TOTAL * 24)} fps={24} width={1080} height={1920} />
     <Composition id="Reel3Cover" component={Reel3Cover} durationInFrames={1} fps={24} width={1080} height={1920} />
+    <Composition id="PromptAvir" component={PromptAvir} durationInFrames={Math.ceil(PROMPT_TOTAL * 24)} fps={24} width={1080} height={1920} />
     <Composition id="DinAvir" component={DinAvir} durationInFrames={Math.ceil(DIN_TOTAL * 24)} fps={24} width={1080} height={1920} />
     <Composition id="Reel3Avir" component={Reel3Avir} durationInFrames={Math.ceil(REEL3_TOTAL * 24)} fps={24} width={1080} height={1920} />
     <Composition id="Reel2Avir" component={Reel2Avir} durationInFrames={Math.ceil(REEL2_TOTAL * 24)} fps={24} width={1080} height={1920} />

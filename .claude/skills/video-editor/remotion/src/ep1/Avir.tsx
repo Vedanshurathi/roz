@@ -39,7 +39,7 @@ const skinify = (m: THREE.MeshStandardMaterial) => {
   return p;
 };
 
-export const ONE_SHOT = new Set(['SitWave', 'SitNamaste', 'SitPoint', 'SitSecret']);
+export const ONE_SHOT = new Set(['SitWave', 'SitNamaste', 'SitPoint', 'SitSecret', 'SitStop', 'SitCount1', 'SitCount2', 'SitCount3', 'SitShrug', 'SitPresent']);
 const smooth = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 
 let cache: Promise<any> | null = null;

@@ -101,8 +101,53 @@ def sit_namaste(t):
         u, f, h = (L3(REST[s][i], N[i], k) for i in range(3)); aim(f"{s}Arm", u); aim(f"{s}ForeArm", f); aim(f"{s}Hand", h)
     fingers(5)
 
+
+# ---- presenter gestures (v2): stop / count 1-2-3 / shrug / present-to-screen, per-finger control
+def hand(side, ext=(), curl=75, spread=0.0):
+    for i, f in enumerate(("Index", "Middle", "Ring", "Pinky")):
+        c = 4 if f in ext else curl
+        for k in (1, 2, 3): pbs[f"{side}Hand{f}{k}"].rotation_quaternion = Quaternion((1, 0, 0), math.radians(c))
+    upd()
+def roll_hand(side, deg):   # twist the wrist about the forearm so the palm faces the camera
+    ax = (pbs[f"{side}ForeArm"].matrix.to_3x3() @ Vector((0, 1, 0))).normalized(); _apply(pbs[f"{side}Hand"], Matrix.Rotation(math.radians(deg), 4, ax))
+def env1(t, a=0.45, d=3.0, r=0.5): return ease(t / a) * (1 - ease((t - d) / r))
+RAISE = ((-0.2, -0.5, -0.65), (0.22, -0.5, 1), (0.1, -0.3, 1))   # hand up beside the face, inside a close portrait frame       # right forearm up, palm to camera
+def raised(t, ext, talk=0.8, d=3.0):
+    seated(t, talk=talk, lean=0.15); k = env1(t, d=d)
+    bob = 0.06 * math.sin(t * 2 * math.pi / 1.3) * k
+    R = tuple(L3(REST["Right"][i], tuple(RAISE[i][j] + (bob if (i == 1 and j == 2) else 0) for j in range(3)), k) for i in range(3))
+    arms(None, R); roll_hand("Right", -50 * k); fingers(18)
+    if k > 0.05:
+        hand("Right", ext, 20 + 60 * k)
+        for n, a in ((1, 25), (2, 40), (3, 40)):   # tuck the thumb so 1-2-3 read clearly
+            pbs[f"RightHandThumb{n}"].rotation_quaternion = Quaternion((0, 0, 1), math.radians(a * k))
+        upd()
+def sit_stop(t):     # "Ruko!" — open palm to the camera, a small push forward
+    seated(t, talk=0.9, lean=0.35 * env1(t, 0.3, 2.4)); k = env1(t, 0.3, 2.4)
+    S = ((-0.18, -0.72, -0.6), (0.18, -0.85, 0.55), (0.08, -0.35, 1))
+    arms(None, tuple(L3(REST["Right"][i], S[i], k) for i in range(3))); roll_hand("Right", -45 * k); fingers(18); hand("Right", ("Index", "Middle", "Ring", "Pinky"), 4)
+def sit_count1(t): raised(t, ("Index",))
+def sit_count2(t): raised(t, ("Index", "Middle"))
+def sit_count3(t): raised(t, ("Index", "Middle", "Ring"))
+def sit_shrug(t):    # palms up, both hands out — "AI bekaar hai?"
+    seated(t, talk=0.7); k = env1(t, 0.4, 2.6)
+    for s, sg in (("Left", 1), ("Right", -1)):
+        U = (sg * 0.42, -0.25, -0.88); Fv = (sg * 0.55, -0.82, 0.05); Hh = (sg * 0.6, -0.78, -0.05)
+        u, f, h = (L3(REST[s][i], (U, Fv, Hh)[i], k) for i in range(3)); aim(f"{s}Arm", u); aim(f"{s}ForeArm", f); aim(f"{s}Hand", h)
+    turn("Neck", (0, 1, 0), 6 * k); fingers(10)
+def sit_present(t):  # sweeps the right hand up toward the screen above / beside him
+    seated(t, talk=0.8, lean=0.1); k = env1(t, 0.5, 3.0)
+    Pz = ((-0.3, -0.45, -0.45), (0.05, -0.35, 1), (0.02, -0.2, 1))      # points up at the screen above him
+    arms(None, tuple(L3(REST["Right"][i], Pz[i], k) for i in range(3))); fingers(12)
+    if k > 0.05:
+        hand("Right", ("Index",), 20 + 60 * k)
+        for n, a in ((1, 25), (2, 40), (3, 40)): pbs[f"RightHandThumb{n}"].rotation_quaternion = Quaternion((0, 0, 1), math.radians(a * k))
+        upd()
+
 clip("SitIdle", 192, sit_idle); clip("SitTalkRight", 144, sit_talk_right); clip("SitTalkBoth", 144, sit_talk_both)
 clip("SitPoint", 96, sit_point); clip("SitSecret", 120, sit_lean_secret); clip("SitWave", 96, sit_wave); clip("SitNamaste", 96, sit_namaste)
+clip("SitStop", 72, sit_stop); clip("SitCount1", 84, sit_count1); clip("SitCount2", 84, sit_count2); clip("SitCount3", 84, sit_count3)
+clip("SitShrug", 72, sit_shrug); clip("SitPresent", 84, sit_present)
 arm.animation_data.action = None; reset()
 hips_z = (arm.matrix_world @ arm.data.bones["Hips"].head_local).z
 arm.location = (0, 0.33, 0.62 - hips_z)      # seated on the studio chair (seat top z≈0.54)

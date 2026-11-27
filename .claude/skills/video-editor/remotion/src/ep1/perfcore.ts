@@ -39,7 +39,7 @@ export function makePerf(DATA: any, MORPH: any, opts: PerfOpts = {}) {
   for (let f = 0, p = 0; f < NF + 200; f++) { p += (0.6 + 0.75 * (ENERGY[f] ?? 0)) / FPS; PHASE.push(p); }
 
   // ---------- body: clip mixture ----------
-  const DURS: Record<string, number> = {SitIdle: 8, SitNamaste: 4, SitPoint: 4, SitSecret: 5, SitTalkBoth: 6, SitTalkRight: 6, SitWave: 4};
+  const DURS: Record<string, number> = {SitIdle: 8, SitNamaste: 4, SitPoint: 4, SitSecret: 5, SitTalkBoth: 6, SitTalkRight: 6, SitWave: 4, SitStop: 3, SitCount1: 3.5, SitCount2: 3.5, SitCount3: 3.5, SitShrug: 3, SitPresent: 3.5};
   const OFF: Record<string, number> = {SitTalkBoth: 1.7, SitTalkRight: 3.1, SitIdle: 0.6};
   // gesture choice per line (one-shots only where they read well on camera)
   const CLIP_OVERRIDE: Record<number, string> = opts.clipOverride ?? {};
