@@ -160,9 +160,15 @@ for v in E['voices']:
     add(vo, v[1], x)
 sf.write(OUT.replace('.wav', '_voice.wav'), vo, sr)
 p = OUT.replace('.wav', '')
+VCH = ('highpass=f=80,equalizer=f=180:t=q:w=1:g=1.5,equalizer=f=450:t=q:w=1.2:g=-2,equalizer=f=3200:t=q:w=1:g=2.5,'
+       'equalizer=f=9000:t=q:w=1:g=1.5,deesser=i=0.3,acompressor=threshold=-22dB:ratio=3.2:attack=4:release=80:makeup=1.5,volume=1.7')
+MV = 0.42
+if E.get('clear'):   # "clear voice": less boom/mud, more presence, steadier level, music further down
+    VCH = ('highpass=f=95,equalizer=f=250:t=q:w=1:g=-3,equalizer=f=500:t=q:w=1.4:g=-1.5,equalizer=f=2800:t=q:w=1:g=3.5,equalizer=f=5500:t=q:w=1:g=1.5,'
+           'equalizer=f=10000:t=q:w=1:g=1,deesser=i=0.4,acompressor=threshold=-24dB:ratio=4:attack=3:release=70:makeup=2,alimiter=limit=0.9,volume=1.6')
+    MV = 0.3
 subprocess.run(f'ffmpeg -loglevel error -y -i {p}_voice.wav -i {p}_music.wav -i {p}_sfx.wav -filter_complex '
-               '"[0:a]highpass=f=80,equalizer=f=180:t=q:w=1:g=1.5,equalizer=f=450:t=q:w=1.2:g=-2,equalizer=f=3200:t=q:w=1:g=2.5,'
-               'equalizer=f=9000:t=q:w=1:g=1.5,deesser=i=0.3,acompressor=threshold=-22dB:ratio=3.2:attack=4:release=80:makeup=1.5,volume=1.7,asplit=2[v][sc];'
-               '[1:a]volume=0.42[m];[m][sc]sidechaincompress=threshold=0.02:ratio=8:attack=15:release=350[md];[2:a]volume=0.9[f];'
+               f'"[0:a]{VCH},asplit=2[v][sc];'
+               f'[1:a]volume={MV}[m];[m][sc]sidechaincompress=threshold=0.02:ratio=8:attack=15:release=350[md];[2:a]volume=0.9[f];'
                '[v][md][f]amix=inputs=3:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=9[o]" -map "[o]" -ar 48000 -ac 2 ' + OUT, shell=True, check=True)
 print('mix ok', OUT, round(tot, 2))
