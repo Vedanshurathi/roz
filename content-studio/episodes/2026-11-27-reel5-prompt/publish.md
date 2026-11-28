@@ -35,7 +35,6 @@ Settings: AI label ON · cover = cover.png · location/collab optional.
 ### YouTube Shorts
 Title: AI Se Aise Mat Poocho ❌ | 3 Prompt Rules (Hindi) #shorts
 Backup A: ChatGPT Se Better Answer Kaise Le? 3 Rules 🔥 #shorts
-Backup B: 99% Galti… Nahi, Zyada Log Yahi Karte Hain ❌ (avoid; keep A/main)
 
 Description:
 AI se better answer kaise le? Zyada log AI (ChatGPT, Claude, Gemini) se galat tareeke se poochte hain, aur phir bolte hain "AI bekaar hai" 😅
