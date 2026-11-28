@@ -36,10 +36,10 @@ css = r'''
 #prog { left:0; top:0; width:1080px; height:8px; background:linear-gradient(90deg,#ff5a1a,#ffb070); transform-origin:0 50%; }
 #shade { left:0; top:0; width:1080px; height:1920px; background: linear-gradient(180deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 62%, rgba(0,0,0,.55) 100%); }
 /* hook */
-#hook { left:0; width:1080px; top:190px; text-align:center; }
+#hook { left:0; width:1080px; top:150px; text-align:center; }
 #hook .h1 { display:inline-block; font-family:IDB; font-size:92px; line-height:1; padding:14px 30px 18px; background:#E5322B; border-radius:22px; transform:rotate(-2deg);
   box-shadow:0 0 50px rgba(229,50,43,.6), 0 20px 50px rgba(0,0,0,.5); }
-#hook .h2 { font-family:IDB; font-size:118px; line-height:1.02; margin-top:18px; text-shadow:0 8px 0 #000, 0 0 40px rgba(0,0,0,.8); }
+#hook .h2 { font-family:IDB; font-size:104px; line-height:1.02; margin-top:18px; text-shadow:0 8px 0 #000, 0 0 40px rgba(0,0,0,.8); }
 #hook .h2 b { color:#FF7A2F; }
 #badchip { left:110px; top:560px; width:860px; padding:22px 28px; border-radius:26px; background:rgba(18,14,12,.85); border:2px solid rgba(255,255,255,.15); font-family:ISB; font-size:38px; color:rgba(255,255,255,.8); }
 #badchip .x { position:absolute; right:-22px; top:-26px; width:76px; height:76px; border-radius:50%; background:#E5322B; display:flex; align-items:center; justify-content:center; font-family:IDB; font-size:46px; box-shadow:0 0 30px rgba(229,50,43,.7); }
