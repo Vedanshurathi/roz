@@ -4,7 +4,58 @@
 (real answers written by Claude; the chat screen is recreated and labelled), Avir below counting the 3 rules on his fingers.
 CTA keyword: PROMPT → send content-studio/prompts/prompt-template.md.
 
-## Instagram caption
+## FINAL SEO + viral copy (v2, use this)
+
+### Instagram Reel caption
+AI se aise mat poocho ❌ zyada log yahi galti karte hain 😅
+
+"Leave application likho" → wahi boring "Respected Sir…" 😴
+Same AI + sahi prompt → perfect WhatsApp message 🔥
+
+AI se better answer lene ke 3 rules 👇
+1️⃣ CONTEXT: kaun ho, kise likh rahe ho, kyun
+2️⃣ FORMAT: WhatsApp/email/table, Hinglish/English, kitni lines
+3️⃣ SAWAL: bolo "pehle mujhse 2 sawal pucho"
+
+Ye ChatGPT, Claude, Gemini… sab pe kaam karta hai ✅
+
+💬 Comment karo "PROMPT", full prompt template DM karunga
+📌 Save karo, next time AI use karte waqt kaam aayega
+📤 Us dost ko bhejo jo bolta hai "AI bekaar hai" 😂
+
+AI kaise use kare | ChatGPT prompt tips in Hindi | prompt engineering Hindi | AI tips for students | AI se leave application
+
+🤖 Avir is an AI-generated virtual creator.
+
+#AITips #ChatGPTTips #PromptEngineering #AIinHindi #TechTips
+
+Alt text: Avir, an AI creator, shows a bad AI prompt ("leave application likho") that gives a boring letter, then the 3 rules (context, format, ask questions) that give a perfect WhatsApp message.
+Settings: AI label ON · cover = cover.png · location/collab optional.
+
+### YouTube Shorts
+Title: AI Se Aise Mat Poocho ❌ | 3 Prompt Rules (Hindi) #shorts
+Backup A: ChatGPT Se Better Answer Kaise Le? 3 Rules 🔥 #shorts
+Backup B: 99% Galti… Nahi, Zyada Log Yahi Karte Hain ❌ (avoid; keep A/main)
+
+Description:
+AI se better answer kaise le? Zyada log AI (ChatGPT, Claude, Gemini) se galat tareeke se poochte hain, aur phir bolte hain "AI bekaar hai" 😅
+Is short mein: bad prompt vs good prompt, live example ("leave application likho" vs perfect WhatsApp message) aur 3 rules:
+1) Context do 2) Format batao 3) AI ko pehle sawal poochne do.
+
+❓ AI se accha answer kaise milta hai? Context + format batao, aur AI ko pehle clarifying questions poochne do.
+❓ Kya ye ChatGPT pe kaam karta hai? Haan: ChatGPT, Claude, Gemini, kisi bhi AI chatbot pe.
+
+👇 Full prompt template chahiye? Comment karo PROMPT
+🔔 Subscribe: unfiltered AI experiments, Hindi mein
+
+🤖 Avir is an AI-generated virtual creator (AI character & voice).
+#shorts #AITips #ChatGPTTips
+
+Tags: ai se kaise poochein, ai tips hindi, chatgpt tips hindi, prompt engineering hindi, how to write prompts, better ai answers, chatgpt prompt, claude ai, gemini ai, ai for students, leave application ai, whatsapp message ai, ai hacks, unfiltered avir
+Pinned comment: Comment "PROMPT" 👇 full template DM kar dunga. Aur batao, aap AI se sabse zyada kya poochte ho? 🤔
+Settings: Altered or synthetic content → Yes · Category: Education · Thumbnail: cover.png
+
+## Older draft: Instagram caption
 AI se aise mat poochna ❌ (zyada tar log yahi galti karte hain)
 
 "Leave application likho" → boring "Respected Sir…" letter 😴
